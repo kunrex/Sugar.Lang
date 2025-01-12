@@ -1,0 +1,130 @@
+#include "collection.h"
+
+#include "../Lexing/Tokens/token.h"
+#include "../Parsing/ParseNodes/parse_node.h"
+#include "../Analysis/Structure/source_object.h"
+#include "../Analysis/Structure/Core/DataTypes/data_type.h"
+#include "../Analysis/Structure/Nodes/Context/context_node.h"
+#include "../Analysis/Structure/Nodes/Creation/Variables/variable.h"
+#include "../Exceptions/compile_exception.h"
+#include "../Parsing/ParseNodes/Conditions/condition_node.h"
+#include "../Parsing/ParseNodes/Statements/declaration_node.h"
+
+using namespace std;
+
+using namespace Exceptions;
+
+using namespace Tokens;
+
+using namespace ParseNodes;
+using namespace ParseNodes::Conditions;
+using namespace ParseNodes::Statements;
+
+using namespace Analysis::Structure;
+using namespace Analysis::Structure::Core;
+using namespace Analysis::Structure::Context;
+using namespace Analysis::Structure::Creation;
+
+namespace Services
+{
+    template <typename TChild>
+    Collection<TChild>::Collection() : children()
+    { }
+
+    template <typename TChild>
+    int Collection<TChild>::ChildCount() const { return children.size(); }
+
+    template <typename TChild>
+    const TChild* Collection<TChild>::GetChild(int index) const
+    {
+        return children.at(index);
+    }
+
+    template <typename TChild>
+    void Collection<TChild>::AddChild(TChild* child)
+    {
+        children.push_back(child);
+    }
+
+    template <typename TChild>
+    typename std::vector<const TChild*>::const_iterator Collection<TChild>::begin() const
+    {
+        return children.begin();
+    }
+
+    template <typename TChild>
+    typename std::vector<const TChild*>::const_iterator Collection<TChild>::end() const
+    {
+        return children.end();
+    }
+
+    template <typename TChild>
+    Collection<TChild>::~Collection()
+    {
+        if (children.size() > 0)
+        {
+            for (auto child: children)
+                delete child;
+
+            children.clear();
+        }
+    }
+
+    template <typename TChild>
+    ConstantCollection<TChild>::ConstantCollection() : children()
+    { }
+
+    template <typename TChild>
+    int ConstantCollection<TChild>::ChildCount() const { return children.size(); }
+
+    template <typename TChild>
+    const TChild* ConstantCollection<TChild>::GetChild(int index) const
+    {
+        return children.at(index);
+    }
+
+    template <typename TChild>
+    void ConstantCollection<TChild>::AddChild(const TChild* child)
+    {
+        children.push_back(child);
+    }
+
+    template <typename TChild>
+    typename std::vector<const TChild*>::const_iterator ConstantCollection<TChild>::begin() const
+    {
+        return children.begin();
+    }
+
+    template <typename TChild>
+    typename std::vector<const TChild*>::const_iterator ConstantCollection<TChild>::end() const
+    {
+        return children.end();
+    }
+
+    template <typename TChild>
+    ConstantCollection<TChild>::~ConstantCollection()
+    {
+        if (children.size() > 0)
+        {
+            for (auto child: children)
+                delete child;
+
+            children.clear();
+        }
+    }
+
+    template class Collection<DataType>;
+    template class Collection<ContextNode>;
+    template class Collection<SourceObject>;
+
+    template class ConstantCollection<Token>;
+    template class ConstantCollection<Variable>;
+    template class ConstantCollection<ParseNode>;
+    template class ConstantCollection<ConditionNode>;
+    template class ConstantCollection<DeclarationNode>;
+    template class ConstantCollection<CompileException>;
+}
+
+
+
+
