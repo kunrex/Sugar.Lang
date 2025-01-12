@@ -1,14 +1,10 @@
 # Sugar.Lang
 
----
-
-Sugar is a compiled programming language I started working on a couple of years back. It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
+Sugar is a compiled (transpiled) programming language I started working on a couple of years back. It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
 
 I aimed to create something simple but useful. Syntactically, sugar inspired by C# but a sweeter version maybe? Personally, I think C# is a wonderful language and while sugar doesn't come close to it in regard of features, I've tried my best at implementing those aspects which I think are fundamental.
 
 ## The Basics
-
----
 
 ### Variables
 ```c++
@@ -20,7 +16,7 @@ The type of the variable is post fixed with a `:`, followed by the name. Variabl
 int: x, y = 10;
 ```
 Although sugar is statically typed, it does let one use the `let` keyword to perform type inference.
-```js
+```rust
 let: x = 10; //type inference to integer
 ```
 
@@ -41,15 +37,15 @@ Sugar offers `if` conditions only as a control based structure. Sugar also offer
 ```python
 if (condition)
 {
-    //body
+    
 }
 elif (condition2)
 {
-    //body
+    
 }
 else
 {
-    //body
+    
 }
 ```
 
@@ -67,7 +63,7 @@ do { } while(condition)
 
 ### I/O Functions
 Sugar uses the `print` and `input` functions for output and input respectively.
-```c++
+```python
 print("hello world");
 string: result = input();
 ```
@@ -146,8 +142,6 @@ int: result = invoke(add, 10, 20);
 
 ## Data Structures
 
----
-
 Sugar supports custom data structures: `class`, `struct` and `enum`.
 1. `enum`: A type that can store multiple compile type constant integer values.
 2. `class`: A reference type that is always created on the heap.
@@ -157,7 +151,7 @@ Sugar is garbage collected since it compiles to CIL.
 
 ### Describers
 Taking inspiration from C#'s attributes, which I adore, sugar has describers.
-```c++
+```cs
 [public]
 class Human
 {
@@ -183,20 +177,20 @@ Describers can contain the following keywords:
 
 ### Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
-```c++
+```cs
 int: x { [public] get; [private] set; }
 ```
 The above line creates a field that is accessible anywhere but only changeable inside the class.
-```c++
+```cs
 [public] int: x; // a public get, public set field
 [public] int: x { get; [private] set; } // a public get, private set field
 ```
 The describer on the variable is given first precedence i.e. in absence of a describer, the accessor is given the same access level as the variable. Also in case of conflicts, the describer on the variable is given preference.  
-```c++
+```cs
 [public] int: x { get; }
 ```
 This effectively creates a runtime constant that can only be initialised in the constructor or explicitly during creation.
-```c++
+```cs
 [public] int: x { set; }
 ```
 While it compiles, the above has virtually no practical use.
@@ -204,7 +198,7 @@ While it compiles, the above has virtually no practical use.
 ### Special Functions
 Sugar features functions for cast overloading, operator overloading, indexers and constructors (destructors only for a class. Even though theres not much use for it now).
 
-```c++
+```cs
 struct Complex
 {
     float: real { [public] get; [private] set; }
@@ -253,10 +247,10 @@ Cast and operator overloads must be static. indexers and constructors cannot be.
 > Sugar features the static `math` class for typical mathematical operations and constants.
 ### Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
-```javascript
+```java
 import "..directory.sub_directory.file.Class";
 ```
-```c++
+```java
 import "..directory.sub_directory.file.Class";
 
 //code
@@ -267,7 +261,7 @@ Importing a directory imports all files whereas importing a file imports all pub
 
 ### Exceptions
 Sugar has a built-in class for exceptions along with the throw keyword.
-```c++
+```cs
 exception: e = create Exception("something went wrong!");
 throw e;
 ```
@@ -279,7 +273,7 @@ But the big question: What about OOP? In the original C# version it was included
 
 Will I add it? Maybe but sugar is functional. I'm not an OOP skeptic, I love it on the contrary. But it was too much for this project.
 That's not to say there's no chance of me revisiting it in the future. Here's the syntax I had planned for generics and OOP:
-```c++
+```cs
 [public]
 interface IArea<TDimension : INumeric> 
 {
