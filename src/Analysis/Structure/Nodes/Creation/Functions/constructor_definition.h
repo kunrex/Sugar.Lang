@@ -5,7 +5,7 @@
 
 namespace Analysis::Structure::Creation
 {
-    class ConstructorDefinition : public Core::Function, public Core::FullyNameable
+    class ConstructorDefinition : public Core::Function
     {
         protected:
             ConstructorDefinition(Enums::Describer describer, const Core::DataType* creationType);

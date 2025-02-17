@@ -5,7 +5,7 @@
 
 namespace Analysis::Structure::Creation
 {
-    class CastDefinition : public Core::Function, public Core::FullyNameable
+    class CastDefinition : public Core::Function
     {
         protected:
             CastDefinition(Enums::Describer describer, const Core::DataType* creationType);

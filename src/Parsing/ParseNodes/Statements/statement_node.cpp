@@ -5,5 +5,5 @@ namespace ParseNodes::Statements
     StatementNode::StatementNode(const Tokens::Token& separator) : separator(separator)
     { }
 
-    const Tokens::Token& StatementNode::Separator() const { return separator; }
+    unsigned long StatementNode::Index() const { return separator.Index(); }
 }

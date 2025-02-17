@@ -17,12 +17,6 @@ namespace Services
     }
 
     template <class TSingleton>
-    void SingletonService<TSingleton>::DestroyInstance() const
-    {
-        delete this;
-    }
-
-    template <class TSingleton>
     SingletonService<TSingleton>::~SingletonService() = default;
 
     template class SingletonService<ExceptionManager>;

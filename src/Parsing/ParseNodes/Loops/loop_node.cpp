@@ -9,7 +9,7 @@ namespace ParseNodes::Loops
 
     const ParseNode* LoopNode::Condition() const { return condition; }
 
-    const Token& LoopNode::Keyword() const { return keyword; }
+    unsigned long LoopNode::Index() const { return keyword.Index(); }
 
     LoopNode::~LoopNode()
     {

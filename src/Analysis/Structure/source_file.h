@@ -3,33 +3,36 @@
 
 #include <vector>
 
-#include "source_object.h"
+#include "../../Services/dictionary.h"
+
 #include "../../Lexing/Tokens/token.h"
-#include "../../Parsing/ParseNodes/parse_node.h"
+
 #include "../../Parsing/ParseNodes/Groups/source_file_node.h"
-#include "../../Services/collection.h"
+
+#include "source_object.h"
 
 namespace Analysis::Structure
 {
-    class SourceFile final : public SourceObject, public Services::Collection<Core::DataType>
+    class SourceFile final : public SourceObject, public Services::Dictionary<std::string, Core::DataType>
     {
         private:
             const std::string source;
             std::vector<Tokens::Token> tokens;
 
-            std::vector<const Core::DataType*> references;
-
             ParseNodes::Groups::SourceFileNode* sourceNode;
+
+            Dictionary<std::string, const Core::DataType> references;
 
         public:
             SourceFile(const std::string& name, std::string source);
 
             [[nodiscard]] Enums::SourceType SourceType() const override;
 
-            void AddChild(Core::DataType* child) override;
+            bool Push(std::string key, Core::DataType* value) override;
 
             void ReferenceThis(SourceObject* other) override;
             void AddReference(const Core::DataType* dataType) override;
+            [[nodiscard]] const Core::DataType* GetReference(const std::string& name) const;
 
             [[nodiscard]] unsigned long SourceLength() const;
             [[nodiscard]] char SourceAt(unsigned long i) const;
@@ -45,5 +48,4 @@ namespace Analysis::Structure
     };
 }
 
-
-#endif //SOURCE_FILE_H
+#endif

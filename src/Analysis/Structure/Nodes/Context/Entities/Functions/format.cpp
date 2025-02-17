@@ -1,9 +1,16 @@
 #include "format.h"
 
+#include "../../../../Wrappers/Reference/string.h"
+
+using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Wrappers;
+
 namespace Analysis::Structure::Context
 {
-    Format::Format() : ContextNode(nullptr), Collection()
+    Format::Format() : ContextNode(&String::Instance()), Collection(), slotCount(0)
     { }
+
+    MemberType Format::MemberType() const { return MemberType::FormatContext; }
 
     bool Format::Readable() const { return true; }
     bool Format::Writable() const { return false; }
@@ -13,14 +20,21 @@ namespace Analysis::Structure::Context
 
     int Format::SlotCount() const
     {
-        int maxCount = 1;
-
-        for (const auto child: children)
+        if (slotCount == 0)
         {
-            if (const auto c = 2 + child->SlotCount(); c > maxCount)
-                maxCount = c;
+            int argCount = 0;
+            for (const auto child: children)
+            {
+                if (const auto size = child->SlotCount(); size > slotCount - argCount)
+                    slotCount = size + argCount;
+
+                argCount += child->CreationType()->SlotCount();
+                slotCount += child->CreationType()->SlotCount();
+            }
+
+            slotCount = std::max(creationType->SlotCount(), slotCount);
         }
 
-        return maxCount;
+        return slotCount;
     }
 }

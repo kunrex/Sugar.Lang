@@ -4,16 +4,16 @@
 #include "body_node.h"
 #include "entity_node.h"
 #include "describable_node.h"
-#include "../Groups/expression_list_node.h"
+#include "../Groups/compound_declaration_node.h"
 
 namespace ParseNodes::Core
 {
-    class FunctionNode : DescribableNode, EntityNode, BodyNode
+    class FunctionNode : public DescribableNode, public EntityNode, public BodyNode
     {
         protected:
             const Groups::CompoundDeclarationNode* parameters;
 
-            FunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const ParseNode* body);
+            FunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const Groups::ScopeNode* body);
 
         public:
             [[nodiscard]] const Groups::CompoundDeclarationNode* Parameters() const;

@@ -7,7 +7,7 @@
 
 namespace ParseNodes::Loops
 {
-    class LoopNode : public ParseNode, Core::BodyNode
+    class LoopNode : public ParseNode, public Core::BodyNode
     {
         protected:
             const ParseNode* condition;
@@ -19,7 +19,7 @@ namespace ParseNodes::Loops
 
             [[nodiscard]] const ParseNode* Condition() const;
 
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~LoopNode() override;
     };

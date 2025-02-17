@@ -11,7 +11,11 @@ namespace Analysis::Structure::Creation
             VoidDefinition(const std::string& name, Enums::Describer describer);
 
         public:
+            [[nodiscard]] Enums::MemberType MemberType() const override;
             [[nodiscard]] bool Readable() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+            [[nodiscard]] const std::string& SignatureString() const override;;
     };
 }
 

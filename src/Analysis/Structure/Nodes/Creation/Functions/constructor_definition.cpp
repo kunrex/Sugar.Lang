@@ -1,5 +1,7 @@
 #include "constructor_definition.h"
 
+#include <format>
+
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 

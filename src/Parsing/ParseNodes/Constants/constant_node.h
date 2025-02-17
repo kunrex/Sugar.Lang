@@ -1,8 +1,9 @@
 #ifndef CONSTANT_NODE_H
 #define CONSTANT_NODE_H
 
-#include "../parse_node.h"
 #include "../../../Lexing/Tokens/token.h"
+
+#include "../parse_node.h"
 
 namespace ParseNodes::Constants
 {
@@ -17,6 +18,11 @@ namespace ParseNodes::Constants
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind ConstantType() const;
+
+            template <typename TType>
+            [[nodiscard]] std::optional<TType> Value() const;
+
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

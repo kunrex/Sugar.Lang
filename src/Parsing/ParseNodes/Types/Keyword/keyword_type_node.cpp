@@ -1,9 +1,11 @@
 #include "keyword_type_node.h"
 
+using namespace Tokens;
+
 namespace ParseNodes::Types
 {
-    KeywordTypeNode::KeywordTypeNode(const Tokens::Token& keyword) : ParseNode(), keyword(keyword)
+    KeywordTypeNode::KeywordTypeNode(const Token& keyword) : ParseNode(), keyword(keyword)
     { }
 
-    const Tokens::Token& KeywordTypeNode::Keyword() const { return keyword;}
+    unsigned long KeywordTypeNode::Index() const { return keyword.Index();}
 }

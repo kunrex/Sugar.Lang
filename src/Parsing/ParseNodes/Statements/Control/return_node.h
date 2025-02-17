@@ -22,4 +22,4 @@ namespace ParseNodes::Statements
     };
 }
 
-#endif //RETURN_NODE_H
+#endif

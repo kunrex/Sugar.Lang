@@ -1,9 +1,6 @@
 #include "indexer_expression_node.h"
 
-using namespace Tokens;
-
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Expressions
 {
@@ -13,6 +10,8 @@ namespace ParseNodes::Expressions
     NodeType IndexerExpressionNode::NodeType() const { return NodeType::Indexer; }
 
     const ParseNode* IndexerExpressionNode::Operand() const { return operand; }
+
+    unsigned long IndexerExpressionNode::Index() const { return operand->Index(); }
 
     IndexerExpressionNode::~IndexerExpressionNode()
     {

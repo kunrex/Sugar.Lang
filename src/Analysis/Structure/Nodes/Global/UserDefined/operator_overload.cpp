@@ -1,10 +1,12 @@
 #include "operator_overload.h"
 
+#include <format>
+
 #include "../../../Core/DataTypes/data_type.h"
 
 using namespace std;
 
-using namespace Tokens::Operators;
+using namespace Tokens::Enums;
 
 using namespace ParseNodes;
 
@@ -13,20 +15,30 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    OperatorOverload::OperatorOverload(const Operator* baseOperator, const Enums::Describer describer, const DataType* creationType, const ParseNode* body) : OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
+    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const DataType* creationType, const Groups::ScopeNode* body) : OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
     { }
 
-    void OperatorOverload::SetParent(const DataType* parent)
+    MemberType OperatorOverload::MemberType() const { return MemberType::OperatorOverload; }
+
+    const std::string& OperatorOverload::FullName() const
     {
-        GlobalNode::SetParent(parent);
-        fullName = parent->FullName() + "::__operator__" + std::to_string(static_cast<short>(baseOperator->Kind()));
+        if (fullName.empty())
+            fullName = std::format("{}::__operator__{}", parent->FullName(), static_cast<short>(baseOperator));
+
+        return fullName;
     }
 
-    bool OperatorOverload::operator<(const OperatorOverload& rhs) const
+    const std::string& OperatorOverload::SignatureString() const
     {
-        if (baseOperator->Kind() != rhs.baseOperator->Kind())
-            return baseOperator->Kind() < rhs.baseOperator->Kind();
+        if (signature.empty())
+            signature = std::format("{} {}{}", CreationType()->FullName(), FullName(), ArgumentSignatureString());
 
-        return Function::operator<(rhs);
+        return signature;
+    }
+
+    void OperatorOverload::AddArgument(const Creation::Variable* parameter)
+    {
+        Scoped::AddArgument(parameter);
+        PushParameterType(parameter->CreationType());
     }
 }

@@ -6,14 +6,17 @@
 
 namespace Analysis::Structure::Global
 {
-    class OperatorOverload final : public Creation::OverloadDefinition, public Core::Scoped
+    class OperatorOverload final : public Creation::OverloadDefinition, public Core::Scoped, public Core::FullyNameable
     {
         public:
-            OperatorOverload(const Tokens::Operators::Operator* baseOperator, Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::ParseNode* body);
+            OperatorOverload(Tokens::Enums::SyntaxKind baseOperator, Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::Groups::ScopeNode* body);
 
-            void SetParent(const Core::DataType* parent) override;
+            [[nodiscard]] Enums::MemberType MemberType() const override;
 
-            bool operator<(const OperatorOverload& rhs) const;
+            [[nodiscard]] const std::string& FullName() const override;
+            [[nodiscard]] const std::string& SignatureString() const override;
+
+            void AddArgument(const Creation::Variable* parameter) override;
     };
 }
 

@@ -7,9 +7,11 @@ namespace Analysis::Structure
     SourceObject::SourceObject(const string& name) : Child(), Nameable(name)
     { }
 
-    void SourceObject::SetParent(const SourceObject* parent)
+    const std::string& SourceObject::FullName() const
     {
-        Child::SetParent(parent);
-        fullName = parent->FullName() + "." + name;
+        if (fullName.empty())
+            fullName = parent->FullName() + "." + name;
+
+        return fullName;
     }
 }

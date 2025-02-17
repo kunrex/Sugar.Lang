@@ -14,4 +14,4 @@ namespace ParseNodes::Expressions
     };
 }
 
-#endif //CAST_EXPRESSION_NODE_H
+#endif

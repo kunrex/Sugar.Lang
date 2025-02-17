@@ -6,14 +6,17 @@
 
 namespace Analysis::Structure::Global
 {
-    class ImplicitCast final : public Creation::CastDefinition, Core::Scoped
+    class ImplicitCast final : public Creation::CastDefinition, public Core::Scoped, public Core::FullyNameable
     {
         public:
-            ImplicitCast(Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::ParseNode* body);
+            ImplicitCast(Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::Groups::ScopeNode* body);
 
-            void SetParent(const Core::DataType* parent) override;
+            [[nodiscard]] Enums::MemberType MemberType() const override;
 
-            bool operator<(const ImplicitCast& rhs) const;
+            [[nodiscard]] const std::string& FullName() const override;
+            [[nodiscard]] const std::string& SignatureString() const override;
+
+            [[nodiscard]] void AddArgument(const Creation::Variable* parameter) override;
     };
 }
 

@@ -4,5 +4,5 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Local
 {
-
+    LocalNode::LocalNode() = default;
 }

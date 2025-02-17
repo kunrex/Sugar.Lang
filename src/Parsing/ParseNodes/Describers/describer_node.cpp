@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Describers
 {
-    DescriberNode::DescriberNode() : ParseNode(), tokens()
+    DescriberNode::DescriberNode(const unsigned long index) : ParseNode(), index(index), tokens()
     { }
 
     NodeType DescriberNode::NodeType() const { return NodeType::Describer; }
@@ -16,6 +16,8 @@ namespace ParseNodes::Describers
         tokens.push_back(token);
     }
 
-    int DescriberNode::TokenCount() const { return tokens.size(); }
+    unsigned long DescriberNode::TokenCount() const { return tokens.size(); }
     const Token& DescriberNode::TokenAt(const int i) const { return *tokens.at(i); }
+
+    unsigned long DescriberNode::Index() const { return index; }
 }

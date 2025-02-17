@@ -11,7 +11,10 @@ namespace Analysis::Structure::Creation
             MethodDefinition(const std::string& name, Enums::Describer describer, const Core::DataType* creationType);
 
         public:
-            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+            [[nodiscard]] const std::string& SignatureString() const override;
     };
 }
 

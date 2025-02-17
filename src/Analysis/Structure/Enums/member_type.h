@@ -9,24 +9,33 @@ namespace Analysis::Structure::Enums
         Class,
         Struct,
 
-        GlobalVariable,
+        Field,
 
-        PropertyGet,
-        PropertySet,
-        PropertyGetSet,
+        Property,
+        BuiltInProperty,
+
+        Indexer,
+        BuiltInIndexer,
 
         VoidDefinition,
-        FunctionDefinition,
+        MethodDefinition,
 
         BuiltInCast,
         ImplicitCast,
         ExplicitCast,
 
-        BuiltInOperator,
+        BuiltInOperation,
         OperatorOverload,
 
         Constructor,
-        Destructor,
+        BuiltInConstructor,
+
+        LocalVariable,
+        FunctionParameter,
+
+        For,
+        While,
+        DoWhile,
 
         PrintContext,
         InputContext,
@@ -39,11 +48,11 @@ namespace Analysis::Structure::Enums
         LocalVariableContext,
         FunctionArgumentContext,
 
-        Box,
-        Unbox,
+        BoxCast,
+        UnboxCast,
         CastClass,
         CastBuiltIn,
-        CastOverload,
+        DefinedCast,
 
         FunctionCallContext,
         OverloadedIndexerContext,
@@ -63,6 +72,19 @@ namespace Analysis::Structure::Enums
         StaticMethodCall,
 
         Invalid
+
+        UnaryExpression,
+        BinaryExpression,
+
+        DefinedIndexerExpression,
+
+        StaticReferenceContext,
+
+        Scope,
+        Return,
+        BranchJump,
+
+        Constant,
     };
 }
 

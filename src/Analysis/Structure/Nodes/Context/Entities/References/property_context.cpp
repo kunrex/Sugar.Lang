@@ -9,11 +9,16 @@ using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::Context
 {
-    PropertyContext::PropertyContext(const Property* property) : ContextNode(property->CreationType()), property(property)
-    { }
+    PropertyContext::PropertyContext(const PropertyDefinition* property) : ContextNode(property->CreationType()), property(property)
+    {
+        slotCount = creationType->SlotCount();
+    }
 
     MemberType PropertyContext::MemberType() const { return MemberType::PropertyContext; }
 
-    std::string PropertyContext::InstructionGet() const { return std::format("call instance {} {}::{}()", property->CreationType()->FullName(), property->Parent()->FullName(), get_property); }
-    std::string PropertyContext::InstructionSet() const { return std::format("call instance void {}::{}({})", property->Parent()->FullName(), set_property, property->CreationType()->FullName()); }
+    bool PropertyContext::Readable() const { return property->Readable(); }
+    bool PropertyContext::Writable() const { return property->Readable(); }
+
+    std::string PropertyContext::InstructionGet() const { return property->SignatureGetString(); }
+    std::string PropertyContext::InstructionSet() const { return property->SignatureSetString(); }
 }

@@ -14,7 +14,7 @@ namespace ParseNodes::Types
             explicit KeywordTypeNode(const Tokens::Token& keyword);
 
         public:
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

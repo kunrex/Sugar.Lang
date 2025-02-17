@@ -8,5 +8,13 @@ namespace ParseNodes::Groups
     { }
 
     NodeType IfChainNode::NodeType() const { return NodeType::IfChain; }
+
+    unsigned long IfChainNode::Index() const
+    {
+        if (!children.empty())
+            return children[0]->Index();
+
+        return 0;
+    }
 }
 

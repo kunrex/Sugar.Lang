@@ -19,6 +19,8 @@ namespace ParseNodes::Expressions
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
+            [[nodiscard]] unsigned long Index() const override;
+
             ~DotExpressionNode() override;
     };
 }

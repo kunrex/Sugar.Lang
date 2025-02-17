@@ -9,6 +9,7 @@ namespace Tokens
     void Keyword::KeywordInit()
     {
         keywordMap["print"] = { SyntaxKind::Print, KeywordType::General };
+        keywordMap["println"] = { SyntaxKind::Println, KeywordType::General };
         keywordMap["input"] = { SyntaxKind::Input, KeywordType::General };
         keywordMap["format"] = { SyntaxKind::Format, KeywordType::General };
         keywordMap["tostring"] = { SyntaxKind::ToString, KeywordType::General };

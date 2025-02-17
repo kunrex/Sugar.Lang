@@ -23,8 +23,6 @@ namespace Analysis::Structure::DataTypes
 
             std::set<std::string, Creation::OverloadDefinition*> overloads;
 
-            Creation::DestructorDefinition* destructor;
-
         public:
             Class(const std::string& name, Enums::Describer describer);
 
@@ -42,13 +40,13 @@ namespace Analysis::Structure::DataTypes
 
             void PushOverload(Creation::OverloadDefinition* overload) override;
 
-            void PushDestructor(Creation::DestructorDefinition* destructor) override;
+            ~Class() override;
      };
 
      class ClassSource final : public Class, public Core::UserDefinedType
      {
         public:
-            ClassSource(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
+            ClassSource(Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
      };
 }
 

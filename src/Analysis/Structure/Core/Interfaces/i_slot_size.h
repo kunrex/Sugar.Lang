@@ -12,4 +12,4 @@ namespace Analysis::Structure::Core::Interfaces
     };
 }
 
-#endif //I_SLOT_SIZE_H
+#endif

@@ -8,13 +8,10 @@
 
 namespace Analysis::Structure::Core
 {
-    class Characteristic : public Interfaces::IReadWrite, public Nameable, public Describable, public Created
+    class Characteristic : public virtual Interfaces::INode, public Nameable, public Describable, public Created, public Interfaces::IReadWrite
     {
         protected:
             Characteristic(const std::string& name, Enums::Describer describer, const DataType* creationType);
-
-        public:
-            bool operator<(const Characteristic& rhs) const;
     };
 }
 

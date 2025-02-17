@@ -12,7 +12,7 @@ namespace ParseNodes::DataTypes
 
     const NodeCollection<ParseNode>* DataTypeNode::Body() const { return body; }
 
-    const Token& DataTypeNode::Keyword() const { return keyword; }
+    unsigned long DataTypeNode::Index() const { return keyword.Index(); }
 
     DataTypeNode::~DataTypeNode()
     {

@@ -11,8 +11,9 @@ namespace ParseNodes::Groups
             SourceFileNode();
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
-
 
 #endif

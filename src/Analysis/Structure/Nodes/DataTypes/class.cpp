@@ -8,14 +8,14 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::DataTypes
 {
-    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer), destructor(nullptr)
+    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer)
     { }
 
     MemberType Class::MemberType() const { return MemberType::Class; }
 
     int Class::SlotCount() const { return 1; }
 
-    ClassSource::ClassSource(const string& name, Enums::Describer describer, const DataTypeNode* skeleton) : Class(name, describer), UserDefinedType(skeleton)
+    ClassSource::ClassSource(const Enums::Describer describer, const DataTypeNode* skeleton) : Class(skeleton->Name()->Value(), describer), UserDefinedType(skeleton)
     { }
 
     void Class::PushCharacteristic(Core::Characteristic* const characteristic)
@@ -27,6 +27,12 @@ namespace Analysis::Structure::DataTypes
     {
         functions.insert(function);
     }
+
+    Class::~Class()
+    {
+
+    }
+
 }
 
 

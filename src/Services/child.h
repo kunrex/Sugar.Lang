@@ -7,16 +7,22 @@ namespace Services
     class Child
     {
         protected:
-            const TParent* parent;
+            TParent* parent;
 
             Child();
 
         public:
-            [[nodiscard]] const TParent* Parent() const;
-
-            virtual void SetParent(const TParent* parent);
+            [[nodiscard]] TParent* Parent() const;
+            void SetParent(TParent* parent);
 
             virtual ~Child();
+    };
+
+    template <typename TParent>
+    class ConstantChild : public Child<const TParent>
+    {
+        protected:
+            ConstantChild();
     };
 }
 

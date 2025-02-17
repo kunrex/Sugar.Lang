@@ -33,6 +33,7 @@ namespace Tokens::Enums
         Print = 6,
         Input = 7,
         Format = 9,
+        Println = 112,
 
         Let = 10,
 
@@ -98,7 +99,7 @@ namespace Tokens::Enums
         Increment = 65,
         Decrement = 66,
         IncrementPrefix = 67,
-        DecrementPrefix = 69,
+        DecrementPrefix = 68,
 
         Not = 69,
         Plus = 70,

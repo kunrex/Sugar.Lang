@@ -17,9 +17,6 @@ namespace Analysis::Structure::Context
             [[nodiscard]] const ContextNode* LHS() const;
             [[nodiscard]] const ContextNode* RHS() const;
 
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
-
             ~BinaryContextNode() override;
     };
 }

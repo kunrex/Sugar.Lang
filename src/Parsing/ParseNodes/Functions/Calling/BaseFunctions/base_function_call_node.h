@@ -14,7 +14,7 @@ namespace ParseNodes::Functions::Calling
         public:
             explicit BaseFunctionCallNode( const Tokens::Token& keyword);
 
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

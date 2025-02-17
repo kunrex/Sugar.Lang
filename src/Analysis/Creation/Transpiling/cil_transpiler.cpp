@@ -4,12 +4,20 @@
 #include <fstream>
 #include <filesystem>
 
+#include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compiling/transpile_file_exception.h"
+#include "../../../Exceptions/Compiling/Analysis/ambiguous_import_exception.h"
 #include "../../Structure/Core/DataTypes/data_type.h"
 #include "../../Structure/Nodes/Context/context_node.h"
 
 using namespace std;
 namespace fs = filesystem;
 
+using namespace Services;
+
+using namespace Exceptions;
+
+using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 
@@ -29,53 +37,67 @@ constexpr string ms_core_struct = "[mscorlib]System.TypeValue";
 
 namespace Analysis::Creation
 {
-    CILTranspiler::CILTranspiler(string name, string directory) : projectName(std::move(name)), projectDirectory(std::move(directory)), source()
-    { }
-
-    bool CILTranspiler::TryCreateFile() const
+    std::optional<std::string> CreateOutputFile(const std::string& outputDirectory, const std::string& fileName)
     {
-        const fs::path file_name = std::format("{}.exe", projectName);
-        const fs::path directory = std::format("{}/bin", projectDirectory);
-        fs::path file_path = directory / file_name;
+        const auto outputFile = outputDirectory / fs::path(fileName);
 
-        if (!exists(directory))
+        if (std::ofstream file(outputFile); file.is_open())
         {
-            if (!create_directories(directory))
+            file.close();
+            return string(outputFile);
+        }
+
+        ExceptionManager::Instance().AddChild(new TranspileFileException(outputFile));
+        return std::nullopt;
+    }
+
+    CILTranspiler::CILTranspiler(string name, string directory, const SourceDirectory* const source) : projectName(std::move(name)), projectDirectory(std::move(directory)), source(source), initialised(false)
+    {
+        const auto outputDirectory = fs::path(std::format("{}/{}/bin", projectDirectory, projectName));
+        if (!exists(outputDirectory))
+        {
+            if (create_directories(outputDirectory))
+                std::cout << "Output directory created: " << outputDirectory << std::endl;
+            else
             {
-                std::cerr << "Failed to bin at: " << directory << std::endl;
-                return false;
+                ExceptionManager::Instance().AddChild(new TranspileFileException(outputDirectory));
+                return;
             }
         }
 
-        std::ofstream file(file_path);
-        if (file.is_open())
+        std::string outputFile;
+        if (const auto programSource = source->Get("program"); programSource != nullptr)
         {
-            file << "This is a file in a new directory.\n";
-            file.close();
-            std::cout << "File created successfully: " << file_path << std::endl;
-            return true;
+            const auto sourceFile = dynamic_cast<const SourceFile*>(programSource);
+
+            if (const auto programFile = sourceFile->Get("Program"); programFile != nullptr)
+            {
+                if (const auto main = programFile->FindFunction("Main", std::vector<const DataType*>()); main != nullptr && main->CheckDescriber(Describer::PublicStatic))
+                {
+                    isExecutable = true;
+                    outputFile = std::format("{}.{}", projectName, "exe");
+                }
+            }
         }
-        else
+
+        if (outputFile.empty())
+            outputFile = std::format("{}.{}", projectName, "dll");
+
+        if (const auto result = CreateOutputFile(outputDirectory, outputFile); result)
+            stringBuilder = new StringBuilder(*result);
+    }
+
+    void CILTranspiler::Transpile()
+    {
+        if (isExecutable)
         {
-            std::cerr << "Failed to create file: " << file_path << std::endl;
-            return false;
+            //map program
         }
     }
 
-    void CILTranspiler::Transpile(const SourceDirectory* directory)
+    void CILTranspiler::TranspileDirectory(const SourceDirectory* const directory)
     {
-
-    }
-
-    void CILTranspiler::TranspileFile(const SourceFile* file)
-    {
-        for (const auto type : *file)
-            TranspileDataType(type);
-    }
-
-    void CILTranspiler::TranspileDirectory(const SourceDirectory* directory)
-    {
-        for (const auto child: *directory)
+        for (const auto child: directory->values())
         {
             if (child->SourceType() == SourceType::File)
                 TranspileFile(dynamic_cast<const SourceFile*>(child));
@@ -84,28 +106,53 @@ namespace Analysis::Creation
         }
     }
 
-    void CILTranspiler::TranspileDataType(const DataType* dataType)
+    void CILTranspiler::TranspileFile(const SourceFile* file)
+    {
+        for (const auto type : file->values())
+            TranspileDataType(type);
+    }
+
+    void CILTranspiler::TranspileDataType(const DataType* const dataType)
     {
         switch (dataType->MemberType())
         {
             case MemberType::Enum:
-                source += std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_enum);
+                stringBuilder->PushLine(std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_enum));
                 break;
             case MemberType::Class:
-                source += std::format(".class {} {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_before, prefix_sealed, dataType->Name(), prefix_extends, ms_core_class);
+                stringBuilder->PushLine(std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_class));
                 break;
             case MemberType::Struct:
-                source += std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_sequential, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_struct);
+                stringBuilder->PushLine(std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_struct));
+                break;
+            default:
                 break;
         }
 
-        source += open_flower;
-        //transpile everything else
-        source += close_flower;
+        stringBuilder->PushLine(open_flower);
+        stringBuilder->IncreaseIndent();
+
+        for (const auto characteristic: dataType->AllCharacteristics())
+        {
+            //create characteristics
+        }
+
+        for (const auto characteristic: dataType->AllFunctions())
+        {
+            //create functions
+        }
+
+        stringBuilder->DecreaseIndent();
+        stringBuilder->PushLine(close_flower);
     }
 
     void CILTranspiler::Expression()
     {
 
+    }
+
+    CILTranspiler::~CILTranspiler()
+    {
+        delete stringBuilder;
     }
 }

@@ -10,6 +10,12 @@ namespace Exceptions
         public:
             FunctionArgumentException(int argumentCount, const Tokens::Token& token, const Analysis::Structure::SourceFile* source);
     };
+
+    class MinimumFunctionArgumentException final : public ParsingException
+    {
+        public:
+            MinimumFunctionArgumentException(int argumentCount, const Tokens::Token& token, const Analysis::Structure::SourceFile* source);
+    };
 }
 
 #endif

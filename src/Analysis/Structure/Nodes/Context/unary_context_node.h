@@ -15,11 +15,6 @@ namespace Analysis::Structure::Context
         public:
             [[nodiscard]] const ContextNode* Operand() const;
 
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
-
-            [[nodiscard]] virtual bool IsPrefix() const = 0;
-
             ~UnaryContextNode() override;
     };
 }

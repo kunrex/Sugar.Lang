@@ -1,6 +1,8 @@
 #ifndef DESCRIBER_H
 #define DESCRIBER_H
 
+#include "../../../Parsing/ParseNodes/Describers/describer_node.h"
+
 namespace Analysis::Structure::Enums
 {
     enum class Describer : short
@@ -14,16 +16,22 @@ namespace Analysis::Structure::Enums
 
         Static = 16,
 
-        AccessModifiers = Public | Private,
+        None = 32,
 
         PublicStatic = Public | Static,
+        AccessModifiers = Public | Private,
+
+        EnumOnly = AccessModifiers,
+        StructOnly = AccessModifiers,
+        ClassOnly = AccessModifiers | Static,
 
         FunctionOnly = AccessModifiers | Static,
-        All = AccessModifiers | Static | Const | Ref,
     };
 
-    Describer operator & (Describer lhs, Describer rhs);
-    Describer operator | (Describer lhs, Describer rhs);
+    Describer operator & (const Describer& lhs, const Describer& rhs);
+    Describer operator | (const Describer& lhs, const Describer& rhs);
+
+    Describer FromNode(const ParseNodes::Describers::DescriberNode* node);
 }
 
 #endif

@@ -13,6 +13,8 @@ namespace ParseNodes::Statements
 
     const ParseNode* ExpressionStatementNode::Expression() const { return expression; }
 
+    unsigned long ExpressionStatementNode::Index() const { return expression->Index(); }
+
     ExpressionStatementNode::~ExpressionStatementNode()
     {
         delete expression;

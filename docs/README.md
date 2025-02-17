@@ -113,6 +113,15 @@ print(collection[0]);
 print(collection[1]);
 ```
 
+#### Nullable
+```cs
+let: nullableInt = create nullable<int>(null);
+if (nullableInt == null)
+    print("int is null");
+```
+
+Nullable wraps around value types only.
+
 > Object creation in sugar is carried out through the `create` keyword. 
 
 #### Delegates (?)
@@ -123,10 +132,10 @@ void HelloWorld(string: message)
     print(message);
 }
 
-action</* argument types are passed in order of declaration */ string>: helloWorld = funcref</* arguement types in order of declaration */ string>(HelloWorld);
+action</* argument types are passed in order of declaration */ string>: helloWorld = funcref</* arguement types in order of declaration */ string>(/* load function from this */ this, HelloWorld);
 ```
 
-The `funcref` function is used to get the reference to a function. The argument signature is passed in using generic expression. Unfortunately, sugar does not feature the ability to create functions dynamically. 
+The `funcref` function is used to get the reference to a function. It contains 2 necessary arguments: the object of interest and the name of the function to be called. The argument signature is passed in using generic expression. Unfortunately, sugar does not feature the ability to create functions dynamically. 
 
 Delegates may be invoked using the `invoke` function.
 ```c++
@@ -169,10 +178,10 @@ class Human
 }
 ```
 Describers can contain the following keywords: 
-1. `const`: A compile time constant
-2. `static`: Declares a member static
-3. `public`: An access specifier for public items
-4. `private`: An access specifier for private items
+1. `const`: A locally scoped readonly value.
+2. `static`: Declares a member static.
+3. `public`: An access specifier for public items.
+4. `private`: An access specifier for private items.
 5. `ref`: Allows passing a value type by reference.  
 
 ### Properties
@@ -196,7 +205,7 @@ This effectively creates a runtime constant that can only be initialised in the 
 While it compiles, the above has virtually no practical use.
 
 ### Special Functions
-Sugar features functions for cast overloading, operator overloading, indexers and constructors (destructors only for a class. Even though theres not much use for it now).
+Sugar features functions for cast overloading, operator overloading, indexers and constructors.
 
 ```cs
 struct Complex

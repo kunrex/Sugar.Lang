@@ -17,6 +17,8 @@ namespace ParseNodes::Expressions
 
             [[nodiscard]] const ParseNode* Operand() const;
 
+            [[nodiscard]] unsigned long Index() const override;
+
             ~UnaryNode() override;
     };
 }

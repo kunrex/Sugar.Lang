@@ -25,7 +25,7 @@ constexpr std::string load_this = "ldarg.0";
 
 namespace Analysis::Creation
 {
-    void CILTranspiler::TranspileExpression(const std::string& indent, const ContextNode* expression)
+    void CILTranspiler::TranspileExpression(const ContextNode* expression)
     {
         switch (expression->MemberType())
         {
@@ -39,7 +39,7 @@ namespace Analysis::Creation
             case MemberType::LocalVariableContext:
             case MemberType::FunctionArgumentContext:
             case MemberType::OverloadedIndexerContext:
-                TranspileEntityInit(indent, expression);;
+                TranspileEntityInit(expression);
                 break;
             case MemberType::Box:
             case MemberType::Unbox:
@@ -47,9 +47,9 @@ namespace Analysis::Creation
             case MemberType::OverloadedCastContext:
                 {
                     const auto casted = dynamic_cast<const OverloadedCastInstruction*>(expression);
-                    TranspileExpression(indent, casted->Operand());
+                    TranspileExpression(casted->Operand());
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             case MemberType::UnaryContext:
@@ -58,47 +58,47 @@ namespace Analysis::Creation
 
 
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
             break;
             case MemberType::BinaryContext:
                 {
                     const auto casted = dynamic_cast<const BinaryContextNode*>(expression);
-                    TranspileExpression(indent, casted->LHS());
-                    TranspileExpression(indent, casted->RHS());
+                    TranspileExpression(casted->LHS());
+                    TranspileExpression(casted->RHS());
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
         }
     }
 
-    void CILTranspiler::TranspileEntity(const std::string& indent, const ContextNode* entity)
+    void CILTranspiler::TranspileEntity(const ContextNode* entity)
     {
         switch (entity->MemberType())
         {
             case MemberType::FieldContext:
-                source += indent + entity->InstructionGet() + "\n";
+                stringBuilder.PushLine(entity->InstructionGet());
                 break;
             case MemberType::FunctionCallContext:
                 {
                     const auto casted = dynamic_cast<const FunctionContext*>(entity);
 
                     for (const auto child: *casted)
-                        TranspileExpression(indent, child);
+                        TranspileExpression(child);
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             case MemberType::OverloadedIndexerContext:
                 {
                     const auto casted = dynamic_cast<const OverloadedIndexerExpression*>(entity);
-                    TranspileEntity(indent, casted);
+                    TranspileEntity(casted);
 
                     for (const auto child: *casted)
-                        TranspileExpression(indent, child);
+                        TranspileExpression(child);
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             default:
@@ -107,78 +107,81 @@ namespace Analysis::Creation
         }
     }
 
-    void CILTranspiler::TranspileEntityInit(const std::string& indent, const ContextNode* entity)
+    void CILTranspiler::TranspileEntityInit(const ContextNode* entity)
     {
         switch (entity->MemberType())
         {
             case MemberType::Dot:
                 {
                     const auto casted = dynamic_cast<const DotExpression*>(entity);
-                    TranspileEntityInit(indent, casted->LHS());
-                    TranspileEntity(indent, casted->RHS());
+                    TranspileEntityInit(casted->LHS());
+                    TranspileEntity(casted->RHS());
                 }
                 break;
             case MemberType::PrintContext:
                 {
                     const auto casted = dynamic_cast<const Print*>(entity);
-                    TranspileEntityInit(indent, casted->GetChild(0));
+                    TranspileEntityInit(casted->GetChild(0));
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             case MemberType::InputContext:
-                source += indent + entity->InstructionGet() + "\n";
+                stringBuilder.PushLine(entity->InstructionGet());
                 break;
             case MemberType::FormatContext:
                 {
                     const auto casted = dynamic_cast<const Print*>(entity);
-                    source += std::format("{} ldc.i4.{}\n{} newarr [mscorlib]System.Object\n", indent, casted->ChildCount(), indent);
+                    stringBuilder.PushLine("ldc.i4." + casted->ChildCount());
+                    stringBuilder.PushLine("newarr [mscorlib]System.Object");
 
                     int i = 0;
                     for (const auto child: *casted)
                     {
-                        source += std::format("{} dup\n{} ldc.i4.", indent, indent, i);
+                        stringBuilder.PushLine("dup");
+                        stringBuilder.PushLine(" ldc.i4." + i);
 
-                        TranspileEntityInit(indent, child);
+                        TranspileEntityInit(child);
                         if (child->CreationType()->MemberType() != MemberType::Class)
-                            source += indent + "box " + child->CreationType()->FullName() + "\n";
+                            stringBuilder.PushLine("box " + child->CreationType()->FullName());
 
-                        source += "stelem.ref\n";
+                        stringBuilder.PushLine("stelem.ref");
                     }
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine("casted->InstructionGet()");
                 }
             case MemberType::ThisContext:
-                source += indent + load_this + "\n";
+                stringBuilder.PushLine(load_this);
                 break;
             case MemberType::LocalVariableContext:
             case MemberType::FunctionArgumentContext:
-                source += indent + entity->InstructionGet() + "\n";
+                stringBuilder.PushLine(entity->InstructionGet());
                 break;
             case MemberType::FieldContext:
-                source += indent + load_this + "\n" + indent + entity->InstructionGet() + "\n";
+                stringBuilder.PushLine(load_this);
+                stringBuilder.PushLine(entity->InstructionGet());
                 break;
             case MemberType::FunctionCallContext:
                 {
                     const auto casted = dynamic_cast<const FunctionContext*>(entity);
                     if (!casted->IsStatic())
-                        source += indent + load_this + "\n";
+                        stringBuilder.PushLine(load_this);
 
                     for (const auto child: *casted)
-                        TranspileExpression(indent, child);
+                        TranspileExpression(child);
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             case MemberType::OverloadedIndexerContext:
                 {
                     const auto casted = dynamic_cast<const OverloadedIndexerExpression*>(entity);
-                    TranspileEntityInit(indent, casted);
+                    TranspileEntityInit(casted);
 
                     for (const auto child: *casted)
-                        TranspileExpression(indent, child);
+                        TranspileExpression(child);
 
-                    source += indent + casted->InstructionGet() + "\n";
+                    stringBuilder.PushLine(casted->InstructionGet());
                 }
                 break;
             default:

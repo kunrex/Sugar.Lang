@@ -15,7 +15,7 @@ namespace ParseNodes::Properties
 
     const CompoundDeclarationNode* BaseIndexerNode::Parameters() const { return parameters; }
 
-    const Token& BaseIndexerNode::Keyword() const { return keyword; }
+    unsigned long BaseIndexerNode::Index() const { return keyword.Index(); }
 
     BaseIndexerNode::~BaseIndexerNode()
     {

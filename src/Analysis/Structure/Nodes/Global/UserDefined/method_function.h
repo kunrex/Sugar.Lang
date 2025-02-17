@@ -9,11 +9,9 @@ namespace Analysis::Structure::Global
     class MethodFunction final : public Creation::MethodDefinition, public Core::Scoped
     {
         public:
-            MethodFunction(const std::string& name, Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::ParseNode* body);
+            MethodFunction(const std::string& name, Enums::Describer describer, const Core::DataType* creationType, const ParseNodes::Groups::ScopeNode* body);
 
-            void SetParent(const Core::DataType* parent) override;
-
-            bool operator<(const MethodFunction& rhs) const;
+            [[nodiscard]] void AddArgument(const Creation::Variable* parameter) override;
     };
 }
 

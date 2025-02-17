@@ -9,7 +9,7 @@ namespace ParseNodes::Types
     BuiltInTypeNode::BuiltInTypeNode(const Tokens::Token& keyword) : KeywordTypeNode(keyword)
     { }
 
-    SyntaxKind BuiltInTypeNode::Type() const { return keyword.Kind(); }
+    SyntaxKind BuiltInTypeNode::Kind() const { return keyword.Kind(); }
 
     NodeType BuiltInTypeNode::NodeType() const { return NodeType::BuiltInType; }
 }

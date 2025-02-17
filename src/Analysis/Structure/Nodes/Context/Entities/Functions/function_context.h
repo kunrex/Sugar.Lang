@@ -6,18 +6,24 @@
 
 namespace Analysis::Structure::Context
 {
-    class FunctionContext final : public ContextNode, public Services::Collection<ContextNode>
+    class FunctionContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
     {
-        protected:
+        private:
+            const std::string cilInstruction;
+            mutable int slotCount;
+
             const Creation::FunctionDefinition* function;
 
-            explicit FunctionContext(const Creation::FunctionDefinition* function);
-
         public:
+            explicit FunctionContext(const Creation::FunctionDefinition* function, bool isStatic);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
             [[nodiscard]] std::string InstructionGet() const override;
             [[nodiscard]] std::string InstructionSet() const override;
-
-            [[nodiscard]] bool IsStatic() const;
 
             [[nodiscard]] int SlotCount() const override;
     };

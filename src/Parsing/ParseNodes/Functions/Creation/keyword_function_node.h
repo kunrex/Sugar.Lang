@@ -6,12 +6,15 @@
 
 namespace ParseNodes::Functions::Creation
 {
-    class KeywordFunctionNode : public ParseNode, Core::FunctionNode
+    class KeywordFunctionNode : public ParseNode, public Core::FunctionNode
     {
         protected:
             const Tokens::Token& keyword;
 
-            KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const ParseNode* body, const Tokens::Token& keyword);
+            KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+
+        public:
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

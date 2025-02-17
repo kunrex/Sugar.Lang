@@ -12,6 +12,14 @@ namespace ParseNodes::Functions::Calling
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };
+
+    class PrintlnNode final : public BaseFunctionCallNode
+    {
+        public:
+            explicit PrintlnNode(const Tokens::Token& keyword);
+
+            [[nodiscard]] Enums::NodeType NodeType() const override;
+    };
 }
 
 #endif

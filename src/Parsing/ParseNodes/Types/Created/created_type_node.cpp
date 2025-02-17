@@ -11,6 +11,7 @@ namespace ParseNodes::Types
     NodeType CreatedTypeNode::NodeType() const { return NodeType::CreatedType;}
 
     const IdentifierNode* CreatedTypeNode::Identifier() const { return identifier; }
+    unsigned long CreatedTypeNode::Index() const { return identifier->Index(); }
 
     CreatedTypeNode::~CreatedTypeNode()
     {

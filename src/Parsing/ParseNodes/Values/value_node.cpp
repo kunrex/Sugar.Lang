@@ -7,5 +7,5 @@ namespace ParseNodes::Values
     ValueNode::ValueNode(const Tokens::Token& token) : token(token)
     { }
 
-    const Token& ValueNode::Token() const { return token; }
+    unsigned long ValueNode::Index() const { return token.Index(); }
 }

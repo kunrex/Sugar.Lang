@@ -90,6 +90,7 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Functions::Calling::InputNode* ParseInputCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FormatNode* ParseFormatCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::InvokeNode* ParseInvokeCall();
+            [[nodiscard]] const ParseNodes::Functions::Calling::PrintlnNode* ParsePrintlnCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FuncRefNode* ParseFuncRefCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::ToStringNode* ParseToStringCall();
 

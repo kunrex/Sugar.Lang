@@ -8,6 +8,6 @@ using namespace Analysis::Structure;
 
 namespace Exceptions
 {
-    GenericArgumentException::GenericArgumentException(int argumentCount, const Token& token, const SourceFile* source) : ParsingException(std::format("{} type requires {} generic argument", ToString(token.Kind()), argumentCount), token, source)
+    GenericArgumentException::GenericArgumentException(int argumentCount, const Token& token, const SourceFile* source) : ParsingException(std::format("{} type requires (a maximum of) {} generic argument", ToString(token.Kind()), argumentCount), token, source)
     { }
 }

@@ -12,4 +12,6 @@ namespace ParseNodes::Statements
     { }
 
     NodeType DeclarationNode::NodeType() const { return NodeType::Declaration; }
+
+    unsigned long DeclarationNode::Index() const { return name->Index(); }
 }

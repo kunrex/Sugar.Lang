@@ -1,20 +1,27 @@
 #ifndef INDEXER_DEFINITION_H
 #define INDEXER_DEFINITION_H
 
-#include "../../../Core/Creation/function.h"
-
-constexpr std::string_view get_indexer = "__index_get__Item";
-constexpr std::string_view set_indexer = "__index_set__Item";
+#include "../../../Core/created.h"
+#include "../../../Core/describable.h"
+#include "../../Global/global_node.h"
+#include "../../../Core/Interfaces/i_read_write.h"
 
 namespace Analysis::Structure::Creation
 {
-    class IndexerDefinition : public Core::Function
+    class IndexerDefinition : public Global::GlobalNode, public Core::Describable, public Core::Created, public Core::Interfaces::IReadWrite
     {
         protected:
-            IndexerDefinition(Enums::Describer describer, const Core::DataType* creationType);
+            mutable std::string getSignature;
+            mutable std::string setSignature;
+
+            explicit IndexerDefinition(Enums::Describer describer, const Core::DataType* creationType);
 
         public:
-            [[nodiscard]] std::string SignatureStringSet() const;
+            [[nodiscard]] virtual const std::string& SignatureGetString() const = 0;
+            [[nodiscard]] virtual const std::string& SignatureSetString() const = 0;
+
+            [[nodiscard]] virtual int ParameterCount() const = 0;
+            [[nodiscard]] virtual const Core::DataType* ParameterAt(int index) const = 0;
     };
 }
 

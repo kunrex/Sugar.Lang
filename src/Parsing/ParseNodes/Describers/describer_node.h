@@ -11,17 +11,20 @@ namespace ParseNodes::Describers
     class DescriberNode final : public ParseNode
     {
         private:
+            const unsigned long index;
             std::vector<const Tokens::Token*> tokens;
 
         public:
-            DescriberNode();
+            explicit DescriberNode(unsigned long index);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
             void PushToken(const Tokens::Token* token);
 
-            [[nodiscard]] int TokenCount() const;
+            [[nodiscard]] unsigned long TokenCount() const;
             [[nodiscard]] const Tokens::Token& TokenAt(int i) const;
+
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

@@ -12,7 +12,7 @@ namespace ParseNodes::Functions::Calling
 
     NodeType FunctionCallNode::NodeType() const { return NodeType::FunctionCall; }
 
-    const IdentifierNode* FunctionCallNode::Identifier() const { return identifier; }
+    unsigned long FunctionCallNode::Index() const { return identifier->Index(); }
 
     FunctionCallNode::~FunctionCallNode()
     {

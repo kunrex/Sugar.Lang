@@ -11,6 +11,8 @@ namespace ParseNodes::Expressions
 
     const ParseNode* UnaryNode::Operand() const { return operand; }
 
+    unsigned long UnaryNode::Index() const { return operand->Index(); }
+
     UnaryNode::~UnaryNode()
     {
         delete operand;

@@ -16,6 +16,7 @@ namespace ParseNodes::Types
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
             [[nodiscard]] const Values::IdentifierNode* Identifier() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~CreatedTypeNode() override;
     };

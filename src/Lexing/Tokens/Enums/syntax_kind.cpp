@@ -36,6 +36,8 @@ namespace Tokens::Enums
                 return "Identifier";
             case SyntaxKind::Print:
                 return "Print";
+            case SyntaxKind::Println:
+                return "Println";
             case SyntaxKind::Input:
                 return "Input";
             case SyntaxKind::Format:

@@ -2,8 +2,6 @@ add_library(Sugar STATIC
         Services/printable.h
         Services/singleton_service.cpp
         Services/singleton_service.h
-        Services/destructible.cpp
-        Services/destructible.h
         Services/printable.cpp
         Services/collection.cpp
         Services/collection.h
@@ -122,8 +120,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Conditions/if_node.h
         Parsing/ParseNodes/Conditions/else_node.cpp
         Parsing/ParseNodes/Conditions/else_node.h
-        Parsing/ParseNodes/Conditions/elif_node.cpp
-        Parsing/ParseNodes/Conditions/elif_node.h
         Parsing/ParseNodes/Loops/loop_node.cpp
         Parsing/ParseNodes/Loops/loop_node.h
         Parsing/ParseNodes/Loops/for_loop_node.cpp
@@ -168,7 +164,6 @@ add_library(Sugar STATIC
         Analysis/Structure/source_file.cpp
         Analysis/Structure/source_file.h
         Analysis/Structure/Enums/member_type.h
-        Analysis/Structure/Core/Interfaces/i_node.cpp
         Analysis/Structure/Core/Interfaces/i_node.h
         Analysis/Structure/Core/nameable.cpp
         Analysis/Structure/Core/nameable.h
@@ -194,8 +189,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Creation/function.h
         Analysis/Structure/Nodes/Local/local_node.cpp
         Analysis/Structure/Nodes/Local/local_node.h
-        Analysis/Structure/Nodes/Local/scope.cpp
-        Analysis/Structure/Nodes/Local/scope.h
         Analysis/Structure/Core/scoped.cpp
         Analysis/Structure/Core/scoped.h
         Analysis/Structure/Nodes/Creation/Functions/void_definition.cpp
@@ -206,14 +199,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Nodes/Creation/Functions/cast_definition.h
         Analysis/Structure/Nodes/Creation/Functions/overload_definition.cpp
         Analysis/Structure/Nodes/Creation/Functions/overload_definition.h
-        Analysis/Structure/Nodes/Creation/Properties/property.cpp
-        Analysis/Structure/Nodes/Creation/Properties/property.h
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/accessor.cpp
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/accessor.h
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/get.cpp
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/get.h
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/set.cpp
-        Analysis/Structure/Nodes/Creation/Properties/Accessors/set.h
+        Analysis/Structure/Nodes/Creation/Properties/property_definition.cpp
+        Analysis/Structure/Nodes/Creation/Properties/property_definition.h
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_cast.cpp
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_cast.h
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_operation.cpp
@@ -230,64 +217,35 @@ add_library(Sugar STATIC
         Analysis/Structure/Nodes/Global/UserDefined/explicit_cast.h
         Analysis/Structure/Nodes/Creation/Properties/indexer_definition.cpp
         Analysis/Structure/Nodes/Creation/Properties/indexer_definition.h
-        Analysis/Structure/Nodes/Creation/Functions/destructor_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/destructor_definition.h
         Analysis/Structure/Nodes/Creation/Functions/constructor_definition.cpp
         Analysis/Structure/Nodes/Creation/Functions/constructor_definition.h
-        Analysis/Structure/Nodes/Global/UserDefined/destructor.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/destructor.h
         Analysis/Structure/Nodes/Global/UserDefined/constructor.cpp
         Analysis/Structure/Nodes/Global/UserDefined/constructor.h
         Analysis/Structure/Nodes/Global/Variables/global_variable.cpp
         Analysis/Structure/Nodes/Global/Variables/global_variable.h
         Analysis/Structure/Nodes/Global/global_node.cpp
         Analysis/Structure/Nodes/Global/global_node.h
-        Analysis/Structure/Nodes/Global/Properties/property_get.cpp
-        Analysis/Structure/Nodes/Global/Properties/property_get.h
-        Analysis/Structure/Nodes/Global/Properties/property_set.cpp
-        Analysis/Structure/Nodes/Global/Properties/property_set.h
-        Analysis/Structure/Nodes/Global/Properties/property_get_set.cpp
-        Analysis/Structure/Nodes/Global/Properties/property_get_set.h
-        Analysis/Structure/Nodes/Global/Properties/indexer_get.cpp
-        Analysis/Structure/Nodes/Global/Properties/indexer_get.h
-        Analysis/Structure/Nodes/Global/Properties/indexer_set.cpp
-        Analysis/Structure/Nodes/Global/Properties/indexer_set.h
-        Analysis/Structure/Nodes/Global/Properties/indexer_get_set.cpp
-        Analysis/Structure/Nodes/Global/Properties/indexer_get_set.h
-        Analysis/Structure/Core/Creation/getable.cpp
-        Analysis/Structure/Core/Creation/getable.h
-        Analysis/Structure/Core/Creation/setable.cpp
-        Analysis/Structure/Core/Creation/setable.h
-        Analysis/Structure/Core/Creation/get_set.cpp
-        Analysis/Structure/Core/Creation/get_set.h
         Analysis/Creation/Transpiling/cil_transpiler.cpp
         Analysis/Creation/Transpiling/cil_transpiler.h
         Analysis/Structure/Nodes/Context/context_node.h
-        Analysis/Structure/Nodes/Context/Casts/cast_class_instruction.cpp
-        Analysis/Structure/Nodes/Context/Casts/cast_class_instruction.h
-        Analysis/Structure/Nodes/Context/Casts/box_instruction.cpp
-        Analysis/Structure/Nodes/Context/Casts/box_instruction.h
-        Analysis/Structure/Nodes/Context/Casts/unbox_instruction.cpp
-        Analysis/Structure/Nodes/Context/Casts/unbox_instruction.h
-        Analysis/Structure/Nodes/Context/Casts/built_in_cast_instruction.cpp
-        Analysis/Structure/Nodes/Context/Casts/built_in_cast_instruction.h
-        Analysis/Structure/Nodes/Context/Casts/overloaded_cast_instruction.cpp
-        Analysis/Structure/Nodes/Context/Casts/overloaded_cast_instruction.h
+        Analysis/Structure/Nodes/Context/Casts/cast_class_expression.cpp
+        Analysis/Structure/Nodes/Context/Casts/cast_class_expression.h
+        Analysis/Structure/Nodes/Context/Casts/box_cast_expression.cpp
+        Analysis/Structure/Nodes/Context/Casts/box_cast_expression.h
+        Analysis/Structure/Nodes/Context/Casts/unbox_cast_expression.cpp
+        Analysis/Structure/Nodes/Context/Casts/unbox_cast_expression.h
+        Analysis/Structure/Nodes/Context/Casts/built_in_cast_expression.cpp
+        Analysis/Structure/Nodes/Context/Casts/built_in_cast_expression.h
+        Analysis/Structure/Nodes/Context/Casts/defined_cast_expression.cpp
+        Analysis/Structure/Nodes/Context/Casts/defined_cast_expression.h
         Analysis/Structure/Nodes/Context/binary_context_node.cpp
         Analysis/Structure/Nodes/Context/binary_context_node.h
         Analysis/Structure/Nodes/Context/unary_context_node.cpp
         Analysis/Structure/Nodes/Context/unary_context_node.h
-        Analysis/Structure/Core/Interfaces/i_read_write.cpp
         Analysis/Structure/Core/Interfaces/i_read_write.h
-        Analysis/Structure/Core/Interfaces/i_slot_size.cpp
         Analysis/Structure/Core/Interfaces/i_slot_size.h
-        Analysis/Structure/Core/Context/built_in_instruction.cpp
-        Analysis/Structure/Core/Context/built_in_instruction.h
         Analysis/Structure/Core/DataTypes/user_defined_type.cpp
         Analysis/Structure/Core/DataTypes/user_defined_type.h
-        Analysis/Structure/Nodes/Creation/Functions/function_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/function_definition.h
-        Analysis/Structure/Core/Context/fully_nameable.cpp
         Analysis/Structure/Core/Context/fully_nameable.h
         Analysis/Structure/Nodes/Context/Entities/indexed_context_node.cpp
         Analysis/Structure/Nodes/Context/Entities/indexed_context_node.h
@@ -307,18 +265,18 @@ add_library(Sugar STATIC
         Analysis/Structure/Nodes/Context/Entities/Functions/function_context.h
         Analysis/Structure/Nodes/Context/Expressions/dot_expression.cpp
         Analysis/Structure/Nodes/Context/Expressions/dot_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/built_in_index_instruction.cpp
-        Analysis/Structure/Nodes/Context/Expressions/built_in_index_instruction.h
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_indexer_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_indexer_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/built_in_index_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/built_in_indexer_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/defined_indexer_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/defined_indexer_expression.h
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_indexer.cpp
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_indexer.h
         Analysis/Structure/Nodes/Context/Expressions/built_in_unary_expression.cpp
         Analysis/Structure/Nodes/Context/Expressions/built_in_unary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_unary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_unary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_binary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/overloaded_binary_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/defined_unary_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/defined_unary_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/defined_binary_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/defined_binary_expression.h
         Analysis/Structure/Nodes/Context/Expressions/built_in_binary_expression.cpp
         Analysis/Structure/Nodes/Context/Expressions/built_in_binary_expression.h
         Analysis/Structure/Nodes/Context/context_node.cpp
@@ -329,8 +287,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Nodes/Context/Entities/Functions/input.cpp
         Analysis/Structure/Nodes/Context/Entities/Functions/input.h
         Analysis/Creation/Transpiling/expression_transpiler.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/println.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/println.h
         Exceptions/compile_exception.cpp
         Exceptions/compile_exception.h
         Exceptions/log_exception.cpp
@@ -367,8 +323,6 @@ add_library(Sugar STATIC
         Parsing/Parser/parser_data_types.cpp
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.cpp
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h
-        Parsing/Parser/Enums/statement_type.cpp
-        Parsing/Parser/Enums/statement_type.h
         Parsing/ParseNodes/Statements/import_statement_node.cpp
         Parsing/ParseNodes/Statements/import_statement_node.h
         Parsing/ParseNodes/Statements/throw_statement_node.cpp
@@ -387,14 +341,14 @@ add_library(Sugar STATIC
         Exceptions/Compiling/Parsing/generic_argument_exception.h
         Exceptions/Compiling/Parsing/invalid_token_exception.cpp
         Exceptions/Compiling/Parsing/invalid_token_exception.h
-        Parsing/ParseNodes/Groups/expression_list_node.cpp
-        Parsing/ParseNodes/Groups/expression_list_node.h
+        Parsing/ParseNodes/Groups/compound_declaration_node.cpp
+        Parsing/ParseNodes/Groups/compound_declaration_node.h
         Parsing/ParseNodes/Groups/scope_node.cpp
         Parsing/ParseNodes/Groups/scope_node.h
         Parsing/ParseNodes/Groups/generic_node.cpp
         Parsing/ParseNodes/Groups/generic_node.h
-        Parsing/ParseNodes/Groups/statement_collection_node.cpp
-        Parsing/ParseNodes/Groups/statement_collection_node.h
+        Parsing/ParseNodes/Groups/expression_list_node.cpp
+        Parsing/ParseNodes/Groups/expression_list_node.h
         Exceptions/Compiling/Parsing/invalid_expression_exception.cpp
         Exceptions/Compiling/Parsing/invalid_expression_exception.h
         Exceptions/Compiling/Parsing/empty_expression_exception.cpp
@@ -405,14 +359,128 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Groups/if_chain_node.h
         Parsing/ParseNodes/Groups/source_file_node.cpp
         Parsing/ParseNodes/Groups/source_file_node.h
-        Analysis/Structure/Wrappers/built_in_data_type.cpp
-        Analysis/Structure/Wrappers/built_in_data_type.h
-        Analysis/Structure/Wrappers/Complex/string.cpp
-        Analysis/Structure/Wrappers/Complex/string.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_function.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_function.h
+        Analysis/Structure/Wrappers/Reference/string.cpp
+        Analysis/Structure/Wrappers/Reference/string.h
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_property.cpp
         Analysis/Structure/Nodes/Global/BuiltIn/built_in_property.h
+        Services/string_builder.cpp
+        Services/string_builder.h
+        Exceptions/Compiling/transpile_file_exception.cpp
+        Exceptions/Compiling/transpile_file_exception.h
+        Exceptions/Compiling/Analysis/invalid_describer_exception.cpp
+        Exceptions/Compiling/Analysis/invalid_describer_exception.h
+        Services/dictionary.cpp
+        Services/dictionary.h
+        Exceptions/Compiling/Analysis/ProjectBinding/invalid_import_path_exception.cpp
+        Exceptions/Compiling/Analysis/ProjectBinding/invalid_import_path_exception.h
+        Exceptions/Compiling/Analysis/ProjectBinding/duplicate_structure_definition_exception.cpp
+        Exceptions/Compiling/Analysis/ProjectBinding/duplicate_structure_definition_exception.h
+        Analysis/Creation/Binding/global_binder.cpp
+        Analysis/Creation/Binding/global_binder.h
+        Exceptions/Compiling/Analysis/ProjectBinding/ambiguous_import_exception.cpp
+        Exceptions/Compiling/Analysis/ProjectBinding/ambiguous_import_exception.h
+        Analysis/Creation/Binding/binder_extensions.cpp
+        Analysis/Creation/Binding/binder_extensions.h
+        Analysis/Structure/Wrappers/Generic/array.cpp
+        Analysis/Structure/Wrappers/Generic/array.h
+        Analysis/Structure/Wrappers/Generic/list.cpp
+        Analysis/Structure/Wrappers/Generic/list.h
+        Analysis/Structure/Wrappers/Generic/nullable.cpp
+        Analysis/Structure/Wrappers/Generic/nullable.h
+        Analysis/Structure/Wrappers/Generic/dictionary.cpp
+        Analysis/Structure/Wrappers/Generic/dictionary.h
+        Analysis/Structure/Wrappers/Generic/tuple.cpp
+        Analysis/Structure/Wrappers/Generic/tuple.h
+        Analysis/Structure/Core/Interfaces/i_built_in_type.h
+        Analysis/Structure/Wrappers/Reference/object.cpp
+        Analysis/Structure/Wrappers/Reference/object.h
+        Analysis/Structure/Wrappers/Value/Integer.cpp
+        Analysis/Structure/Wrappers/Value/Integer.h
+        Analysis/Structure/Wrappers/Value/Boolean.cpp
+        Analysis/Structure/Wrappers/Value/Boolean.h
+        Analysis/Structure/Wrappers/Value/Character.cpp
+        Analysis/Structure/Wrappers/Value/Character.h
+        Analysis/Structure/Wrappers/Value/Short.cpp
+        Analysis/Structure/Wrappers/Value/Short.h
+        Analysis/Structure/Wrappers/Value/Long.cpp
+        Analysis/Structure/Wrappers/Value/Long.h
+        Analysis/Structure/Wrappers/Value/Float.cpp
+        Analysis/Structure/Wrappers/Value/Float.h
+        Analysis/Structure/Wrappers/Value/Double.cpp
+        Analysis/Structure/Wrappers/Value/Double.h
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_void.cpp
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_void.h
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_method.cpp
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_method.h
+        Analysis/Structure/Wrappers/Generic/action.cpp
+        Analysis/Structure/Wrappers/Generic/action.h
+        Analysis/Structure/Wrappers/Generic/func.cpp
+        Analysis/Structure/Wrappers/Generic/func.h
+        Analysis/Structure/Wrappers/Generic/generic_extensions.cpp
+        Analysis/Structure/Wrappers/Generic/generic_extensions.h
+        Analysis/Structure/Nodes/Local/Variables/function_parameter.cpp
+        Analysis/Structure/Nodes/Local/Variables/function_parameter.h
+        Parsing/ParseNodes/Properties/assigned_property_node.cpp
+        Parsing/ParseNodes/Properties/assigned_property_node.h
+        Analysis/Creation/Binding/local_binder.cpp
+        Analysis/Creation/Binding/local_binder.h
+        Analysis/Structure/Core/Interfaces/i_generic_class.h
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_constructor.cpp
+        Analysis/Structure/Nodes/Global/BuiltIn/built_in_constructor.h
+        Analysis/Structure/Nodes/Creation/Functions/function_definition.cpp
+        Analysis/Structure/Nodes/Creation/Functions/function_definition.h
+        Analysis/Structure/Nodes/Global/Properties/indexer.cpp
+        Analysis/Structure/Nodes/Global/Properties/indexer.h
+        Analysis/Structure/Nodes/Global/Properties/property.cpp
+        Analysis/Structure/Nodes/Global/Properties/property.h
+        Analysis/Structure/Nodes/Context/invalid_context.cpp
+        Analysis/Structure/Nodes/Context/invalid_context.h
+        Analysis/Structure/Nodes/Context/static_reference_context.cpp
+        Analysis/Structure/Nodes/Context/static_reference_context.h
+        Analysis/Structure/Nodes/Context/this_context.cpp
+        Analysis/Structure/Nodes/Context/this_context.h
+        Analysis/Structure/Nodes/Context/Casts/invalid_cast_node.cpp
+        Analysis/Structure/Nodes/Context/Casts/invalid_cast_node.h
+        Analysis/Structure/Nodes/Context/Expressions/invalid_unary_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/invalid_unary_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/invalid_binary_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/invalid_binary_expression.h
+        Analysis/Structure/Nodes/Context/Expressions/invalid_indexer_expression.cpp
+        Analysis/Structure/Nodes/Context/Expressions/invalid_indexer_expression.h
+        Analysis/Structure/Nodes/Context/Entities/Functions/invalid_function_context.cpp
+        Analysis/Structure/Nodes/Context/Entities/Functions/invalid_function_context.h
+        Analysis/Structure/Nodes/Context/Control/return.cpp
+        Analysis/Structure/Nodes/Context/Control/return.h
+        Analysis/Structure/Nodes/Context/Control/branch.cpp
+        Analysis/Structure/Nodes/Context/Control/branch.h
+        Analysis/Structure/Nodes/Context/Control/branch_condition.cpp
+        Analysis/Structure/Nodes/Context/Control/branch_condition.h
+        Analysis/Structure/Nodes/Context/Constants/integer_constant.cpp
+        Analysis/Structure/Nodes/Context/Constants/integer_constant.h
+        Analysis/Structure/Nodes/Context/Constants/string_constant.cpp
+        Analysis/Structure/Nodes/Context/Constants/string_constant.h
+        Analysis/Structure/Nodes/Context/Constants/float_constant.cpp
+        Analysis/Structure/Nodes/Context/Constants/float_constant.h
+        Analysis/Structure/Nodes/Context/Constants/null_constant.cpp
+        Analysis/Structure/Nodes/Context/Constants/null_constant.h
+        Analysis/Structure/Wrappers/Reference/exception.cpp
+        Analysis/Structure/Wrappers/Reference/exception.h
+        Exceptions/Compiling/Analysis/duplicate_variable_definition_exception.cpp
+        Exceptions/Compiling/Analysis/duplicate_variable_definition_exception.h
+        Exceptions/Compiling/Analysis/invalid_variable_declaration_exception.cpp
+        Exceptions/Compiling/Analysis/invalid_variable_declaration_exception.h
+        Analysis/Structure/Nodes/Local/Scopes/scope.cpp
+        Analysis/Structure/Nodes/Local/Scopes/scope.h
+        Analysis/Structure/Enums/scope_type.h
+        Analysis/Structure/Enums/scope_type.cpp
+        Analysis/Structure/Core/default_valued.cpp
+        Analysis/Structure/Core/default_valued.h
+        Parsing/ParseNodes/Values/null_node.cpp
+        Parsing/ParseNodes/Values/null_node.h
+        Analysis/Creation/Binding/project_binder.cpp
+        Analysis/Creation/Binding/project_binder.h
+        Exceptions/Compiling/Analysis/static_binding_exception.cpp
+        Exceptions/Compiling/Analysis/static_binding_exception.h
 )
 
 

@@ -10,4 +10,3 @@ namespace Analysis::Structure::Creation
     FunctionDefinition::FunctionDefinition(const string& name, const Enums::Describer describer, const DataType* creationType) : Nameable(name), Function(describer, creationType)
     { }
 }
-

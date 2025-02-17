@@ -86,7 +86,7 @@ namespace Parsing
     {
         TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true);
 
-        const auto describer = new DescriberNode();
+        const auto describer = new DescriberNode(index - 1);
         while (index < source->TokenCount())
         {
             const auto current = Current();
@@ -132,7 +132,7 @@ namespace Parsing
             const auto type =  ParseType();
             index += 2;
 
-            return ParseVariableDeclaration(new DescriberNode(), type, breakSeparator);
+            return ParseVariableDeclaration(new DescriberNode(index), type, breakSeparator);
         }
 
         const auto entity = ParseEntity(breakSeparator);
@@ -175,7 +175,7 @@ namespace Parsing
                         const auto type = CheckType(entity);
                         index++;
 
-                        return ParseFunction(new DescriberNode(), type);
+                        return ParseFunction(new DescriberNode(index), type);
                     }
                 case TokenType::Separator:
                     {
@@ -212,7 +212,6 @@ namespace Parsing
                     index++;
                     return new ThrowStatementNode(ParseNonEmptyExpression(breakSeparator), current, Current());
                 }
-                break;
             case SyntaxKind::If:
                 return ParseIf();
             case SyntaxKind::While:
@@ -248,11 +247,11 @@ namespace Parsing
                     return new ContinueNode(keyword);
                 }
             case SyntaxKind::Enum:
-                return ParseEnumDefinition(new DescriberNode());
+                return ParseEnumDefinition(new DescriberNode(index));
             case SyntaxKind::Class:
-                return ParseClassDefinition(new DescriberNode());
+                return ParseClassDefinition(new DescriberNode(index));
             case SyntaxKind::Struct:
-                return ParseStructDefinition(new DescriberNode());
+                return ParseStructDefinition(new DescriberNode(index));
             default:
                 {
                     if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
@@ -262,9 +261,9 @@ namespace Parsing
 
                         const auto cur = Current();
                         if (MatchToken(cur, SyntaxKind::Colon, true))
-                            return ParseVariableDeclaration(new DescriberNode(), type, breakSeparator);
+                            return ParseVariableDeclaration(new DescriberNode(index), type, breakSeparator);
                         if (MatchType(cur, TokenType::Identifier))
-                            return ParseFunction(new DescriberNode(), type);
+                            return ParseFunction(new DescriberNode(index), type);
                     }
                 }
                 break;
@@ -353,7 +352,7 @@ namespace Parsing
     {
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
 
-        const auto scope = new ScopeNode();
+        const auto scope = new ScopeNode(index - 1);
         for (; index < source->TokenCount(); index++)
         {
             if (MatchToken(Current(), SyntaxKind::FlowerCloseBracket))

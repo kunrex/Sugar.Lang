@@ -1,28 +1,41 @@
 #include "explicit_cast.h"
 
+#include <format>
+
 #include "../../../Core/DataTypes/data_type.h"
 
 using namespace ParseNodes;
+using namespace ParseNodes::Groups;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    ExplicitCast::ExplicitCast(const Enums::Describer describer, const DataType* creationType, const ParseNode* body) : CastDefinition(describer, creationType), Scoped(body)
+    ExplicitCast::ExplicitCast(const Enums::Describer describer, const DataType* creationType, const ScopeNode* body) : CastDefinition(describer, creationType), Scoped(body)
     { }
 
-    void ExplicitCast::SetParent(const DataType* parent)
+    MemberType ExplicitCast::MemberType() const { return MemberType::ExplicitCast; }
+
+    const std::string& ExplicitCast::FullName() const
     {
-        GlobalNode::SetParent(parent);
-        fullName = parent->FullName() + "::__explicit__" + creationType->FullName();
+        if (fullName.empty())
+            fullName = parent->FullName() + "::__explicit__" + creationType->FullName();
+
+        return fullName;
     }
 
-    bool ExplicitCast::operator<(const ExplicitCast& rhs) const
+    const std::string& ExplicitCast::SignatureString() const
     {
-        if (fullName != rhs.fullName)
-            return fullName < rhs.fullName;
+        if (signature.empty())
+            signature = std::format("{} {}{}", creationType->FullName(), FullName(), ArgumentSignatureString());
 
-        return Function::operator<(rhs);
+        return signature;
+    }
+
+    void ExplicitCast::AddArgument(const Creation::Variable* parameter)
+    {
+        Scoped::AddArgument(parameter);
+        PushParameterType(parameter->CreationType());
     }
 }

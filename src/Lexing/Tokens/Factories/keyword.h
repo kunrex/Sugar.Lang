@@ -1,8 +1,7 @@
 #ifndef KEYWORD_H
 #define KEYWORD_H
 
-#include <map>
-#include <optional>
+#include <unordered_map>
 
 #include "../token.h"
 #include "../Enums/keyword_type.h"

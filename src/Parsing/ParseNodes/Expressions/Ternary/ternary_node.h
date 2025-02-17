@@ -24,6 +24,8 @@ namespace ParseNodes::Expressions
             [[nodiscard]] const ParseNode* True() const;
             [[nodiscard]] const ParseNode* False() const;
 
+            [[nodiscard]] unsigned long Index() const override;
+
             ~TernaryNode() override;
     };
 }

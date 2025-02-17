@@ -20,7 +20,7 @@ namespace ParseNodes::Functions::Calling
 
             [[nodiscard]] const ParseNode* Type() const;
 
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~ConstructorCallNode() override;
     };

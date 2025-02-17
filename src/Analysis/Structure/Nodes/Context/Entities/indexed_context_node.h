@@ -8,13 +8,11 @@ namespace Analysis::Structure::Context
     class IndexedContextNode : public VariableContext
     {
         protected:
-            int index;
+            const int index;
 
-            IndexedContextNode(const Creation::Variable* variable, int index);
+            IndexedContextNode(const Core::Characteristic* characteristic, int index);
 
         public:
-            [[nodiscard]] int SlotCount() const override;
-
             [[nodiscard]] int Index() const;
     };
 }

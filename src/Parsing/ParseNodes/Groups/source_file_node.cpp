@@ -8,4 +8,12 @@ namespace ParseNodes::Groups
     { }
 
     NodeType SourceFileNode::NodeType() const { return NodeType::Source; }
+
+    unsigned long SourceFileNode::Index() const
+    {
+        if (!children.empty())
+            return children[0]->Index();
+
+        return 0;
+    }
 }

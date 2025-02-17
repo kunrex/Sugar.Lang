@@ -5,7 +5,7 @@
 
 namespace ParseNodes::Statements
 {
-    class ThrowStatementNode : public StatementNode
+    class ThrowStatementNode final : public StatementNode
     {
         private:
             const ParseNode* exception;
@@ -18,6 +18,8 @@ namespace ParseNodes::Statements
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
             [[nodiscard]] const ParseNode* Exception() const;
+
+            [[nodiscard]] unsigned long Index() const override;
 
             ~ThrowStatementNode() override;
     };

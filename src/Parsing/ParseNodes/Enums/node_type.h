@@ -13,6 +13,7 @@ namespace ParseNodes::Enums
         StatementCollection,
 
         This,
+        Null,
         Generic,
 
         VoidType,
@@ -34,6 +35,7 @@ namespace ParseNodes::Enums
         Get,
         Set,
         Property,
+        PropertyInitialisation,
 
         For,
         While,
@@ -45,12 +47,12 @@ namespace ParseNodes::Enums
         FunctionParameters,
         FunctionDeclaration,
         ConstructorDeclaration,
-        DestructorDeclaration,
 
         Print,
         Input,
         Invoke,
         Format,
+        Println,
         FuncRef,
         ToString,
 
@@ -71,17 +73,14 @@ namespace ParseNodes::Enums
         Return,
         Continue,
 
+        Throw,
+
         If,
         Else,
         ElseIf,
         IfChain,
 
         Describer,
-
-        Try,
-        Catch,
-        Throw,
-        Finally,
 
         OperatorOverload,
         IndexerDeclaration,

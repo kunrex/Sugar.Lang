@@ -4,8 +4,10 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Groups
 {
-    CompoundDeclarationNode::CompoundDeclarationNode() : NodeCollection()
+    ExpressionListNode::ExpressionListNode(const unsigned long index) : NodeCollection(), index(index)
     { }
 
-    NodeType CompoundDeclarationNode::NodeType() const { return NodeType::CompoundCreation; }
+    NodeType ExpressionListNode::NodeType() const { return NodeType::StatementCollection; }
+
+    unsigned long ExpressionListNode::Index() const { return index; }
 }

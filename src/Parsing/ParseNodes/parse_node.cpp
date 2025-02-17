@@ -13,9 +13,7 @@ using namespace ParseNodes::Statements;
 namespace ParseNodes
 {
     ParseNode::ParseNode() : IParseNode()
-    {
-
-    }
+    { }
 
     bool ParseNode::DefinesChildren() const { return false; }
 
@@ -41,8 +39,10 @@ namespace ParseNodes
     { }
 
     template <class TChild>
-    NodeCollection<TChild>::NodeCollection() : Services::ConstantCollection<TChild>()
-    { }
+    NodeCollection<TChild>::NodeCollection() : ParseNode(), Services::ConstantCollection<TChild>()
+    {
+
+    }
 
     template <class TChild>
     void NodeCollection<TChild>::PrintChildren(std::string indent) const

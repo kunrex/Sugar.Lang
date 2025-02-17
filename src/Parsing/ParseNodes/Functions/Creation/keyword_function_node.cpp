@@ -2,8 +2,12 @@
 
 using namespace Tokens;
 
+using namespace ParseNodes::Groups;
+
 namespace ParseNodes::Functions::Creation
 {
-    KeywordFunctionNode::KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const ParseNode* body, const Token& keyword) : FunctionNode(describer, type, parameters, body), keyword(keyword)
+    KeywordFunctionNode::KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const CompoundDeclarationNode* parameters, const ScopeNode* body, const Token& keyword) : FunctionNode(describer, type, parameters, body), keyword(keyword)
     { }
+
+    unsigned long KeywordFunctionNode::Index() const { return keyword.Index(); }
 }

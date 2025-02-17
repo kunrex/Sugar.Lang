@@ -8,33 +8,42 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Core
 {
-    Function::Function(const Enums::Describer describer, const DataType* creationType) : Describable(describer), Created(creationType)
+    Function::Function(const Enums::Describer describer, const DataType* creationType) : Describable(describer), Created(creationType), parameterTypes()
     { }
 
     bool Function::Readable() const { return true; }
     bool Function::Writable() const { return false; }
 
-    std::string Function::SignatureString() const
+    const std::string& Function::ArgumentSignatureString() const
     {
-        string signature = "(";
-
-        for (int i = 0; i < ChildCount(); i++)
+        if (argumentSignature.empty())
         {
-            signature += GetChild(i)->CreationType()->FullName();
-            if (i < ChildCount() - 1)
-                signature += " ";
+            argumentSignature += "(";
+            for (int i = 0; i < parameterTypes.size(); i++)
+            {
+                argumentSignature += parameterTypes.at(i)->FullName();
+                if (i != parameterTypes.size() - 1)
+                    argumentSignature += " ";
+            }
+
+            argumentSignature += ")";
         }
 
-        return signature + ")";
+        return argumentSignature;
     }
 
-    bool Function::operator<(const Function& rhs) const
+    int Function::ParameterCount() const { return parameterTypes.size(); }
+
+    void Function::PushParameterType(const DataType* argument)
     {
-        for (int i = 0; i < std::min(children.size(), rhs.children.size()); i++)
-            if (children[i]->Name() != rhs.children[i]->Name())
-                return children[i]->Name() < rhs.children[i]->Name();
-
-        return false;
+        parameterTypes.push_back(argument);
     }
 
+    const DataType* Function::ParameterAt(const int index) const
+    {
+        if (index > -1 && index < parameterTypes.size())
+            return parameterTypes.at(index);
+
+        return nullptr;
+    }
 }

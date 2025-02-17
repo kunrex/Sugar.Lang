@@ -15,7 +15,7 @@ namespace ParseNodes::Functions::Calling
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
-            [[nodiscard]] const Values::IdentifierNode* Identifier() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~FunctionCallNode() override;
     };

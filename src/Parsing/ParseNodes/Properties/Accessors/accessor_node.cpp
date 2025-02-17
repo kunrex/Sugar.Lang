@@ -2,12 +2,13 @@
 
 using namespace Tokens;
 
+using namespace ParseNodes::Groups;
 using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    AccessorNode::AccessorNode(const DescriberNode* describer, const ParseNode* body, const Token& keyword) : ParseNode(), DescribableNode(describer), BodyNode(body), keyword(keyword)
+    AccessorNode::AccessorNode(const DescriberNode* describer, const ScopeNode* body, const Token& keyword) : ParseNode(), DescribableNode(describer), BodyNode(body), keyword(keyword)
     { }
 
-    const Token& AccessorNode::Keyword() const { return keyword; }
+    unsigned long AccessorNode::Index() const { return keyword.Index(); }
 }

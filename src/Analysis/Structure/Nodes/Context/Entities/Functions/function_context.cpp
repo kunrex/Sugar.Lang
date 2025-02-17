@@ -3,36 +3,44 @@
 #include "../../../../Core/DataTypes/data_type.h"
 
 #include <format>
+#include <functional>
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::Context
 {
-    FunctionContext::FunctionContext(const FunctionDefinition* function) : ContextNode(function->CreationType()), function(function)
+    FunctionContext::FunctionContext(const FunctionDefinition* function, bool isStatic) : ContextNode(function->CreationType()), cilInstruction(std::format("call {} {}", isStatic ? "" : "instance", function->SignatureString())), slotCount(-1), function(function)
     { }
 
-    std::string FunctionContext::InstructionGet() const { return std::format("call {}{} {}{}", function->CheckDescriber(Describer::Static) ? "" : "instance ", function->CreationType()->FullName(), function->FullName(), function->SignatureString()); }
-    std::string FunctionContext::InstructionSet() const { return ""; }
+    MemberType FunctionContext::MemberType() const { return MemberType::FunctionCallContext; }
 
-    bool FunctionContext::IsStatic() const { return function->CheckDescriber(Describer::Static); }
+    bool FunctionContext::Readable() const { return true; }
+    bool FunctionContext::Writable() const { return function->Writable(); }
+
+    std::string FunctionContext::InstructionGet() const { return cilInstruction; }
+    std::string FunctionContext::InstructionSet() const { return ""; }
 
     int FunctionContext::SlotCount() const
     {
-        int current = 0, maxCount = 0;
-        for (const auto child : children)
+        if (slotCount == -1)
         {
-            if (const auto c = std::max(child->SlotCount(), child->CreationType()->SlotCount()); current + c > maxCount)
-                maxCount = current + c;
+            slotCount = 0;
 
-            current += child->CreationType()->SlotCount();
+            int argCount = 0;
+            for (const auto child: children)
+            {
+                if (const auto size = child->SlotCount(); size > slotCount - argCount)
+                    slotCount = size + argCount;
+
+                argCount += child->CreationType()->SlotCount();
+                slotCount += child->CreationType()->SlotCount();
+            }
+
+            slotCount = std::max(creationType->SlotCount(), slotCount);
         }
 
-        auto result = maxCount + !function->CheckDescriber(Describer::Static);
-        if (result == 0 and function->CreationType() != nullptr)
-            result = 1;
-
-        return result;
+        return slotCount;
     }
 }
 

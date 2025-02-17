@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "../../Analysis/Structure/Wrappers/Generic/generic_extensions.h"
 
 #include "../../Exceptions/exception_manager.h"
 #include "../../Exceptions/Compiling/Parsing/invalid_token_exception.h"
@@ -32,6 +33,7 @@
 #include "../ParseNodes/Types/Keyword/Generic/action_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/nullable_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/dictionary_type_node.h"
+#include "../ParseNodes/Values/null_node.h"
 
 using namespace std;
 
@@ -48,6 +50,8 @@ using namespace ParseNodes::Values;
 using namespace ParseNodes::Constants;
 using namespace ParseNodes::Statements;
 using namespace ParseNodes::Expressions;
+
+using namespace Analysis::Structure::Wrappers;
 
 namespace Parsing
 {
@@ -146,7 +150,7 @@ namespace Parsing
                 if (output.size() % 2 == tokens.size() % 2)
                 {
                     ExceptionManager::Instance().AddChild(new TokenExpectedException(expected, Current(), source));
-                    output.push(new InvalidNode());
+                    output.push(new InvalidNode(index));
                 }
 
                 ClearStack(tokens, output);
@@ -167,7 +171,7 @@ namespace Parsing
             return top;
         }
 
-        const auto invalidNode = new InvalidNode();
+        const auto invalidNode = new InvalidNode(index);
         while (!output.empty())
         {
             const auto top = output.top();
@@ -221,6 +225,9 @@ namespace Parsing
                                     break;
                                 case SyntaxKind::Create:
                                     output.push(ParseConstructorCall());
+                                    break;
+                                case SyntaxKind::Null:
+                                    output.push(new NullNode(current));
                                     break;
                                 default:
                                     {
@@ -402,7 +409,7 @@ namespace Parsing
                 }
             default:
                 {
-                    const auto invalidNode = new InvalidNode();
+                    const auto invalidNode = new InvalidNode(index);
                     while (!output.empty())
                     {
                         const auto top = output.top();
@@ -423,7 +430,7 @@ namespace Parsing
         if (expression->NodeType() == NodeType::Empty)
         {
             ExceptionManager::Instance().AddChild(new EmptyExpressionException(Current(), source));
-            const auto invalid = new InvalidNode();
+            const auto invalid = new InvalidNode(index);
             invalid->AddChild(expression);
             return invalid;
         }
@@ -463,7 +470,7 @@ namespace Parsing
     {
         TryMatchToken(Current(), SyntaxKind::LesserThan, true);
 
-        const auto generic = new GenericNode();
+        const auto generic = new GenericNode(index - 1);
         while (index < source->TokenCount())
         {
             if (MatchType(Current(), TokenType::Keyword | TokenType::Identifier))
@@ -549,6 +556,9 @@ namespace Parsing
                 {
                     index++;
                     const auto generic = ParseGeneric();
+                    if (generic->ChildCount() > max_tuple_length)
+                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_tuple_length, current, source));
+
                     return new TupleTypeNode(current, generic);
                 }
             case SyntaxKind::Dictionary:
@@ -564,12 +574,18 @@ namespace Parsing
                 {
                     index++;
                     const auto generic = ParseGeneric();
+                    if (generic->ChildCount() > max_delegate_length)
+                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+
                     return new FuncTypeNode(current, generic);
                 }
             case SyntaxKind::Action:
                 {
                     index++;
                     const auto generic = ParseGeneric();
+                    if (generic->ChildCount() > max_delegate_length)
+                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+
                     return new ActionTypeNode(current, generic);
                 }
             case SyntaxKind::Nullable:
@@ -610,7 +626,7 @@ namespace Parsing
             default:
                 {
                     ExceptionManager::Instance().AddChild(new ParsingException("Type expected", Current(), source));;
-                    const auto invalid = new InvalidNode();
+                    const auto invalid = new InvalidNode(index);
                     invalid->AddChild(parsed);
                     return invalid;
                 }

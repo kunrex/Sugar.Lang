@@ -13,11 +13,15 @@ namespace Analysis::Structure::Context
     class ContextNode : public Core::Interfaces::INode, public Core::Created, public Core::Interfaces::ISlotSize, public Core::Interfaces::IReadWrite
     {
         protected:
+            mutable int slotCount;
+
             explicit ContextNode(const Core::DataType* creationType);
 
         public:
             [[nodiscard]] virtual std::string InstructionGet() const = 0;
             [[nodiscard]] virtual std::string InstructionSet() const = 0;
+
+            [[nodiscard]] int SlotCount() const override;
     };
 }
 

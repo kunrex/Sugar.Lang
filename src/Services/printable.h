@@ -3,15 +3,15 @@
 
 #include <iostream>
 
-#include "destructible.h"
-
 namespace Services
 {
-    class Printable : Destructible
+    class Printable
     {
         public:
             virtual void Print() const;
             virtual void Print(std::string indent, bool last) const;
+
+            virtual ~Printable() = 0;
     };
 }
 

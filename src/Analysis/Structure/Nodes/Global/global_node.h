@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class GlobalNode : public Core::Interfaces::INode, public Services::Child<Core::DataType>
+    class GlobalNode : public virtual Core::Interfaces::INode, public Services::ConstantChild<Core::DataType>
     {
         protected:
             GlobalNode();

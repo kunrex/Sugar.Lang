@@ -5,7 +5,7 @@
 #include "../Core/entity_node.h"
 #include "../Core/property_node.h"
 #include "../../../Lexing/Tokens/token.h"
-#include "../Groups/expression_list_node.h"
+#include "../Groups/compound_declaration_node.h"
 
 namespace ParseNodes::Properties
 {
@@ -23,7 +23,7 @@ namespace ParseNodes::Properties
 
             [[nodiscard]] const Groups::CompoundDeclarationNode* Parameters() const;
 
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~BaseIndexerNode() override;
     };

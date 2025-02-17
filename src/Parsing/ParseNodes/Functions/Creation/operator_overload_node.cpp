@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    OperatorOverloadNode::OperatorOverloadNode(const DescriberNode* describer, const ParseNode* type, const Token& base, const CompoundDeclarationNode* parameters, const ParseNode* body, const Token& keyword) : KeywordFunctionNode(describer, type, parameters, body, keyword), base(base)
+    OperatorOverloadNode::OperatorOverloadNode(const DescriberNode* describer, const ParseNode* type, const Token& base, const CompoundDeclarationNode* parameters, const ScopeNode* body, const Token& keyword) : KeywordFunctionNode(describer, type, parameters, body, keyword), base(base)
     { }
 
     NodeType OperatorOverloadNode::NodeType() const { return NodeType::OperatorOverload; }

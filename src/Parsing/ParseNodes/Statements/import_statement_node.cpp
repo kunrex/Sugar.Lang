@@ -1,5 +1,7 @@
 #include "import_statement_node.h"
 
+using namespace std;
+
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
@@ -10,4 +12,6 @@ namespace ParseNodes::Statements
     { }
 
     NodeType ImportStatementNode::NodeType() const { return NodeType::Import; }
+
+    string ImportStatementNode::Path() const { return string(*path.Value<std::string_view>()); }
 }

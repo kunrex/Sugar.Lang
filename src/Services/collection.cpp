@@ -35,7 +35,7 @@ namespace Services
     int Collection<TChild>::ChildCount() const { return children.size(); }
 
     template <typename TChild>
-    const TChild* Collection<TChild>::GetChild(int index) const
+    TChild* Collection<TChild>::GetChild(int index) const
     {
         return children.at(index);
     }
@@ -47,13 +47,13 @@ namespace Services
     }
 
     template <typename TChild>
-    typename std::vector<const TChild*>::const_iterator Collection<TChild>::begin() const
+    typename std::vector<TChild*>::const_iterator Collection<TChild>::begin() const
     {
         return children.begin();
     }
 
     template <typename TChild>
-    typename std::vector<const TChild*>::const_iterator Collection<TChild>::end() const
+    typename std::vector<TChild*>::const_iterator Collection<TChild>::end() const
     {
         return children.end();
     }
@@ -71,51 +71,19 @@ namespace Services
     }
 
     template <typename TChild>
-    ConstantCollection<TChild>::ConstantCollection() : children()
+    ConstantCollection<TChild>::ConstantCollection() : Collection<const TChild>()
     { }
-
-    template <typename TChild>
-    int ConstantCollection<TChild>::ChildCount() const { return children.size(); }
-
-    template <typename TChild>
-    const TChild* ConstantCollection<TChild>::GetChild(int index) const
-    {
-        return children.at(index);
-    }
-
-    template <typename TChild>
-    void ConstantCollection<TChild>::AddChild(const TChild* child)
-    {
-        children.push_back(child);
-    }
-
-    template <typename TChild>
-    typename std::vector<const TChild*>::const_iterator ConstantCollection<TChild>::begin() const
-    {
-        return children.begin();
-    }
-
-    template <typename TChild>
-    typename std::vector<const TChild*>::const_iterator ConstantCollection<TChild>::end() const
-    {
-        return children.end();
-    }
-
-    template <typename TChild>
-    ConstantCollection<TChild>::~ConstantCollection()
-    {
-        if (children.size() > 0)
-        {
-            for (auto child: children)
-                delete child;
-
-            children.clear();
-        }
-    }
 
     template class Collection<DataType>;
     template class Collection<ContextNode>;
     template class Collection<SourceObject>;
+
+    template class Collection<const Token>;
+    template class Collection<const Variable>;
+    template class Collection<const ParseNode>;
+    template class Collection<const ConditionNode>;
+    template class Collection<const DeclarationNode>;
+    template class Collection<const CompileException>;
 
     template class ConstantCollection<Token>;
     template class ConstantCollection<Variable>;

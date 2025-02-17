@@ -113,6 +113,7 @@ namespace Parsing
 
     InvalidNode* Parser::ParseInvalid(const SeparatorKind breakOut)
     {
+        const auto start = index;
         const SeparatorKind extra = SeparatorKind::Semicolon | SeparatorKind::FlowerOpenBracket | SeparatorKind::FlowerCloseBracket;
         const SeparatorKind match = breakOut | extra;
 
@@ -127,7 +128,7 @@ namespace Parsing
             }
         }
 
-        return new InvalidNode();
+        return new InvalidNode(start);
     }
 
     void Parser::Parse(Analysis::Structure::SourceFile* source)

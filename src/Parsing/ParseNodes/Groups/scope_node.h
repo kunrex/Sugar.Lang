@@ -7,10 +7,15 @@ namespace ParseNodes::Groups
 {
     class ScopeNode final : public NodeCollection<ParseNode>
     {
+        private:
+            const unsigned long index;
+
         public:
-            ScopeNode();
+            explicit ScopeNode(unsigned long index);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

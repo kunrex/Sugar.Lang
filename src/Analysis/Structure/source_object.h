@@ -22,7 +22,7 @@ namespace Analysis::Structure
             virtual void ReferenceThis(SourceObject* other) = 0;
             virtual void AddReference(const Core::DataType* dataType) = 0;
 
-            void SetParent(const SourceObject* parent) override;
+            [[nodiscard]] const std::string& FullName() const override;
     };
 }
 

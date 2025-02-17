@@ -13,12 +13,12 @@ namespace ParseNodes::Conditions
 
             const Tokens::Token& keyword;
 
-            ConditionNode(const ParseNode* condition, const ParseNode* body, const Tokens::Token& keyword);
+            ConditionNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
 
         public:
             [[nodiscard]] virtual const ParseNode* Condition() const;
 
-            [[nodiscard]] virtual const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~ConditionNode() override;
     };

@@ -7,7 +7,7 @@
 
 namespace ParseNodes::Core
 {
-    class CharacteristicNode : public NameableNode, public DescribableNode, public EntityNode
+    class CharacteristicNode : public DescribableNode, public EntityNode, public NameableNode
     {
         protected:
             CharacteristicNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier);

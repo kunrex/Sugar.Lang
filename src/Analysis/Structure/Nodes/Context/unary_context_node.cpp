@@ -9,9 +9,6 @@ namespace Analysis::Structure::Context
 
     const ContextNode* UnaryContextNode::Operand() const { return operand; }
 
-    bool UnaryContextNode::Readable() const { return true; }
-    bool UnaryContextNode::Writable() const { return false; }
-
     UnaryContextNode::~UnaryContextNode()
     {
         delete operand;

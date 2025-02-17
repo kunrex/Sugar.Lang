@@ -1,7 +1,6 @@
 #include "parser.h"
 
 #include "../ParseNodes/Conditions/if_node.h"
-#include "../ParseNodes/Conditions/elif_node.h"
 #include "../ParseNodes/Conditions/else_node.h"
 
 using namespace Tokens::Enums;
@@ -33,7 +32,7 @@ namespace Parsing
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
                         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-                        const auto body = ParseStatement();
+                        const auto body = ParseScope();
 
                         chain->AddChild(new IfNode(condition, body, keyword));
                         flag = true;
@@ -45,15 +44,15 @@ namespace Parsing
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
                         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-                        const auto body = ParseStatement();
+                        const auto body = ParseScope();
 
-                        chain->AddChild(new ElifNode(condition, body, keyword));
+                        chain->AddChild(new IfNode(condition, body, keyword));
                     }
                     break;
                 case SyntaxKind::Else:
                     {
                         flag = false;
-                        chain->AddChild(new ElseNode(ParseStatement(), keyword));;
+                        chain->AddChild(new ElseNode(ParseScope(), keyword));;
                     }
                     break;
                 default:

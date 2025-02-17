@@ -11,9 +11,7 @@ namespace ParseNodes::Types
             explicit BuiltInTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-            [[nodiscard]] Tokens::Enums::SyntaxKind Type() const;
-
-            ~BuiltInTypeNode() override;
+            [[nodiscard]] Tokens::Enums::SyntaxKind Kind() const;
     };
 }
 

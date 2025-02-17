@@ -1,10 +1,11 @@
 #ifndef CIL_TRANSPILER_H
 #define CIL_TRANSPILER_H
 
-#include "../../Structure/source_file.h"
-#include "../../Structure/source_directory.h"
+#include "../../../Services/string_builder.h"
 #include "../../../Services/singleton_service.h"
-#include "../../Structure/Nodes/Context/context_node.h"
+
+#include "../../Structure/source_directory.h"
+#include "../../Structure/source_file.h"
 
 namespace Analysis::Creation
 {
@@ -14,21 +15,22 @@ namespace Analysis::Creation
             const std::string projectName;
             const std::string projectDirectory;
 
-            std::string source;
+            const Structure::SourceDirectory* source;
 
-            void TranspileFile(const Structure::SourceFile* file);
-            void TranspileDirectory(const Structure::SourceDirectory* directory);
+            bool isExecutable;
+            Services::StringBuilder* stringBuilder;
 
-            void TranspileDataType(const Structure::Core::DataType* dataType);
+            void CILTranspiler::TranspileDirectory(const Structure::SourceDirectory* directory);
 
-            void TranspileEntity(const std::string& indent, const Structure::Context::ContextNode* entity);
-            void TranspileEntityInit(const std::string& indent, const Structure::Context::ContextNode* entity);
+            void CILTranspiler::TranspileFile(const Structure::SourceFile* file);
+            void CILTranspiler::TranspileDataType(const Structure::Core::DataType* dataType);
+
         public:
-            CILTranspiler(std::string name, std::string directory);
+            CILTranspiler(std::string name, std::string directory, const Structure::SourceDirectory* source);
 
-            [[nodiscard]] bool TryCreateFile() const;
+            void Transpile();
 
-            void Transpile(const Structure::SourceDirectory* directory);
+            ~CILTranspiler() override;
     };
 }
 

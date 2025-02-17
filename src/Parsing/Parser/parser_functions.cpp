@@ -1,11 +1,11 @@
 #include "parser.h"
 
 #include "../../Exceptions/exception_manager.h"
+#include "../ParseNodes/Statements/initialisation_node.h"
+#include "../ParseNodes/Properties/assigned_property_node.h"
 #include "../../Exceptions/Compiling/Parsing/invalid_token_exception.h"
 #include "../../Exceptions/Compiling/Parsing/token_expected_exception.h"
 #include "../../Exceptions/Compiling/Parsing/function_argument_exception.h"
-
-#include "../ParseNodes/Statements/initialisation_node.h"
 
 using namespace Exceptions;
 
@@ -30,7 +30,7 @@ namespace Parsing
         const GetNode* get = nullptr;
         const SetNode* set = nullptr;
 
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode();
+        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
         if (MatchToken(Current(), SyntaxKind::Get))
         {
             const auto current = Current();
@@ -43,7 +43,7 @@ namespace Parsing
             index++;
         }
 
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode();
+        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
         if (MatchToken(Current(), SyntaxKind::Set))
         {
             const auto current = Current();
@@ -59,6 +59,12 @@ namespace Parsing
         TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket, true);
         if (get == nullptr && set == nullptr)
             ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Get, Current(), source));
+
+        if (MatchToken(Current(), SyntaxKind::Equals, true))
+        {
+            const auto value = ParseNonEmptyExpression(SeparatorKind::Semicolon);
+            return new AssignedPropertyNode(describer, type, identifier, get, set, value);;
+        }
 
         return new BasePropertyNode(describer, type, identifier, get, set);
     }
@@ -79,7 +85,7 @@ namespace Parsing
         const GetNode* get = nullptr;
         const SetNode* set = nullptr;
 
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode();
+        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
         if (MatchToken(Current(), SyntaxKind::Get))
         {
             const auto current = Current();
@@ -92,7 +98,7 @@ namespace Parsing
             index++;
         }
 
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode();
+        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
         if (MatchToken(Current(), SyntaxKind::Set))
         {
             const auto current = Current();
@@ -127,7 +133,7 @@ namespace Parsing
                 index++;
             }
             else
-                describer = new DescriberNode();
+                describer = new DescriberNode(index);
 
             const auto type = ParseType();
             index++;
@@ -282,6 +288,19 @@ namespace Parsing
         return print;
     }
 
+    const PrintlnNode* Parser::ParsePrintlnCall()
+    {
+        const auto keyword = Current();
+        const auto print = new PrintlnNode(keyword);;
+        index++;
+
+        ParseFunctionArguments(print);
+        if (print->ChildCount() != 1)
+            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+
+        return print;
+    }
+
     const InputNode* Parser::ParseInputCall()
     {
         const auto keyword = Current();
@@ -312,6 +331,9 @@ namespace Parsing
         index++;
 
         ParseFunctionArguments(invoke);
+        if (invoke->ChildCount() < 1)
+            ExceptionManager::Instance().AddChild(new MinimumFunctionArgumentException(1, keyword, source));
+
         return invoke;
     }
 
@@ -326,7 +348,7 @@ namespace Parsing
         const auto funcRef = new FuncRefNode(generic, keyword);
 
         ParseFunctionArguments(funcRef);
-        if (funcRef->ChildCount() != 1)
+        if (funcRef->ChildCount() != 2)
             ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
 
         return funcRef;

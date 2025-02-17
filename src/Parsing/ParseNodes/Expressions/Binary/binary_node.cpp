@@ -12,6 +12,8 @@ namespace ParseNodes::Expressions
     const ParseNode* BinaryNode::LHS() const { return lhs; }
     const ParseNode* BinaryNode::RHS() const { return rhs; }
 
+    unsigned long BinaryNode::Index() const { return lhs->Index(); }
+
     BinaryNode::~BinaryNode()
     {
         delete lhs;

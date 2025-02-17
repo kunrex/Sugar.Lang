@@ -14,7 +14,7 @@ namespace Analysis::Structure::DataTypes
             std::map<std::string, std::tuple<int, Core::Characteristic>> characteristics;
 
         public:
-            Enum(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* parseNode);
+            Enum(Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
             [[nodiscard]] int SlotCount() const override;

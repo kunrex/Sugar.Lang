@@ -2,20 +2,25 @@
 #define BUILT_IN_UNARY_EXPRESSION_H
 
 #include "../unary_context_node.h"
-#include "../../Global/BuiltIn/built_in_operation.h"
+#include "../../Creation/Functions/overload_definition.h"
 
 namespace Analysis::Structure::Context
 {
     class BuiltInUnaryExpression final : public UnaryContextNode
     {
         private:
-            const Global::BuiltInOperation* operation;
+            const std::string cilExpression;
 
         public:
-            BuiltInUnaryExpression(const Global::BuiltInOperation* operation, const ContextNode* operand);
+            BuiltInUnaryExpression(const Creation::OverloadDefinition* operation, const ContextNode* operand);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] std::string InstructionGet() const override;
             [[nodiscard]] std::string InstructionSet() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
     };
 }
 

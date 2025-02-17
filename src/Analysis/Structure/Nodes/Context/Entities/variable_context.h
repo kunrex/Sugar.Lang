@@ -2,16 +2,16 @@
 #define VARIABLE_CONTEXT_H
 
 #include "../context_node.h"
-#include "../../Creation/Variables/variable.h"
+#include "../../../Core/Creation/characteristic.h"
 
 namespace Analysis::Structure::Context
 {
     class VariableContext : public ContextNode
     {
         protected:
-            const Creation::Variable* variable;
+            const Core::Characteristic* characteristic;
 
-            explicit VariableContext(const Creation::Variable* variable);
+            explicit VariableContext(const Core::Characteristic* characteristic);
     };
 }
 

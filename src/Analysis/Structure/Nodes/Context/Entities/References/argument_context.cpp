@@ -1,12 +1,15 @@
 #include "argument_context.h"
 
+using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::Context
 {
-    ArgumentContext::ArgumentContext(const Variable* variable, const int index) : IndexedContextNode(variable, index)
+    ArgumentContext::ArgumentContext(const Characteristic* characteristic, const int index) : IndexedContextNode(characteristic, index)
     { }
+
+    bool ArgumentContext::Readable() const { return characteristic->Readable(); }
+    bool ArgumentContext::Writable() const { return characteristic->Writable(); }
 
     MemberType ArgumentContext::MemberType() const { return MemberType::FunctionArgumentContext; }
 

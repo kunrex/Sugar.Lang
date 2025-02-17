@@ -8,12 +8,13 @@ namespace Analysis::Structure::Core
     class FullyNameable
     {
         protected:
-            std::string fullName;
+            mutable std::string fullName;
 
             FullyNameable();
 
         public:
-            [[nodiscard]] std::string FullName() const;
+            [[nodiscard]] virtual const std::string& FullName() const = 0;
+            virtual ~FullyNameable() = 0;
     };
 }
 

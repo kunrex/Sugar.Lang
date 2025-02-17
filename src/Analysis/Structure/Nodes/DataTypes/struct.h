@@ -46,7 +46,7 @@ namespace Analysis::Structure::DataTypes
     class StructSource final : public Struct, public Core::UserDefinedType
     {
         public:
-            StructSource(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
+            StructSource(Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
     };
 }
 

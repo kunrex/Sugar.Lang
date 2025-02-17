@@ -13,7 +13,7 @@ namespace ParseNodes::Core
             explicit DescribableNode(const Describers::DescriberNode* describer);
 
         public:
-            [[nodiscard]] const Describers::DescriberNode* Name() const;
+            [[nodiscard]] const Describers::DescriberNode* Describer() const;
 
             virtual ~DescribableNode();
     };

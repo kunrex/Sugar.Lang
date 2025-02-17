@@ -1,19 +1,19 @@
 #ifndef BODY_NODE
 #define BODY_NODE
 
-#include "../parse_node.h"
+#include "../Groups/scope_node.h"
 
 namespace ParseNodes::Core
 {
     class BodyNode
     {
         protected:
-            const ParseNode* body;
+            const Groups::ScopeNode* body;
 
-            explicit BodyNode(const ParseNode* body);
+            explicit BodyNode(const Groups::ScopeNode* body);
 
         public:
-            [[nodiscard]] const ParseNode* Body() const;
+            [[nodiscard]] const Groups::ScopeNode* Body() const;
 
             virtual ~BodyNode();
     };

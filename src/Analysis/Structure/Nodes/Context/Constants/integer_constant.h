@@ -1,0 +1,105 @@
+#ifndef INTEGER_CONSTANT_H
+#define INTEGER_CONSTANT_H
+
+#include "../context_node.h"
+
+namespace Analysis::Structure::Context
+{
+    class ShortConstant final : public ContextNode
+    {
+        private:
+            const short value;
+
+        public:
+            explicit ShortConstant(short value);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+
+    class IntegerConstant final : public ContextNode
+    {
+        private:
+            const int value;
+
+        public:
+            explicit IntegerConstant(int value);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+
+    class LongConstant final : public ContextNode
+    {
+        private:
+            const long value;
+
+        public:
+            explicit LongConstant(long value);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+
+    class CharacterConstant final : public ContextNode
+    {
+        private:
+            const char value;
+
+        public:
+            explicit CharacterConstant(char value);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+
+    class TrueConstant final : public ContextNode
+    {
+        public:
+            TrueConstant();
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+
+    class FalseConstant final : public ContextNode
+    {
+        public:
+            FalseConstant();
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string InstructionGet() const override;
+            [[nodiscard]] std::string InstructionSet() const override;
+    };
+}
+
+#endif

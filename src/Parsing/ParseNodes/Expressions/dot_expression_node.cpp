@@ -10,8 +10,9 @@ namespace ParseNodes::Expressions
     NodeType DotExpressionNode::NodeType() const { return NodeType::Dot; }
 
     const ParseNode* DotExpressionNode::LHS() const { return lhs; }
-
     const ParseNode* DotExpressionNode::RHS() const { return rhs; }
+
+    unsigned long DotExpressionNode::Index() const { return lhs->Index(); }
 
     DotExpressionNode::~DotExpressionNode()
     {

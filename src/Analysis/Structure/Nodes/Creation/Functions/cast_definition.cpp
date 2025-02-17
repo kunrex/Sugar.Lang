@@ -1,5 +1,7 @@
 #include "cast_definition.h"
 
+#include "../../../Core/DataTypes/data_type.h"
+
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 

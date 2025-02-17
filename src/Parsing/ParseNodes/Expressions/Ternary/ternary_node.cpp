@@ -14,6 +14,8 @@ namespace ParseNodes::Expressions
     const ParseNode* TernaryNode::True() const { return trueValue; }
     const ParseNode* TernaryNode::False() const { return condition; }
 
+    unsigned long TernaryNode::Index() const { return condition->Index(); }
+
     TernaryNode::~TernaryNode()
     {
         delete condition;

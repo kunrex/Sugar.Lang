@@ -7,7 +7,7 @@
 
 namespace ParseNodes::DataTypes
 {
-    class DataTypeNode : public ParseNode, Core::DescribableNode, Core::NameableNode
+    class DataTypeNode : public ParseNode, public Core::DescribableNode, public Core::NameableNode
     {
         protected:
             const NodeCollection<ParseNode>* body;
@@ -19,7 +19,7 @@ namespace ParseNodes::DataTypes
         public:
             [[nodiscard]] const NodeCollection<ParseNode>* Body() const;
 
-            [[nodiscard]] const Tokens::Token& Keyword() const;
+            [[nodiscard]] unsigned long Index() const override;
 
             ~DataTypeNode() override;
     };

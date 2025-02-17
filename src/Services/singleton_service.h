@@ -12,12 +12,24 @@ namespace Services
 
         public:
             static TSingleton& Instance();
-            void DestroyInstance() const;
 
             SingletonService(const SingletonService&) = delete;
             SingletonService& operator=(const SingletonService&) = delete;
             SingletonService(SingletonService&&) = delete;
             SingletonService& operator=(SingletonService&&) = delete;
+    };
+
+    class SingletonCollection
+    {
+        protected:
+            SingletonCollection();
+            virtual ~SingletonCollection();
+
+        public:
+            SingletonCollection(const SingletonCollection&) = delete;
+            SingletonCollection& operator=(const SingletonCollection&) = delete;
+            SingletonCollection(SingletonCollection&&) = delete;
+            SingletonCollection& operator=(SingletonCollection&&) = delete;
     };
 }
 

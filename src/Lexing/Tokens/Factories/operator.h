@@ -1,5 +1,5 @@
-#ifndef OPERATORFACTORY_H
-#define OPERATORFACTORY_H
+#ifndef OPERATOR_H
+#define OPERATOR_H
 
 #include <tuple>
 

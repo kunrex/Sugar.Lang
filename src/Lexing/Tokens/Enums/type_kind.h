@@ -1,8 +1,6 @@
 #ifndef TYPE_KIND_H
 #define TYPE_KIND_H
 
-#include <iostream>
-
 namespace Tokens::Enums
 {
     enum class TypeKind : short

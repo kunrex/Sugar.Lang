@@ -9,10 +9,15 @@ namespace Analysis::Structure::Context
     class BuiltInBinaryExpression final : public BinaryContextNode
     {
         private:
-            const Global::BuiltInOperation* operation;
+            const std::string cilExpression;
 
         public:
-            explicit BuiltInBinaryExpression(const Global::BuiltInOperation* operation, const ContextNode* lhs, const ContextNode* rhs);
+            explicit BuiltInBinaryExpression(const Creation::OverloadDefinition* operation, const ContextNode* lhs, const ContextNode* rhs);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string InstructionGet() const override;
             [[nodiscard]] std::string InstructionSet() const override;

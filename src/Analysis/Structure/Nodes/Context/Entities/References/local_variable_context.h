@@ -8,9 +8,12 @@ namespace Analysis::Structure::Context
     class LocalVariableContext final : public IndexedContextNode
     {
         public:
-            LocalVariableContext(const Creation::Variable* variable, int index);
+            LocalVariableContext(const Core::Characteristic* characteristic, int index);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string InstructionGet() const override;
             [[nodiscard]] std::string InstructionSet() const override;

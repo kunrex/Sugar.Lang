@@ -7,5 +7,5 @@ namespace ParseNodes::Functions::Calling
     BaseFunctionCallNode::BaseFunctionCallNode(const Token& keyword) : NodeCollection(), keyword(keyword)
     { }
 
-    const Token& BaseFunctionCallNode::Keyword() const { return keyword; }
+    unsigned long BaseFunctionCallNode::Index() const { return keyword.Index(); }
 }

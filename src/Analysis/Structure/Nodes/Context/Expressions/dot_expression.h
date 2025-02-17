@@ -10,6 +10,11 @@ namespace Analysis::Structure::Context
         public:
             DotExpression(const ContextNode* lhs, const ContextNode* rhs);
 
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
             [[nodiscard]] std::string InstructionGet() const override;
             [[nodiscard]] std::string InstructionSet() const override;
     };

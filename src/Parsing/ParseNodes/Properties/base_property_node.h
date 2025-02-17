@@ -8,12 +8,14 @@
 
 namespace ParseNodes::Properties
 {
-    class BasePropertyNode final : public ParseNode, public Core::CharacteristicNode, public Core::PropertyNode
+    class BasePropertyNode : public ParseNode, public Core::CharacteristicNode, public Core::PropertyNode
     {
         public:
             BasePropertyNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier, const GetNode* get, const SetNode* set);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

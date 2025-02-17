@@ -14,7 +14,7 @@ namespace ParseNodes::Values
             explicit ValueNode(const Tokens::Token& token);
 
         public:
-            [[nodiscard]] const Tokens::Token& Token() const;
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

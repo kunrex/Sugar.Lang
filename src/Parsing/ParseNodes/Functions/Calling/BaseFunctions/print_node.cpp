@@ -10,5 +10,10 @@ namespace ParseNodes::Functions::Calling
     { }
 
     NodeType PrintNode::NodeType() const { return NodeType::Print; }
+
+    PrintlnNode::PrintlnNode(const Token& keyword) : BaseFunctionCallNode(keyword)
+    { }
+
+    NodeType PrintlnNode::NodeType() const { return NodeType::Println; }
 }
 

@@ -19,6 +19,8 @@ namespace ParseNodes::Expressions
             [[nodiscard]] const ParseNode* LHS() const;
             [[nodiscard]] const ParseNode* RHS() const;
 
+            [[nodiscard]] unsigned long Index() const override;
+
             ~BinaryNode() override;
     };
 }

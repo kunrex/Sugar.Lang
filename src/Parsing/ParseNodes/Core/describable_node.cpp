@@ -5,7 +5,7 @@ namespace ParseNodes::Core
     DescribableNode::DescribableNode(const Describers::DescriberNode* describer) : describer(describer)
     { }
 
-    const Describers::DescriberNode* DescribableNode::Name() const { return describer; }
+    const Describers::DescriberNode* DescribableNode::Describer() const { return describer; }
 
     DescribableNode::~DescribableNode()
     {

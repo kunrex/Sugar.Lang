@@ -13,7 +13,7 @@ namespace ParseNodes::Functions::Calling
 
     const ParseNode* ConstructorCallNode::Type() const { return type; }
 
-    const Token& ConstructorCallNode::Keyword() const { return keyword; }
+    unsigned long ConstructorCallNode::Index() const { return keyword.Index(); }
 
     ConstructorCallNode::~ConstructorCallNode()
     {

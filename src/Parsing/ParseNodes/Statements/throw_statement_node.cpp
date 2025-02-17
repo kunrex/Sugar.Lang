@@ -13,6 +13,8 @@ namespace ParseNodes::Statements
 
     const ParseNode* ThrowStatementNode::Exception() const { return exception; }
 
+    unsigned long ThrowStatementNode::Index() const { return exception->Index(); }
+
     ThrowStatementNode::~ThrowStatementNode()
     {
         delete exception;

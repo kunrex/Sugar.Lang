@@ -15,7 +15,7 @@ namespace ParseNodes::Statements
             explicit StatementNode(const Tokens::Token& separator);
 
         public:
-            [[nodiscard]] const Tokens::Token& Separator() const;
+            [[nodiscard]] unsigned long Index() const override;
     };
 }
 
