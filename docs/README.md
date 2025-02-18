@@ -61,6 +61,8 @@ for(int x = 0; x < 10; x++)
 do { } while(condition) 
 ```
 
+> Loops and conditions must define a scope as a body (i.e. they must use flower brackets)
+
 ### I/O Functions
 Sugar uses the `print` and `input` functions for output and input respectively.
 ```python
