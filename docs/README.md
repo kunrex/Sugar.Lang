@@ -72,8 +72,8 @@ string: result = input();
 
 All data types in sugar are converted to strings using the `tostring` function. Sugar also provides built in string formatting using the `format` method.
 ```js
-string: x = tostring(7);
-let: y = format(x, " ate ", 9); // "7 ate 9"
+let: y = format("{0} ate {1}", /* 0th argument */ tostring(7), /* 1st argument */ 9);
+print(y); // "7 ate 9"
 ```
 ### Data Types
 These data types are built into sugar:
