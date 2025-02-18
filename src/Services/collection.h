@@ -15,6 +15,7 @@ namespace Services
 
         public:
             [[nodiscard]] int ChildCount() const;
+
             [[nodiscard]] TChild* GetChild(int index) const;
 
             virtual void AddChild(TChild* child);
