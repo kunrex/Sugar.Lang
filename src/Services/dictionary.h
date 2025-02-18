@@ -16,6 +16,7 @@ namespace Services
 
         public:
             [[nodiscard]] int ChildCount() const;
+
             [[nodiscard]] TValue* Get(TKey key) const;
 
             virtual bool Push(TKey key, TValue* value);
