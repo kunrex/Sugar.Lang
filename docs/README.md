@@ -188,6 +188,18 @@ Describers can contain the following keywords:
 4. `const`: A locally scoped readonly value.
 5. `ref`: Allows passing a value type by reference.  
 
+```cs
+void LocalDescribers([const] int: x, [ref] int: y)
+{
+    // x = y; compile time error, x is constant
+    y = 10;
+}
+
+int: z = 20;
+LocalDescribers(10, z)
+print(z) //prints 10
+```
+
 ### Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
 ```cs
