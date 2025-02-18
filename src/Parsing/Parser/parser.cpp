@@ -131,7 +131,7 @@ namespace Parsing
         return new InvalidNode(start);
     }
 
-    void Parser::Parse(Analysis::Structure::SourceFile* source)
+    void Parser::Parse(Analysis::Structure::SourceFile* const source)
     {
         this->source = source;
 
