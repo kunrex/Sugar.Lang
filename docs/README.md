@@ -179,11 +179,13 @@ class Human
     }
 }
 ```
-Describers can contain the following keywords: 
-1. `const`: A locally scoped readonly value.
-2. `static`: Declares a member static.
-3. `public`: An access specifier for public items.
-4. `private`: An access specifier for private items.
+Describers can contain the following keywords:
+1. `static`: Declares a member static.
+2. `public`: An access specifier for public items.
+3. `private`: An access specifier for private items.
+
+
+4. `const`: A locally scoped readonly value.
 5. `ref`: Allows passing a value type by reference.  
 
 ### Properties
