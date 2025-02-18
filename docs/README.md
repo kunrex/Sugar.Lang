@@ -22,7 +22,7 @@ let: x = 10; //type inference to integer
 
 ### Functions
 ```c++
-int Add(int x, int y)
+int Add(int: x, int: y)
 {
     return x + y;
 }
