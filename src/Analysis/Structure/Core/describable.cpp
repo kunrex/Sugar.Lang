@@ -1,5 +1,7 @@
 #include "describable.h"
 
+using namespace Analysis::Structure::Enums;
+
 namespace Analysis::Structure::Core
 {
     Describable::Describable(const Enums::Describer describer) : describer(describer)
