@@ -2,7 +2,6 @@
 #define DEFAULT_VALUED_H
 
 #include "../../../Parsing/ParseNodes/parse_node.h"
-#include "../Nodes/Context/context_node.h"
 
 namespace Analysis::Structure::Core
 {
