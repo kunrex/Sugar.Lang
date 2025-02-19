@@ -17,7 +17,6 @@ namespace Analysis::Structure::Core
 
             [[nodiscard]] bool MatchDescriber(Enums::Describer expected) const;
             [[nodiscard]] bool CheckDescriber(Enums::Describer describer) const;
-            [[nodiscard]] bool ValidateDescriber(Enums::Describer allowed) const;
     };
 }
 
