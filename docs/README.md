@@ -83,7 +83,9 @@ These data types are built into sugar:
 4. Arrays, List, Dictionaries and Tuple: `array`, `list`, `dictionary` and `tuple`.
 5. Funcs and Action: `func` and `action`.
 6. Nullable: `nullable` serves a generic type to create nullable value type equivalents.
-7. Object: `object` serves as the base object reference for any type (as in C#).
+7. Exception: `exception` serves to represent compile time exceptions that can be thrown.
+8. Math: `math` serves as a built in static class to define mathematical constants and functions.
+9. Object: `object` serves as the base object reference for any type (as in C#).
 
 #### Collections
 
@@ -122,7 +124,13 @@ if (nullableInt == null)
     print("int is null");
 ```
 
-Nullable wraps around value types only.
+> Nullable wraps around value types only and is itself a value type.
+
+#### Exceptions
+```cs
+let: e = create Exception("something went wrong!");
+throw e;
+```
 
 > Object creation in sugar is carried out through the `create` keyword. 
 
@@ -137,7 +145,9 @@ void HelloWorld(string: message)
 action</* argument types are passed in order of declaration */ string>: helloWorld = funcref</* arguement types in order of declaration */ string>(/* load function from this */ this, HelloWorld);
 ```
 
-The `funcref` function is used to get the reference to a function. It contains 2 necessary arguments: the object of interest and the name of the function to be called. The argument signature is passed in using generic expression. Unfortunately, sugar does not feature the ability to create functions dynamically. 
+The `funcref` function is used to get the reference to a function. It contains 2 necessary arguments: the object of interest and the name of the function to be called. 
+
+The argument signature is passed in using generic expression. Unfortunately, sugar does not feature the ability to create functions dynamically. 
 
 Delegates may be invoked using the `invoke` function.
 ```c++
@@ -149,14 +159,14 @@ int Add(int x, int y)
 func</* first arg is the return type */ int, int, int>: add = funcref<int, int>(Add);
 int: result = invoke(add, 10, 20);
 ```
->Sugar technically supports generics, but only for built-in types and functions as of now.
+> Sugar technically supports generics, but only for built-in types and functions.
 
 ## Data Structures
 
 Sugar supports custom data structures: `class`, `struct` and `enum`.
 1. `enum`: A type that can store multiple compile type constant integer values.
 2. `class`: A reference type that is always created on the heap.
-3. `struct`: A  value type that is always created on the stack.
+3. `struct`: A value type that is always created on the stack.
 
 Sugar is garbage collected since it compiles to CIL.
 
@@ -203,21 +213,17 @@ print(a); //prints 10
 ### Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
 ```cs
-int: x { [public] get; [private] set; }
+[public] int: x { get; [private] set; }
 ```
 - A public get, private set property. It can be accessed anywhere but changed only in the implementation of the structure it's defined in
 ```cs
-[public] int: x { get; [private] set; } // a public get, private set property
+[private] int: x { [public] get; [public] set; }  // a private get set property
 ```
-- The describer on the variable is given first precedence i.e. in absence of a describer, the accessor is given the same access level as the variable.
-```cs
-[private] int: x { get; [public] set; } // a private get set property
-```
-- In case of conflicts like above, the describer on the variable is given preference.
+- In case of conflicts like above, the describer on the field definition is given preference.
 ```cs
 [public] int: x { get; }
 ```
-- This effectively creates a runtime constant that can only be initialised in the constructor or during creation.
+- Creates a runtime constant that can only be initialised in a constructor or during creation.
 ```cs
 [public] int: x { set; }
 ```
@@ -272,7 +278,6 @@ struct Complex
 Cast and operator overloads must be static. indexers and constructors cannot be. 
 > The explicit conversion to a string is internally called by the `tostring` and `format` function. 
 
-> Sugar features the static `math` class for typical mathematical operations and constants.
 ### Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
 ```java
@@ -286,13 +291,6 @@ import "..directory.sub_directory.file.Class";
 let: x = create Class(param1, param2);
 ```
 Importing a directory imports all files whereas importing a file imports all public structures within it.
-
-### Exceptions
-Sugar has a built-in class for exceptions along with the throw keyword.
-```cs
-exception: e = create Exception("something went wrong!");
-throw e;
-```
 
 ## Questions ?!
 So yes there a few things here. No try-catch-finally statements, no switch statements, no generics, no destructors and may have even noticed that there is no static constructor either.
