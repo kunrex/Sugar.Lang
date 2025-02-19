@@ -9,6 +9,6 @@ namespace Analysis::Structure::Core
 
     bool Describable::ValidateDescriber(const Describer allowed) const { return (allowed & describer) == describer; }
 
-    bool Describable::CheckDescriber(const Enums::Describer describer) const { return (describer & this->describer) == describer; }
-    bool Describable::ValidateDescriber(const Enums::Describer allowed) const { return (allowed & describer) == describer; }
+    bool Describable::MatchDescriber(const Describer expected) const { return describer == expected; }
+    bool Describable::CheckDescriber(const Describer describer) const { return (describer & this->describer) == describer; }
 }
