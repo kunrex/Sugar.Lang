@@ -4,7 +4,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Core
 {
-    Describable::Describable(const Enums::Describer describer) : describer(describer)
+    Describable::Describable(const Describer describer) : describer(describer)
     { }
 
     Enums::Describer Describable::Describer() const { return describer; }
