@@ -1,10 +1,11 @@
 #ifndef BASE_INDEXER_NODE_H
 #define BASE_INDEXER_NODE_H
 
+#include "../../../Lexing/Tokens/token.h"
+
 #include "../parse_node.h"
 #include "../Core/entity_node.h"
 #include "../Core/property_node.h"
-#include "../../../Lexing/Tokens/token.h"
 #include "../Groups/compound_declaration_node.h"
 
 namespace ParseNodes::Properties

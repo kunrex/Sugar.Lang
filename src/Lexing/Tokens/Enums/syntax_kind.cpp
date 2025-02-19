@@ -110,8 +110,6 @@ namespace Tokens::Enums
                 return "False";
             case SyntaxKind::Ref:
                 return "Ref";
-            case SyntaxKind::Const:
-                return "Const";
             case SyntaxKind::As:
                 return "As";
             case SyntaxKind::Addition:

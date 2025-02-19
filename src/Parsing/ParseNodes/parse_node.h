@@ -2,6 +2,7 @@
 #define PARSE_NODE_H
 
 #include "../../Services/collection.h"
+
 #include "Core/Interfaces/i_parse_node.h"
 
 namespace ParseNodes

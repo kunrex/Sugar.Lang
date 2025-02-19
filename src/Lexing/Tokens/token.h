@@ -20,7 +20,7 @@ namespace Tokens
             const Enums::SyntaxKind syntaxKind;
 
             const short metadata;
-            const std::variant<long, double, std::string_view> value;
+            const std::variant<long, double, std::string> value;
 
         public:
             static Token Invalid(unsigned long i, std::string value);

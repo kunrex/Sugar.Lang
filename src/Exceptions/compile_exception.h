@@ -8,12 +8,12 @@ namespace Exceptions
 {
     class CompileException : public std::exception
     {
-        protected:
-            const std::string message;
-
-            explicit CompileException(std::string message);
+        private:
+            const char* c_str;
 
         public:
+            explicit CompileException(const std::string& message);
+
             [[nodiscard]] const char* what() const noexcept override;
     };
 }

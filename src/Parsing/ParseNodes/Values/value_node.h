@@ -1,8 +1,9 @@
 #ifndef VALUE_NODE_H
 #define VALUE_NODE_H
 
-#include "../parse_node.h"
 #include "../../../Lexing/Tokens/token.h"
+
+#include "../parse_node.h"
 
 namespace ParseNodes::Values
 {

@@ -7,31 +7,34 @@ namespace Analysis::Structure::Enums
 {
     enum class Describer : short
     {
+        None = 0,
+
         Ref = 1,
 
-        Const = 2,
+        Public = 2,
+        Private = 4,
 
-        Public = 4,
-        Private = 8,
+        Static = 8,
 
-        Static = 16,
-
-        None = 32,
-
-        PublicStatic = Public | Static,
         AccessModifiers = Public | Private,
 
-        EnumOnly = AccessModifiers,
-        StructOnly = AccessModifiers,
-        ClassOnly = AccessModifiers | Static,
+        ValidEnum = AccessModifiers,
+        ValidStruct = AccessModifiers,
+        ValidClass = AccessModifiers | Static,
 
-        FunctionOnly = AccessModifiers | Static,
+        ValidGlobalMember = AccessModifiers | Static,
+
+        ValidFunctionArgument = Ref,
+
+        PublicStatic = Public | Static,
     };
 
     Describer operator & (const Describer& lhs, const Describer& rhs);
     Describer operator | (const Describer& lhs, const Describer& rhs);
 
     Describer FromNode(const ParseNodes::Describers::DescriberNode* node);
+
+    std::string ToString(const Describer& describer);
 }
 
 #endif

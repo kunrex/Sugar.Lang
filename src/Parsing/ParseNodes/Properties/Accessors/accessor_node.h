@@ -1,10 +1,11 @@
 #ifndef ACCESSOR_NODE_H
 #define ACCESSOR_NODE_H
 
+#include "../../../../Lexing/Tokens/token.h"
+
 #include "../../parse_node.h"
 #include "../../Core/body_node.h"
 #include "../../Core/describable_node.h"
-#include "../../../../Lexing/Tokens/token.h"
 
 namespace ParseNodes::Properties
 {

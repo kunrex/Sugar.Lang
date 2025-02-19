@@ -1,8 +1,9 @@
 #ifndef SOURCE_DIRECTORY_H
 #define SOURCE_DIRECTORY_H
 
-#include "source_object.h"
 #include "../../Services/dictionary.h"
+
+#include "source_object.h"
 
 namespace Analysis::Structure
 {
@@ -13,10 +14,7 @@ namespace Analysis::Structure
 
             [[nodiscard]] Enums::SourceType SourceType() const override;
 
-            bool Push(std::string key, SourceObject* value) override;
-
-            void ReferenceThis(SourceObject* other) override;
-            void AddReference(const Core::DataType* dataType) override;
+            bool AddChild(std::string key, SourceObject* value) override;
     };
 }
 

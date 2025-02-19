@@ -3,9 +3,10 @@
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 #include "../Exceptions/exception_manager.h"
-#include "../Exceptions/Compiling/transpile_file_exception.h"
+#include "../Exceptions/Compilation/transpile_file_exception.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -16,6 +17,8 @@ namespace Services
 {
     StringBuilder::StringBuilder(string outputFile) : value(), outputFile(std::move(outputFile))
     { }
+
+    const std::string& StringBuilder::OutputFile() const { return outputFile; }
 
     void StringBuilder::IncreaseIndent() { indent++; }
 
@@ -36,6 +39,6 @@ namespace Services
             value.clear();
         }
         else
-            ExceptionManager::Instance().AddChild(new TranspileFileException(outputFile));
+            ExceptionManager::Instance().AddChild(new TranspileFileException(string(outputFile)));
     }
 }

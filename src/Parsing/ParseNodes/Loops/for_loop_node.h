@@ -13,7 +13,7 @@ namespace ParseNodes::Loops
             const ParseNode* post;
 
         public:
-            ForLoopNode(const ParseNode* pre, const ParseNode* condition, const ParseNode* post, const ParseNode* body, const Tokens::Token& keyword);
+            ForLoopNode(const ParseNode* pre, const ParseNode* condition, const ParseNode* post, const Groups::ScopeNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

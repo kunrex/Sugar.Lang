@@ -4,7 +4,7 @@
 
 namespace ParseNodes::Core
 {
-    EntityNode::EntityNode(const ParseNode* type) : type(type)
+    EntityNode::EntityNode(const ParseNode* const type) : type(type)
     { }
 
     const ParseNode* EntityNode::Type() const { return type; }

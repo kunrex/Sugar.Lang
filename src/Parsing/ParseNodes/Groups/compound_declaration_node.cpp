@@ -7,7 +7,7 @@ namespace ParseNodes::Groups
     CompoundDeclarationNode::CompoundDeclarationNode() : NodeCollection()
     { }
 
-    NodeType CompoundDeclarationNode::NodeType() const { return NodeType::CompoundCreation; }
+    NodeType CompoundDeclarationNode::NodeType() const { return NodeType::CompoundDeclaration; }
 
     unsigned long CompoundDeclarationNode::Index() const
     {

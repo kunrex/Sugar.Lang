@@ -19,6 +19,7 @@ namespace Analysis::Structure::Enums
 
         VoidDefinition,
         MethodDefinition,
+        BuiltInDefinition,
 
         BuiltInCast,
         ImplicitCast,

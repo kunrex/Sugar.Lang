@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::DataTypes
 {
-    DataTypeNode::DataTypeNode(const DescriberNode* describer, const IdentifierNode* identifier, const NodeCollection<ParseNode>* body, const Token& keyword) : ParseNode(), DescribableNode(describer), NameableNode(identifier), body(body), keyword(keyword)
+    DataTypeNode::DataTypeNode(const DescriberNode* const describer, const IdentifierNode* const identifier, const NodeCollection<ParseNode>* const body, const Token& keyword) : ParseNode(), DescribableNode(describer), NameableNode(identifier), body(body), keyword(keyword)
     { }
 
     const NodeCollection<ParseNode>* DataTypeNode::Body() const { return body; }

@@ -1,8 +1,9 @@
 #ifndef KEYWORD_TYPE_NODE_H
 #define KEYWORD_TYPE_NODE_H
 
-#include "../../parse_node.h"
 #include "../../../../Lexing/Tokens/token.h"
+
+#include "../../parse_node.h"
 
 namespace ParseNodes::Types
 {

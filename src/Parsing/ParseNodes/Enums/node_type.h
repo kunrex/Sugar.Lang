@@ -10,7 +10,8 @@ namespace ParseNodes::Enums
 
         Constant,
         Identifier,
-        StatementCollection,
+
+        ExpressionList,
 
         This,
         Null,
@@ -28,9 +29,10 @@ namespace ParseNodes::Enums
         AnonymousType,
         DictionaryType,
 
+        Expression,
         Declaration,
         Initialisation,
-        CompoundCreation,
+        CompoundDeclaration,
 
         Get,
         Set,
@@ -44,7 +46,6 @@ namespace ParseNodes::Enums
         FunctionCall,
         ConstructorCall,
 
-        FunctionParameters,
         FunctionDeclaration,
         ConstructorDeclaration,
 
@@ -60,10 +61,8 @@ namespace ParseNodes::Enums
         Cast,
         Unary,
         Binary,
-        Bracket,
         Indexer,
         Ternary,
-        Expression,
 
         Enum,
         Class,

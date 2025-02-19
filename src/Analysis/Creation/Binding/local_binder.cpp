@@ -4,8 +4,8 @@
 
 #include "binder_extensions.h"
 #include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compiling/Analysis/duplicate_variable_definition_exception.h"
-#include "../../../Exceptions/Compiling/Analysis/invalid_describer_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/variable_definition_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 #include "../../../Parsing/ParseNodes/Conditions/condition_node.h"
 #include "../../../Parsing/ParseNodes/Conditions/else_node.h"
 #include "../../../Parsing/ParseNodes/Conditions/if_node.h"
@@ -141,7 +141,7 @@ namespace Analysis::Creation::Binding
     {
         if (const auto identifierNode = declaration->Name(); VariableExists(identifierNode, scoped, scope))
         {
-            ExceptionManager::Instance().AddChild(new InvalidVariableException(identifierNode->Value(), identifierNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::Instance().AddChild(new DuplicateVariableDefinitionException(identifierNode->Value(), identifierNode->Token().Index(), dataType->Parent()));
             return;
         }
 
@@ -152,7 +152,7 @@ namespace Analysis::Creation::Binding
         {
             case NodeType::VoidType:
             case NodeType::AnonymousType:
-                ExceptionManager::Instance().AddChild(new InvalidVariableException(identifier, declaration->Name()->Token().Index(), dataType->Parent()));
+                ExceptionManager::Instance().AddChild(new DuplicateVariableDefinitionException(identifier, declaration->Name()->Token().Index(), dataType->Parent()));
                 break;
             default:
                 {
@@ -201,7 +201,7 @@ namespace Analysis::Creation::Binding
     {
         if (const auto identifierNode = initialisation->Name(); VariableExists(identifierNode, scoped, scope))
         {
-            ExceptionManager::Instance().AddChild(new InvalidVariableException(identifierNode->Value(), identifierNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::Instance().AddChild(new DuplicateVariableDefinitionException(identifierNode->Value(), identifierNode->Token().Index(), dataType->Parent()));
             return;
         }
 
@@ -211,7 +211,7 @@ namespace Analysis::Creation::Binding
         switch (const auto typeNode = initialisation->Type(); typeNode->NodeType())
         {
             case NodeType::VoidType:
-                ExceptionManager::Instance().AddChild(new InvalidVariableException(identifier, initialisation->Name()->Token().Index(), dataType->Parent()));
+                ExceptionManager::Instance().AddChild(new DuplicateVariableDefinitionException(identifier, initialisation->Name()->Token().Index(), dataType->Parent()));
                 break;
             case NodeType::AnonymousType:
                 {
@@ -846,12 +846,19 @@ namespace Analysis::Creation::Binding
             case NodeType::Unary:
                 {
                     const auto unary = dynamic_cast<const UnaryNode*>(expression);
+                    const auto kind = unary->Base().Kind();
+
                     const auto operand = BindExpression(unary->Operand(), scoped, scope, dataType);
+
+                    if (kind.IsAssignment() && !operand->Writable())
+                    {
+                        //exception
+                    }
 
                     auto args = std::vector<const DataType*>();
                     args.push_back(operand->CreationType());
 
-                    const auto definition = operand->CreationType()->FindOverload(unary->Base().Kind(), args);
+                    const auto definition = operand->CreationType()->FindOverload(kind, args);
                     if (definition == nullptr)
                     {
                         //exception
@@ -870,6 +877,11 @@ namespace Analysis::Creation::Binding
 
                     const auto lhs = BindExpression(binary->LHS(), scoped, scope, dataType);
                     const auto rhs = BindExpression(binary->RHS(), scoped, scope, dataType);
+
+                    if (kind.IsAssignment() && !lhs->Writable())
+                    {
+                        //exception
+                    }
 
                     const auto lhsCreationType = lhs->CreationType();
                     const auto rhsCreationType = rhs->CreationType();
@@ -1202,13 +1214,13 @@ namespace Analysis::Creation::Binding
 
     void BindFunctions(DataType* const dataType)
     {
-        for (const auto characteristic: *dataType->AllCharacteristics())
+        for (const auto characteristic: dataType->AllCharacteristics())
         {
             if (characteristic.ParseNode() != nullptr)
                 characteristic.WithDefault(BindExpression(characteristic.ParseNode()));
         }
 
-        for (const auto function: *dataType->AllFunctions())
+        for (const auto function: dataType->AllFunctions())
         {
             BindScope(function->ParseNode(), function->Scope(), function, dataType);
 
@@ -1222,7 +1234,7 @@ namespace Analysis::Creation::Binding
                 case MemberType::OperatorOverload:
                 case MemberType::MethodDefinition:
                     {
-                        if (!CheckCodePaths(function, function->CreationType()))
+                        if (!CheckCodePaths(function->Scope(), function->CreationType()))
                         {
                             //exception
                         }

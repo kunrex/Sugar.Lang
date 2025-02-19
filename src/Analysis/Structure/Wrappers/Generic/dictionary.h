@@ -1,8 +1,9 @@
 #ifndef DICTIONARY_WRAPPER_H
 #define DICTIONARY_WRAPPER_H
 
-#include "../../Nodes/DataTypes/class.h"
 #include "../../../../Services/singleton_service.h"
+
+#include "../../Nodes/DataTypes/class.h"
 #include "../../Core/Interfaces/i_built_in_type.h"
 #include "../../Core/Interfaces/i_generic_class.h"
 

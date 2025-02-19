@@ -1,5 +1,7 @@
 #include "describer.h"
 
+using namespace std;
+
 using namespace Tokens::Enums;
 
 using namespace ParseNodes::Describers;
@@ -26,9 +28,6 @@ namespace Analysis::Structure::Enums
                 case SyntaxKind::Ref:
                     final = final | Describer::Ref;
                     break;
-                case SyntaxKind::Const:
-                    final = final | Describer::Const;
-                    break;
                 case SyntaxKind::Static:
                     final = final | Describer::Static;
                     break;
@@ -45,5 +44,27 @@ namespace Analysis::Structure::Enums
         }
 
         return final;
+    }
+
+    string ToString(const Describer& describer)
+    {
+        if (describer == Describer::None) return "None";
+
+        const auto shortValue = static_cast<short>(describer);
+        std::string result;
+
+        if (shortValue & static_cast<short>(Describer::Ref))
+            result += "Ref, ";
+        if (shortValue & static_cast<short>(Describer::Public))
+            result += "Public, ";
+        if (shortValue & static_cast<short>(Describer::Private))
+            result += "Private, ";
+        if (shortValue & static_cast<short>(Describer::Static))
+            result += "Static, ";
+
+        if (!result.empty())
+            result.erase(result.size() - 3);
+
+        return result;
     }
 }

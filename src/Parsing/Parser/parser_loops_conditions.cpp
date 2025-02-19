@@ -32,7 +32,7 @@ namespace Parsing
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
                         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-                        const auto body = ParseScope();
+                        const auto body = ParseLazyScope();
 
                         chain->AddChild(new IfNode(condition, body, keyword));
                         flag = true;
@@ -44,7 +44,7 @@ namespace Parsing
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
                         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-                        const auto body = ParseScope();
+                        const auto body = ParseLazyScope();
 
                         chain->AddChild(new IfNode(condition, body, keyword));
                     }
@@ -52,7 +52,7 @@ namespace Parsing
                 case SyntaxKind::Else:
                     {
                         flag = false;
-                        chain->AddChild(new ElseNode(ParseScope(), keyword));;
+                        chain->AddChild(new ElseNode(ParseLazyScope(), keyword));;
                     }
                     break;
                 default:
@@ -77,7 +77,7 @@ namespace Parsing
         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-        const auto body = ParseStatement();
+        const auto body = ParseLazyScope();
         return new WhileNode(condition, body, keyword);
     }
 
@@ -86,7 +86,7 @@ namespace Parsing
         const auto keyword = Current();
         index++;
 
-        const auto body = ParseStatement();
+        const auto body = ParseLazyScope();
         index++;
 
         TryMatchToken(Current(), SyntaxKind::While, true);
@@ -112,7 +112,7 @@ namespace Parsing
         const auto post = ParseExpression(SeparatorKind::CloseBracket);
         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
 
-        const auto body = ParseStatement();
+        const auto body = ParseLazyScope();
         return new ForLoopNode(pre, condition, post, body, keyword);
     }
 }

@@ -1,6 +1,7 @@
 #include "child.h"
 
 #include "../Parsing/ParseNodes/parse_node.h"
+
 #include "../Analysis/Structure/source_object.h"
 
 using namespace ParseNodes;

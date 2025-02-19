@@ -3,10 +3,11 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
+using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Loops
 {
-    ForLoopNode::ForLoopNode(const ParseNode* pre, const ParseNode* condition, const ParseNode* post, const ParseNode* body, const Token& keyword) : LoopNode(condition, body, keyword), pre(pre), post(post)
+    ForLoopNode::ForLoopNode(const ParseNode* const pre, const ParseNode* const condition, const ParseNode* const post, const ScopeNode* const body, const Token& keyword) : LoopNode(condition, body, keyword), pre(pre), post(post)
     { }
 
     NodeType ForLoopNode::NodeType() const { return NodeType::For; }

@@ -4,7 +4,7 @@ using namespace ParseNodes::Properties;
 
 namespace ParseNodes::Core
 {
-    PropertyNode::PropertyNode(const GetNode* get, const SetNode* set) : get(get), set(set)
+    PropertyNode::PropertyNode(const GetNode* const get, const SetNode* const set) : get(get), set(set)
     { }
 
     const GetNode* PropertyNode::Get() const { return get; }

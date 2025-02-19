@@ -17,7 +17,7 @@ namespace ParseNodes
 
     bool ParseNode::DefinesChildren() const { return false; }
 
-    void ParseNode::Print(std::string indent, const bool last) const
+    void ParseNode::Print(string indent, const bool last) const
     {
         cout << indent;
         if (last)
@@ -35,17 +35,15 @@ namespace ParseNodes
         PrintChildren(indent);
     }
 
-    void ParseNode::PrintChildren(const std::string indent) const
+    void ParseNode::PrintChildren(const string indent) const
     { }
 
     template <class TChild>
     NodeCollection<TChild>::NodeCollection() : ParseNode(), Services::ConstantCollection<TChild>()
-    {
-
-    }
+    { }
 
     template <class TChild>
-    void NodeCollection<TChild>::PrintChildren(std::string indent) const
+    void NodeCollection<TChild>::PrintChildren(const string indent) const
     {
         unsigned long i = 0;
         const auto length = this->children.size();

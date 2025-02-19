@@ -1,7 +1,7 @@
 #ifndef PRINTABLE_H
 #define PRINTABLE_H
 
-#include <iostream>
+#include <string>
 
 namespace Services
 {

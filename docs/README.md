@@ -47,6 +47,8 @@ else
 {
     
 }
+
+string: result = 0 % 2 == 0 ? "0 is even" : "0 is odd";
 ```
 
 ### Loops
@@ -60,8 +62,6 @@ for(int x = 0; x < 10; x++)
 
 do { } while(condition) 
 ```
-
-> Loops and conditions must define a scope as a body (i.e. they must use flower brackets)
 
 ### I/O Functions
 Sugar uses the `print` and `input` functions for output and input respectively.
@@ -184,41 +184,44 @@ Describers can contain the following keywords:
 2. `public`: An access specifier for public items.
 3. `private`: An access specifier for private items.
 
-
-4. `const`: A locally scoped readonly value.
-5. `ref`: Allows passing a value type by reference.  
+4. `ref`: Allows passing a value type by reference into a function.
 
 ```cs
-void LocalDescribers([const] int: x, [ref] int: y)
+void FunctionDescribers([ref] int: x)
 {
-    // x = y; compile time error, x is constant
-    y = 10;
+    x = 10;
 }
 
-int: z = 20;
-LocalDescribers(10, z)
-print(z) //prints 10
+int: a = 20;
+PassByReference(a);
+
+print(a); //prints 10
 ```
+
+> This behaviour is also applicable when functions are used as delegates
 
 ### Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
 ```cs
 int: x { [public] get; [private] set; }
 ```
-The above line creates a field that is accessible anywhere but only changeable inside the class.
+- A public get, private set property. It can be accessed anywhere but changed only in the implementation of the structure it's defined in
 ```cs
-[public] int: x; // a public get, public set field
-[public] int: x { get; [private] set; } // a public get, private set field
+[public] int: x { get; [private] set; } // a public get, private set property
 ```
-The describer on the variable is given first precedence i.e. in absence of a describer, the accessor is given the same access level as the variable. Also in case of conflicts, the describer on the variable is given preference.  
+- The describer on the variable is given first precedence i.e. in absence of a describer, the accessor is given the same access level as the variable.
+```cs
+[private] int: x { get; [public] set; } // a private get set property
+```
+- In case of conflicts like above, the describer on the variable is given preference.
 ```cs
 [public] int: x { get; }
 ```
-This effectively creates a runtime constant that can only be initialised in the constructor or explicitly during creation.
+- This effectively creates a runtime constant that can only be initialised in the constructor or during creation.
 ```cs
 [public] int: x { set; }
 ```
-While it compiles, the above has virtually no practical use.
+- While it compiles, the above has virtually no practical use.
 
 ### Special Functions
 Sugar features functions for cast overloading, operator overloading, indexers and constructors.

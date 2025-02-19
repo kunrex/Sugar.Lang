@@ -1,4 +1,3 @@
-
 #ifndef TUPLE_TYPE_NODE_H
 #define TUPLE_TYPE_NODE_H
 

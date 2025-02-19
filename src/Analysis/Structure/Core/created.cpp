@@ -2,7 +2,7 @@
 
 namespace Analysis::Structure::Core
 {
-    Created::Created(const DataType* creationType) : creationType(creationType)
+    Created::Created(const DataType* const creationType) : creationType(creationType)
     { }
 
     const DataType* Created::CreationType() const { return creationType; }

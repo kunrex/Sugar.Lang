@@ -2,7 +2,6 @@
 #define TERNARY_NODE_H
 
 #include "../../parse_node.h"
-#include "../../../../Lexing/Tokens/token.h"
 
 namespace ParseNodes::Expressions
 {

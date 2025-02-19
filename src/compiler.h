@@ -8,23 +8,15 @@
 class Compiler
 {
     private:
+        mutable std::string name;
         const std::string sourcePath;
-        Analysis::Structure::SourceDirectory* source;
 
-        void PushDirectory(const std::string& strPath, Analysis::Structure::SourceDirectory* directory);
-
-        void LexParse(Analysis::Structure::SourceObject* directory);
-
-        void StructureDataTypes(const Analysis::Structure::SourceDirectory* directory);
-        void ManageImportStatements(const Analysis::Structure::SourceDirectory* directory);
-
-        void BindGlobal(const Analysis::Structure::SourceDirectory* directory);
-        void BindLocal(const Analysis::Structure::SourceDirectory* directory);
+        mutable Analysis::Structure::SourceDirectory* source;
 
     public:
         explicit Compiler(const std::string& sourcePath);
 
-        void Compile();
+        void Compile() const;
 };
 
 #endif

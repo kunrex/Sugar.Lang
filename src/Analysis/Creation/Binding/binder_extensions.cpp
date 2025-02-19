@@ -2,7 +2,9 @@
 
 #include "../../../Exceptions/log_exception.h"
 #include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compiling/Analysis/static_binding_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/static_binding_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/type_exception.h"
 
 #include "../../../Parsing/ParseNodes/Types/Created/created_type_node.h"
 #include "../../../Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h"
@@ -24,6 +26,7 @@
 #include "../../Structure/Wrappers/Value/boolean.h"
 #include "../../Structure/Wrappers/Value/character.h"
 
+#include "../../Structure/Wrappers/Reference/math.h"
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Reference/object.h"
 #include "../../Structure/Wrappers/Reference/exception.h"
@@ -51,6 +54,26 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Creation::Binding
 {
+    void PushException(const LogException* const exception)
+    {
+        ExceptionManager::Instance().AddChild(exception);
+    }
+
+    void MatchDescriber(const Describable* describable, const Describer expected, const unsigned long index, const SourceFile* const source)
+    {
+        if (!describable->MatchDescriber(expected))
+            ExceptionManager::Instance().AddChild(new InvalidDescriberException(describable->Describer(), expected, index, source));
+    }
+
+    void ValidateDescriber(const Describable* describable, const Describer allowed, const unsigned long index, const DataType* const dataType)
+    {
+        if (!describable->ValidateDescriber(allowed))
+            ExceptionManager::Instance().AddChild(new InvalidDescriberException(describable->Describer(), allowed, index, dataType->Parent()));
+
+        if (dataType->CheckDescriber(Describer::Static) && !describable->CheckDescriber(Describer::Static))
+            ExceptionManager::Instance().AddChild(new StaticBindingException(dataType->FullName(), index, dataType->Parent()));
+    }
+
     const DataType* BindBuiltInType(const BuiltInTypeNode* node)
     {
         switch (node->Kind())
@@ -73,6 +96,8 @@ namespace Analysis::Creation::Binding
                 return &Boolean::Instance();
             case SyntaxKind::Exception:
                 return &Exception::Instance();
+            case SyntaxKind::Math:
+                return &Math::Instance();
             default:
                 return &Object::Instance();
         }
@@ -110,8 +135,8 @@ namespace Analysis::Creation::Binding
         const auto typeNode = generic->GetChild(0);
 
         const auto type = BindDataType(typeNode, source);
-        if (type->MemberType() != Structure::Enums::MemberType::Struct)
-            ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in a Nullable.", typeNode->Index(), source));
+        if (type->MemberType() != MemberType::Struct)
+            ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in nullable<T>.", typeNode->Index(), source));
 
         return Nullable::Instance(type);
     }
@@ -160,28 +185,23 @@ namespace Analysis::Creation::Binding
                     const auto casted = dynamic_cast<const CreatedTypeNode*>(node);
                     return source->GetReference(casted->Identifier()->Value());
                 }
-            case NodeType::TupleType:
-                return BindTuple(dynamic_cast<const TupleTypeNode*>(node), source);
-            case NodeType::ListType:
-                return BindList(dynamic_cast<const ListTypeNode*>(node), source);
-            case NodeType::ActionType:
-                return BindAction(dynamic_cast<const ActionTypeNode*>(node), source);
-            case NodeType::ArrayType:
-                return BindArray(dynamic_cast<const ArrayTypeNode*>(node), source);
             case NodeType::FuncType:
                 return BindFunc(dynamic_cast<const FuncTypeNode*>(node), source);
-            case NodeType::DictionaryType:
-                return BindDictionary(dynamic_cast<const DictionaryTypeNode*>(node), source);
+            case NodeType::ListType:
+                return BindList(dynamic_cast<const ListTypeNode*>(node), source);
+            case NodeType::TupleType:
+                return BindTuple(dynamic_cast<const TupleTypeNode*>(node), source);
+            case NodeType::ArrayType:
+                return BindArray(dynamic_cast<const ArrayTypeNode*>(node), source);
+            case NodeType::ActionType:
+                return BindAction(dynamic_cast<const ActionTypeNode*>(node), source);
             case NodeType::NullableType:
                 return BindNullable(dynamic_cast<const NullableTypeNode*>(node), source);
+            case NodeType::DictionaryType:
+                return BindDictionary(dynamic_cast<const DictionaryTypeNode*>(node), source);
             default:
+                ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Index(), source));
                 return &Object::Instance();
         }
-    }
-
-    void MatchStaticBindings(const Describable* const describable, const DataType* const dataType, const unsigned long index)
-    {
-        if (dataType->CheckDescriber(Describer::Static) && !describable->CheckDescriber(Describer::Static))
-            ExceptionManager::Instance().AddChild(new StaticBindingException(dataType->FullName(), index, dataType->Parent()));
     }
 }

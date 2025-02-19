@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    UnaryNode::UnaryNode(const Tokens::Token& base, const ParseNode* operand) : OperatorExpressionNode(base), operand(operand)
+    UnaryNode::UnaryNode(const Tokens::Token& base, const ParseNode* const operand) : OperatorExpressionNode(base), operand(operand)
     { }
 
     NodeType UnaryNode::NodeType() const { return NodeType::Unary; }

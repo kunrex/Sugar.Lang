@@ -1,9 +1,10 @@
 #ifndef EXCEPTION_MANAGER_H
 #define EXCEPTION_MANAGER_H
 
-#include "compile_exception.h"
 #include "../Services/collection.h"
 #include "../Services/singleton_service.h"
+
+#include "compile_exception.h"
 
 namespace Exceptions
 {
@@ -12,7 +13,7 @@ namespace Exceptions
         public:
             ExceptionManager();
 
-            void LogAllExceptions() const;
+            bool LogAllExceptions() const;
     };
 }
 

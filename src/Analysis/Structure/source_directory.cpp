@@ -12,22 +12,12 @@ namespace Analysis::Structure
 
     SourceType SourceDirectory::SourceType() const { return SourceType::Directory; }
 
-    bool SourceDirectory::Push(const string key, SourceObject* const value)
+    bool SourceDirectory::AddChild(const string key, SourceObject* const value)
     {
-        const auto result = Dictionary::Push(key, value);
+        const auto result = Dictionary::AddChild(key, value);
         if (result)
             value->SetParent(this);
 
         return result;
     }
-
-    void SourceDirectory::ReferenceThis(SourceObject* other)
-    {
-        for (auto const& child: map)
-            if (child.second->SourceType() == SourceType::File)
-                child.second->ReferenceThis(other);
-    }
-
-    void SourceDirectory::AddReference(const DataType* dataType)
-    { }
 }

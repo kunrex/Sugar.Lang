@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ExpressionStatementNode::ExpressionStatementNode(const ParseNode* expression, const Token& separator) : StatementNode(separator), expression(expression)
+    ExpressionStatementNode::ExpressionStatementNode(const ParseNode* const expression, const Token& separator) : StatementNode(separator), expression(expression)
     { }
 
     NodeType ExpressionStatementNode::NodeType() const { return NodeType::Expression; }

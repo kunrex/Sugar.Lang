@@ -11,37 +11,28 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure
 {
-    SourceFile::SourceFile(const string& name, string source) : SourceObject(name), Dictionary(), source(std::move(source)), references(), sourceNode(nullptr)
+    SourceFile::SourceFile(const string& name, string source) : SourceObject(name), Dictionary(), source(std::move(source)), tokens(), sourceNode(nullptr), references()
     { }
 
     SourceType SourceFile::SourceType() const { return SourceType::File; }
 
-    bool SourceFile::Push(const std::string key, DataType* const value)
+    bool SourceFile::AddChild(const string key, DataType* const value)
     {
-        const auto result = Dictionary::Push(key, value);
+        const auto result = Dictionary::AddChild(key, value);
         if (result)
-        {
             value->SetParent(this);
-            AddReference(value);
-        }
 
         return result;
     }
 
-    void SourceFile::ReferenceThis(SourceObject* other)
+    void SourceFile::AddReference(const DataType* const dataType)
     {
-        for (const auto child: references.values())
-            other->AddReference(child);
+        references[dataType->Name()] == dataType;
     }
 
-    void SourceFile::AddReference(const DataType* dataType)
+    const DataType* SourceFile::GetReference(const string& name) const
     {
-        references.Push(dataType->Name(), dataType);
-    }
-
-    const DataType* SourceFile::GetReference(const std::string& name) const
-    {
-        return references.Get(name);
+        return references.contains(name) ? nullptr : references.at(name);
     }
 
     unsigned long SourceFile::SourceLength() const { return source.size(); }

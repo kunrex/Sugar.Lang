@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    IndexerExpressionNode::IndexerExpressionNode(const ParseNode* operand) : NodeCollection(), operand(operand)
+    IndexerExpressionNode::IndexerExpressionNode(const ParseNode* const operand) : NodeCollection(), operand(operand)
     { }
 
     NodeType IndexerExpressionNode::NodeType() const { return NodeType::Indexer; }

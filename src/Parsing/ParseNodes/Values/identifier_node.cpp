@@ -13,5 +13,5 @@ namespace ParseNodes::Values
 
     NodeType IdentifierNode::NodeType() const { return NodeType::Identifier; }
 
-    string IdentifierNode::Value() const { return string(*token.Value<std::string_view>()); }
+    string IdentifierNode::Value() const { return *token.Value<std::string>(); }
 }

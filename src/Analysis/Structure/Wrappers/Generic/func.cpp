@@ -11,11 +11,11 @@ using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 
-constexpr std::string_view action_cil = "[mscorlib]System.Func";
+constexpr std::string cil_func = "[System.Runtime]System.Func";
 
 namespace Analysis::Structure::Wrappers
 {
-    Func::Func(const MethodFunction* definition) : Class("Func", Describer::Public), SingletonCollection(), genericSignature(), callSignature()
+    Func::Func() : Class(cil_func, Describer::Public), SingletonCollection(),  types(), genericSignature(), callSignature()
     { }
 
     const Func* Func::Instance(const std::vector<const DataType*>& types)
@@ -31,7 +31,7 @@ namespace Analysis::Structure::Wrappers
             action->types.push_back(type);
 
         action->genericSignature = std::format("`{}<{}>", types.size(), signature);
-        action->fullName = std::format("{}{}", action_cil, action->genericSignature);
+        action->fullName = std::format("{}{}", cil_func, action->genericSignature);
 
         action->InitialiseMembers();
         map[signature] = action;
@@ -62,7 +62,15 @@ namespace Analysis::Structure::Wrappers
     }
 
     void Func::InitialiseMembers()
-    {
+    { }
 
+    unsigned long Func::TypeCount() const {  return types.size(); }
+
+    const Core::DataType* Func::TypeAt(const unsigned long index) const
+    {
+        if (index >= types.size())
+            return nullptr;
+
+        return types.at(index);
     }
 }

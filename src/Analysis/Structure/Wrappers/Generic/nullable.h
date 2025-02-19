@@ -1,14 +1,14 @@
 #ifndef NULLABLE_H
 #define NULLABLE_H
 
-#include "../../Nodes/DataTypes/class.h"
+#include "../../Nodes/DataTypes/struct.h"
 #include "../../../../Services/singleton_service.h"
 #include "../../Core/Interfaces/i_built_in_type.h"
 #include "../../Core/Interfaces/i_generic_class.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Nullable final : public DataTypes::Class, public Services::SingletonCollection, public Analysis::Core::Interfaces::IBuiltInType, public Core::Interfaces::IGenericClass
+    class Nullable final : public DataTypes::Struct, public Services::SingletonCollection, public Analysis::Core::Interfaces::IBuiltInType, public Core::Interfaces::IGenericClass
     {
         private:
             const DataType* nullableType;

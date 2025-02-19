@@ -1,8 +1,9 @@
 #ifndef CONSTRUCTOR_CALL_NODE_H
 #define CONSTRUCTOR_CALL_NODE_H
 
-#include "../../parse_node.h"
 #include "../../../../Lexing/Tokens/token.h"
+
+#include "../../parse_node.h"
 
 namespace ParseNodes::Functions::Calling
 {

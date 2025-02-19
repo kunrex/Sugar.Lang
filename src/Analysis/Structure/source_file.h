@@ -21,17 +21,16 @@ namespace Analysis::Structure
 
             ParseNodes::Groups::SourceFileNode* sourceNode;
 
-            Dictionary<std::string, const Core::DataType> references;
+            std::unordered_map<std::string, const Core::DataType*> references;
 
         public:
             SourceFile(const std::string& name, std::string source);
 
             [[nodiscard]] Enums::SourceType SourceType() const override;
 
-            bool Push(std::string key, Core::DataType* value) override;
+            bool AddChild(std::string key, Core::DataType* value) override;
 
-            void ReferenceThis(SourceObject* other) override;
-            void AddReference(const Core::DataType* dataType) override;
+            void AddReference(const Core::DataType* dataType);
             [[nodiscard]] const Core::DataType* GetReference(const std::string& name) const;
 
             [[nodiscard]] unsigned long SourceLength() const;

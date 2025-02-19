@@ -1,9 +1,10 @@
 #ifndef BOOLEAN_H
 #define BOOLEAN_H
 
-#include "../../Nodes/DataTypes/struct.h"
-#include "../../Core/Interfaces/i_built_in_type.h"
 #include "../../../../Services/singleton_service.h"
+
+#include "../../DataTypes/struct.h"
+#include "../../Core/Interfaces/i_built_in_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -13,6 +14,8 @@ namespace Analysis::Structure::Wrappers
             Boolean();
 
         public:
+            [[nodiscard]] int SlotCount() const override;
+
             void InitialiseMembers() override;
     };
 }

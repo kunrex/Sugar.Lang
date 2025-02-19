@@ -1,11 +1,11 @@
 #ifndef DESCRIBABLE_H
 #define DESCRIBABLE_H
 
-#include "../Enums/describer.h"
+#include "Interfaces/i_describable.h"
 
 namespace Analysis::Structure::Core
 {
-    class Describable
+    class Describable : public virtual Interfaces::IDescribable
     {
         protected:
             const Enums::Describer describer;
@@ -13,10 +13,12 @@ namespace Analysis::Structure::Core
             explicit Describable(Enums::Describer describer);
 
         public:
-            [[nodiscard]] bool ValidateDescriber(Enums::Describer allowed) const;
+            [[nodiscard]] Enums::Describer Describer() const;
 
-            [[nodiscard]] bool MatchDescriber(Enums::Describer expected) const;
-            [[nodiscard]] bool CheckDescriber(Enums::Describer describer) const;
+            [[nodiscard]] bool ValidateDescriber(Enums::Describer allowed) const override;
+
+            [[nodiscard]] bool MatchDescriber(Enums::Describer expected) const override;
+            [[nodiscard]] bool CheckDescriber(Enums::Describer describer) const override;
     };
 }
 

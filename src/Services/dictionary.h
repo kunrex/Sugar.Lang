@@ -17,9 +17,8 @@ namespace Services
         public:
             [[nodiscard]] int ChildCount() const;
 
-            [[nodiscard]] TValue* Get(TKey key) const;
-
-            virtual bool Push(TKey key, TValue* value);
+            [[nodiscard]] TValue* GetChild(TKey key) const;
+            virtual bool AddChild(TKey key, TValue* value);
 
             typename std::unordered_map<TKey, TValue*>::const_iterator begin() const;
             typename std::unordered_map<TKey, TValue*>::const_iterator end() const;

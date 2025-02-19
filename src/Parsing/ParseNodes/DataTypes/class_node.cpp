@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::DataTypes
 {
-    ClassNode::ClassNode(const DescriberNode* describer, const IdentifierNode* identifier, const NodeCollection<ParseNode>* body, const Token& keyword) : DataTypeNode(describer, identifier, body, keyword)
+    ClassNode::ClassNode(const DescriberNode* const describer, const IdentifierNode* const identifier, const NodeCollection<ParseNode>* const body, const Token& keyword) : DataTypeNode(describer, identifier, body, keyword)
     { }
 
     NodeType ClassNode::NodeType() const { return NodeType::Class; }

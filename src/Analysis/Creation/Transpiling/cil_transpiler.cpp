@@ -5,8 +5,8 @@
 #include <filesystem>
 
 #include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compiling/transpile_file_exception.h"
-#include "../../../Exceptions/Compiling/Analysis/ambiguous_import_exception.h"
+#include "../../../Exceptions/Compilation/transpile_file_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/ambiguous_import_exception.h"
 #include "../../Structure/Core/DataTypes/data_type.h"
 #include "../../Structure/Nodes/Context/context_node.h"
 
@@ -66,11 +66,11 @@ namespace Analysis::Creation
         }
 
         std::string outputFile;
-        if (const auto programSource = source->Get("program"); programSource != nullptr)
+        if (const auto programSource = source->GetChild("program"); programSource != nullptr)
         {
             const auto sourceFile = dynamic_cast<const SourceFile*>(programSource);
 
-            if (const auto programFile = sourceFile->Get("Program"); programFile != nullptr)
+            if (const auto programFile = sourceFile->GetChild("Program"); programFile != nullptr)
             {
                 if (const auto main = programFile->FindFunction("Main", std::vector<const DataType*>()); main != nullptr && main->CheckDescriber(Describer::PublicStatic))
                 {

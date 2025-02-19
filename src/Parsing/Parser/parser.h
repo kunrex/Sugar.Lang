@@ -127,6 +127,7 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::ParseNode* ParseDescriberStatement(Tokens::Enums::SeparatorKind breakSeparator);
             [[nodiscard]] const ParseNodes::ParseNode* ParseIdentifierStatement(Tokens::Enums::SeparatorKind breakSeparator);
 
+            [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseLazyScope();
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseScope();
             [[nodiscard]] const ParseNodes::ParseNode* ParseStatement();
 

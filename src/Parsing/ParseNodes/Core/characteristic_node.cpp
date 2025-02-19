@@ -5,6 +5,6 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Core
 {
-    CharacteristicNode::CharacteristicNode(const DescriberNode* describer, const ParseNode* type, const IdentifierNode* identifier) : DescribableNode(describer), EntityNode(type), NameableNode(identifier)
+    CharacteristicNode::CharacteristicNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier) : DescribableNode(describer), EntityNode(type), NameableNode(identifier)
     { }
 }

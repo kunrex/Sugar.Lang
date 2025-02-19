@@ -6,7 +6,7 @@ using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Conditions
 {
-    ConditionNode::ConditionNode(const ParseNode* condition, const ScopeNode* body, const Token& keyword) : ParseNode(), BodyNode(body), condition(condition), keyword(keyword)
+    ConditionNode::ConditionNode(const ParseNode* const condition, const ScopeNode* const body, const Token& keyword) : ParseNode(), BodyNode(body), condition(condition), keyword(keyword)
     { }
 
     const ParseNode* ConditionNode::Condition() const { return condition; }

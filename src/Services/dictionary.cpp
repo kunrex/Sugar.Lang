@@ -1,5 +1,10 @@
 #include "dictionary.h"
 
+#include "../Analysis/Structure/source_object.h"
+
+using namespace Analysis::Structure;
+using namespace Analysis::Structure::Core;
+
 namespace Services
 {
     template <typename TKey, typename TValue>
@@ -10,14 +15,14 @@ namespace Services
     int Dictionary<TKey, TValue>::ChildCount() const { return map.size(); }
 
     template <typename TKey, typename TValue>
-    TValue* Dictionary<TKey, TValue>::Get(TKey key) const
+    TValue* Dictionary<TKey, TValue>::GetChild(TKey key) const
     {
         auto it = map.find(key);
         return it == map.end() ? nullptr : it->second;
     }
 
     template <typename TKey, typename TValue>
-    bool Dictionary<TKey, TValue>::Push(TKey key, TValue* value)
+    bool Dictionary<TKey, TValue>::AddChild(TKey key, TValue* value)
     {
         auto it = map.find(key);
         if (it == map.end())
@@ -70,4 +75,7 @@ namespace Services
         for (auto it = map.begin(); it != map.end(); ++it)
             delete it->second;
     }
+
+    template class Dictionary<std::string, SourceObject>;
+    template class Dictionary<std::string, DataType>;
 }

@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    FunctionCreationNode::FunctionCreationNode(const DescriberNode* describer, const ParseNode* type, const IdentifierNode* identifier, const CompoundDeclarationNode* parameters, const ScopeNode* body) : ParseNode(), FunctionNode(describer, type, parameters, body), NameableNode(identifier), index(identifier->Index())
+    FunctionCreationNode::FunctionCreationNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const CompoundDeclarationNode* const parameters, const ScopeNode* const body) : ParseNode(), FunctionNode(describer, type, parameters, body), NameableNode(identifier)
     { }
 
     NodeType FunctionCreationNode::NodeType() const { return NodeType::FunctionDeclaration; }

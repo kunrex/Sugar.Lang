@@ -3,9 +3,9 @@
 #include "../../Exceptions/exception_manager.h"
 #include "../ParseNodes/Statements/initialisation_node.h"
 #include "../ParseNodes/Properties/assigned_property_node.h"
-#include "../../Exceptions/Compiling/Parsing/invalid_token_exception.h"
-#include "../../Exceptions/Compiling/Parsing/token_expected_exception.h"
-#include "../../Exceptions/Compiling/Parsing/function_argument_exception.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
+#include "../../Exceptions/Compilation/Parsing/function_argument_exception.h"
 
 using namespace Exceptions;
 
@@ -205,7 +205,7 @@ namespace Parsing
         return functionCall;
     }
 
-    const FunctionCreationNode* Parser::ParseFunction(const DescriberNode* describer, const ParseNode* type)
+    const FunctionCreationNode* Parser::ParseFunction(const DescriberNode* const describer, const ParseNode* const type)
     {
         const auto identifier = ParseIdentifier(true);
 
@@ -216,7 +216,7 @@ namespace Parsing
         return new FunctionCreationNode(describer, type, identifier, parameters, body);
     }
 
-    const ConstructorCreationNode* Parser::ParseConstructor(const DescriberNode* describer)
+    const ConstructorCreationNode* Parser::ParseConstructor(const DescriberNode* const describer)
     {
         const auto keyword = Current();
         index++;
@@ -228,7 +228,7 @@ namespace Parsing
         return new ConstructorCreationNode(describer, parameters, body, keyword);
     }
 
-    const ExplicitCastNode* Parser::ParseExplicitCast(const DescriberNode* describer)
+    const ExplicitCastNode* Parser::ParseExplicitCast(const DescriberNode* const describer)
     {
         const auto keyword = Current();
         index++;
@@ -241,7 +241,7 @@ namespace Parsing
         return new ExplicitCastNode(describer, type, parameters, body, keyword);
     }
 
-    const ImplicitCastNode* Parser::ParseImplicitCast(const DescriberNode* describer)
+    const ImplicitCastNode* Parser::ParseImplicitCast(const DescriberNode* const describer)
     {
         const auto keyword = Current();
         index++;
@@ -256,7 +256,7 @@ namespace Parsing
         return new ImplicitCastNode(describer, type, parameters, body, keyword);
     }
 
-    const OperatorOverloadNode* Parser::ParseOperatorOverload(const DescriberNode* describer)
+    const OperatorOverloadNode* Parser::ParseOperatorOverload(const DescriberNode* const describer)
     {
         const auto keyword = Current();
         index++;

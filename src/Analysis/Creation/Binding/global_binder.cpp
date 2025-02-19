@@ -3,7 +3,14 @@
 #include <format>
 
 #include "binder_extensions.h"
+
 #include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/variable_definition_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/return_accessibility_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/non_static_member_definition_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/duplicate_function_definition_exception.h"
 
 #include "../../../Lexing/Tokens/Factories/operator.h"
 
@@ -24,8 +31,6 @@
 #include "../../Structure/Nodes/DataTypes/enum.h"
 #include "../../Structure/Nodes/DataTypes/class.h"
 
-#include "../../Structure/Wrappers/Value/integer.h"
-
 #include "../../Structure/Nodes/Global/Properties/indexer.h"
 #include "../../Structure/Nodes/Global/Properties/property.h"
 
@@ -40,6 +45,10 @@
 
 #include "../../Structure/Nodes/Local/Variables/function_parameter.h"
 
+#include "../../Structure/Wrappers/Value/integer.h"
+
+using namespace Exceptions;
+
 using namespace Tokens::Enums;
 
 using namespace ParseNodes::Enums;
@@ -51,10 +60,12 @@ using namespace ParseNodes::Statements;
 using namespace ParseNodes::Expressions;
 using namespace ParseNodes::Functions::Creation;
 
+using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::DataTypes;
 
@@ -66,37 +77,31 @@ constexpr std::string_view set_indexer_name = "set_indexer";
 
 namespace Analysis::Creation::Binding
 {
-    void MatchReturnAccessibility(const Characteristic* const characteristic, const DataType* const dataType)
+    void MatchReturnAccessibility(const Characteristic* const characteristic, const unsigned long index, const DataType* const dataType)
     {
         if (characteristic->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (characteristic->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-        {
-            //exception
-        }
+            PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void MatchReturnAccessibility(const Function* const function, const DataType* const dataType)
+    void MatchReturnAccessibility(const Function* const function, const unsigned long index, const DataType* const dataType)
     {
         if (function->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (function->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-        {
-            //exception
-        }
+            PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void MatchReturnAccessibility(const Structure::Creation::IndexerDefinition* const indexer, const DataType* const dataType)
+    void MatchReturnAccessibility(const IndexerDefinition* const indexer, const unsigned long index, const DataType* const dataType)
     {
         if (indexer->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (indexer->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-        {
-            //exception
-        }
+            PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
     void BindEnumExpression(const ExpressionStatementNode* const expressionNode, DataType* const dataType)
@@ -105,96 +110,96 @@ namespace Analysis::Creation::Binding
         {
             case NodeType::Identifier:
                 {
-                    const auto identifier = dynamic_cast<const IdentifierNode*>(expression);
-                    if (dataType->FindCharacteristic(identifier->Value()) != nullptr)
-                    {
-                        //exception
-                        return;
-                    }
+                    const auto identifier = *dynamic_cast<const IdentifierNode*>(expression);
+                    const auto value = identifier.Value();
+                    const auto index = identifier.Index();
 
-                    dataType->PushCharacteristic(new GlobalVariable(identifier->Value(), Describer::Public | Describer::Const, &Integer::Instance()));
+                    if (dataType->FindCharacteristic(value) != nullptr)
+                        PushException(new DuplicateVariableDefinitionException(value, index, dataType->Parent()));
+                    else
+                        dataType->PushCharacteristic(new GlobalVariable(value, Describer::Public | Describer::Const, &Integer::Instance()));
                 }
                 break;
             case NodeType::Binary:
                 {
-                    const auto casted = dynamic_cast<const BinaryNode*>(expression);
-                    if (casted->Base().Kind() != SyntaxKind::Assignment)
+                    const auto casted = *dynamic_cast<const BinaryNode*>(expression);
+                    const auto index = casted.Index();
+
+                    if (casted.Base().Kind() != SyntaxKind::Assignment)
                     {
-                        //exception
+                        PushException(new InvalidGlobalStatementException(index, dataType->Parent()));
                         return;
                     }
 
-                    const auto lhs = casted->LHS();
+                    const auto lhs = casted.LHS();
                     if (lhs->NodeType() != NodeType::Identifier)
                     {
-                        //exception
+                        PushException(new InvalidGlobalStatementException(index, dataType->Parent()));
                         return;
                     }
 
-                    const auto identifier = dynamic_cast<const IdentifierNode*>(lhs);
-                    if (dataType->FindCharacteristic(identifier->Value()) != nullptr)
+                    const auto identifier = *dynamic_cast<const IdentifierNode*>(lhs);
+                    const auto value = identifier.Value();
+
+                    if (dataType->FindCharacteristic(value) != nullptr)
                     {
-                        //exception
+                        PushException(new DuplicateVariableDefinitionException(value, index, dataType->Parent()));
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalVariable(identifier->Value(), Describer::Public | Describer::Const, &Integer::Instance(), casted->RHS()));
+                    dataType->PushCharacteristic(new GlobalVariable(value, Describer::Public | Describer::Const, &Integer::Instance(), casted.RHS()));
                 }
                 break;
             default:
-                //exception
+                PushException(new InvalidGlobalStatementException(expression->Index(), dataType->Parent()));
                 break;
         }
     }
 
     void DeclareGlobalVariable(const DeclarationNode* const declarationNode, DataType* const dataType)
     {
-        const auto identifier = declarationNode->Name()->Value();
-        const auto creationType = BindDataType(declarationNode->Type(), dataType->Parent());
+        const auto index = declarationNode->Index();
+        const auto source = dataType->Parent();
 
-        if (creationType == nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto identifier = declarationNode->Name()->Value();
+
+        const auto creationType = BindDataType(declarationNode->Type(), source);
 
         if (dataType->FindCharacteristic(identifier) != nullptr)
         {
-            //exception
+            PushException(new DuplicateVariableDefinitionException(identifier, index, source));
             return;
         }
 
-        const auto describer = FromNode(declarationNode->Describer());
-        const auto globalVariable = new GlobalVariable(identifier, describer, creationType);
+        const auto globalVariable = new GlobalVariable(identifier, FromNode(declarationNode->Describer()), creationType);
+
+        MatchReturnAccessibility(globalVariable, index, dataType);
+        ValidateDescriber(globalVariable, Describer::ValidMembers, index, source);
 
         dataType->PushCharacteristic(globalVariable);
-        MatchStaticBindings(globalVariable, dataType, declarationNode->Index());
-        MatchReturnAccessibility(globalVariable, dataType);
     }
 
     void InitialiseGlobalVariable(const InitialisationNode* const initialisationNode, DataType* const dataType)
     {
-        const auto identifier = initialisationNode->Name()->Value();
-        const auto creationType = BindDataType(initialisationNode->Type(), dataType->Parent());
+        const auto index = initialisationNode->Index();
+        const auto source = dataType->Parent();
 
-        if (creationType == nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto identifier = initialisationNode->Name()->Value();
+
+        const auto creationType = BindDataType(initialisationNode->Type(), source);
 
         if (dataType->FindCharacteristic(identifier) != nullptr)
         {
-            //exception
+            PushException(new DuplicateVariableDefinitionException(identifier, index, source));
             return;
         }
 
-        const auto describer = FromNode(initialisationNode->Describer());
-        const auto globalVariable = new GlobalVariable(identifier, describer, creationType, initialisationNode->Value());
+        const auto globalVariable = new GlobalVariable(identifier, FromNode(initialisationNode->Describer()), creationType, initialisationNode->Value());
+
+        MatchReturnAccessibility(globalVariable, index, dataType);
+        ValidateDescriber(globalVariable, Describer::ValidMembers, index, source);
 
         dataType->PushCharacteristic(globalVariable);
-        MatchStaticBindings(globalVariable, dataType, initialisationNode->Index());
-        MatchReturnAccessibility(globalVariable, dataType);
     }
 
     void CreatePropertyFunctions(const GetNode* const getNode, const SetNode* const setNode, const std::string& identifier, const Describer describer, const DataType* const creationType, const MethodFunction*& get, VoidFunction*& set)
@@ -229,94 +234,94 @@ namespace Analysis::Creation::Binding
 
     void CreateProperty(const BasePropertyNode* const propertyNode, DataType* const dataType)
     {
-        const auto identifier = propertyNode->Name()->Value();
-        const auto creationType = BindDataType(propertyNode->Type(), dataType->Parent());
+        const auto index = propertyNode->Index();
+        const auto source = dataType->Parent();
 
-        if (creationType == nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto identifier = propertyNode->Name()->Value();
+
+        const auto creationType = BindDataType(propertyNode->Type(), source);
 
         if (dataType->FindCharacteristic(identifier) != nullptr)
         {
-            //exception
+            PushException(new DuplicateVariableDefinitionException(identifier, index, source));
             return;
         }
 
         const auto describer = FromNode(propertyNode->Describer());
 
-        const MethodFunction* get = nullptr;
-        VoidFunction* set = nullptr;
+        const MethodFunction* get = nullptr;  VoidFunction* set = nullptr;
         CreatePropertyFunctions(propertyNode->Get(), propertyNode->Set(), identifier, describer, creationType, get, set);
+
         const auto property = new Property(identifier, describer, creationType, get, set);
 
+        MatchReturnAccessibility(property, index, dataType);
+        ValidateDescriber(property, Describer::ValidMembers, index, source);
+
         dataType->PushCharacteristic(property);
-        MatchStaticBindings(property, dataType, propertyNode->Index());
-        MatchReturnAccessibility(property, dataType);
     }
 
     void InitialiseProperty(const AssignedPropertyNode* const propertyNode, DataType* const dataType)
     {
+        const auto index = propertyNode->Index();
+        const auto source = dataType->Parent();
+
         const auto identifier = propertyNode->Name()->Value();
-        const auto creationType = BindDataType(propertyNode->Type(), dataType->Parent());
 
-        if (creationType == nullptr)
-        {
-            //exception
-            return;
-        }
-
-        if (dataType->FindCharacteristic(identifier) != nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto creationType = BindDataType(propertyNode->Type(), source);
 
         const auto describer = FromNode(propertyNode->Describer());
 
-        const MethodFunction* get = nullptr;
-        VoidFunction* set = nullptr;
+        const MethodFunction* get = nullptr; VoidFunction* set = nullptr;
         CreatePropertyFunctions(propertyNode->Get(), propertyNode->Set(), identifier, describer, creationType, get, set);
+
         const auto property = new Property(identifier, describer, creationType, get, set, propertyNode->Value());
 
+        MatchReturnAccessibility(property, index, dataType);
+        ValidateDescriber(property, Describer::ValidMembers, index, source);
+
         dataType->PushCharacteristic(property);
-        MatchStaticBindings(property, dataType, propertyNode->Index());
-        MatchReturnAccessibility(property, dataType);
     }
 
-    void BindFunctionParameters(Scoped* const scope, const std::vector<const DataType*>& parameters, const CompoundDeclarationNode* const declarationNode)
+    void BindFunctionParameters(const CompoundDeclarationNode* const declarationNode, std::vector<const DataType*>& parameters, const SourceFile* const source)
+    {
+        for (const auto typeNode: *declarationNode)
+            parameters.push_back(BindDataType(typeNode->Type(), source));
+    }
+
+    void BindFunctionParameters(Scoped* const scope, const std::vector<const DataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
     {
         for (int i = 0; i < declarationNode->ChildCount(); ++i)
         {
-            const auto current = declarationNode->GetChild(i);
-            const auto name = current->Name()->Value();
+            const auto current = *declarationNode->GetChild(i);
 
-            if (scope->ContainsArgument(name))
+            const auto index = current.Index();
+            const auto identifier = current.Name()->Value();
+
+            const auto creationType = parameters.at(i);
+
+            if (scope->ContainsArgument(identifier))
             {
-                //exception
+                PushException(new DuplicateVariableDefinitionException(identifier, index, source));
+                continue;
             }
 
-            const auto describer = FromNode(current->Describer());
+            const auto parameter = new FunctionParameter(identifier, FromNode(current.Describer()), creationType);
 
-            const auto parameter = new FunctionParameter(name, describer, parameters.at(i));
-            if (!parameter->ValidateDescriber(Describer::Ref | Describer::Const))
-            {
-                //exception
-            }
+            const auto validDescribers = Describer::Const | (creationType->MemberType() == MemberType::Struct ? Describer::Ref : Describer::None);
+            ValidateDescriber(parameter, validDescribers, index, source);
 
             scope->AddArgument(parameter);
         }
     }
 
-    void CreateIndexerFunctions(const GetNode* const getNode, const SetNode* const setNode, const CompoundDeclarationNode* declarationNode, const std::vector<const DataType*>& parameters, const DataType* const creationType, const Describer describer, MethodFunction*& get, VoidFunction*& set)
+    void CreateIndexerFunctions(const GetNode* const getNode, const SetNode* const setNode, const CompoundDeclarationNode* declarationNode, const std::vector<const DataType*>& parameters, const DataType* const creationType, const Describer describer, MethodFunction*& get, VoidFunction*& set, const SourceFile* const source)
     {
         if (getNode != nullptr)
         {
             const auto actualDescriber = (FromNode(getNode->Describer()) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
 
             get = new MethodFunction(std::string(get_indexer_name), actualDescriber, creationType, getNode->Body());
-            BindFunctionParameters(get, parameters, declarationNode);
+            BindFunctionParameters(get, parameters, declarationNode, source);
         }
 
         if (setNode != nullptr)
@@ -324,11 +329,10 @@ namespace Analysis::Creation::Binding
             const auto actualDescriber = (FromNode(setNode->Describer()) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
 
             set = new VoidFunction(std::string(set_indexer_name), actualDescriber, setNode->Body());
-            BindFunctionParameters(set, parameters, declarationNode);
+            BindFunctionParameters(set, parameters, declarationNode, source);
+
             if (set->GetArgument("value") >= 0)
-            {
-                //exception
-            }
+                PushException(new DuplicateVariableDefinitionException("value", declarationNode->Index(), source));
             else
                 set->AddArgument(new FunctionParameter("value", Describer::Const, creationType));
         }
@@ -336,280 +340,224 @@ namespace Analysis::Creation::Binding
 
     void CreateIndexer(const BaseIndexerNode* const indexerNode, DataType* const dataType)
     {
+        const auto index = indexerNode->Index();
+        const auto source = dataType->Parent();
+
         if (dataType->CheckDescriber(Describer::Static))
         {
-            //exception
+            PushException(new NonStaticMemberDefinitionException(index, source));
             return;
         }
 
-        const auto creationType = BindDataType(indexerNode->Type(), dataType->Parent());
-        const auto declarationNOde = indexerNode->Parameters();
+        const auto creationType = BindDataType(indexerNode->Type(), source);
+        const auto declarationNode = indexerNode->Parameters();
 
         std::vector<const DataType*> parameters;
-        for (const auto typeNode: *declarationNOde)
-        {
-            const auto type = BindDataType(typeNode->Type(), dataType->Parent());
-            if (type == nullptr)
-            {
-                //exception
-                return;
-            }
-
-            parameters.push_back(type);
-        }
+        BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindIndexer(parameters) != nullptr)
         {
-            //exception
+            PushException(new DuplicateFunctionDefinition(index, source));
             return;
         }
 
         const auto describer = FromNode(indexerNode->Describer());
-        if ((describer & Describer::Static) == Describer::Static)
-        {
-            //exception
-        }
 
-        MethodFunction* get = nullptr;
-        VoidFunction* set = nullptr;
-        CreateIndexerFunctions(indexerNode->Get(), indexerNode->Set(), declarationNOde, parameters, creationType, describer, get, set);
+        MethodFunction* get = nullptr; VoidFunction* set = nullptr;
+        CreateIndexerFunctions(indexerNode->Get(), indexerNode->Set(), declarationNode, parameters, creationType, describer, get, set, source);
 
         const auto indexer = new Indexer(describer, creationType, get, set);
+
+        MatchReturnAccessibility(indexer, index, dataType);
+        ValidateDescriber(indexer, Describer::AccessModifiers, index, source);;
+
         dataType->PushIndexer(indexer);
-        MatchReturnAccessibility(indexer, dataType);
     }
 
-    void CreateFunction(const FunctionCreationNode* const functionCreation, DataType* const dataType)
+    void CreateFunction(const FunctionCreationNode* const functionCreationNode, DataType* const dataType)
     {
-        const auto identifier = functionCreation->Name()->Value();
+        const auto index = functionCreationNode->Index();
+        const auto source = dataType->Parent();
+
+        const auto identifier = functionCreationNode->Name()->Value();
+        const auto declarationNode = functionCreationNode->Parameters();
 
         std::vector<const DataType*> parameters;
-        for (const auto typeNode: *functionCreation->Parameters())
-        {
-            const auto type = BindDataType(typeNode->Type(), dataType->Parent());
-            if (type == nullptr)
-            {
-                //exception
-                return;
-            }
-
-            parameters.push_back(type);
-        }
+        BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindFunction(identifier, parameters) != nullptr)
         {
-            //exception
+            PushException(new DuplicateFunctionDefinition(index, source));
             return;
         }
 
-        const auto describer = FromNode(functionCreation->Describer());
+        const auto describer = FromNode(functionCreationNode->Describer());
 
-        if (const auto typeNode = functionCreation->Type(); typeNode->NodeType() == NodeType::VoidType)
+        FunctionDefinition* function;
+        if (const auto typeNode = functionCreationNode->Type(); typeNode->NodeType() == NodeType::VoidType)
         {
-            const auto function = new VoidFunction(identifier, describer, functionCreation->Body());
-            BindFunctionParameters(function, parameters, functionCreation->Parameters());;
+            const auto voidDefinition = new VoidFunction(identifier, describer, functionCreationNode->Body());
+            BindFunctionParameters(voidDefinition, parameters, declarationNode, source);
 
-            dataType->PushFunction(function);
-            MatchStaticBindings(function, dataType, functionCreation->Index());
-            MatchReturnAccessibility(function, dataType);
+            function = voidDefinition;
         }
         else
         {
-            const auto function = new MethodFunction(identifier, describer, BindDataType(typeNode, dataType->Parent()), functionCreation->Body());
-            BindFunctionParameters(function, parameters, functionCreation->Parameters());;
+            const auto methodDefinition = new MethodFunction(identifier, describer, BindDataType(typeNode, source), functionCreationNode->Body());
+            BindFunctionParameters(methodDefinition, parameters, declarationNode, source);
 
-            dataType->PushFunction(function);
-            MatchStaticBindings(function, dataType, functionCreation->Index());
-            MatchReturnAccessibility(function, dataType);
+            function = methodDefinition;
         }
+
+        MatchReturnAccessibility(function, index, dataType);
+        ValidateDescriber(function, Describer::ValidMembers, index, source);
+
+        dataType->PushFunction(function);
     }
 
-    void CreateConstructor(const ConstructorCreationNode* const constructor, DataType* const dataType)
+    void CreateConstructor(const ConstructorCreationNode* const constructorDefinitionNode, DataType* const dataType)
     {
+        const auto index = constructorDefinitionNode->Index();
+        const auto source = dataType->Parent();
+
         if (dataType->CheckDescriber(Describer::Static))
         {
-            //exception
+            PushException(new NonStaticMemberDefinitionException(index, source));
             return;
         }
 
-        std::vector<const DataType*> parameters;
-        for (const auto typeNode: *constructor->Parameters())
-        {
-            const auto type = BindDataType(typeNode->Type(), dataType->Parent());
-            if (type == nullptr)
-            {
-                //exception
-                return;
-            }
+        const auto declarationNode = constructorDefinitionNode->Parameters();
 
-            parameters.push_back(type);
-        }
+        std::vector<const DataType*> parameters;
+        BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindConstructor(parameters) != nullptr)
         {
-            //exception
+            PushException(new DuplicateFunctionDefinition(index, source));
             return;
         }
 
-        const auto describer = FromNode(constructor->Describer());
-        if ((describer & Describer::Static) == Describer::Static)
-        {
-            //exception
-        }
+        const auto constructor = new Constructor(FromNode(constructorDefinitionNode->Describer()), dataType, constructorDefinitionNode->Body());
+        BindFunctionParameters(constructor, parameters, declarationNode, source);
 
-        const auto constructorDefinition = new Constructor(describer, dataType, constructor->Body());
-        BindFunctionParameters(constructorDefinition, parameters, constructor->Parameters());
+        ValidateDescriber(constructor, Describer::AccessModifiers, index, source);
 
-        dataType->PushConstructor(constructorDefinition);
+        dataType->PushConstructor(constructor);
     }
 
-    void CreateExplict(const ExplicitCastNode* const explicitCast, DataType* const dataType)
+    void CreateExplict(const ExplicitCastNode* const explicitCastNode, DataType* const dataType)
     {
+        const auto index = explicitCastNode->Index();
+        const auto source = dataType->Parent();
+
         if (dataType->CheckDescriber(Describer::Static))
         {
-            //exception
+            PushException(new NonStaticMemberDefinitionException(index, source));
             return;
         }
 
-        const auto creationType = BindDataType(explicitCast->Type(), dataType->Parent());
-        if (creationType == nullptr)
+        const auto creationType = BindDataType(explicitCastNode->Type(), source);
+        const auto declarationNode = explicitCastNode->Parameters();
+
+        std::vector<const DataType*> parameters;
+        BindFunctionParameters(declarationNode, parameters, source);
+
+        if (parameters.size() != 1)
         {
-            //exception
+            PushException(new LogException("Explicit cast definition can contain only 1 parameter.", index, source));
             return;
         }
 
-        const auto parameters = explicitCast->Parameters();
-        if (parameters->ChildCount() != 1)
-        {
-            //exception
-            return;
-        }
-
-        const auto fromTypeNode = parameters->GetChild(0);
-        const auto fromType = BindDataType(fromTypeNode->Type(), dataType->Parent());
-        if (fromType == nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto fromType = parameters[0];
 
         if (fromType != dataType && creationType != dataType)
         {
-            //exception
+            PushException(new LogException("Return type or the argument of an explicit cast must the same as the type its defined in.", index, source));
             return;
         }
 
         if  (dataType->FindExplicitCast(creationType, fromType) != nullptr)
         {
-            //exception
+            PushException(new DuplicateFunctionDefinition(index, source));
             return;
         }
 
-        const auto describer = FromNode(explicitCast->Describer());
-        if (describer != Describer::PublicStatic)
-        {
-            //exception
-        }
+        const auto explicitCast = new ExplicitCast(FromNode(explicitCastNode->Describer()), creationType, explicitCastNode->Body());
+        BindFunctionParameters(explicitCast, parameters, declarationNode, source);
 
-        const auto explicitCastDefinition = new ExplicitCast(describer, creationType, explicitCast->Body());
+        MatchReturnAccessibility(explicitCast, index, dataType);
+        MatchDescriber(explicitCast, Describer::Public | Describer::Static, index, source);
 
-        const auto argument = new FunctionParameter(fromTypeNode->Name()->Value(), FromNode(explicitCast->Describer()), fromType);
-        if (!argument->ValidateDescriber(Describer::Const))
-        {
-            //exception
-        }
-
-        explicitCastDefinition->AddArgument(argument);
-        dataType->PushExplicitCast(explicitCastDefinition);
-        MatchReturnAccessibility(explicitCastDefinition, dataType);
+        dataType->PushExplicitCast(explicitCast);
     }
 
-    void CreateImplicit(const ImplicitCastNode* const implicitCast, DataType* const dataType)
+    void CreateImplicit(const ImplicitCastNode* const implicitCastNode, DataType* const dataType)
     {
+        const auto index = implicitCastNode->Index();
+        const auto source = dataType->Parent();
+
         if (dataType->CheckDescriber(Describer::Static))
         {
-            //exception
+            PushException(new NonStaticMemberDefinitionException(index, source));
             return;
         }
 
-        const auto creationType = BindDataType(implicitCast->Type(), dataType->Parent());
-        if (creationType == nullptr)
+        const auto creationType = BindDataType(implicitCastNode->Type(), source);
+        const auto declarationNode = implicitCastNode->Parameters();
+
+        std::vector<const DataType*> parameters;
+        BindFunctionParameters(declarationNode, parameters, source);
+
+        if (parameters.size() != 1)
         {
-            //exception
+            PushException(new LogException("Implicit cast definition can contain only 1 parameter.", index, source));
             return;
         }
 
-        const auto parameters = implicitCast->Parameters();
-        if (parameters->ChildCount() != 1)
-        {
-            //exception
-            return;
-        }
-
-        const auto fromTypeNode = parameters->GetChild(0);
-        const auto fromType = BindDataType(fromTypeNode->Type(), dataType->Parent());
-        if (fromType == nullptr)
-        {
-            //exception
-            return;
-        }
+        const auto fromType = parameters[0];
 
         if (fromType != dataType && creationType != dataType)
         {
-            //exception
+            PushException(new LogException("Return type or the argument of an implicit cast must the same as the type its defined in.", index, source));
             return;
         }
 
         if  (dataType->FindImplicitCast(creationType, fromType) != nullptr)
         {
-            //exception
+            PushException(new DuplicateFunctionDefinition(index, source));
             return;
         }
 
-        const auto describer = FromNode(implicitCast->Describer());
-        if (describer != Describer::PublicStatic)
-        {
-            //exception
-        }
+        const auto implicitCast = new ImplicitCast(FromNode(implicitCastNode->Describer()), creationType, implicitCastNode->Body());
+        BindFunctionParameters(implicitCast, parameters, declarationNode, source);
 
-        const auto implicitCastDefinition = new ImplicitCast(describer, creationType, implicitCast->Body());
+        MatchReturnAccessibility(implicitCast, index, dataType);
+        MatchDescriber(implicitCast, Describer::Public | Describer::Static, index, source);
 
-        const auto argument = new FunctionParameter(fromTypeNode->Name()->Value(), FromNode(implicitCast->Describer()), fromType);
-        if (!argument->ValidateDescriber(Describer::Const))
-        {
-            //exception
-        }
-
-        implicitCastDefinition->AddArgument(argument);
-        dataType->PushImplicitCast(implicitCastDefinition);
-        MatchReturnAccessibility(implicitCastDefinition, dataType);
+        dataType->PushImplicitCast(implicitCast);
     }
 
-    void CreateOperator(const OperatorOverloadNode* const operatorOverload, DataType* const dataType)
+    void CreateOperatorOverload(const OperatorOverloadNode* const operatorOverloadNode, DataType* const dataType)
     {
+        const auto index = operatorOverloadNode->Index();
+        const auto source = dataType->Parent();
+
         if (dataType->CheckDescriber(Describer::Static))
         {
-            //exception
+            PushException(new NonStaticMemberDefinitionException(index, source));
             return;
         }
 
-        const auto creationType = BindDataType(operatorOverload->Type(), dataType->Parent());
+        const auto creationType = BindDataType(operatorOverloadNode->Type(), source);
+        if (creationType != dataType)
+            PushException(new LogException(std::format("Expected return type: {}.", dataType->FullName()), index, source));
 
-        int argCount = 0;
+        const auto declarationNode = operatorOverloadNode->Parameters();
+
         std::vector<const DataType*> parameters;
-        for (const auto typeNode: *operatorOverload->Parameters())
-        {
-            if (BindDataType(typeNode->Type(), dataType->Parent()) != dataType)
-            {
-                //exception
-                return;
-            }
+        BindFunctionParameters(declarationNode, parameters, source);
 
-            argCount++;
-            parameters.push_back(dataType);
-        }
-
-        const auto& token = operatorOverload->Operator();;
+        const auto& token = operatorOverloadNode->Operator();
         switch (token.Kind())
         {
             case SyntaxKind::Increment:
@@ -622,32 +570,24 @@ namespace Analysis::Creation::Binding
             case SyntaxKind::BitwiseNot:
             case SyntaxKind::BitwiseAnd:
                 {
-                    if (argCount != 1)
-                    {
-                        //exception
-                        return;
-                    }
+                    if (parameters.size() != 1)
+                        PushException(new LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), index, source));
                 }
                 break;
             default:
-                if (argCount != 2)
                 {
-                    //exception
-                    return;
+                    if (parameters.size() != 2)
+                        PushException(new LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), index, source));
                 }
+                break;
         }
 
-        const auto describer = FromNode(operatorOverload->Describer());
-        if (describer != Describer::PublicStatic)
-        {
-            //exception
-        }
+        const auto operatorOverload = new OperatorOverload(token.Kind(), FromNode(operatorOverloadNode->Describer()), creationType, operatorOverloadNode->Body());
+        BindFunctionParameters(operatorOverload, parameters, operatorOverloadNode->Parameters(), source);
 
-        const auto overload = new OperatorOverload(token.Kind(), describer, creationType, operatorOverload->Body());
-        BindFunctionParameters(overload, parameters, operatorOverload->Parameters());
+        MatchDescriber(operatorOverload, Describer::Public | Describer::Static, index, source);
 
-        dataType->PushOverload(overload);
-        MatchReturnAccessibility(overload, dataType);
+        dataType->PushOverload(operatorOverload);
     }
 
     void BindEnum(Enum* enumSource)
@@ -660,7 +600,7 @@ namespace Analysis::Creation::Binding
                     BindEnumExpression(dynamic_cast<const ExpressionStatementNode*>(child), enumSource);
                     break;
                 default:
-                    //exception
+                    PushException(new InvalidGlobalStatementException(child->Index(), enumSource->Parent()));
                     break;
             }
         }
@@ -700,10 +640,10 @@ namespace Analysis::Creation::Binding
                     CreateExplict(dynamic_cast<const ExplicitCastNode*>(child), classSource);
                     break;
                 case NodeType::OperatorOverload:
-                    CreateOperator(dynamic_cast<const OperatorOverloadNode*>(child), classSource);
+                    CreateOperatorOverload(dynamic_cast<const OperatorOverloadNode*>(child), classSource);
                     break;
                 default:
-                    //exception
+                    PushException(new InvalidGlobalStatementException(child->Index(), classSource->Parent()));
                     break;
             }
         }
@@ -743,16 +683,16 @@ namespace Analysis::Creation::Binding
                     CreateExplict(dynamic_cast<const ExplicitCastNode*>(child), structSource);
                     break;
                 case NodeType::OperatorOverload:
-                    CreateOperator(dynamic_cast<const OperatorOverloadNode*>(child), structSource);
+                    CreateOperatorOverload(dynamic_cast<const OperatorOverloadNode*>(child), structSource);
                     break;
                 default:
-                    //exception
-                        break;
+                    PushException(new InvalidGlobalStatementException(child->Index(), structSource->Parent()));
+                    break;
             }
         }
     }
 
-    void GlobalBindSourceFile(const Structure::SourceFile* const source)
+    void GlobalBindSourceFile(const SourceFile* const source)
     {
         for (const auto type: source->values())
         {
@@ -767,10 +707,7 @@ namespace Analysis::Creation::Binding
                 case MemberType::Struct:
                     BindStruct(dynamic_cast<StructSource*>(type));
                     break;
-                case NodeType::Import:
-                    break;
                 default:
-                    //exception
                     break;
             }
         }

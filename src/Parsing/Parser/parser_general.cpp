@@ -1,7 +1,7 @@
 #include "parser.h"
 
 #include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compiling/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
 
 #include "../../Lexing/Tokens/Enums/keyword_type.h"
 
@@ -29,7 +29,7 @@ using namespace ParseNodes::Functions::Calling;
 
 namespace Parsing
 {
-    const ParseNode* Parser::ParseVariableDeclaration(const DescriberNode* describer, const ParseNode* type, const SeparatorKind breakSeparator)
+    const ParseNode* Parser::ParseVariableDeclaration(const DescriberNode* const describer, const ParseNode* const type, const SeparatorKind breakSeparator)
     {
         const auto identifier = ParseIdentifier(true);
 
@@ -348,6 +348,17 @@ namespace Parsing
         return invalid;
     }
 
+    const ScopeNode* Parser::ParseLazyScope()
+    {
+        if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
+            return ParseScope();
+
+        const auto scope = new ScopeNode(index);
+        scope->AddChild(ParseStatement());
+
+        return scope;
+    }
+
     const ScopeNode* Parser::ParseScope()
     {
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
@@ -358,7 +369,7 @@ namespace Parsing
             if (MatchToken(Current(), SyntaxKind::FlowerCloseBracket))
                 return scope;
 
-            scope->AddChild(ParseStatement());
+            scope->AddChild(ParseLazyScope());
         }
 
         TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
@@ -372,9 +383,6 @@ namespace Parsing
             return ParseKeywordStatement(SeparatorKind::Semicolon);
         if (MatchType(current, TokenType::Identifier))
             return ParseIdentifierStatement(SeparatorKind::Semicolon);
-
-        if (MatchToken(current, SyntaxKind::FlowerOpenBracket))
-            return ParseScope();
         if (MatchToken(current, SyntaxKind::Semicolon))
             return new EmptyNode(current);
 
@@ -382,5 +390,4 @@ namespace Parsing
         TryMatchToken(current, SyntaxKind::Semicolon);
         return invalid;
     }
-
 }

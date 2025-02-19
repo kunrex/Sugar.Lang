@@ -53,6 +53,7 @@ namespace Tokens
         keywordMap["string"] = { SyntaxKind::String, KeywordType::Type };
         keywordMap["exception"] = { SyntaxKind::Exception, KeywordType::Type };
         keywordMap["object"] = { SyntaxKind::Object, KeywordType::Type };
+        keywordMap["math"] = { SyntaxKind::Math, KeywordType::Type };
 
         keywordMap["void"] = { SyntaxKind::Void, KeywordType::Function };
         keywordMap["indexer"] = { SyntaxKind::Indexer, KeywordType::Function };
@@ -62,7 +63,6 @@ namespace Tokens
         keywordMap["constructor"] = { SyntaxKind::Static, KeywordType::Function };
 
         keywordMap["ref"] = { SyntaxKind::Ref, KeywordType::Describer };
-        keywordMap["const"] = { SyntaxKind::Const, KeywordType::Describer };
         keywordMap["static"] = { SyntaxKind::Static, KeywordType::Describer };
         keywordMap["public"] = { SyntaxKind::Public, KeywordType::Describer };
         keywordMap["private"] = { SyntaxKind::Private, KeywordType::Describer };

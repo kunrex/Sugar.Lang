@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    DotExpressionNode::DotExpressionNode(const ParseNode* lhs, const ParseNode* rhs) : ParseNode(), lhs(lhs), rhs(rhs)
+    DotExpressionNode::DotExpressionNode(const ParseNode* const lhs, const ParseNode* const rhs) : ParseNode(), lhs(lhs), rhs(rhs)
     { }
 
     NodeType DotExpressionNode::NodeType() const { return NodeType::Dot; }

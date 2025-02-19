@@ -10,7 +10,7 @@ constexpr std::string_view nullable_cil = "[mscorlib]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const DataType* nullableType) : Class("NullableType", Describer::Public), nullableType(nullableType), genericSignature()
+    Nullable::Nullable(const DataType* nullableType) : Struct("Nullable", Describer::Public), nullableType(nullableType), genericSignature()
     { }
 
     const Nullable* Nullable::Instance(const DataType* dataType)

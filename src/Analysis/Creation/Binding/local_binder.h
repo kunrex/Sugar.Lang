@@ -3,9 +3,9 @@
 
 #include "../../Structure/source_file.h"
 
-namespace Analysis::Structure::Binding
+namespace Analysis::Creation::Binding
 {
-    void LocalBindSourceFile(const SourceFile* source);
+    void LocalBindSourceFile(const Structure::SourceFile* source);
 }
 
 #endif

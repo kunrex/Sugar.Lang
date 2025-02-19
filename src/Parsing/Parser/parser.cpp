@@ -1,7 +1,7 @@
 #include "parser.h"
 
 #include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compiling/Parsing/token_expected_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
 
 #include "../ParseNodes/invalid_node.h"
 
@@ -137,7 +137,7 @@ namespace Parsing
 
         const auto sourceNode = new SourceFileNode();
         for (index = 0; index < source->TokenCount(); index++)
-            sourceNode->AddChild(ParseStatement());
+            sourceNode->AddChild(ParseLazyScope());
 
         this->source->WithSourceNode(sourceNode);
 

@@ -26,7 +26,9 @@ namespace Tokens::Enums
         Tuple = 109,
 
         Nullable = 110,
-        Exception = 111
+        Exception = 111,
+
+        Math = 112
     };
 
     std::string ToString(const TypeKind& typeKind);

@@ -16,6 +16,8 @@ namespace Services
         public:
             explicit StringBuilder(std::string outputFile);
 
+            [[nodiscard]] const std::string& OutputFile() const;
+
             void IncreaseIndent();
             void DecreaseIndent();
 

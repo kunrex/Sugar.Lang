@@ -64,7 +64,6 @@ namespace Tokens::Enums
         Constructor = 37,
 
         Ref = 38,
-        Const = 39,
         Static = 40,
         Public = 41,
         Private = 42,
@@ -159,6 +158,7 @@ namespace Tokens::Enums
         Nullable = static_cast<short>(TypeKind::Nullable),
 
         Exception = static_cast<short>(TypeKind::Exception),
+        Math = static_cast<short>(TypeKind::Math),
     };
 
     std::string ToString(const SyntaxKind& syntaxKind);

@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    TernaryNode::TernaryNode(const ParseNode* condition, const ParseNode* trueValue, const ParseNode* falseValue) : ParseNode(), condition(condition), trueValue(trueValue), falseValue(falseValue)
+    TernaryNode::TernaryNode(const ParseNode* const condition, const ParseNode* const trueValue, const ParseNode* const falseValue) : ParseNode(), condition(condition), trueValue(trueValue), falseValue(falseValue)
     { }
 
     NodeType TernaryNode::NodeType() const { return NodeType::Ternary; }

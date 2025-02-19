@@ -17,7 +17,6 @@ namespace Services
             [[nodiscard]] int ChildCount() const;
 
             [[nodiscard]] TChild* GetChild(int index) const;
-
             virtual void AddChild(TChild* child);
 
             typename std::vector<TChild*>::const_iterator begin() const;

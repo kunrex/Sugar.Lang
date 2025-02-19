@@ -1,160 +1,217 @@
 add_library(Sugar STATIC
-        Services/printable.h
-        Services/singleton_service.cpp
-        Services/singleton_service.h
-        Services/printable.cpp
-        Services/collection.cpp
-        Services/collection.h
+        compiler.cpp
+        compiler.h
+
         Services/child.cpp
         Services/child.h
+        Services/printable.cpp
+        Services/printable.h
+        Services/collection.cpp
+        Services/collection.h
+        Services/dictionary.cpp
+        Services/dictionary.h
+        Services/string_builder.cpp
+        Services/string_builder.h
+        Services/singleton_service.cpp
+        Services/singleton_service.h
+
         Lexing/Tokens/token.cpp
         Lexing/Tokens/token.h
+        Lexing/Tokens/Enums/type_kind.cpp
+        Lexing/Tokens/Enums/type_kind.h
+        Lexing/Tokens/Enums/token_type.cpp
         Lexing/Tokens/Enums/token_type.h
+        Lexing/Tokens/Enums/syntax_kind.cpp
         Lexing/Tokens/Enums/syntax_kind.h
         Lexing/Tokens/Enums/keyword_type.h
+        Lexing/Tokens/Enums/separator_kind.cpp
         Lexing/Tokens/Enums/separator_kind.h
+
+        Lexing/Tokens/Factories/keyword.cpp
+        Lexing/Tokens/Factories/keyword.h
+        Lexing/Tokens/Factories/constant.cpp
+        Lexing/Tokens/Factories/constant.h
+        Lexing/Tokens/Factories/operator.cpp
+        Lexing/Tokens/Factories/operator.h
+        Lexing/Tokens/Factories/separator.cpp
+        Lexing/Tokens/Factories/separator.h
+
         Lexing/Lexer/lexer.cpp
         Lexing/Lexer/lexer.h
+
+        Parsing/ParseNodes/Core/Interfaces/i_parse_node.h
+        Parsing/ParseNodes/Enums/node_type.h
+
         Parsing/ParseNodes/parse_node.cpp
         Parsing/ParseNodes/parse_node.h
-        Parsing/ParseNodes/Enums/node_type.h
-        Parsing/ParseNodes/Core/Interfaces/i_parse_node.h
         Parsing/ParseNodes/invalid_node.cpp
         Parsing/ParseNodes/invalid_node.h
-        Parsing/ParseNodes/Constants/constant_node.cpp
-        Parsing/ParseNodes/Constants/constant_node.h
-        Parsing/ParseNodes/Values/identifier_node.cpp
-        Parsing/ParseNodes/Values/identifier_node.h
+
+        Parsing/ParseNodes/Values/null_node.cpp
+        Parsing/ParseNodes/Values/null_node.h
         Parsing/ParseNodes/Values/this_node.cpp
         Parsing/ParseNodes/Values/this_node.h
+        Parsing/ParseNodes/Values/identifier_node.cpp
+        Parsing/ParseNodes/Values/identifier_node.h
+
+        Parsing/ParseNodes/Constants/constant_node.cpp
+        Parsing/ParseNodes/Constants/constant_node.h
+
         Parsing/ParseNodes/Types/Keyword/void_type_node.cpp
         Parsing/ParseNodes/Types/Keyword/void_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/array_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/array_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/func_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/func_type_node.h
-        Parsing/ParseNodes/Types/Keyword/anonymous_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/anonymous_type_node.h
-        Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.cpp
-        Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h
-        Parsing/ParseNodes/Types/Created/created_type_node.cpp
-        Parsing/ParseNodes/Types/Created/created_type_node.h
         Parsing/ParseNodes/Types/Keyword/keyword_type_node.cpp
         Parsing/ParseNodes/Types/Keyword/keyword_type_node.h
-        Parsing/ParseNodes/Expressions/Ternary/ternary_node.cpp
-        Parsing/ParseNodes/Expressions/Ternary/ternary_node.h
-        Parsing/ParseNodes/Expressions/operation_expression_node.cpp
-        Parsing/ParseNodes/Expressions/operation_expression_node.h
-        Parsing/ParseNodes/Expressions/Binary/binary_node.cpp
-        Parsing/ParseNodes/Expressions/Binary/binary_node.h
+        Parsing/ParseNodes/Types/Created/created_type_node.cpp
+        Parsing/ParseNodes/Types/Created/created_type_node.h
+        Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.cpp
+        Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h
+        Parsing/ParseNodes/Types/Keyword/anonymous_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/anonymous_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/list_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/list_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/func_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/func_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/array_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/array_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/tuple_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/tuple_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.h
+        Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.cpp
+        Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.h
+
         Parsing/ParseNodes/Expressions/Unary/unary_node.cpp
         Parsing/ParseNodes/Expressions/Unary/unary_node.h
+        Parsing/ParseNodes/Expressions/Binary/binary_node.cpp
+        Parsing/ParseNodes/Expressions/Binary/binary_node.h
+        Parsing/ParseNodes/Expressions/dot_expression_node.cpp
+        Parsing/ParseNodes/Expressions/dot_expression_node.h
+        Parsing/ParseNodes/Expressions/Ternary/ternary_node.cpp
+        Parsing/ParseNodes/Expressions/Ternary/ternary_node.h
+        Parsing/ParseNodes/Expressions/cast_expression_node.cpp
+        Parsing/ParseNodes/Expressions/cast_expression_node.h
+        Parsing/ParseNodes/Expressions/operation_expression_node.cpp
+        Parsing/ParseNodes/Expressions/operation_expression_node.h
+
+        Parsing/ParseNodes/Statements/empty_node.cpp
+        Parsing/ParseNodes/Statements/empty_node.h
+        Parsing/ParseNodes/Statements/statement_node.cpp
+        Parsing/ParseNodes/Statements/statement_node.h
         Parsing/ParseNodes/Statements/declaration_node.cpp
         Parsing/ParseNodes/Statements/declaration_node.h
+        Parsing/ParseNodes/Statements/Control/break_node.cpp
+        Parsing/ParseNodes/Statements/Control/break_node.h
+        Parsing/ParseNodes/Statements/Control/return_node.cpp
+        Parsing/ParseNodes/Statements/Control/return_node.h
         Parsing/ParseNodes/Statements/initialisation_node.cpp
         Parsing/ParseNodes/Statements/initialisation_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/print_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/print_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/invoke_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/invoke_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/input_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/input_node.h
+        Parsing/ParseNodes/Statements/throw_statement_node.cpp
+        Parsing/ParseNodes/Statements/throw_statement_node.h
+        Parsing/ParseNodes/Statements/import_statement_node.cpp
+        Parsing/ParseNodes/Statements/import_statement_node.h
+        Parsing/ParseNodes/Statements/Control/continue_node.cpp
+        Parsing/ParseNodes/Statements/Control/continue_node.h
+        Parsing/ParseNodes/Statements/expression_statement_node.cpp
+        Parsing/ParseNodes/Statements/expression_statement_node.h
+
+        Parsing/ParseNodes/Describers/describer_node.cpp
+        Parsing/ParseNodes/Describers/describer_node.h
+
         Parsing/ParseNodes/Functions/Calling/function_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/function_call_node.h
         Parsing/ParseNodes/Functions/Calling/constructor_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/constructor_call_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/input_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/input_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/print_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/print_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/invoke_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/invoke_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/format_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/format_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.h
+
+        Parsing/ParseNodes/Functions/Creation/explicit_cast_node.cpp
+        Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h
+        Parsing/ParseNodes/Functions/Creation/implicit_cast_node.cpp
+        Parsing/ParseNodes/Functions/Creation/implicit_cast_node.h
+        Parsing/ParseNodes/Functions/Creation/keyword_function_node.cpp
+        Parsing/ParseNodes/Functions/Creation/keyword_function_node.h
+        Parsing/ParseNodes/Functions/Creation/operator_overload_node.cpp
+        Parsing/ParseNodes/Functions/Creation/operator_overload_node.h
         Parsing/ParseNodes/Functions/Creation/function_creation_node.cpp
         Parsing/ParseNodes/Functions/Creation/function_creation_node.h
-        Parsing/ParseNodes/Describers/describer_node.cpp
-        Parsing/ParseNodes/Describers/describer_node.h
+        Parsing/ParseNodes/Functions/Creation/constructor_creation_node.cpp
+        Parsing/ParseNodes/Functions/Creation/constructor_creation_node.h
+
+        Parsing/ParseNodes/Core/body_node.cpp
+        Parsing/ParseNodes/Core/body_node.h
+        Parsing/ParseNodes/Core/entity_node.cpp
+        Parsing/ParseNodes/Core/entity_node.h
+        Parsing/ParseNodes/Core/function_node.cpp
+        Parsing/ParseNodes/Core/function_node.h
         Parsing/ParseNodes/Core/nameable_node.cpp
         Parsing/ParseNodes/Core/nameable_node.h
+        Parsing/ParseNodes/Core/property_node.cpp
+        Parsing/ParseNodes/Core/property_node.h
         Parsing/ParseNodes/Core/describable_node.cpp
         Parsing/ParseNodes/Core/describable_node.h
         Parsing/ParseNodes/Core/characteristic_node.cpp
         Parsing/ParseNodes/Core/characteristic_node.h
         Parsing/ParseNodes/Core/Interfaces/i_parse_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.cpp
-        Parsing/ParseNodes/Statements/statement_node.cpp
-        Parsing/ParseNodes/Statements/statement_node.h
-        Parsing/ParseNodes/Core/entity_node.cpp
-        Parsing/ParseNodes/Core/entity_node.h
-        Parsing/ParseNodes/Core/function_node.cpp
-        Parsing/ParseNodes/Core/function_node.h
-        Parsing/ParseNodes/Functions/Creation/keyword_function_node.cpp
-        Parsing/ParseNodes/Functions/Creation/keyword_function_node.h
-        Parsing/ParseNodes/Functions/Creation/implicit_cast_node.cpp
-        Parsing/ParseNodes/Functions/Creation/implicit_cast_node.h
-        Parsing/ParseNodes/Functions/Creation/constructor_creation_node.cpp
-        Parsing/ParseNodes/Functions/Creation/constructor_creation_node.h
-        Parsing/ParseNodes/Functions/Creation/operator_overload_node.cpp
-        Parsing/ParseNodes/Functions/Creation/operator_overload_node.h
-        Parsing/ParseNodes/Functions/Creation/explicit_cast_node.cpp
-        Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h
-        Parsing/ParseNodes/Statements/Control/break_node.cpp
-        Parsing/ParseNodes/Statements/Control/break_node.h
-        Parsing/ParseNodes/Statements/Control/continue_node.cpp
-        Parsing/ParseNodes/Statements/Control/continue_node.h
-        Parsing/ParseNodes/Statements/Control/return_node.cpp
-        Parsing/ParseNodes/Statements/Control/return_node.h
-        Parsing/ParseNodes/Core/body_node.cpp
-        Parsing/ParseNodes/Core/body_node.h
-        Parsing/ParseNodes/DataTypes/data_type_node.cpp
-        Parsing/ParseNodes/DataTypes/data_type_node.h
-        Parsing/ParseNodes/Statements/empty_node.cpp
-        Parsing/ParseNodes/Statements/empty_node.h
+
         Parsing/ParseNodes/DataTypes/class_node.cpp
         Parsing/ParseNodes/DataTypes/class_node.h
         Parsing/ParseNodes/DataTypes/struct_node.cpp
         Parsing/ParseNodes/DataTypes/struct_node.h
         Parsing/ParseNodes/DataTypes/enum_node.cpp
         Parsing/ParseNodes/DataTypes/enum_node.h
-        Parsing/ParseNodes/Conditions/condition_node.cpp
-        Parsing/ParseNodes/Conditions/condition_node.h
+        Parsing/ParseNodes/DataTypes/data_type_node.cpp
+        Parsing/ParseNodes/DataTypes/data_type_node.h
+
         Parsing/ParseNodes/Conditions/if_node.cpp
         Parsing/ParseNodes/Conditions/if_node.h
         Parsing/ParseNodes/Conditions/else_node.cpp
         Parsing/ParseNodes/Conditions/else_node.h
+        Parsing/ParseNodes/Conditions/condition_node.cpp
+        Parsing/ParseNodes/Conditions/condition_node.h
+
         Parsing/ParseNodes/Loops/loop_node.cpp
         Parsing/ParseNodes/Loops/loop_node.h
-        Parsing/ParseNodes/Loops/for_loop_node.cpp
-        Parsing/ParseNodes/Loops/for_loop_node.h
         Parsing/ParseNodes/Loops/while_node.cpp
         Parsing/ParseNodes/Loops/while_node.h
+        Parsing/ParseNodes/Loops/for_loop_node.cpp
+        Parsing/ParseNodes/Loops/for_loop_node.h
         Parsing/ParseNodes/Loops/do_while_node.cpp
         Parsing/ParseNodes/Loops/do_while_node.h
+
+        Parsing/ParseNodes/Properties/base_indexer_node.cpp
+        Parsing/ParseNodes/Properties/base_indexer_node.h
         Parsing/ParseNodes/Properties/Accessors/get_node.cpp
         Parsing/ParseNodes/Properties/Accessors/get_node.h
-        Parsing/ParseNodes/Properties/Accessors/accessor_node.cpp
-        Parsing/ParseNodes/Properties/Accessors/accessor_node.h
         Parsing/ParseNodes/Properties/Accessors/set_node.cpp
         Parsing/ParseNodes/Properties/Accessors/set_node.h
         Parsing/ParseNodes/Properties/base_property_node.cpp
         Parsing/ParseNodes/Properties/base_property_node.h
-        Parsing/ParseNodes/Core/property_node.cpp
-        Parsing/ParseNodes/Core/property_node.h
-        Parsing/ParseNodes/Properties/base_indexer_node.cpp
-        Parsing/ParseNodes/Properties/base_indexer_node.h
-        Parsing/ParseNodes/Expressions/dot_expression_node.cpp
-        Parsing/ParseNodes/Expressions/dot_expression_node.h
-        Parsing/ParseNodes/Expressions/cast_expression_node.cpp
-        Parsing/ParseNodes/Expressions/cast_expression_node.h
+        Parsing/ParseNodes/Properties/Accessors/accessor_node.cpp
+        Parsing/ParseNodes/Properties/Accessors/accessor_node.h
+
         Parsing/Parser/parser.cpp
         Parsing/Parser/parser.h
-        Lexing/Tokens/Enums/separator_kind.cpp
+        Parsing/Parser/parser_general.cpp
+        Parsing/Parser/parser_functions.cpp
+        Parsing/Parser/parser_data_types.cpp
         Parsing/Parser/parser_expressions.cpp
-        Lexing/Tokens/Enums/token_type.cpp
-        Parsing/ParseNodes/Statements/expression_statement_node.cpp
-        Parsing/ParseNodes/Statements/expression_statement_node.h
-
-        Lexing/Tokens/Enums/syntax_kind.cpp
-        compiler.cpp
-        compiler.h
+        Parsing/Parser/parser_loops_conditions.cpp
 
         Analysis/Structure/source_object.cpp
         Analysis/Structure/source_object.h
@@ -173,174 +230,140 @@ add_library(Sugar STATIC
         Analysis/Structure/Enums/describer.cpp
         Analysis/Structure/Core/DataTypes/data_type.cpp
         Analysis/Structure/Core/DataTypes/data_type.h
-        Analysis/Structure/Nodes/DataTypes/class.cpp
-        Analysis/Structure/Nodes/DataTypes/class.h
-        Analysis/Structure/Nodes/DataTypes/struct.cpp
-        Analysis/Structure/Nodes/DataTypes/struct.h
-        Analysis/Structure/Nodes/DataTypes/enum.cpp
-        Analysis/Structure/Nodes/DataTypes/enum.h
-        Analysis/Structure/Nodes/Creation/Variables/variable.cpp
-        Analysis/Structure/Nodes/Creation/Variables/variable.h
+        Analysis/Structure/DataTypes/class.cpp
+        Analysis/Structure/DataTypes/class.h
+        Analysis/Structure/DataTypes/struct.cpp
+        Analysis/Structure/DataTypes/struct.h
+        Analysis/Structure/DataTypes/enum.cpp
+        Analysis/Structure/DataTypes/enum.h
         Analysis/Structure/Core/Creation/characteristic.cpp
         Analysis/Structure/Core/Creation/characteristic.h
         Analysis/Structure/Core/created.cpp
         Analysis/Structure/Core/created.h
         Analysis/Structure/Core/Creation/function.cpp
         Analysis/Structure/Core/Creation/function.h
-        Analysis/Structure/Nodes/Local/local_node.cpp
-        Analysis/Structure/Nodes/Local/local_node.h
+        Analysis/Structure/Local/local_node.cpp
+        Analysis/Structure/Local/local_node.h
         Analysis/Structure/Core/scoped.cpp
         Analysis/Structure/Core/scoped.h
-        Analysis/Structure/Nodes/Creation/Functions/void_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/void_definition.h
-        Analysis/Structure/Nodes/Creation/Functions/method_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/method_definition.h
-        Analysis/Structure/Nodes/Creation/Functions/cast_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/cast_definition.h
-        Analysis/Structure/Nodes/Creation/Functions/overload_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/overload_definition.h
-        Analysis/Structure/Nodes/Creation/Properties/property_definition.cpp
-        Analysis/Structure/Nodes/Creation/Properties/property_definition.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_cast.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_cast.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_operation.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_operation.h
-        Analysis/Structure/Nodes/Global/UserDefined/void_function.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/void_function.h
-        Analysis/Structure/Nodes/Global/UserDefined/method_function.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/method_function.h
-        Analysis/Structure/Nodes/Global/UserDefined/operator_overload.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/operator_overload.h
-        Analysis/Structure/Nodes/Global/UserDefined/implicit_cast.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/implicit_cast.h
-        Analysis/Structure/Nodes/Global/UserDefined/explicit_cast.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/explicit_cast.h
-        Analysis/Structure/Nodes/Creation/Properties/indexer_definition.cpp
-        Analysis/Structure/Nodes/Creation/Properties/indexer_definition.h
-        Analysis/Structure/Nodes/Creation/Functions/constructor_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/constructor_definition.h
-        Analysis/Structure/Nodes/Global/UserDefined/constructor.cpp
-        Analysis/Structure/Nodes/Global/UserDefined/constructor.h
-        Analysis/Structure/Nodes/Global/Variables/global_variable.cpp
-        Analysis/Structure/Nodes/Global/Variables/global_variable.h
-        Analysis/Structure/Nodes/Global/global_node.cpp
-        Analysis/Structure/Nodes/Global/global_node.h
+        Analysis/Structure/Creation/Functions/void_definition.cpp
+        Analysis/Structure/Creation/Functions/void_definition.h
+        Analysis/Structure/Creation/Functions/method_definition.cpp
+        Analysis/Structure/Creation/Functions/method_definition.h
+        Analysis/Structure/Creation/Functions/cast_definition.cpp
+        Analysis/Structure/Creation/Functions/cast_definition.h
+        Analysis/Structure/Creation/Functions/overload_definition.cpp
+        Analysis/Structure/Creation/Functions/overload_definition.h
+        Analysis/Structure/Creation/Properties/property_definition.cpp
+        Analysis/Structure/Creation/Properties/property_definition.h
+        Analysis/Structure/Global/BuiltIn/built_in_cast.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_cast.h
+        Analysis/Structure/Global/BuiltIn/built_in_operation.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_operation.h
+        Analysis/Structure/Global/Functions/void_function.cpp
+        Analysis/Structure/Global/Functions/void_function.h
+        Analysis/Structure/Global/Functions/method_function.cpp
+        Analysis/Structure/Global/Functions/method_function.h
+        Analysis/Structure/Global/Functions/operator_overload.cpp
+        Analysis/Structure/Global/Functions/operator_overload.h
+        Analysis/Structure/Global/Functions/implicit_cast.cpp
+        Analysis/Structure/Global/Functions/implicit_cast.h
+        Analysis/Structure/Global/Functions/explicit_cast.cpp
+        Analysis/Structure/Global/Functions/explicit_cast.h
+        Analysis/Structure/Creation/Properties/indexer_definition.cpp
+        Analysis/Structure/Creation/Properties/indexer_definition.h
+        Analysis/Structure/Creation/Functions/constructor_definition.cpp
+        Analysis/Structure/Creation/Functions/constructor_definition.h
+        Analysis/Structure/Global/Functions/constructor.cpp
+        Analysis/Structure/Global/Functions/constructor.h
+        Analysis/Structure/Global/Variables/global_variable.cpp
+        Analysis/Structure/Global/Variables/global_variable.h
+        Analysis/Structure/Global/global_node.cpp
+        Analysis/Structure/Global/global_node.h
         Analysis/Creation/Transpiling/cil_transpiler.cpp
         Analysis/Creation/Transpiling/cil_transpiler.h
-        Analysis/Structure/Nodes/Context/context_node.h
-        Analysis/Structure/Nodes/Context/Casts/cast_class_expression.cpp
-        Analysis/Structure/Nodes/Context/Casts/cast_class_expression.h
-        Analysis/Structure/Nodes/Context/Casts/box_cast_expression.cpp
-        Analysis/Structure/Nodes/Context/Casts/box_cast_expression.h
-        Analysis/Structure/Nodes/Context/Casts/unbox_cast_expression.cpp
-        Analysis/Structure/Nodes/Context/Casts/unbox_cast_expression.h
-        Analysis/Structure/Nodes/Context/Casts/built_in_cast_expression.cpp
-        Analysis/Structure/Nodes/Context/Casts/built_in_cast_expression.h
-        Analysis/Structure/Nodes/Context/Casts/defined_cast_expression.cpp
-        Analysis/Structure/Nodes/Context/Casts/defined_cast_expression.h
-        Analysis/Structure/Nodes/Context/binary_context_node.cpp
-        Analysis/Structure/Nodes/Context/binary_context_node.h
-        Analysis/Structure/Nodes/Context/unary_context_node.cpp
-        Analysis/Structure/Nodes/Context/unary_context_node.h
+        Analysis/Structure/Context/context_node.h
+        Analysis/Structure/Context/Casts/cast_class_expression.cpp
+        Analysis/Structure/Context/Casts/cast_class_expression.h
+        Analysis/Structure/Context/Casts/box_cast_expression.cpp
+        Analysis/Structure/Context/Casts/box_cast_expression.h
+        Analysis/Structure/Context/Casts/unbox_cast_expression.cpp
+        Analysis/Structure/Context/Casts/unbox_cast_expression.h
+        Analysis/Structure/Context/Casts/built_in_cast_expression.cpp
+        Analysis/Structure/Context/Casts/built_in_cast_expression.h
+        Analysis/Structure/Context/Casts/defined_cast_expression.cpp
+        Analysis/Structure/Context/Casts/defined_cast_expression.h
+        Analysis/Structure/Context/binary_context_node.cpp
+        Analysis/Structure/Context/binary_context_node.h
+        Analysis/Structure/Context/unary_context_node.cpp
+        Analysis/Structure/Context/unary_context_node.h
         Analysis/Structure/Core/Interfaces/i_read_write.h
         Analysis/Structure/Core/Interfaces/i_slot_size.h
         Analysis/Structure/Core/DataTypes/user_defined_type.cpp
         Analysis/Structure/Core/DataTypes/user_defined_type.h
         Analysis/Structure/Core/Context/fully_nameable.h
-        Analysis/Structure/Nodes/Context/Entities/indexed_context_node.cpp
-        Analysis/Structure/Nodes/Context/Entities/indexed_context_node.h
-        Analysis/Structure/Nodes/Local/Variables/local_variable.cpp
-        Analysis/Structure/Nodes/Local/Variables/local_variable.h
-        Analysis/Structure/Nodes/Context/Entities/References/local_variable_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/References/local_variable_context.h
-        Analysis/Structure/Nodes/Context/Entities/References/argument_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/References/argument_context.h
-        Analysis/Structure/Nodes/Context/Entities/References/field_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/References/field_context.h
-        Analysis/Structure/Nodes/Context/Entities/variable_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/variable_context.h
-        Analysis/Structure/Nodes/Context/Entities/References/property_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/References/property_context.h
-        Analysis/Structure/Nodes/Context/Entities/Functions/function_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/function_context.h
-        Analysis/Structure/Nodes/Context/Expressions/dot_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/dot_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/built_in_index_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/built_in_indexer_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/defined_indexer_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/defined_indexer_expression.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_indexer.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_indexer.h
-        Analysis/Structure/Nodes/Context/Expressions/built_in_unary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/built_in_unary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/defined_unary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/defined_unary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/defined_binary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/defined_binary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/built_in_binary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/built_in_binary_expression.h
-        Analysis/Structure/Nodes/Context/context_node.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/print.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/print.h
-        Analysis/Structure/Nodes/Context/Entities/Functions/format.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/format.h
-        Analysis/Structure/Nodes/Context/Entities/Functions/input.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/input.h
+        Analysis/Structure/Context/Entities/indexed_context_node.cpp
+        Analysis/Structure/Context/Entities/indexed_context_node.h
+        Analysis/Structure/Local/Variables/local_variable.cpp
+        Analysis/Structure/Local/Variables/local_variable.h
+        Analysis/Structure/Context/Entities/References/local_variable_context.cpp
+        Analysis/Structure/Context/Entities/References/local_variable_context.h
+        Analysis/Structure/Context/Entities/References/argument_context.cpp
+        Analysis/Structure/Context/Entities/References/argument_context.h
+        Analysis/Structure/Context/Entities/References/field_context.cpp
+        Analysis/Structure/Context/Entities/References/field_context.h
+        Analysis/Structure/Context/Entities/variable_context.cpp
+        Analysis/Structure/Context/Entities/variable_context.h
+        Analysis/Structure/Context/Entities/References/property_context.cpp
+        Analysis/Structure/Context/Entities/References/property_context.h
+        Analysis/Structure/Context/Entities/Functions/function_context.cpp
+        Analysis/Structure/Context/Entities/Functions/function_context.h
+        Analysis/Structure/Context/Expressions/dot_expression.cpp
+        Analysis/Structure/Context/Expressions/dot_expression.h
+        Analysis/Structure/Context/Expressions/built_in_index_expression.cpp
+        Analysis/Structure/Context/Expressions/built_in_indexer_expression.h
+        Analysis/Structure/Context/Expressions/defined_indexer_expression.cpp
+        Analysis/Structure/Context/Expressions/defined_indexer_expression.h
+        Analysis/Structure/Global/BuiltIn/built_in_indexer.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_indexer.h
+        Analysis/Structure/Context/Expressions/built_in_unary_expression.cpp
+        Analysis/Structure/Context/Expressions/built_in_unary_expression.h
+        Analysis/Structure/Context/Expressions/defined_unary_expression.cpp
+        Analysis/Structure/Context/Expressions/defined_unary_expression.h
+        Analysis/Structure/Context/Expressions/defined_binary_expression.cpp
+        Analysis/Structure/Context/Expressions/defined_binary_expression.h
+        Analysis/Structure/Context/Expressions/built_in_binary_expression.cpp
+        Analysis/Structure/Context/Expressions/built_in_binary_expression.h
+        Analysis/Structure/Context/context_node.cpp
+        Analysis/Structure/Context/Entities/Functions/print.cpp
+        Analysis/Structure/Context/Entities/Functions/print.h
+        Analysis/Structure/Context/Entities/Functions/format.cpp
+        Analysis/Structure/Context/Entities/Functions/format.h
+        Analysis/Structure/Context/Entities/Functions/input.cpp
+        Analysis/Structure/Context/Entities/Functions/input.h
         Analysis/Creation/Transpiling/expression_transpiler.cpp
-        Exceptions/compile_exception.cpp
-        Exceptions/compile_exception.h
         Exceptions/log_exception.cpp
         Exceptions/log_exception.h
         Exceptions/exception_manager.cpp
         Exceptions/exception_manager.h
-        Lexing/Tokens/Factories/operator.cpp
-        Lexing/Tokens/Factories/operator.h
-        Lexing/Tokens/Factories/keyword.cpp
-        Lexing/Tokens/Factories/keyword.h
-        Lexing/Tokens/Factories/separator.cpp
-        Lexing/Tokens/Factories/separator.h
-        Lexing/Tokens/Factories/constant.cpp
-        Lexing/Tokens/Factories/constant.h
-        Lexing/Tokens/Enums/type_kind.h
-        Exceptions/Compiling/Lexing/constant_out_of_range_exception.cpp
-        Exceptions/Compiling/Lexing/constant_out_of_range_exception.h
-        Lexing/Tokens/Enums/type_kind.cpp
-        Exceptions/Compiling/source_file_exception.cpp
-        Exceptions/Compiling/source_file_exception.h
-        Exceptions/Compiling/Lexing/character_expected_exception.cpp
-        Exceptions/Compiling/Lexing/character_expected_exception.h
-        Exceptions/Compiling/Lexing/invalid_character_exception.cpp
-        Exceptions/Compiling/Lexing/invalid_character_exception.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/format_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/format_node.h
-        Exceptions/Compiling/Parsing/token_expected_exception.cpp
-        Exceptions/Compiling/Parsing/token_expected_exception.h
-        Parsing/Parser/parser_loops_conditions.cpp
-        Parsing/Parser/parser_general.cpp
-        Parsing/Parser/parser_functions.cpp
-        Parsing/Parser/parser_data_types.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h
-        Parsing/ParseNodes/Statements/import_statement_node.cpp
-        Parsing/ParseNodes/Statements/import_statement_node.h
-        Parsing/ParseNodes/Statements/throw_statement_node.cpp
-        Parsing/ParseNodes/Statements/throw_statement_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/list_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/list_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/tuple_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/tuple_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.h
-        Exceptions/Compiling/Parsing/parsing_exception.cpp
-        Exceptions/Compiling/Parsing/parsing_exception.h
-        Exceptions/Compiling/Parsing/generic_argument_exception.cpp
-        Exceptions/Compiling/Parsing/generic_argument_exception.h
-        Exceptions/Compiling/Parsing/invalid_token_exception.cpp
-        Exceptions/Compiling/Parsing/invalid_token_exception.h
+        Exceptions/Compilation/Lexing/constant_out_of_range_exception.cpp
+        Exceptions/Compilation/Lexing/constant_out_of_range_exception.h
+        Exceptions/Compilation/source_file_exception.cpp
+        Exceptions/Compilation/source_file_exception.h
+        Exceptions/Compilation/Lexing/character_expected_exception.cpp
+        Exceptions/Compilation/Lexing/character_expected_exception.h
+        Exceptions/Compilation/Lexing/invalid_character_exception.cpp
+        Exceptions/Compilation/Lexing/invalid_character_exception.h
+
+        Exceptions/Compilation/Parsing/token_expected_exception.cpp
+        Exceptions/Compilation/Parsing/token_expected_exception.h
+
+        Exceptions/Compilation/Parsing/parsing_exception.cpp
+        Exceptions/Compilation/Parsing/parsing_exception.h
+        Exceptions/Compilation/Parsing/generic_argument_exception.cpp
+        Exceptions/Compilation/Parsing/generic_argument_exception.h
+        Exceptions/Compilation/Parsing/invalid_token_exception.cpp
+        Exceptions/Compilation/Parsing/invalid_token_exception.h
         Parsing/ParseNodes/Groups/compound_declaration_node.cpp
         Parsing/ParseNodes/Groups/compound_declaration_node.h
         Parsing/ParseNodes/Groups/scope_node.cpp
@@ -349,36 +372,34 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Groups/generic_node.h
         Parsing/ParseNodes/Groups/expression_list_node.cpp
         Parsing/ParseNodes/Groups/expression_list_node.h
-        Exceptions/Compiling/Parsing/invalid_expression_exception.cpp
-        Exceptions/Compiling/Parsing/invalid_expression_exception.h
-        Exceptions/Compiling/Parsing/empty_expression_exception.cpp
-        Exceptions/Compiling/Parsing/empty_expression_exception.h
-        Exceptions/Compiling/Parsing/function_argument_exception.cpp
-        Exceptions/Compiling/Parsing/function_argument_exception.h
+        Exceptions/Compilation/Parsing/invalid_expression_exception.cpp
+        Exceptions/Compilation/Parsing/invalid_expression_exception.h
+        Exceptions/Compilation/Parsing/empty_expression_exception.cpp
+        Exceptions/Compilation/Parsing/empty_expression_exception.h
+        Exceptions/Compilation/Parsing/function_argument_exception.cpp
+        Exceptions/Compilation/Parsing/function_argument_exception.h
         Parsing/ParseNodes/Groups/if_chain_node.cpp
         Parsing/ParseNodes/Groups/if_chain_node.h
         Parsing/ParseNodes/Groups/source_file_node.cpp
         Parsing/ParseNodes/Groups/source_file_node.h
         Analysis/Structure/Wrappers/Reference/string.cpp
         Analysis/Structure/Wrappers/Reference/string.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_property.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_property.h
-        Services/string_builder.cpp
-        Services/string_builder.h
-        Exceptions/Compiling/transpile_file_exception.cpp
-        Exceptions/Compiling/transpile_file_exception.h
-        Exceptions/Compiling/Analysis/invalid_describer_exception.cpp
-        Exceptions/Compiling/Analysis/invalid_describer_exception.h
-        Services/dictionary.cpp
-        Services/dictionary.h
-        Exceptions/Compiling/Analysis/ProjectBinding/invalid_import_path_exception.cpp
-        Exceptions/Compiling/Analysis/ProjectBinding/invalid_import_path_exception.h
-        Exceptions/Compiling/Analysis/ProjectBinding/duplicate_structure_definition_exception.cpp
-        Exceptions/Compiling/Analysis/ProjectBinding/duplicate_structure_definition_exception.h
+        Analysis/Structure/Global/BuiltIn/built_in_property.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_property.h
+
+        Exceptions/Compilation/transpile_file_exception.cpp
+        Exceptions/Compilation/transpile_file_exception.h
+        Exceptions/Compilation/Analysis/invalid_describer_exception.cpp
+        Exceptions/Compilation/Analysis/invalid_describer_exception.h
+
+        Exceptions/Compilation/Analysis/Project/invalid_import_path_exception.cpp
+        Exceptions/Compilation/Analysis/Project/invalid_import_path_exception.h
+        Exceptions/Compilation/Analysis/Project/duplicate_structure_definition_exception.cpp
+        Exceptions/Compilation/Analysis/Project/duplicate_structure_definition_exception.h
         Analysis/Creation/Binding/global_binder.cpp
         Analysis/Creation/Binding/global_binder.h
-        Exceptions/Compiling/Analysis/ProjectBinding/ambiguous_import_exception.cpp
-        Exceptions/Compiling/Analysis/ProjectBinding/ambiguous_import_exception.h
+        Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.cpp
+        Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.h
         Analysis/Creation/Binding/binder_extensions.cpp
         Analysis/Creation/Binding/binder_extensions.h
         Analysis/Structure/Wrappers/Generic/array.cpp
@@ -408,79 +429,98 @@ add_library(Sugar STATIC
         Analysis/Structure/Wrappers/Value/Float.h
         Analysis/Structure/Wrappers/Value/Double.cpp
         Analysis/Structure/Wrappers/Value/Double.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_void.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_void.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_method.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_method.h
+        Analysis/Structure/Global/BuiltIn/built_in_void.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_void.h
+        Analysis/Structure/Global/BuiltIn/built_in_method.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_method.h
         Analysis/Structure/Wrappers/Generic/action.cpp
         Analysis/Structure/Wrappers/Generic/action.h
         Analysis/Structure/Wrappers/Generic/func.cpp
         Analysis/Structure/Wrappers/Generic/func.h
         Analysis/Structure/Wrappers/Generic/generic_extensions.cpp
         Analysis/Structure/Wrappers/Generic/generic_extensions.h
-        Analysis/Structure/Nodes/Local/Variables/function_parameter.cpp
-        Analysis/Structure/Nodes/Local/Variables/function_parameter.h
+        Analysis/Structure/Local/Variables/function_parameter.cpp
+        Analysis/Structure/Local/Variables/function_parameter.h
         Parsing/ParseNodes/Properties/assigned_property_node.cpp
         Parsing/ParseNodes/Properties/assigned_property_node.h
         Analysis/Creation/Binding/local_binder.cpp
         Analysis/Creation/Binding/local_binder.h
         Analysis/Structure/Core/Interfaces/i_generic_class.h
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_constructor.cpp
-        Analysis/Structure/Nodes/Global/BuiltIn/built_in_constructor.h
-        Analysis/Structure/Nodes/Creation/Functions/function_definition.cpp
-        Analysis/Structure/Nodes/Creation/Functions/function_definition.h
-        Analysis/Structure/Nodes/Global/Properties/indexer.cpp
-        Analysis/Structure/Nodes/Global/Properties/indexer.h
-        Analysis/Structure/Nodes/Global/Properties/property.cpp
-        Analysis/Structure/Nodes/Global/Properties/property.h
-        Analysis/Structure/Nodes/Context/invalid_context.cpp
-        Analysis/Structure/Nodes/Context/invalid_context.h
-        Analysis/Structure/Nodes/Context/static_reference_context.cpp
-        Analysis/Structure/Nodes/Context/static_reference_context.h
-        Analysis/Structure/Nodes/Context/this_context.cpp
-        Analysis/Structure/Nodes/Context/this_context.h
-        Analysis/Structure/Nodes/Context/Casts/invalid_cast_node.cpp
-        Analysis/Structure/Nodes/Context/Casts/invalid_cast_node.h
-        Analysis/Structure/Nodes/Context/Expressions/invalid_unary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/invalid_unary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/invalid_binary_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/invalid_binary_expression.h
-        Analysis/Structure/Nodes/Context/Expressions/invalid_indexer_expression.cpp
-        Analysis/Structure/Nodes/Context/Expressions/invalid_indexer_expression.h
-        Analysis/Structure/Nodes/Context/Entities/Functions/invalid_function_context.cpp
-        Analysis/Structure/Nodes/Context/Entities/Functions/invalid_function_context.h
-        Analysis/Structure/Nodes/Context/Control/return.cpp
-        Analysis/Structure/Nodes/Context/Control/return.h
-        Analysis/Structure/Nodes/Context/Control/branch.cpp
-        Analysis/Structure/Nodes/Context/Control/branch.h
-        Analysis/Structure/Nodes/Context/Control/branch_condition.cpp
-        Analysis/Structure/Nodes/Context/Control/branch_condition.h
-        Analysis/Structure/Nodes/Context/Constants/integer_constant.cpp
-        Analysis/Structure/Nodes/Context/Constants/integer_constant.h
-        Analysis/Structure/Nodes/Context/Constants/string_constant.cpp
-        Analysis/Structure/Nodes/Context/Constants/string_constant.h
-        Analysis/Structure/Nodes/Context/Constants/float_constant.cpp
-        Analysis/Structure/Nodes/Context/Constants/float_constant.h
-        Analysis/Structure/Nodes/Context/Constants/null_constant.cpp
-        Analysis/Structure/Nodes/Context/Constants/null_constant.h
+        Analysis/Structure/Global/BuiltIn/built_in_constructor.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_constructor.h
+        Analysis/Structure/Creation/Functions/function_definition.cpp
+        Analysis/Structure/Creation/Functions/function_definition.h
+        Analysis/Structure/Global/Properties/indexer.cpp
+        Analysis/Structure/Global/Properties/indexer.h
+        Analysis/Structure/Global/Properties/property.cpp
+        Analysis/Structure/Global/Properties/property.h
+        Analysis/Structure/Context/invalid_context.cpp
+        Analysis/Structure/Context/invalid_context.h
+        Analysis/Structure/Context/static_reference_context.cpp
+        Analysis/Structure/Context/static_reference_context.h
+        Analysis/Structure/Context/this_context.cpp
+        Analysis/Structure/Context/this_context.h
+        Analysis/Structure/Context/Casts/invalid_cast_node.cpp
+        Analysis/Structure/Context/Casts/invalid_cast_node.h
+        Analysis/Structure/Context/Expressions/invalid_unary_expression.cpp
+        Analysis/Structure/Context/Expressions/invalid_unary_expression.h
+        Analysis/Structure/Context/Expressions/invalid_binary_expression.cpp
+        Analysis/Structure/Context/Expressions/invalid_binary_expression.h
+        Analysis/Structure/Context/Expressions/invalid_indexer_expression.cpp
+        Analysis/Structure/Context/Expressions/invalid_indexer_expression.h
+        Analysis/Structure/Context/Entities/Functions/invalid_function_context.cpp
+        Analysis/Structure/Context/Entities/Functions/invalid_function_context.h
+        Analysis/Structure/Context/Control/return.cpp
+        Analysis/Structure/Context/Control/return.h
+        Analysis/Structure/Context/Control/branch.cpp
+        Analysis/Structure/Context/Control/branch.h
+        Analysis/Structure/Context/Control/branch_condition.cpp
+        Analysis/Structure/Context/Control/branch_condition.h
+        Analysis/Structure/Context/Constants/integer_constant.cpp
+        Analysis/Structure/Context/Constants/integer_constant.h
+        Analysis/Structure/Context/Constants/string_constant.cpp
+        Analysis/Structure/Context/Constants/string_constant.h
+        Analysis/Structure/Context/Constants/float_constant.cpp
+        Analysis/Structure/Context/Constants/float_constant.h
+        Analysis/Structure/Context/Constants/null_constant.cpp
+        Analysis/Structure/Context/Constants/null_constant.h
         Analysis/Structure/Wrappers/Reference/exception.cpp
         Analysis/Structure/Wrappers/Reference/exception.h
-        Exceptions/Compiling/Analysis/duplicate_variable_definition_exception.cpp
-        Exceptions/Compiling/Analysis/duplicate_variable_definition_exception.h
-        Exceptions/Compiling/Analysis/invalid_variable_declaration_exception.cpp
-        Exceptions/Compiling/Analysis/invalid_variable_declaration_exception.h
-        Analysis/Structure/Nodes/Local/Scopes/scope.cpp
-        Analysis/Structure/Nodes/Local/Scopes/scope.h
+        Exceptions/Compilation/Analysis/variable_definition_exception.cpp
+        Exceptions/Compilation/Analysis/variable_definition_exception.h
+        Analysis/Structure/Local/Scopes/scope.cpp
+        Analysis/Structure/Local/Scopes/scope.h
         Analysis/Structure/Enums/scope_type.h
         Analysis/Structure/Enums/scope_type.cpp
-        Analysis/Structure/Core/default_valued.cpp
-        Analysis/Structure/Core/default_valued.h
-        Parsing/ParseNodes/Values/null_node.cpp
-        Parsing/ParseNodes/Values/null_node.h
+
         Analysis/Creation/Binding/project_binder.cpp
         Analysis/Creation/Binding/project_binder.h
-        Exceptions/Compiling/Analysis/static_binding_exception.cpp
-        Exceptions/Compiling/Analysis/static_binding_exception.h
+        Exceptions/Compilation/Analysis/static_binding_exception.cpp
+        Exceptions/Compilation/Analysis/static_binding_exception.h
+        Exceptions/Compilation/Analysis/Global/return_accessibility_exception.cpp
+        Exceptions/Compilation/Analysis/Global/return_accessibility_exception.h
+        Exceptions/Compilation/Analysis/type_exception.cpp
+        Exceptions/Compilation/Analysis/type_exception.h
+        Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.cpp
+        Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h
+        Exceptions/Compilation/Analysis/Global/duplicate_function_definition_exception.cpp
+        Exceptions/Compilation/Analysis/Global/duplicate_function_definition_exception.h
+        Exceptions/Compilation/Analysis/Global/non_static_member_definition_exception.cpp
+        Exceptions/Compilation/Analysis/Global/non_static_member_definition_exception.h
+        Analysis/Structure/Wrappers/Generic/referenced.cpp
+        Analysis/Structure/Wrappers/Generic/referenced.h
+        Analysis/Structure/Wrappers/Reference/math.cpp
+        Analysis/Structure/Wrappers/Reference/math.h
+        Exceptions/compile_exception.cpp
+        Exceptions/compile_exception.h
+        Exceptions/Compilation/Analysis/Local/read_write_exception.cpp
+        Exceptions/Compilation/Analysis/Local/read_write_exception.h
+        Analysis/Structure/Core/Creation/variable.cpp
+        Analysis/Structure/Core/Creation/variable.h
+        Analysis/Structure/Core/Interfaces/i_created.h
+        Analysis/Structure/Core/Interfaces/i_describable.h
+        Analysis/Structure/Core/Interfaces/i_property.h
+        Analysis/Structure/Core/Interfaces/i_function.h
+        Analysis/Structure/DataTypes/data_type_extensions.cpp
+        Analysis/Structure/DataTypes/data_type_extensions.h
 )
-
-

@@ -9,7 +9,7 @@
 
 namespace Analysis::Creation
 {
-    class CILTranspiler final : public Services::SingletonService<CILTranspiler>
+    class CILTranspiler final
     {
         private:
             const std::string projectName;
@@ -28,9 +28,10 @@ namespace Analysis::Creation
         public:
             CILTranspiler(std::string name, std::string directory, const Structure::SourceDirectory* source);
 
-            void Transpile();
+            void Transpile() const;
+            [[nodiscard]] const std::string& OutputFile() const;
 
-            ~CILTranspiler() override;
+            ~CILTranspiler();
     };
 }
 

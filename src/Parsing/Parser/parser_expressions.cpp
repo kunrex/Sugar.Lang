@@ -2,11 +2,11 @@
 #include "../../Analysis/Structure/Wrappers/Generic/generic_extensions.h"
 
 #include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compiling/Parsing/invalid_token_exception.h"
-#include "../../Exceptions/Compiling/Parsing/token_expected_exception.h"
-#include "../../Exceptions/Compiling/Parsing/empty_expression_exception.h"
-#include "../../Exceptions/Compiling/Parsing/generic_argument_exception.h"
-#include "../../Exceptions/Compiling/Parsing/invalid_expression_exception.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
+#include "../../Exceptions/Compilation/Parsing/empty_expression_exception.h"
+#include "../../Exceptions/Compilation/Parsing/generic_argument_exception.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_expression_exception.h"
 
 #include "../../Lexing/Tokens/Enums/keyword_type.h"
 #include "../../Lexing/Tokens/Factories/operator.h"
@@ -607,7 +607,7 @@ namespace Parsing
         }
     }
 
-    const ParseNode* Parser::CheckType(const ParseNode* parsed) const
+    const ParseNode* Parser::CheckType(const ParseNode* const parsed) const
     {
         switch (parsed->NodeType())
         {

@@ -3,7 +3,6 @@
 #include <map>
 #include <format>
 
-#include "func.h"
 #include "generic_extensions.h"
 
 using namespace std;
@@ -12,11 +11,11 @@ using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 
-constexpr std::string_view action_cil = "[mscorlib]System.Action";
+constexpr std::string cil_action = "[System.Runtime]System.Action";
 
 namespace Analysis::Structure::Wrappers
 {
-    Action::Action() : Class("Action", Describer::Public), SingletonCollection(),  types(), genericSignature(), callSignature()
+    Action::Action() : Class(cil_action, Describer::Public), SingletonCollection(),  types(), genericSignature(), callSignature()
     { }
 
     const Action* Action::Instance(const std::vector<const DataType*>& types)
@@ -32,7 +31,7 @@ namespace Analysis::Structure::Wrappers
             action->types.push_back(type);
 
         action->genericSignature = std::format("`{}<{}>", types.size(), signature);
-        action->fullName = std::format("{}{}", action_cil, action->genericSignature);
+        action->fullName = std::format("{}{}", cil_action, action->genericSignature);
 
         action->InitialiseMembers();
         map[signature] = action;
@@ -63,18 +62,13 @@ namespace Analysis::Structure::Wrappers
     }
 
     void Action::InitialiseMembers()
-    {
+    { }
 
-    }
+    unsigned long Action::TypeCount() const {  return types.size(); }
 
-    int Action::TypeCount() const
+    const Core::DataType* Action::TypeAt(const unsigned long index) const
     {
-        return types.size();
-    }
-
-    const Core::DataType* Action::TypeAt(const int index) const
-    {
-        if (index < 0 || index >= types.size())
+        if (index >= types.size())
             return nullptr;
 
         return types.at(index);

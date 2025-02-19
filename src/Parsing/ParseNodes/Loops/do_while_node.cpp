@@ -3,10 +3,11 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
+using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Loops
 {
-    DoWhileNode::DoWhileNode(const ParseNode* condition, const ParseNode* body, const Token& keyword) : LoopNode(condition, body, keyword)
+    DoWhileNode::DoWhileNode(const ParseNode* const condition, const ScopeNode* const body, const Token& keyword) : LoopNode(condition, body, keyword)
     { }
 
     NodeType DoWhileNode::NodeType() const { return NodeType::DoWhile; }

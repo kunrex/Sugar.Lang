@@ -1,23 +1,24 @@
 #include "scoped.h"
 
-#include "../../../Analysis/Structure/Nodes/Local/Scopes/scope.h"
+#include "../Local/Scopes/scope.h"
 
 using namespace ParseNodes;
 using namespace ParseNodes::Groups;
 
+using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 
 namespace Analysis::Structure::Core
 {
-    Scoped::Scoped(const ScopeNode* parseNode) : ConstantCollection(), parseNode(parseNode), argumentCount(0)
+    Scoped::Scoped(const ScopeNode* const parseNode) : ConstantCollection(), parseNode(parseNode), argumentCount(0)
     {
-        scope = new Scope(this);
+        scope = new Local::Scope(ScopeType::Scope, "", this);
     }
 
     const ScopeNode* Scoped::ParseNode() const { return parseNode; }
 
-    int Scoped::ArgumentCount() const { return argumentCount; }
-    int Scoped::VariableCount() const { return children.size(); }
+    unsigned long Scoped::ArgumentCount() const { return argumentCount; }
+    unsigned long Scoped::VariableCount() const { return children.size(); }
 
     Scope* Scoped::Scope() const { return scope; }
 
@@ -32,21 +33,16 @@ namespace Analysis::Structure::Core
         AddChild(variable);
     }
 
-    bool Scoped::ContainsArgument(const std::string& name) const
-    {
-        return GetArgument(name) != nullptr;
-    }
-
-    int Scoped::GetArgument(const std::string& name) const
+    std::optional<unsigned long> Scoped::GetArgumentIndex(const std::string& name) const
     {
         for (int i = 0; i < argumentCount; i++)
             if (children.at(i)->Name() == name)
                 return i;
 
-        return -1;
+        return std::nullopt;
     }
 
-    const LocalVariable* Scoped::VariableAt(const int i) const
+    const LocalVariable* Scoped::VariableAt(const unsigned long i) const
     {
         return children.at(i);
     }

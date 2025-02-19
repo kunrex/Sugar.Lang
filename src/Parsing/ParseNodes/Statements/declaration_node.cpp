@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Statements
 {
-    DeclarationNode::DeclarationNode(const DescriberNode* describer, const ParseNode* type, const IdentifierNode* identifier, const Token& separator) : StatementNode(separator), CharacteristicNode(describer, type, identifier)
+    DeclarationNode::DeclarationNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const Token& separator) : StatementNode(separator), CharacteristicNode(describer, type, identifier)
     { }
 
     NodeType DeclarationNode::NodeType() const { return NodeType::Declaration; }

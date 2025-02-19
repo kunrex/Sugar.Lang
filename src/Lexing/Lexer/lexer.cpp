@@ -5,9 +5,9 @@
 #include <optional>
 
 #include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compiling/Lexing/invalid_character_exception.h"
-#include "../../Exceptions/Compiling/Lexing/character_expected_exception.h"
-#include "../../Exceptions/Compiling/Lexing/constant_out_of_range_exception.h"
+#include "../../Exceptions/Compilation/Lexing/invalid_character_exception.h"
+#include "../../Exceptions/Compilation/Lexing/character_expected_exception.h"
+#include "../../Exceptions/Compilation/Lexing/constant_out_of_range_exception.h"
 
 #include "../Tokens/Factories/keyword.h"
 #include "../Tokens/Factories/constant.h"

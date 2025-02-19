@@ -1,14 +1,16 @@
 #include "collection.h"
 
-#include "../Lexing/Tokens/token.h"
-#include "../Parsing/ParseNodes/parse_node.h"
-#include "../Analysis/Structure/source_object.h"
-#include "../Analysis/Structure/Core/DataTypes/data_type.h"
-#include "../Analysis/Structure/Nodes/Context/context_node.h"
-#include "../Analysis/Structure/Nodes/Creation/Variables/variable.h"
 #include "../Exceptions/compile_exception.h"
+
+#include "../Lexing/Tokens/token.h"
+
+#include "../Parsing/ParseNodes/parse_node.h"
 #include "../Parsing/ParseNodes/Conditions/condition_node.h"
 #include "../Parsing/ParseNodes/Statements/declaration_node.h"
+
+#include "../Analysis/Structure/source_object.h"
+#include "../Analysis/Structure/Context/context_node.h"
+#include "../Analysis/Structure/Local/Variables/local_variable.h"
 
 using namespace std;
 
@@ -22,8 +24,8 @@ using namespace ParseNodes::Statements;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
+using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Context;
-using namespace Analysis::Structure::Creation;
 
 namespace Services
 {
@@ -79,20 +81,16 @@ namespace Services
     template class Collection<SourceObject>;
 
     template class Collection<const Token>;
-    template class Collection<const Variable>;
     template class Collection<const ParseNode>;
     template class Collection<const ConditionNode>;
+    template class Collection<const LocalVariable>;
     template class Collection<const DeclarationNode>;
     template class Collection<const CompileException>;
 
     template class ConstantCollection<Token>;
-    template class ConstantCollection<Variable>;
     template class ConstantCollection<ParseNode>;
     template class ConstantCollection<ConditionNode>;
+    template class ConstantCollection<LocalVariable>;
     template class ConstantCollection<DeclarationNode>;
     template class ConstantCollection<CompileException>;
 }
-
-
-
-

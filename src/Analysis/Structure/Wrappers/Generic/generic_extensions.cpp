@@ -8,7 +8,7 @@ namespace Analysis::Structure::Wrappers
         for (int i = 0; i < types.size(); i++)
         {
             signature += types.at(i)->FullName();
-            if (i != types.size() - 1)
+            if (i < types.size())
                 signature += ", ";
         }
 

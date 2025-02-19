@@ -4,22 +4,21 @@
 #include <sstream>
 #include <filesystem>
 
-#include "Analysis/project_initializer.h"
-#include "Analysis/Creation/Transpiling/cil_transpiler.h"
-#include "Lexing/Lexer/lexer.h"
+#include "Exceptions/log_exception.h"
 #include "Exceptions/exception_manager.h"
-#include "Analysis/Structure/source_file.h"
-#include "Analysis/Structure/Enums/describer.h"
-#include "Analysis/Structure/Nodes/DataTypes/class.h"
-#include "Analysis/Structure/Nodes/DataTypes/enum.h"
-#include "Analysis/Structure/Nodes/DataTypes/struct.h"
-#include "Exceptions/Compiling/source_file_exception.h"
-#include "Exceptions/Compiling/Analysis/duplicate_structure_definition.h"
-#include "Exceptions/Compiling/Analysis/invalid_describer_exception.h"
-#include "Exceptions/Compiling/Analysis/invalid_import_path_exception.h"
-#include "Parsing/ParseNodes/DataTypes/data_type_node.h"
-#include "Parsing/ParseNodes/Statements/import_statement_node.h"
+#include "Exceptions/Compilation/source_file_exception.h"
+
+#include "Lexing/Lexer/lexer.h"
+
 #include "Parsing/Parser/parser.h"
+
+#include "Analysis/Structure/source_file.h"
+
+#include "Analysis/Creation/Binding/local_binder.h"
+#include "Analysis/Creation/Binding/global_binder.h"
+#include "Analysis/Creation/Binding/project_binder.h"
+
+#include "Analysis/Creation/Transpiling/cil_transpiler.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -35,30 +34,14 @@ using namespace ParseNodes::Statements;
 using namespace Parsing;
 
 using namespace Analysis::Creation;
+using namespace Analysis::Creation::Binding;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::DataTypes;
 
 constexpr string_view source_extension = ".sugar";
 
-Compiler::Compiler(const std::string& sourcePath) : sourcePath(sourcePath)
-{
-    const fs::path path = sourcePath;
-    if (!exists(path) || !is_directory(path))
-    {
-        ExceptionManager::Instance().AddChild(new SourceFileException(path));
-        return;
-    }
-
-    const auto name = path.filename().string();
-    source = new SourceDirectory(name);
-
-    ExceptionManager::Instance();
-    PushDirectory(sourcePath, source);
-}
-
-void Compiler::PushDirectory(const std::string& strPath, SourceDirectory* const directory)
+void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
 {
     const auto path = fs::path(strPath);
 
@@ -75,7 +58,7 @@ void Compiler::PushDirectory(const std::string& strPath, SourceDirectory* const 
         if (is_directory(entry))
         {
             const auto child = new SourceDirectory(name);
-            directory->Push(name, child);
+            directory->AddChild(name, child);
 
             PushDirectory(childPath.string(), child);
         }
@@ -88,12 +71,12 @@ void Compiler::PushDirectory(const std::string& strPath, SourceDirectory* const 
                 return;
             }
 
-            directory->Push(name, new SourceFile(name, string((std::istreambuf_iterator(file)), std::istreambuf_iterator<char>())));
+            directory->AddChild(name, new SourceFile(name, string((std::istreambuf_iterator(file)), std::istreambuf_iterator<char>())));
         }
     }
 }
 
-void Compiler::LexParse(SourceObject* const directory)
+void LexParse(SourceObject* const directory)
 {
     for (const auto child: *directory)
     {
@@ -111,7 +94,7 @@ void Compiler::LexParse(SourceObject* const directory)
     }
 }
 
-void Compiler::StructureDataTypes(const SourceDirectory* const directory)
+void StructureDataTypes(const SourceDirectory* const directory)
 {
     for (const auto child: directory->values())
     {
@@ -142,7 +125,7 @@ void Compiler::StructureDataTypes(const SourceDirectory* const directory)
     }
 }
 
-void Compiler::ManageImportStatements(const SourceDirectory* const directory)
+void ManageImportStatements(const SourceDirectory* const directory)
 {
     for (const auto child: directory->values())
     {
@@ -162,52 +145,61 @@ void Compiler::ManageImportStatements(const SourceDirectory* const directory)
                 case NodeType::Struct:
                     break;
                 case NodeType::Import:
-                    {
-                        const auto importNode = dynamic_cast<const ImportStatementNode*>(node);
-                        ImportStatement(*importNode, file);
-                    }
+                    ImportStatement(dynamic_cast<const ImportStatementNode*>(node), file);
                     break;
                 default:
+                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Index(), file));
                     break;
             }
         }
     }
 }
 
-void Compiler::BindGlobal(const SourceDirectory* directory)
+void BindGlobal(const SourceDirectory* directory)
 {
     for (const auto child: directory->values())
     {
         if (child->SourceType() == SourceType::Directory)
         {
-            ManageImportStatements(dynamic_cast<SourceDirectory*>(child));
+            BindGlobal(dynamic_cast<SourceDirectory*>(child));
             continue;
         }
 
-        const auto file = dynamic_cast<SourceFile*>(child);
-        for (const auto type: file->values())
-            BindDataTypeGlobal(type);
+        GlobalBindSourceFile(dynamic_cast<SourceFile*>(child));
     }
 }
 
-void Compiler::BindLocal(const SourceDirectory* directory)
+void BindLocal(const SourceDirectory* directory)
 {
     for (const auto child: directory->values())
     {
         if (child->SourceType() == SourceType::Directory)
         {
-            ManageImportStatements(dynamic_cast<SourceDirectory*>(child));
+            BindLocal(dynamic_cast<SourceDirectory*>(child));
             continue;
         }
 
-        const auto file = dynamic_cast<SourceFile*>(child);
-        for (const auto type: file->values())
-            BindDataTypeLocal(type);
+        LocalBindSourceFile(dynamic_cast<SourceFile*>(child));
     }
 }
 
+Compiler::Compiler(const std::string& sourcePath) : sourcePath(sourcePath)
+{
+    const fs::path path = sourcePath;
+    if (!exists(path) || !is_directory(path))
+    {
+        ExceptionManager::Instance().AddChild(new SourceFileException(path));
+        return;
+    }
 
-void Compiler::Compile()
+    const auto name = path.filename().string();
+    source = new SourceDirectory(name);
+
+    ExceptionManager::Instance();
+    PushDirectory(sourcePath, source);
+}
+
+void Compiler::Compile() const
 {
     if (ExceptionManager::Instance().ChildCount() > 0)
         return;
@@ -216,45 +208,28 @@ void Compiler::Compile()
     Parser::Instance();
     LexParse(source);
 
-    if (ExceptionManager::Instance().ChildCount() > 0)
+    std::vector<void (*)(const SourceDirectory*)> steps;
+    steps.push_back(StructureDataTypes);
+    steps.push_back(ManageImportStatements);
+    steps.push_back(BindGlobal);
+    steps.push_back(BindLocal);
+
+    for (const auto func : steps)
     {
-        delete source;
-        return;
+        func(source);
+
+        if (ExceptionManager::Instance().LogAllExceptions())
+        {
+            delete source;
+            return;
+        }
     }
 
-    StructureDataTypes(source);
-    if (ExceptionManager::Instance().ChildCount() > 0)
-    {
-        delete source;
-        return;
-    }
+    const CILTranspiler transpiler(name, sourcePath, source);
+    transpiler.Transpile();
 
-    ManageImportStatements(source);
+    if (!ExceptionManager::Instance().LogAllExceptions())
+        cout << "Compiled successfully at " << transpiler.OutputFile() << endl;
 
-    if (ExceptionManager::Instance().ChildCount() > 0)
-    {
-        delete source;
-        return;
-    }
-
-    BindGlobal(source);
-
-    if (ExceptionManager::Instance().ChildCount() > 0)
-    {
-        delete source;
-        return;
-    }
-
-    BindLocal(source);
-
-    if (ExceptionManager::Instance().ChildCount() > 0)
-    {
-        delete source;
-        return;
-    }
-
-    const auto
-
-    const auto transpiler = CILTranspiler(source->Name(), );
-    //yayyy
+    delete source;
 }

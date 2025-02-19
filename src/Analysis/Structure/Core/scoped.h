@@ -1,8 +1,12 @@
 #ifndef SCOPED_H
 #define SCOPED_H
 
-#include "../Nodes/Local/Variables/local_variable.h"
 #include "../../../Parsing/ParseNodes/Groups/scope_node.h"
+
+#include "created.h"
+#include "describable.h"
+
+#include "../Local/Variables/local_variable.h"
 
 namespace Analysis::Structure::Local
 {
@@ -11,12 +15,12 @@ namespace Analysis::Structure::Local
 
 namespace Analysis::Structure::Core
 {
-    class Scoped : public virtual Describable, Services::ConstantCollection<Local::LocalVariable>
+    class Scoped : public virtual Interfaces::INode, public virtual Interfaces::IDescribable, public virtual Interfaces::ICreated, public Services::ConstantCollection<Local::LocalVariable>
     {
         protected:
             const ParseNodes::Groups::ScopeNode* parseNode;
 
-            mutable int argumentCount;
+            mutable unsigned long argumentCount;
             mutable Local::Scope* scope;
 
             explicit Scoped(const ParseNodes::Groups::ScopeNode* parseNode);
@@ -24,18 +28,17 @@ namespace Analysis::Structure::Core
         public:
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseNode() const;
 
-            [[nodiscard]] int ArgumentCount() const;
-            [[nodiscard]] int VariableCount() const;
+            [[nodiscard]] unsigned long ArgumentCount() const;
+            [[nodiscard]] unsigned long VariableCount() const;
 
             [[nodiscard]] Local::Scope* Scope() const;
 
-            virtual void AddArgument(const Local::LocalVariable* parameter);
+            void AddArgument(const Local::LocalVariable* parameter);
             void AddLocalVariable(const Local::LocalVariable* variable);
 
-            [[nodiscard]] bool ContainsArgument(const std::string& name) const;
-            [[nodiscard]] int GetArgument(const std::string& name) const;
+            [[nodiscard]] std::optional<unsigned long> GetArgumentIndex(const std::string& name) const;
 
-            [[nodiscard]] const Local::LocalVariable* VariableAt(int i) const;
+            [[nodiscard]] const Local::LocalVariable* VariableAt(unsigned long i) const;
     };
 }
 

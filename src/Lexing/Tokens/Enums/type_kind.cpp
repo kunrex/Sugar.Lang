@@ -36,6 +36,8 @@ namespace Tokens::Enums
                 return "Nullable";
             case TypeKind::Exception:
                 return "Exception";
+            case TypeKind::Math:
+                return "Math";
             default:
                 return "Object";
         }

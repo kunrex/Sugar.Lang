@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ThrowStatementNode::ThrowStatementNode(const ParseNode* exception, const Token& keyword, const Token& separator) : StatementNode(separator), exception(exception), keyword(keyword)
+    ThrowStatementNode::ThrowStatementNode(const ParseNode* const exception, const Token& keyword, const Token& separator) : StatementNode(separator), exception(exception), keyword(keyword)
     { }
 
     NodeType ThrowStatementNode::NodeType() const { return NodeType::Throw; }

@@ -1,7 +1,12 @@
 #ifndef USER_DEFINED_TYPE_H
 #define USER_DEFINED_TYPE_H
 
+#include <functional>
+
 #include "../../../../Parsing/ParseNodes/DataTypes/data_type_node.h"
+
+#include "../scoped.h"
+#include "../Creation/characteristic.h"
 
 namespace Analysis::Structure::Core
 {

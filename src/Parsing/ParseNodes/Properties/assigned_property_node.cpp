@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    AssignedPropertyNode::AssignedPropertyNode(const DescriberNode* describer, const ParseNode* type, const IdentifierNode* identifier, const GetNode* get, const SetNode* set, const ParseNode* value) : BasePropertyNode(describer, type, identifier, get, set), value(value)
+    AssignedPropertyNode::AssignedPropertyNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const GetNode* const get, const SetNode* const set, const ParseNode* const value) : BasePropertyNode(describer, type, identifier, get, set), value(value)
     { }
 
     NodeType AssignedPropertyNode::NodeType() const { return NodeType::PropertyInitialisation; }

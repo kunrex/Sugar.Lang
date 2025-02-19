@@ -7,12 +7,17 @@ namespace Exceptions
     ExceptionManager::ExceptionManager() : SingletonService(), ConstantCollection()
     { }
 
-    void ExceptionManager::LogAllExceptions() const
+    bool ExceptionManager::LogAllExceptions() const
     {
+        if (children.empty())
+            return false;
+
         for (const auto exception: children)
         {
             std::cerr << exception->what() << std::endl;
             std::cout<< std::endl;
         }
+
+        return true;
     }
 }

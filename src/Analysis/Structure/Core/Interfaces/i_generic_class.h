@@ -1,6 +1,8 @@
 #ifndef I_GENERIC_CLASS_H
 #define I_GENERIC_CLASS_H
 
+#include <string>
+
 namespace Analysis::Structure::Core::Interfaces
 {
     class IGenericClass

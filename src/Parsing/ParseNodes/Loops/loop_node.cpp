@@ -2,9 +2,11 @@
 
 using namespace Tokens;
 
+using namespace ParseNodes::Groups;
+
 namespace ParseNodes::Loops
 {
-    LoopNode::LoopNode(const ParseNode* condition, const ParseNode* body, const Token& keyword) : BodyNode(body), condition(condition), keyword(keyword)
+    LoopNode::LoopNode(const ParseNode* const condition, const ScopeNode* const body, const Token& keyword) : BodyNode(body), condition(condition), keyword(keyword)
     { }
 
     const ParseNode* LoopNode::Condition() const { return condition; }

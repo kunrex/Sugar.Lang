@@ -2,11 +2,14 @@
 
 #include <format>
 
+#include "../../Nodes/Global/BuiltIn/built_in_property.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 
-constexpr std::string_view list_cil = "[mscorlib]System.Collections.Generic.Dictionary";
+constexpr std::string_view list_cil = "[System.Runtime]System.Collections.Generic.Dictionary";
 
 namespace Analysis::Structure::Wrappers
 {
@@ -37,7 +40,7 @@ namespace Analysis::Structure::Wrappers
 
     void List::InitialiseMembers()
     {
-
+        PushCharacteristic(new Global::BuiltInProperty())
     }
 
 }
