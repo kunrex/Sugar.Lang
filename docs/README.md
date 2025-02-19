@@ -243,18 +243,18 @@ struct Complex
     {
         real = imaginary = 0;
     }
-    
+
     [public]
-    indexer float (int index) // allows instances of complex to be indexed using []
+    indexer float (int: index) // allows instances of complex to be indexed using []
     {
-       get { return index == 0 ? real : imaginary; }
-       [private] set { if (index == 0) real = value; else imaginary = value; }
+        get { return index == 0 ? real : imaginary; }
+        [private] set { if (index == 0) real = value; else imaginary = value; }
     }
     
     [public, static]
-    explicit string(Complex: person) //allows the explicit conversion of complex to a string
+    explicit string(Complex: person) //allows the explicit conversion of complex to a string, internally called by tostring() and format()
     {
-        return format(real,"i +", imaginary, "j");
+        return format("{0} + {1}j", real, imaginary);
     }
     
     [public, static]
@@ -275,8 +275,7 @@ struct Complex
     }
 }
 ```
-Cast and operator overloads must be static. indexers and constructors cannot be. 
-> The explicit conversion to a string is internally called by the `tostring` and `format` function. 
+Cast and operator overloads must be public and static. indexers and constructors cannot be static. All structures have a defaullt string conversion and constructor unless specified.
 
 ### Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
