@@ -23,7 +23,7 @@ namespace Services
     {
         protected:
             SingletonCollection();
-            virtual ~SingletonCollection();
+            virtual ~SingletonCollection() = default;
 
         public:
             SingletonCollection(const SingletonCollection&) = delete;
