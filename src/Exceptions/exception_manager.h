@@ -13,7 +13,7 @@ namespace Exceptions
         public:
             ExceptionManager();
 
-            bool LogAllExceptions() const;
+            [[nodiscard]] bool LogAllExceptions() const;
     };
 }
 
