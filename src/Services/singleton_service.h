@@ -8,7 +8,7 @@ namespace Services
     {
         protected:
             SingletonService();
-            virtual ~SingletonService();
+            virtual ~SingletonService() = default;
 
         public:
             static TSingleton& Instance();
