@@ -8,7 +8,7 @@ namespace Analysis::Structure::Core::Interfaces
         public:
             [[nodiscard]] virtual int SlotCount() const = 0;
 
-            virtual ~ISlotSize();
+            virtual ~ISlotSize() = default;
     };
 }
 

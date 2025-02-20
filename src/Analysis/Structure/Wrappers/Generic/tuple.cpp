@@ -4,53 +4,64 @@
 
 #include "generic_extensions.h"
 
+#include <map>
+
+#include "../../DataTypes/data_type_extensions.h"
+#include "../../Global/BuiltIn/built_in_constructor.h"
+
+#include "../../Global/BuiltIn/built_in_property.h"
+
 using namespace std;
 
-using namespace Analysis::Structure::Core;
+using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::DataTypes;
 
-constexpr std::string_view tuple_cil = "[System.ValueTuple]System.ValueTuple";
+constexpr std::string cil_tuple = "[System.Runtime]System.Tuple";
 
 namespace Analysis::Structure::Wrappers
 {
-    Tuple::Tuple() : Class("Tuple", Describer::Public), SingletonCollection(), types(), genericSignature()
+    Tuple::Tuple() : Class("Tuple", Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
     { }
-
-    void Tuple::PushType(const DataType* type)
-    {
-        if (types.size() < max_tuple_length - 1)
-            types.push_back(type);
-    }
 
     const Tuple* Tuple::Instance(const std::vector<const DataType*>& types)
     {
-        static std::map<string, const Tuple*> map;
-        const auto signature = MapGenericSignature(types);
+        static std::map<unsigned long, const Tuple*> map;
 
-        if (map.contains(signature))
-            return map.at(signature);
+        const auto hash = ArgumentHash(types);
+
+        if (map.contains(hash))
+            return map.at(hash);
 
         const auto tuple = new Tuple();
         for (const auto type : types)
-            tuple->PushType(type);
+            tuple->types.push_back(type);
+
+        tuple->genericSignature = std::format("{}`{}<{}>", cil_tuple, types.size(), MapGenericSignature(types));
+        tuple->callSignature = MapGenericCallSignature(types);
 
         tuple->InitialiseMembers();
-        map[signature] = tuple;
 
-        tuple->fullName = std::format("{}{}", tuple_cil, tuple->genericSignature);
+        map[hash] = tuple;
         return tuple;
     }
 
-    const std::string& Tuple::GenericSignature() const
-    {
-        if (genericSignature.empty())
-            genericSignature = std::format("`{}<{}>", types.size(), MapGenericSignature(types));
-
-        return genericSignature;
-    }
+    const std::string& Tuple::FullName() const { return genericSignature; }
 
     void Tuple::InitialiseMembers()
     {
+        const auto constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor({})", genericSignature, callSignature));
 
+        int i = 1;
+        for (const auto type: types)
+        {
+            const auto getInstruction = std::format("call instance {} class {}::get_Item{}()", type->FullName(), genericSignature, i);
+            PushCharacteristic(new BuiltInProperty(Describer::Public, std::format("Element{}", i++), type, true, getInstruction, false, ""));
+
+            constructor->PushParameterType(type);
+        }
+
+        PushConstructor(constructor);
     }
 }

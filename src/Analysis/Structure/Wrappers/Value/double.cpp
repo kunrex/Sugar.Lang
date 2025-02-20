@@ -1,25 +1,31 @@
 #include "double.h"
 
-#include "../../Nodes/Global/BuiltIn/built_in_cast.h"
-#include "../../Nodes/Global/BuiltIn/built_in_method.h"
-#include "../../Nodes/Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_cast.h"
+#include "../../Global/BuiltIn/built_in_method.h"
+#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_operation.h"
 
 #include "short.h"
 #include "integer.h"
 #include "long.h"
 #include "./float.h"
+#include "boolean.h"
 #include "../Reference/string.h"
 #include "../Generic/referenced.h"
+
+using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 
-constexpr std::string cil_float = "[System.Runtime]System.Double";
+constexpr std::string cil_double = "[System.Runtime]System.Double";
 
 namespace Analysis::Structure::Wrappers
 {
-    Double::Double() : Struct(cil_float, Describer::Public), SingletonService()
+    Double::Double() : Struct(cil_double, Describer::Public), SingletonService()
     { }
+
+    int Double::SlotCount() const { return 2; }
 
     void Double::InitialiseMembers()
     {
@@ -32,7 +38,7 @@ namespace Analysis::Structure::Wrappers
 
         PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "Epsilon", &Instance(), true, "ldc.r8 4.94065645841247E-324", false, ""));
 
-        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Instance());
+        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Double::TryParse(string, float64&)");
         tryParse->PushParameterType(&String::Instance());
         tryParse->PushParameterType(Referenced::Instance(&Instance()));
         PushFunction(tryParse);
@@ -53,8 +59,87 @@ namespace Analysis::Structure::Wrappers
         explicitFloat->PushParameterType(&Instance());
         PushExplicitCast(explicitFloat);
 
-        const auto explicitString = new BuiltInCast(&String::Instance(), "callvirt instance string [mscorlib]System.Object::ToString()");
+        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()");
         explicitString->PushParameterType(&Instance());
         PushExplicitCast(explicitString);
+
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "ceq");
+        equals->PushParameterType(&Instance());
+        equals->PushParameterType(&Instance());
+        PushOverload(equals);
+
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        notEquals->PushParameterType(&Instance());
+        notEquals->PushParameterType(&Instance());
+        PushOverload(notEquals);
+
+        const auto addition = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "add");
+        addition->PushParameterType(&Instance());
+        addition->PushParameterType(&Instance());
+        PushOverload(addition);
+
+        const auto subtraction = new BuiltInOperation(SyntaxKind::Subtraction, &Instance(), "sub");
+        subtraction->PushParameterType(&Instance());
+        subtraction->PushParameterType(&Instance());
+        PushOverload(subtraction);
+
+        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "mul");
+        multiplication->PushParameterType(&Instance());
+        multiplication->PushParameterType(&Instance());
+        PushOverload(multiplication);
+
+        const auto division = new BuiltInOperation(SyntaxKind::Division, &Instance(), "div");
+        division->PushParameterType(&Instance());
+        division->PushParameterType(&Instance());
+        PushOverload(division);
+
+        const auto remainder = new BuiltInOperation(SyntaxKind::Modulus, &Instance(), "rem");
+        remainder->PushParameterType(&Instance());
+        remainder->PushParameterType(&Instance());
+        PushOverload(remainder);
+
+        const auto negation = new BuiltInOperation(SyntaxKind::Minus, &Instance(), "neg");
+        negation->PushParameterType(&Instance());
+        PushOverload(negation);
+
+        const auto increment = new BuiltInOperation(SyntaxKind::Increment, &Instance(), "ldc.r8 1.0 add");
+        increment->PushParameterType(&Instance());
+        increment->PushParameterType(&Instance());
+        PushOverload(increment);
+
+        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub");
+        decrement->PushParameterType(&Instance());
+        decrement->PushParameterType(&Instance());
+        PushOverload(remainder);
+
+        const auto incrementPrefix = new BuiltInOperation(SyntaxKind::IncrementPrefix, &Instance(), "ldc.r8 1.0 add");
+        incrementPrefix->PushParameterType(&Instance());
+        incrementPrefix->PushParameterType(&Instance());
+        PushOverload(incrementPrefix);
+
+        const auto decrementPrefix = new BuiltInOperation(SyntaxKind::DecrementPrefix, &Instance(), "ldc.r8 1.0 sub");
+        decrementPrefix->PushParameterType(&Instance());
+        decrementPrefix->PushParameterType(&Instance());
+        PushOverload(decrementPrefix);
+
+        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt");
+        greater->PushParameterType(&Instance());
+        greater->PushParameterType(&Instance());
+        PushOverload(equals);
+
+        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, &Boolean::Instance(), "clt");
+        lesser->PushParameterType(&Instance());
+        lesser->PushParameterType(&Instance());
+        PushOverload(lesser);
+
+        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, &Boolean::Instance(), "clt ldc.i4.0 ceq");
+        greaterEquals->PushParameterType(&Instance());
+        greaterEquals->PushParameterType(&Instance());
+        PushOverload(greaterEquals);
+
+        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, &Boolean::Instance(), "cgt ldc.i4.0 ceq");
+        lesserEquals->PushParameterType(&Instance());
+        lesserEquals->PushParameterType(&Instance());
+        PushOverload(lesserEquals);
     }
 }

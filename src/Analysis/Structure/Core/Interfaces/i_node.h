@@ -10,7 +10,7 @@ namespace Analysis::Structure::Core::Interfaces
         public:
             [[nodiscard]] virtual Enums::MemberType MemberType() const = 0;
 
-            virtual ~INode();
+            virtual ~INode() = default;
     };
 }
 

@@ -9,7 +9,7 @@ namespace Analysis::Structure::Core::Interfaces
             [[nodiscard]] virtual bool Readable() const = 0;
             [[nodiscard]] virtual bool Writable() const = 0;
 
-            virtual ~IReadWrite();
+            virtual ~IReadWrite() = default;
     };
 }
 

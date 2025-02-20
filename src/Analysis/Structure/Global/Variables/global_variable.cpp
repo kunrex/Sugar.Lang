@@ -11,10 +11,10 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* creationType) : Characteristic(name, describer, creationType, nullptr)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* const creationType) : Characteristic(name, describer, creationType, nullptr)
     { }
 
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* creationType, const ParseNodes::ParseNode* value) : Characteristic(name, describer, creationType, value)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* const creationType, const ParseNodes::ParseNode* const value) : Characteristic(name, describer, creationType, value)
     { }
 
     MemberType GlobalVariable::MemberType() const { return MemberType::Field; }
@@ -26,4 +26,7 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
+
+    bool GlobalVariable::Readable() const { return true; }
+    bool GlobalVariable::Writable() const { return true; }
 }

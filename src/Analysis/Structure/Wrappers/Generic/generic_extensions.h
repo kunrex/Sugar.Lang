@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../../Core/DataTypes/data_type.h"
+#include "../../source_object.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -11,6 +11,7 @@ namespace Analysis::Structure::Wrappers
     constexpr int max_delegate_length = 16;
 
     std::string MapGenericSignature(const std::vector<const Core::DataType*>& types);
+    std::string MapGenericCallSignature(const std::vector<const Core::DataType*>& types);
 }
 
 #endif

@@ -5,7 +5,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class GlobalVariable final : public Core::Characteristic
+    class GlobalVariable : public Core::Characteristic
     {
         public:
             GlobalVariable(const std::string& name, Enums::Describer describer, const Core::DataType* creationType);
@@ -14,6 +14,9 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
     };
 }
 

@@ -24,5 +24,10 @@ namespace Analysis::Structure::Global
     unsigned long BuiltInIndexer::ParameterCount() const { return parameters.size(); }
 
     const DataType* BuiltInIndexer::ParameterAt(const unsigned long index) const { return parameters.at(index); }
+
+    void BuiltInIndexer::PushParameterType(const DataType* type)
+    {
+        parameters.push_back(type);
+    }
 }
 

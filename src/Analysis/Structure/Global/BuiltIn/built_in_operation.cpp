@@ -21,4 +21,9 @@ namespace Analysis::Structure::Global
     unsigned long BuiltInOperation::ParameterCount() const { return parameters.size(); }
 
     const DataType* BuiltInOperation::ParameterAt(const unsigned long index) const { return parameters.at(index); }
+
+    void BuiltInOperation::PushParameterType(const DataType* type)
+    {
+        parameters.push_back(type);
+    }
 }

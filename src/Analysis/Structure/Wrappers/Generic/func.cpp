@@ -4,73 +4,50 @@
 #include <format>
 
 #include "generic_extensions.h"
+#include "../../DataTypes/data_type_extensions.h"
 
 using namespace std;
 
 using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::DataTypes;
 
 constexpr std::string cil_func = "[System.Runtime]System.Func";
 
 namespace Analysis::Structure::Wrappers
 {
-    Func::Func() : Class(cil_func, Describer::Public), SingletonCollection(),  types(), genericSignature(), callSignature()
+    Func::Func() : Class(cil_func, Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
     { }
 
     const Func* Func::Instance(const std::vector<const DataType*>& types)
     {
-        static std::map<string, const Func*> map;
-        const auto signature = MapGenericSignature(types);
+        static std::map<unsigned long, const Func*> map;
 
-        if (map.contains(signature))
-            return map.at(signature);
+        const auto hash = ArgumentHash(types);
 
-        const auto action = new Func();
+        if (map.contains(hash))
+            return map.at(hash);
+
+        const auto func = new Func();
         for (const auto type : types)
-            action->types.push_back(type);
+            func->types.push_back(type);
 
-        action->genericSignature = std::format("`{}<{}>", types.size(), signature);
-        action->fullName = std::format("{}{}", cil_func, action->genericSignature);
+        func->genericSignature = std::format("{}`{}<{}>", cil_func, types.size(), MapGenericSignature(types));
+        func->callSignature = MapGenericCallSignature(types);
 
-        action->InitialiseMembers();
-        map[signature] = action;
-        return action;
+        func->InitialiseMembers();
+
+        map[hash] = func;
+        return func;
     }
 
-    const std::string& Func::GenericSignature() const
-    {
-        return genericSignature;
-    }
-
-    const std::string& Func::CallSignature() const
-    {
-        if (callSignature.empty())
-        {
-            callSignature = "(";
-            for (int i = 0; i < types.size(); i++)
-            {
-                callSignature += std::format("!{}", i);
-                if (i < types.size() - 1)
-                    callSignature += " ";
-            }
-
-            callSignature += ")";
-        }
-
-        return callSignature;
-    }
-
-    void Func::InitialiseMembers()
-    { }
+    const std::string& Func::FullName() const { return genericSignature; }
 
     unsigned long Func::TypeCount() const {  return types.size(); }
 
-    const Core::DataType* Func::TypeAt(const unsigned long index) const
-    {
-        if (index >= types.size())
-            return nullptr;
+    const Core::DataType* Func::TypeAt(const unsigned long index) const { return types.at(index); }
 
-        return types.at(index);
-    }
+    void Func::InitialiseMembers()
+    { }
 }

@@ -5,7 +5,6 @@
 
 #include "binder_extensions.h"
 
-#include "../../../Exceptions/exception_manager.h"
 #include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/Project/invalid_import_path_exception.h"
@@ -24,6 +23,7 @@ using namespace ParseNodes::Statements;
 using namespace ParseNodes::Describers;
 
 using namespace Analysis::Structure;
+using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::DataTypes;
 
@@ -32,6 +32,12 @@ const auto pathRegex = std::regex(R"(^(\.)*(?:[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)
 
 namespace Analysis::Creation::Binding
 {
+    void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
+    {
+        if (!describable->ValidateDescriber(allowed))
+            PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
+    }
+
     void CreateEnum(const DataTypeNode* const node, SourceFile* const sourceFile)
     {
         const auto index = node->Index();
@@ -44,9 +50,9 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->Describer());
-        const auto enumSource = new Enum(identifier, describer, node);
+        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
-        ValidateDescriber(enumSource, describer, index, sourceFile);
+        ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(enumSource->Name(), enumSource);
     }
 
@@ -62,9 +68,9 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->Describer());
-        const auto classSource = new ClassSource(identifier, describer, node);
+        const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
-        ValidateDescriber(classSource, describer, index, sourceFile);
+        ValidateDescriber(classSource, Describer::Static | Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(classSource->Name(), classSource);
     }
 
@@ -80,9 +86,9 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->Describer());
-        const auto structSource = new StructSource(identifier, describer, node);
+        const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
-        ValidateDescriber(structSource, describer, index, sourceFile);
+        ValidateDescriber(structSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(structSource->Name(), structSource);
     }
 

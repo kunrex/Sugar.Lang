@@ -92,15 +92,15 @@ These data types are built into sugar:
 Sugar supports the collections mentioned above.
 1. `array`:
 ```c++
-array<int>: collection = { 1, 2, 3, 4 };
-collection[3] = 3;
-print(collection[3]);
+array<int>: collection = create array<int>(3);
+collection[2] = 3;
+print(collection[2]);
 ```
 2. `list`:
 ```c++
-list<int>: collection = { 1, 2, 3, 4 };
+list<int>: collection = create list<int>();
 collection.Add(5);
-print(collection[4]);
+print(collection[0]);
 ```
 
 3.  `dictionary`:
@@ -113,8 +113,8 @@ print(collection[10]);
 4.  `tuple`:
 ```c++
 let: collection = create tuple<int, string>(1, "one");
-print(collection[0]);
-print(collection[1]);
+print(collection.Element1);
+print(collection.Element2);
 ```
 
 #### Nullable
@@ -169,6 +169,40 @@ Sugar supports custom data structures: `class`, `struct` and `enum`.
 3. `struct`: A value type that is always created on the stack.
 
 Sugar is garbage collected since it compiles to CIL.
+
+### Memory
+
+The only difference between a class and a struct in sugar is how they're handled in memory.
+
+| Criteria  | Class                 | Struct                                   |
+|:---------:|-----------------------|------------------------------------------|
+| Creation  | Allocated on the heap | Allocated on the stack                   |
+| Arguments | Passed by reference   | Passed by value (unless specified using `ref`) |
+| Returning | Returned a reference  | Returns a copy                           |
+
+```cs
+class Type
+{
+    [public] int: x;
+}
+
+let: a = create Type();
+let: b = a; //references the same instance
+b.x = 10;
+print(a.x) // prints 10
+```
+
+```cs
+struct Type
+{
+    [public] int: x;
+}
+
+let: a = create Type();
+let: b = a; //creates a copy 
+b.x = 10;
+print(a.x) // prints 0
+```
 
 ### Describers
 Taking inspiration from C#'s attributes, which I adore, sugar has describers.

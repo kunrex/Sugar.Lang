@@ -4,10 +4,11 @@
 #include <vector>
 
 #include "../../Creation/Properties/indexer_definition.h"
+#include "../../Core/Interfaces/i_built_in_parametrized.h"
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInIndexer final : public Creation::IndexerDefinition
+    class BuiltInIndexer final : public Creation::IndexerDefinition, public virtual Analysis::Core::Interfaces::IBuiltInParametrized
     {
         protected:
             const bool readable;
@@ -28,6 +29,8 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] unsigned long ParameterCount() const override;
             [[nodiscard]] const Core::DataType* ParameterAt(unsigned long index) const override;
+
+            void PushParameterType(const Core::DataType* type) override;
     };
 }
 

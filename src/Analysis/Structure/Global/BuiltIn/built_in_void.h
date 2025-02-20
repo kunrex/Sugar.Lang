@@ -2,10 +2,11 @@
 #define BUILT_IN_VOID_H
 
 #include "../../Creation/Functions/void_definition.h"
+#include "../../Core/Interfaces/i_built_in_parametrized.h"
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInVoid final : public Creation::VoidDefinition
+    class BuiltInVoid final : public Creation::VoidDefinition, public virtual Analysis::Core::Interfaces::IBuiltInParametrized
     {
         private:
             std::vector<const Core::DataType*> parameters;
@@ -19,6 +20,8 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] unsigned long ParameterCount() const override;
             [[nodiscard]] const Core::DataType* ParameterAt(unsigned long index) const override;
+
+            void PushParameterType(const Core::DataType* type) override;
     };
 }
 

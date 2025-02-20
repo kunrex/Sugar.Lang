@@ -1,6 +1,6 @@
 #include "exception.h"
 
-#include "../../Nodes/Global/BuiltIn/built_in_constructor.h"
+#include "../../Global/BuiltIn/built_in_constructor.h"
 
 #include "./string.h"
 
@@ -16,7 +16,7 @@ namespace Analysis::Structure::Wrappers
 
     void Exception::InitialiseMembers()
     {
-        const auto defaultConstructor = new BuiltInConstructor(&Instance(), "newobj instance void [mscorlib]System.Exception::.ctor(string)");
+        const auto defaultConstructor = new BuiltInConstructor(&Instance(), "call instance void class [System.Runtime]System.Exception::.ctor(string)");
         defaultConstructor->PushParameterType(&String::Instance());
         PushConstructor(defaultConstructor);
     }

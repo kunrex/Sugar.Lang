@@ -59,21 +59,6 @@ namespace Analysis::Creation::Binding
         ExceptionManager::Instance().AddChild(exception);
     }
 
-    void MatchDescriber(const Describable* describable, const Describer expected, const unsigned long index, const SourceFile* const source)
-    {
-        if (!describable->MatchDescriber(expected))
-            ExceptionManager::Instance().AddChild(new InvalidDescriberException(describable->Describer(), expected, index, source));
-    }
-
-    void ValidateDescriber(const Describable* describable, const Describer allowed, const unsigned long index, const DataType* const dataType)
-    {
-        if (!describable->ValidateDescriber(allowed))
-            ExceptionManager::Instance().AddChild(new InvalidDescriberException(describable->Describer(), allowed, index, dataType->Parent()));
-
-        if (dataType->CheckDescriber(Describer::Static) && !describable->CheckDescriber(Describer::Static))
-            ExceptionManager::Instance().AddChild(new StaticBindingException(dataType->FullName(), index, dataType->Parent()));
-    }
-
     const DataType* BindBuiltInType(const BuiltInTypeNode* node)
     {
         switch (node->Kind())

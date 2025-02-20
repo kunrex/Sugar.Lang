@@ -19,4 +19,9 @@ namespace Analysis::Structure::Global
     unsigned long BuiltInCast::ParameterCount() const { return parameters.size(); }
 
     const DataType* BuiltInCast::ParameterAt(const unsigned long index) const { return parameters.at(index); }
+
+    void BuiltInCast::PushParameterType(const DataType* type)
+    {
+        parameters.push_back(type);
+    }
 }

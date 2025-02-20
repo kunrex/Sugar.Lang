@@ -3,7 +3,7 @@
 
 #include "../../../../Services/singleton_service.h"
 
-#include "../../Nodes/DataTypes/struct.h"
+#include "../../DataTypes/struct.h"
 #include "../../Core/Interfaces/i_built_in_type.h"
 
 namespace Analysis::Structure::Wrappers
@@ -14,6 +14,8 @@ namespace Analysis::Structure::Wrappers
             Double();
 
         public:
+            [[nodiscard]] int SlotCount() const override;
+
             void InitialiseMembers() override;
     };
 }

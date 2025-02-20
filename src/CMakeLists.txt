@@ -444,7 +444,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Properties/assigned_property_node.h
         Analysis/Creation/Binding/local_binder.cpp
         Analysis/Creation/Binding/local_binder.h
-        Analysis/Structure/Core/Interfaces/i_generic_class.h
         Analysis/Structure/Global/BuiltIn/built_in_constructor.cpp
         Analysis/Structure/Global/BuiltIn/built_in_constructor.h
         Analysis/Structure/Creation/Functions/function_definition.cpp
@@ -526,4 +525,9 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/property_signature.h
         Analysis/Structure/Global/Functions/function_extensions.cpp
         Analysis/Structure/Global/Functions/function_extensions.h
+        Analysis/Structure/Global/Variables/enum_constant.cpp
+        Analysis/Structure/Global/Variables/enum_constant.h
+        Analysis/Structure/Core/Interfaces/i_built_in_parametrized.h
+        Analysis/Structure/Core/generic_type.cpp
+        Analysis/Structure/Core/generic_type.h
 )

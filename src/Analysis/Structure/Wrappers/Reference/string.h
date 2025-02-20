@@ -3,7 +3,7 @@
 
 #include "../../../../Services/singleton_service.h"
 
-#include "../../Nodes/DataTypes/class.h"
+#include "../../DataTypes/class.h"
 #include "../../Core/Interfaces/i_built_in_type.h"
 
 namespace Analysis::Structure::Wrappers

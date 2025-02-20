@@ -8,18 +8,18 @@ using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::Global
 {
-    Indexer::Indexer(const Enums::Describer describer, const DataType* creationType, const MethodDefinition* get, const VoidDefinition* set) : IndexerDefinition(describer, creationType), get(get), set(set), readable(false), getInstruction(), writable(false), setInstruction()
+    Indexer::Indexer(const Enums::Describer describer, const DataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set) : IndexerDefinition(describer, creationType), get(get), set(set), readable(false), getInstruction(), writable(false), setInstruction()
     {
         if (get != nullptr)
         {
             readable = true;
-            getInstruction = std::format("call {}", get->SignatureString());
+            getInstruction = std::format("call {}", get->FullName());
         }
 
         if (set != nullptr)
         {
             writable = true;
-            setInstruction = std::format("call {}", set->SignatureString());
+            setInstruction = std::format("call {}", set->FullName());
         }
     }
 
