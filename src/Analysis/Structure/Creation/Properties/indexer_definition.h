@@ -3,20 +3,16 @@
 
 #include "../../Core/created.h"
 #include "../../Core/describable.h"
-#include "../../Core/Interfaces/i_function.h"
-#include "../../Core/Interfaces/i_property.h"
-#include "../../Core/Interfaces/i_read_write.h"
+#include "../../Core/property_signature.h"
+#include "../../Core/Interfaces/i_parametrized.h"
 
 #include "../../Global/global_node.h"
 
 namespace Analysis::Structure::Creation
 {
-    class IndexerDefinition : public Global::GlobalNode, public Core::Describable, public Core::Created, public Core::Interfaces::IFunction, public Core::Interfaces::IProperty, public Core::Interfaces::IReadWrite
+    class IndexerDefinition : public Global::GlobalNode, public Core::Describable, public Core::Created, public virtual Core::PropertySignature, public virtual Core::Interfaces::IParametrized
     {
         protected:
-            mutable std::string getSignature;
-            mutable std::string setSignature;
-
             IndexerDefinition(Enums::Describer describer, const Core::DataType* creationType);
     };
 }

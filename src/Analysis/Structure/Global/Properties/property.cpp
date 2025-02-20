@@ -17,7 +17,7 @@ namespace Analysis::Structure::Global
         if (get != nullptr)
         {
             readable = true;
-            getInstruction = std::format("call {}", get->SignatureString());
+            getInstruction = std::format("call {}", get->FullName());
         }
 
         if (set != nullptr)

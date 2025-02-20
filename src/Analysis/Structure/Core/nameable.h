@@ -1,11 +1,11 @@
 #ifndef NAMEABLE_H
 #define NAMEABLE_H
 
-#include "Context/fully_nameable.h"
+#include "Interfaces/i_fully_nameable.h"
 
 namespace Analysis::Structure::Core
 {
-    class Nameable : public FullyNameable
+    class Nameable : public virtual IFullyNameable
     {
         protected:
             const std::string name;

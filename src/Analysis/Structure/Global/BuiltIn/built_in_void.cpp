@@ -11,14 +11,14 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInVoid::BuiltInVoid(const Enums::Describer describer, const string& instruction) : VoidDefinition(instruction, describer), parameters()
-    { }
+    BuiltInVoid::BuiltInVoid(const std::string& name, const Enums::Describer describer, const string& instruction) : VoidDefinition(name, describer), parameters()
+    {
+        fullName = instruction;
+    }
 
     MemberType BuiltInVoid::MemberType() const { return MemberType::BuiltInDefinition; }
 
-    const string& BuiltInVoid::FullName() const { return name; }
-    const string& BuiltInVoid::SignatureString() const { return name; }
-    const string& BuiltInVoid::ArgumentSignatureString() const { return name; }
+    const string& BuiltInVoid::FullName() const { return fullName; }
 
     unsigned long BuiltInVoid::ParameterCount() const { return parameters.size(); }
 

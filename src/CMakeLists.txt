@@ -301,7 +301,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/i_slot_size.h
         Analysis/Structure/Core/DataTypes/user_defined_type.cpp
         Analysis/Structure/Core/DataTypes/user_defined_type.h
-        Analysis/Structure/Core/Context/fully_nameable.h
         Analysis/Structure/Context/Entities/indexed_context_node.cpp
         Analysis/Structure/Context/Entities/indexed_context_node.h
         Analysis/Structure/Local/Variables/local_variable.cpp
@@ -519,8 +518,12 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Creation/variable.h
         Analysis/Structure/Core/Interfaces/i_created.h
         Analysis/Structure/Core/Interfaces/i_describable.h
-        Analysis/Structure/Core/Interfaces/i_property.h
-        Analysis/Structure/Core/Interfaces/i_function.h
+        Analysis/Structure/Core/Interfaces/i_parametrized.h
         Analysis/Structure/DataTypes/data_type_extensions.cpp
         Analysis/Structure/DataTypes/data_type_extensions.h
+        Analysis/Structure/Core/Interfaces/i_fully_nameable.h
+        Analysis/Structure/Core/property_signature.cpp
+        Analysis/Structure/Core/property_signature.h
+        Analysis/Structure/Global/Functions/function_extensions.cpp
+        Analysis/Structure/Global/Functions/function_extensions.h
 )

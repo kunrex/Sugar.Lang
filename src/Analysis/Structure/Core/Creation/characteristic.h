@@ -10,6 +10,8 @@ namespace Analysis::Structure::Core
     class Characteristic : public Global::GlobalNode, public Variable
     {
         protected:
+            mutable std::string fullName;
+
             const ParseNodes::ParseNode* parseNode;
 
             Characteristic(const std::string& name, Enums::Describer describer, const DataType* creationType, const ParseNodes::ParseNode* parseNode);

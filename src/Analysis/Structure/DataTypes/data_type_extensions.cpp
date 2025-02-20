@@ -8,7 +8,7 @@ namespace Analysis::Structure::DataTypes
     constexpr unsigned int prime = 31;
     constexpr unsigned int unique = 0x9e3779b9;
 
-    unsigned long ArgumentHash(const IFunction* const function)
+    unsigned long ArgumentHash(const IParametrized* const function)
     {
         unsigned long typeHash = 0;
 

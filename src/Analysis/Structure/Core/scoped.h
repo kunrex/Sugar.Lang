@@ -15,7 +15,7 @@ namespace Analysis::Structure::Local
 
 namespace Analysis::Structure::Core
 {
-    class Scoped : public virtual Interfaces::INode, public virtual Interfaces::IDescribable, public virtual Interfaces::ICreated, public Services::ConstantCollection<Local::LocalVariable>
+    class Scoped : public Services::ConstantCollection<Local::LocalVariable>, public virtual Interfaces::INode, public virtual Interfaces::IDescribable, public virtual Interfaces::ICreated
     {
         protected:
             const ParseNodes::Groups::ScopeNode* parseNode;
@@ -23,7 +23,7 @@ namespace Analysis::Structure::Core
             mutable unsigned long argumentCount;
             mutable Local::Scope* scope;
 
-            explicit Scoped(const ParseNodes::Groups::ScopeNode* parseNode);
+            Scoped(const ParseNodes::Groups::ScopeNode* parseNode);
 
         public:
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseNode() const;

@@ -13,7 +13,4 @@ namespace Analysis::Structure::Local
     MemberType LocalVariable::MemberType() const { return MemberType::LocalVariable; }
 
     const std::string& LocalVariable::FullName() const { return name; }
-
-    bool LocalVariable::Readable() const { return true; }
-    bool LocalVariable::Writable() const { return true; }
 }

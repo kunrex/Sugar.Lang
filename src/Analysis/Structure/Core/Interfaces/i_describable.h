@@ -13,7 +13,7 @@ namespace Analysis::Structure::Core::Interfaces
             [[nodiscard]] virtual bool MatchDescriber(Enums::Describer expected) const = 0;
             [[nodiscard]] virtual bool CheckDescriber(Enums::Describer describer) const = 0;
 
-            virtual ~IDescribable() = 0;
+            virtual ~IDescribable() = default;
     };
 }
 

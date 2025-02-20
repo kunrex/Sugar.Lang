@@ -11,13 +11,11 @@ namespace Analysis::Structure::Global
             std::vector<const Core::DataType*> parameters;
 
         public:
-            BuiltInMethod(Enums::Describer describer, const Core::DataType* creationType, const std::string& instruction);
+            BuiltInMethod(const std::string& name, Enums::Describer describer, const Core::DataType* creationType, const std::string& instruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
-            [[nodiscard]] const std::string& SignatureString() const override;
-            [[nodiscard]] const std::string& ArgumentSignatureString() const override;
 
             [[nodiscard]] unsigned long ParameterCount() const override;
             [[nodiscard]] const Core::DataType* ParameterAt(unsigned long index) const override;

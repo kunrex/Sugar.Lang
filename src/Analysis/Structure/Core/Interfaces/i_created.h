@@ -10,7 +10,7 @@ namespace Analysis::Structure::Core::Interfaces
         public:
             [[nodiscard]] virtual const DataType* CreationType() const = 0;
 
-            virtual ~ICreated() = 0;
+            virtual ~ICreated() = default;
     };
 }
 

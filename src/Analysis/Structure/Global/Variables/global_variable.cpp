@@ -26,7 +26,4 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    bool GlobalVariable::Readable() const { return true; }
-    bool GlobalVariable::Writable() const { return true; }
 }

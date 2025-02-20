@@ -9,8 +9,8 @@ namespace Analysis::Structure::Global
 {
     BuiltInProperty::BuiltInProperty(const Enums::Describer describer, const string& name, const DataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : PropertyDefinition(name, describer, creationType, nullptr), readable(readable), writable(writable)
     {
-        getSignature = getInstruction;
-        setSignature = setInstruction;
+        this->getInstruction = getInstruction;
+        this->setInstruction = setInstruction;
     }
 
     MemberType BuiltInProperty::MemberType() const { return MemberType::BuiltInProperty; }
@@ -20,6 +20,6 @@ namespace Analysis::Structure::Global
     bool BuiltInProperty::Readable() const { return readable; }
     bool BuiltInProperty::Writable() const { return writable; }
 
-    const std::string& BuiltInProperty::SignatureGetString() const { return getSignature; }
-    const std::string& BuiltInProperty::SignatureSetString() const { return setSignature; }
+    const std::string& BuiltInProperty::SignatureGetString() const { return getInstruction; }
+    const std::string& BuiltInProperty::SignatureSetString() const { return setInstruction; }
 }

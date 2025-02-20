@@ -15,9 +15,6 @@ namespace Analysis::Structure::Local
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
-
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
     };
 }
 

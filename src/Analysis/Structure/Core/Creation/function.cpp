@@ -8,9 +8,6 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Core
 {
-    Function::Function(const Enums::Describer describer, const DataType* const creationType) : Describable(describer), Created(creationType), GlobalNode()
+    Function::Function(const Enums::Describer describer, const DataType* const creationType) : GlobalNode(), Describable(describer), Created(creationType), fullName()
     { }
-
-    bool Function::Readable() const { return true; }
-    bool Function::Writable() const { return false; }
 }

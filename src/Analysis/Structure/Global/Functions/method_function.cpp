@@ -2,6 +2,8 @@
 
 #include <format>
 
+#include "function_extensions.h"
+
 #include "../../Core/DataTypes/data_type.h"
 
 using namespace std;
@@ -21,36 +23,10 @@ namespace Analysis::Structure::Global
 
     const string& MethodFunction::FullName() const
     {
-        if (fullName.empty())
-            fullName = parent->FullName() + "::" + creationType->Name();
+        if (fullName.empty() && parent != nullptr)
+            fullName = std::format("{} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
-    }
-
-    const string& MethodFunction::SignatureString() const
-    {
-        if (signature.empty())
-            signature = std::format("{} {} {} {}{}", CheckDescriber(Describer::Static) ? "" : "instance", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", FullName(), ArgumentSignatureString());
-
-        return signature;
-    }
-
-    const string& MethodFunction::ArgumentSignatureString() const
-    {
-        if (argumentSignature.empty())
-        {
-            argumentSignature += "(";
-            for (int i = 0; i < argumentCount; i++)
-            {
-                argumentSignature += children.at(i)->FullName();
-                if (i < argumentCount - 1)
-                    argumentSignature += " ";
-            }
-
-            argumentSignature += ")";
-        }
-
-        return argumentSignature;
     }
 
     unsigned long MethodFunction::ParameterCount() const { return argumentCount; }

@@ -11,14 +11,12 @@ namespace Analysis::Structure::Global
 {
     BuiltInConstructor::BuiltInConstructor(const DataType* const creationType, const string& instruction) : ConstructorDefinition(Describer::Public, creationType), parameters()
     {
-        signature = instruction;
+        fullName = instruction;
     }
 
     MemberType BuiltInConstructor::MemberType() const { return MemberType::BuiltInConstructor; }
 
-    const string& BuiltInConstructor::SignatureString() const { return signature; }
-
-    const string& BuiltInConstructor::ArgumentSignatureString() const { return signature; }
+    const string& BuiltInConstructor::FullName() const { return fullName; }
 
     unsigned long BuiltInConstructor::ParameterCount() const { return parameters.size(); }
 

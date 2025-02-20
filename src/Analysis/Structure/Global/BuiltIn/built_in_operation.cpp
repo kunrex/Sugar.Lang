@@ -11,14 +11,12 @@ namespace Analysis::Structure::Global
 {
     BuiltInOperation::BuiltInOperation(const SyntaxKind baseOperator, const DataType* const creationType, const string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), parameters()
     {
-        signature = instruction;
+        fullName = instruction;
     }
 
     MemberType BuiltInOperation::MemberType() const { return MemberType::BuiltInOperation; }
 
-    const string& BuiltInOperation::SignatureString() const { return signature; }
-
-    const string& BuiltInOperation::ArgumentSignatureString() const { return signature; }
+    const string& BuiltInOperation::FullName() const { return fullName; }
 
     unsigned long BuiltInOperation::ParameterCount() const { return parameters.size(); }
 

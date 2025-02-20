@@ -9,14 +9,12 @@ namespace Analysis::Structure::Global
 {
     BuiltInCast::BuiltInCast(const DataType* const creationType, const string& instruction) : CastDefinition(Describer::PublicStatic, creationType()), parameters()
     {
-        signature = instruction;
+        fullName = instruction;
     }
 
     MemberType BuiltInCast::MemberType() const { return MemberType::BuiltInCast; }
 
-    const string& BuiltInCast::SignatureString() const { return signature; }
-
-    const string& BuiltInCast::ArgumentSignatureString() const { return signature;}
+    const string& BuiltInCast::FullName() const { return fullName; }
 
     unsigned long BuiltInCast::ParameterCount() const { return parameters.size(); }
 

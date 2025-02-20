@@ -7,14 +7,12 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Local
 {
-    Scope::Scope(const ScopeType type, const string& name, Scoped* const scoped) : LocalNode(), FullyNameable(), ConstantChild(), ConstantCollection(), type(type), scoped(scoped), nested(), variableIndices()
-    {
-        fullName = name;
-    }
+    Scope::Scope(const ScopeType type, const string& name, Scoped* const scoped) : LocalNode(), Nameable(name), ConstantChild(), ConstantCollection(), type(type), scoped(scoped), nested(), variableIndices()
+    { }
 
     MemberType Scope::MemberType() const { return MemberType::Scope; }
 
-    const string& Scope::FullName() const { return fullName; }
+    const string& Scope::FullName() const { return name; }
 
     ScopeType Scope::Type() const { return type; }
 

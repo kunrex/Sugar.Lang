@@ -11,14 +11,14 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInMethod::BuiltInMethod(const Enums::Describer describer, const DataType* const creationType, const string& instruction) : MethodDefinition(instruction, describer, creationType), parameters()
-    { }
+    BuiltInMethod::BuiltInMethod(const string& name, const Enums::Describer describer, const DataType* const creationType, const string& instruction) : MethodDefinition(name, describer, creationType), parameters()
+    {
+        fullName = instruction;
+    }
 
     MemberType BuiltInMethod::MemberType() const { return MemberType::BuiltInDefinition; }
 
-    const string& BuiltInMethod::FullName() const { return name; }
-    const string& BuiltInMethod::SignatureString() const { return name; }
-    const string& BuiltInMethod::ArgumentSignatureString() const { return name; }
+    const string& BuiltInMethod::FullName() const { return fullName; }
 
     unsigned long BuiltInMethod::ParameterCount() const { return parameters.size(); }
 
