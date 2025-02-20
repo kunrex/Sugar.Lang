@@ -11,7 +11,7 @@ namespace Services
             virtual void Print() const;
             virtual void Print(std::string indent, bool last) const;
 
-            virtual ~Printable() = 0;
+            virtual ~Printable() = default;
     };
 }
 
