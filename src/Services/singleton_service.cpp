@@ -31,9 +31,6 @@ namespace Services
         return instance;
     }
 
-    template <class TSingleton>
-    SingletonService<TSingleton>::~SingletonService() = default;
-
     template class SingletonService<ExceptionManager>;
 
     template class SingletonService<Short>;
