@@ -16,7 +16,7 @@ namespace Analysis::Structure::Wrappers
 
     void Exception::InitialiseMembers()
     {
-        const auto defaultConstructor = new BuiltInConstructor(&Instance(), "call instance void class [System.Runtime]System.Exception::.ctor(string)");
+        const auto defaultConstructor = new BuiltInConstructor(this, "call instance void class [System.Runtime]System.Exception::.ctor(string)");
         defaultConstructor->PushParameterType(&String::Instance());
         PushConstructor(defaultConstructor);
     }

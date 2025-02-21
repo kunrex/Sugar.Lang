@@ -45,6 +45,7 @@ namespace ParseNodes::Enums
 
         FunctionCall,
         ConstructorCall,
+        CollectionConstructorCall,
 
         FunctionDeclaration,
         ConstructorDeclaration,

@@ -530,4 +530,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/i_built_in_parametrized.h
         Analysis/Structure/Core/generic_type.cpp
         Analysis/Structure/Core/generic_type.h
+        Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.cpp
+        Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h
 )

@@ -28,7 +28,7 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    unsigned long VoidFunction::ParameterCount() const { return argumentCount; }
+    unsigned long VoidFunction::ParameterCount() const { return parameterCount; }
 
     const DataType* VoidFunction::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

@@ -6,6 +6,7 @@
 #include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
 #include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
 #include "../../Exceptions/Compilation/Parsing/function_argument_exception.h"
+#include "../ParseNodes/Functions/Calling/collection_construction_call_node.h"
 
 using namespace Exceptions;
 
@@ -13,6 +14,7 @@ using namespace Tokens;
 using namespace Tokens::Enums;
 
 using namespace ParseNodes;
+using namespace ParseNodes::Enums;
 using namespace ParseNodes::Groups;
 using namespace ParseNodes::Values;
 using namespace ParseNodes::Statements;
@@ -163,27 +165,10 @@ namespace Parsing
     void Parser::ParseFunctionArguments(NodeCollection<ParseNode>* const function)
     {
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
-
-        while (index < source->TokenCount())
-        {
-            const auto argument = ParseNonEmptyExpression(SeparatorKind::Colon | SeparatorKind::CloseBracket);
-            function->AddChild(argument);
-
-            const auto current = Current();
-            if (MatchToken(current, SyntaxKind::Comma, true))
-                continue;
-            if (MatchToken(current, SyntaxKind::CloseBracket))
-                return;
-
-            ExceptionManager::Instance().AddChild(new InvalidTokenException(current, source));
-            break;
-        }
-
-        function->AddChild(ParseInvalid(SeparatorKind::CloseBracket));
-        TryMatchToken(Current(), SyntaxKind::CloseBracket);
+        ParseExpressionCollection(function, SeparatorKind::CloseBracket);
     }
 
-    const ConstructorCallNode* Parser::ParseConstructorCall()
+    const ParseNode* Parser::ParseConstructorCall()
     {
         const auto keyword = Current();
         index++;
@@ -191,8 +176,20 @@ namespace Parsing
         const auto type = ParseType();
         index++;
 
-        const auto constructor = new ConstructorCallNode(type, keyword);
+        switch (type->NodeType())
+        {
+            case NodeType::ListType:
+            case NodeType::ArrayType:
+                {
+                    if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
+                        return new CollectionConstructorCallNode(type, ParseScopedExpression());
+                }
+                break;
+            default:
+                break;
+        }
 
+        const auto constructor = new ConstructorCallNode(type, keyword);
         ParseFunctionArguments(constructor);
         return constructor;
     }

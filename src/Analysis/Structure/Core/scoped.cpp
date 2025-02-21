@@ -10,21 +10,21 @@ using namespace Analysis::Structure::Local;
 
 namespace Analysis::Structure::Core
 {
-    Scoped::Scoped(const ScopeNode* const parseNode) : ConstantCollection(), parseNode(parseNode), argumentCount(0)
+    Scoped::Scoped(const ScopeNode* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0)
     {
         scope = new Local::Scope(ScopeType::Scope, "", this);
     }
 
     const ScopeNode* Scoped::ParseNode() const { return parseNode; }
 
-    unsigned long Scoped::ArgumentCount() const { return argumentCount; }
+    unsigned long Scoped::ArgumentCount() const { return parameterCount; }
     unsigned long Scoped::VariableCount() const { return children.size(); }
 
     Scope* Scoped::Scope() const { return scope; }
 
-    void Scoped::AddArgument(const LocalVariable* parameter)
+    void Scoped::AddParameter(const LocalVariable* parameter)
     {
-        argumentCount++;
+        parameterCount++;
         AddChild(parameter);
     }
 
@@ -33,9 +33,9 @@ namespace Analysis::Structure::Core
         AddChild(variable);
     }
 
-    std::optional<unsigned long> Scoped::GetArgumentIndex(const std::string& name) const
+    std::optional<unsigned long> Scoped::GetParameterIndex(const std::string& name) const
     {
-        for (int i = 0; i < argumentCount; i++)
+        for (int i = 0; i < parameterCount; i++)
             if (children.at(i)->Name() == name)
                 return i;
 

@@ -24,12 +24,12 @@ namespace Analysis::Structure::Global
     const string& Constructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("instance void {} {}::{}{}", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("call instance void {} {}::{}{}", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
 
-    unsigned long Constructor::ParameterCount() const { return argumentCount; }
+    unsigned long Constructor::ParameterCount() const { return parameterCount; }
 
     const DataType* Constructor::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

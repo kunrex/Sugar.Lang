@@ -244,7 +244,7 @@ namespace Analysis::Creation::Binding
                 actualDescriber = actualDescriber | Describer::Static;
 
             set = new VoidFunction(setName, actualDescriber, setNode->Body());
-            set->AddArgument(new FunctionParameter("value", Describer::None, creationType));
+            set->AddParameter(new FunctionParameter("value", Describer::None, creationType));
         }
 
         return std::make_tuple(get, set);
@@ -324,7 +324,7 @@ namespace Analysis::Creation::Binding
             const auto identifier = current.Name()->Value();
             const auto creationType = parameters.at(i);
 
-            if (scope->GetArgumentIndex(identifier))
+            if (scope->GetParameterIndex(identifier))
             {
                 PushException(new DuplicateVariableDefinitionException(index, source));
                 continue;
@@ -333,7 +333,7 @@ namespace Analysis::Creation::Binding
             const auto parameter = new FunctionParameter(identifier, FromNode(current.Describer()), creationType);
             ValidateDescriber(parameter, creationType->MemberType() == MemberType::Class ? Describer::None : Describer::Ref, index, source);
 
-            scope->AddArgument(parameter);
+            scope->AddParameter(parameter);
         }
     }
 
@@ -356,10 +356,10 @@ namespace Analysis::Creation::Binding
             set = new VoidFunction(std::string(set_indexer_name), actualDescriber, setNode->Body());
             BindFunctionParameters(set, parameters, declarationNode, source);
 
-            if (set->GetArgumentIndex("value"))
+            if (set->GetParameterIndex("value"))
                 PushException(new DuplicateVariableDefinitionException(declarationNode->Index(), source));
             else
-                set->AddArgument(new FunctionParameter("value", Describer::None, creationType));
+                set->AddParameter(new FunctionParameter("value", Describer::None, creationType));
         }
 
         return std::make_tuple(get, set);

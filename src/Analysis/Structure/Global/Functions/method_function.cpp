@@ -29,7 +29,7 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    unsigned long MethodFunction::ParameterCount() const { return argumentCount; }
+    unsigned long MethodFunction::ParameterCount() const { return parameterCount; }
 
     const DataType* MethodFunction::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

@@ -40,7 +40,7 @@ namespace Parsing
         index++;
 
         const auto identifier = ParseIdentifier(true);
-        const auto body = ParseScope();
+        const auto body = ParseScopedExpression();
 
         return new EnumNode(describer, identifier, body, keyword);
     }

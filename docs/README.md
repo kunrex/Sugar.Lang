@@ -92,36 +92,49 @@ These data types are built into sugar:
 Sugar supports the collections mentioned above.
 1. `array`:
 ```c++
-array<int>: collection = create array<int>(3);
+let: collection = create array<int>(3);
+
 collection[2] = 3;
 print(collection[2]);
 ```
 2. `list`:
 ```c++
-list<int>: collection = create list<int>();
+let: collection = create list<int>();
+
 collection.Add(5);
 print(collection[0]);
+```
+
+- You may create arrays and lists using the { } expression too
+```
+let: array = create array<int> { 1, 2, 3 };
+let: list = create list<int> { 1, 2, 3, 4, 5 };
 ```
 
 3.  `dictionary`:
 ```c++
 let: collection = create dictionary<int, string>();;
-collection[10] = "ten";
+
+collection.Add(10, "ten");
 print(collection[10]);
 ```
 
 4.  `tuple`:
 ```c++
 let: collection = create tuple<int, string>(1, "one");
+
 print(collection.Element1);
 print(collection.Element2);
 ```
 
 #### Nullable
 ```cs
-let: nullableInt = create nullable<int>(null);
-if (nullableInt == null)
+let: nullableInt = create nullable<int>(); // int with value "null"
+
+if (nullableInt.IsNull)
     print("int is null");
+
+print(nullableInt.Value); // will throw an error as the value is "null"
 ```
 
 > Nullable wraps around value types only and is itself a value type.
@@ -184,24 +197,34 @@ The only difference between a class and a struct in sugar is how they're handled
 class Type
 {
     [public] int: x;
+    
+    [public] void Modify() { x = 10; }
 }
 
 let: a = create Type();
-let: b = a; //references the same instance
-b.x = 10;
+let: b = a; // references the same instance
+
+b.Modify();
+
 print(a.x) // prints 10
+print(b.x) // prints 10
 ```
 
 ```cs
 struct Type
 {
     [public] int: x;
+    
+    [public] void Modify() { x = 10; }
 }
 
 let: a = create Type();
-let: b = a; //creates a copy 
-b.x = 10;
+let: b = a; // creates a copy
+
+b.Modify();
+
 print(a.x) // prints 0
+print(b.x) // prints 10
 ```
 
 ### Describers

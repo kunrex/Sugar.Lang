@@ -24,12 +24,12 @@ namespace Analysis::Structure::Global
     const string& ImplicitCast::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} {} {}::{}{}", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("call {} {} {}::{}{}", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
 
-    unsigned long ImplicitCast::ParameterCount() const { return argumentCount; }
+    unsigned long ImplicitCast::ParameterCount() const { return parameterCount; }
 
     const DataType* ImplicitCast::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

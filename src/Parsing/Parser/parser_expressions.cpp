@@ -493,28 +493,44 @@ namespace Parsing
         return generic;
     }
 
-    const IndexerExpressionNode* Parser::ParseIndexerExpression(const ParseNode* const operand)
+    void Parser::ParseExpressionCollection(NodeCollection<ParseNode>* const collection, const SeparatorKind breakSeparator)
     {
-        TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true);
-
-        const auto indexer = new IndexerExpressionNode(operand);
         while (index < source->TokenCount())
         {
-            const auto expression = ParseNonEmptyExpression(SeparatorKind::Comma | SeparatorKind::BoxCloseBracket);
-            indexer->AddChild(expression);
+            const auto expression = ParseNonEmptyExpression(SeparatorKind::Comma | breakSeparator);
+            collection->AddChild(expression);
 
             const auto current = Current();
             if (MatchToken(current, SyntaxKind::Comma, true))
                 continue;
-            if (MatchToken(current, SyntaxKind::BoxCloseBracket))
-                return indexer;
+            if (MatchSeparator(current, breakSeparator))
+                return;
 
             ExceptionManager::Instance().AddChild(new InvalidTokenException(current, source));
             break;
         }
 
-        indexer->AddChild(ParseInvalid(SeparatorKind::BoxCloseBracket));
-        TryMatchToken(Current(), SyntaxKind::BoxCloseBracket);
+        collection->AddChild(ParseInvalid(breakSeparator);
+        TryMatchSeparator(Current(), breakSeparator);
+    }
+
+    const ScopeNode* Parser::ParseScopedExpression()
+    {
+        TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
+
+        const auto scope = new ScopeNode(index - 1);
+        ParseExpressionCollection(scope, SeparatorKind::FlowerCloseBracket);
+
+        return scope;
+    }
+
+    const IndexerExpressionNode* Parser::ParseIndexerExpression(const ParseNode* const operand)
+    {
+        TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true);
+
+        const auto indexer = new IndexerExpressionNode(operand);
+        ParseExpressionCollection(indexer, SeparatorKind::BoxCloseBracket);
+
         return indexer;
     }
 

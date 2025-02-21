@@ -20,10 +20,10 @@ namespace Analysis::Structure::Core
         protected:
             const ParseNodes::Groups::ScopeNode* parseNode;
 
-            mutable unsigned long argumentCount;
+            mutable unsigned long parameterCount;
             mutable Local::Scope* scope;
 
-            Scoped(const ParseNodes::Groups::ScopeNode* parseNode);
+            explicit Scoped(const ParseNodes::Groups::ScopeNode* parseNode);
 
         public:
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseNode() const;
@@ -33,10 +33,10 @@ namespace Analysis::Structure::Core
 
             [[nodiscard]] Local::Scope* Scope() const;
 
-            void AddArgument(const Local::LocalVariable* parameter);
+            void AddParameter(const Local::LocalVariable* parameter);
             void AddLocalVariable(const Local::LocalVariable* variable);
 
-            [[nodiscard]] std::optional<unsigned long> GetArgumentIndex(const std::string& name) const;
+            [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const;
 
             [[nodiscard]] const Local::LocalVariable* VariableAt(unsigned long i) const;
     };

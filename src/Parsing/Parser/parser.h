@@ -75,7 +75,10 @@ namespace Parsing
             void ClearStack(const Tokens::Token& top, std::stack<const ParseNodes::ParseNode*>& output);
             void ClearStack(std::stack<const Tokens::Token*>& stack, std::stack<const ParseNodes::ParseNode*>& output);
 
+            void ParseExpressionCollection(ParseNodes::NodeCollection<ParseNodes::ParseNode>* collection, Tokens::Enums::SeparatorKind breakSeparator);
+
             [[nodiscard]] const ParseNodes::Groups::GenericNode* ParseGeneric();
+            [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseScopedExpression();
             [[nodiscard]] const ParseNodes::Expressions::IndexerExpressionNode* ParseIndexerExpression(const ParseNodes::ParseNode* operand);
 
             [[nodiscard]] const ParseNodes::ParseNode* ParseType();
@@ -94,7 +97,7 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Functions::Calling::FuncRefNode* ParseFuncRefCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::ToStringNode* ParseToStringCall();
 
-            [[nodiscard]] const ParseNodes::Functions::Calling::ConstructorCallNode* ParseConstructorCall();
+            [[nodiscard]] const ParseNodes::ParseNode* ParseConstructorCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FunctionCallNode* ParseFunctionCall(const ParseNodes::Values::IdentifierNode* identifier);
 
             [[nodiscard]] const ParseNodes::Properties::BasePropertyNode* ParseProperty(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::ParseNode* type, const ParseNodes::Values::IdentifierNode* identifier);
