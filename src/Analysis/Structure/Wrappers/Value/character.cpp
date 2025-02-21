@@ -20,7 +20,7 @@ constexpr std::string cil_boolean = "[System.Runtime]System.Char";
 
 namespace Analysis::Structure::Wrappers
 {
-    Character::Character() : Struct(cil_boolean, Describer::Public), SingletonService()
+    Character::Character() : ValueType(cil_boolean, Describer::Public), SingletonService()
     { }
 
     int Character::SlotCount() const { return 1; }

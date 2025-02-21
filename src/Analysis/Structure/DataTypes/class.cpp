@@ -14,14 +14,20 @@ using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::DataTypes
 {
-    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer)
+    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer), fullName()
     { }
 
     MemberType Class::MemberType() const { return MemberType::Class; }
 
     int Class::SlotCount() const { return 1; }
 
-    const string& Class::FullName() const { return name; }
+    const string& Class::FullName() const
+    {
+        if (fullName.empty() && parent != nullptr)
+            fullName = parent->FullName() + "." + name;
+
+        return fullName;
+    }
 
     void Class::PushCharacteristic(Characteristic* const characteristic)
     {

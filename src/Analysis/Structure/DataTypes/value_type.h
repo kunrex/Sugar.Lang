@@ -1,5 +1,5 @@
-#ifndef STRUCT_H
-#define STRUCT_H
+#ifndef VALUE_TYPE_H
+#define VALUE_TYPE_H
 
 #include <map>
 
@@ -8,10 +8,11 @@
 
 namespace Analysis::Structure::DataTypes
 {
-    class Struct : public Core::DataType
+    class ValueType : public Core::DataType
     {
         protected:
             mutable int slotCount;
+            mutable std::string fullName;
 
             std::map<std::string, Core::Characteristic*> characteristics;
 
@@ -27,7 +28,7 @@ namespace Analysis::Structure::DataTypes
             std::map<Tokens::Enums::SyntaxKind, Creation::OverloadDefinition*> overloads;
 
         public:
-            Struct(const std::string& name, Enums::Describer describer);
+            ValueType(const std::string& name, Enums::Describer describer);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
             [[nodiscard]] int SlotCount() const override;
@@ -56,10 +57,10 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] std::vector<const Core::Characteristic*> AllCharacteristics() const override;
 
-            ~Struct() override;
+            ~ValueType() override;
     };
 
-    class StructSource final : public Struct, public Core::UserDefinedType
+    class StructSource final : public ValueType, public Core::UserDefinedType
     {
         public:
             StructSource(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);

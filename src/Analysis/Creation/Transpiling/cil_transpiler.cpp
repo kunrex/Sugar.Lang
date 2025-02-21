@@ -122,7 +122,7 @@ namespace Analysis::Creation
             case MemberType::Class:
                 stringBuilder->PushLine(std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_class));
                 break;
-            case MemberType::Struct:
+            case MemberType::ValueType:
                 stringBuilder->PushLine(std::format(".class {} {} {} {} {} {} {}", dataType->Describer(), prefix_auto, prefix_ansi, prefix_sealed, dataType->Name(), prefix_extends, ms_core_struct));
                 break;
             default:

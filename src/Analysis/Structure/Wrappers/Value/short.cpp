@@ -22,7 +22,7 @@ constexpr std::string cil_double = "[System.Runtime]System.Int16";
 
 namespace Analysis::Structure::Wrappers
 {
-    Short::Short() : Struct(cil_double, Describer::Public), SingletonService()
+    Short::Short() : ValueType(cil_double, Describer::Public), SingletonService()
     { }
 
     void Short::InitialiseMembers()

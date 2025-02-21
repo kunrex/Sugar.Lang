@@ -232,8 +232,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/DataTypes/data_type.h
         Analysis/Structure/DataTypes/class.cpp
         Analysis/Structure/DataTypes/class.h
-        Analysis/Structure/DataTypes/struct.cpp
-        Analysis/Structure/DataTypes/struct.h
+        Analysis/Structure/DataTypes/value_type.cpp
+        Analysis/Structure/DataTypes/value_type.h
         Analysis/Structure/DataTypes/enum.cpp
         Analysis/Structure/DataTypes/enum.h
         Analysis/Structure/Core/Creation/characteristic.cpp
@@ -525,8 +525,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/property_signature.h
         Analysis/Structure/Global/Functions/function_extensions.cpp
         Analysis/Structure/Global/Functions/function_extensions.h
-        Analysis/Structure/Global/Variables/enum_constant.cpp
-        Analysis/Structure/Global/Variables/enum_constant.h
+        Analysis/Structure/Global/Variables/enum_field.cpp
+        Analysis/Structure/Global/Variables/enum_field.h
         Analysis/Structure/Core/Interfaces/i_built_in_parametrized.h
         Analysis/Structure/Core/generic_type.cpp
         Analysis/Structure/Core/generic_type.h

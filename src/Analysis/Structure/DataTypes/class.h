@@ -11,6 +11,8 @@ namespace Analysis::Structure::DataTypes
     class Class : public Core::DataType
     {
         protected:
+            mutable std::string fullName;
+
             std::map<std::string, Core::Characteristic*> characteristics;
 
             std::map<unsigned long, Creation::FunctionDefinition*> functions;

@@ -11,15 +11,21 @@ namespace Analysis::Structure::DataTypes
     class Enum final : public Core::DataType, public Core::UserDefinedType
     {
         protected:
+            mutable std::string fullName;
+            DataType* const valueImplementation;
+
             std::map<std::string, Core::Characteristic*> characteristics;
+            Creation::FunctionDefinition* values;
 
         public:
-            Enum(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
+            Enum(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton, DataType* valueImplementation);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            [[nodiscard]] DataType* ValueImplementation() const;
 
             void PushCharacteristic(Core::Characteristic* characteristic) override;
             const Core::Characteristic* FindCharacteristic(const std::string& name) const override;

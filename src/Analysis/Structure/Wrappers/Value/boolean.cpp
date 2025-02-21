@@ -16,7 +16,7 @@ constexpr std::string cil_boolean = "[System.Runtime]System.Boolean";
 
 namespace Analysis::Structure::Wrappers
 {
-    Boolean::Boolean() : Struct(cil_boolean, Enums::Describer::Public), SingletonService()
+    Boolean::Boolean() : ValueType(cil_boolean, Enums::Describer::Public), SingletonService()
     { }
 
     int Boolean::SlotCount() const { return 1; }

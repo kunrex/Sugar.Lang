@@ -22,7 +22,7 @@ constexpr std::string cil_double = "[System.Runtime]System.Single";
 
 namespace Analysis::Structure::Wrappers
 {
-    Float::Float() : Struct(cil_double, Describer::Public), SingletonService()
+    Float::Float() : ValueType(cil_double, Describer::Public), SingletonService()
     { }
 
     int Float::SlotCount() const { return 1; }

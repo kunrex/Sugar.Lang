@@ -7,9 +7,10 @@ namespace Analysis::Structure::Enums
     {
         Enum,
         Class,
-        Struct,
+        ValueType,
 
         Field,
+        EnumField,
 
         Property,
         BuiltInProperty,

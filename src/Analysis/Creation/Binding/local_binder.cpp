@@ -235,7 +235,7 @@ namespace Analysis::Creation::Binding
                     {
                         if (type == &Object::Instance())
                         {
-                            if (value->CreationType()->MemberType() == MemberType::Struct)
+                            if (value->CreationType()->MemberType() == MemberType::ValueType)
                                 scope->AddChild(new BoxCastExpression(value));
                             else
                                 scope->AddChild(value);
@@ -937,7 +937,7 @@ namespace Analysis::Creation::Binding
 
                     if (type == &Object::Instance())
                     {
-                        if (operand->CreationType()->MemberType() == MemberType::Struct)
+                        if (operand->CreationType()->MemberType() == MemberType::ValueType)
                             return new BoxCastExpression(operand);
 
                         return operand;

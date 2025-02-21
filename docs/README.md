@@ -177,15 +177,10 @@ int: result = invoke(add, 10, 20);
 ## Data Structures
 
 Sugar supports custom data structures: `class`, `struct` and `enum`.
-1. `enum`: A type that can store multiple compile type constant integer values.
-2. `class`: A reference type that is always created on the heap.
-3. `struct`: A value type that is always created on the stack.
 
-Sugar is garbage collected since it compiles to CIL.
+### Memory Implications (`class` vs `struct`)
 
-### Memory
-
-The only difference between a class and a struct in sugar is how they're handled in memory.
+Sugar is garbage collected since it compiles to CIL. The only difference between a class and a struct in sugar is how they're handled in memory.
 
 | Criteria  | Class                 | Struct                                   |
 |:---------:|-----------------------|------------------------------------------|
@@ -225,6 +220,51 @@ b.Modify();
 
 print(a.x) // prints 0
 print(b.x) // prints 10
+```
+
+### Enums
+Enums in sugar are a collection of immutable constant values. Members can be initialised to any compile time constant number, character, boolean, string or expression of the same. They can also be null.
+```cs
+enum Colors
+{
+    Red = "Red",
+    Blue = "Blue",
+    Green = "Green",
+    
+    None = null
+}
+
+enum EncodingBase
+{
+    Binary = 2,
+    Octal = 8,
+    Hex = 16,
+    Base64 = 64
+}
+```
+
+If values are left implicit to the compiler, then the value is stored as null.
+
+An implication of this behaviour is that enum members are unique but can contain the same value. Sugar resolves this by introducing the `value` property. The `name` property returns the name of the enum value as a string.
+
+You may also get all members using the `Values` function as an array. 
+```cs
+enum MyEnum
+{
+    Elem1, // = 0, first element
+    Elem2 = 2, // would be initialised to 1 if implicit to the compiler
+    
+    Elem3 // = 2, fourth element
+}
+
+let: enumValue = MyEnum.Elem2;
+
+print(enumValue == MyEnum.Elem3); //false
+print(enumValue.value == MyEnum.Elem3.value); //true
+
+print(enumValue.name); // "Elem1"
+
+print(MyEnum.Values()); // { MyEnum.Elem1, MyEnum.Elem2, MyEnum.Elem3 }
 ```
 
 ### Describers

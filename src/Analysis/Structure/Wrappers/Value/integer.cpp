@@ -22,7 +22,7 @@ constexpr std::string cil_double = "[System.Runtime]System.Int32";
 
 namespace Analysis::Structure::Wrappers
 {
-    Integer::Integer() : Struct(cil_double, Describer::Public), SingletonService()
+    Integer::Integer() : ValueType(cil_double, Describer::Public), SingletonService()
     { }
 
     int Integer::SlotCount() const { return 1; }

@@ -3,12 +3,12 @@
 
 #include "../../../../Services/singleton_service.h"
 
-#include "../../DataTypes/struct.h"
+#include "../../DataTypes/value_type.h"
 #include "../../Core/Interfaces/i_built_in_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Boolean final : public DataTypes::Struct, public Services::SingletonService<Boolean>, public Analysis::Core::Interfaces::IBuiltInType
+    class Boolean final : public DataTypes::ValueType, public Services::SingletonService<Boolean>, public Analysis::Core::Interfaces::IBuiltInType
     {
         protected:
             Boolean();

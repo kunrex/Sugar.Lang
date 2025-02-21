@@ -2,12 +2,15 @@
 
 #include "../../Global/BuiltIn/built_in_method.h"
 #include "../../Global/BuiltIn/built_in_indexer.h"
+#include "../../Global/BuiltIn/built_in_operation.h"
 #include "../../Global/BuiltIn/built_in_property.h"
 
 #include "../Value/integer.h"
 #include "../Value/boolean.h"
 #include "../Value/character.h"
 #include "../Generic/array.h"
+
+using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
@@ -85,5 +88,15 @@ namespace Analysis::Structure::Wrappers
         const auto indexer = new BuiltInIndexer(&Character::Instance(), true, "instance char class [System.Runtime]System.String::get_Chars(int32)", false, "");
         indexer->PushParameterType(&Integer::Instance());
         PushIndexer(indexer);
+
+        const auto concatenation = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "call string class [System.Runtime]System.String::Concat(string, string)");
+        concatenation->PushParameterType(&Instance());
+        concatenation->PushParameterType(&Instance());
+        PushOverload(concatenation);
+
+        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "call class [System.Linq]System.Collections.Generic.IEnumerable`1<string> [System.Linq]System.Linq.Enumerable::Repeat<string>(!!0, int32) call string [System.Runtime]System.String::Concat(class [System.Runtime]System.Collections.Generic.IEnumerable`1<string>)");
+        multiplication->PushParameterType(&Instance());
+        multiplication->PushParameterType(&Integer::Instance());
+        PushOverload(concatenation);
     }
 }

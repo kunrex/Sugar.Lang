@@ -1,4 +1,4 @@
-#include "struct.h"
+#include "value_type.h"
 
 #include "data_type_extensions.h"
 
@@ -18,14 +18,14 @@ constexpr int word_size = 8;
 
 namespace Analysis::Structure::DataTypes
 {
-    Struct::Struct(const string& name, const Enums::Describer describer) : DataType(name, describer)
+    ValueType::ValueType(const string& name, const Enums::Describer describer) : DataType(name, describer)
     {
         slotCount = 0;
     }
 
-    MemberType Struct::MemberType() const { return MemberType::Struct; }
+    MemberType ValueType::MemberType() const { return MemberType::ValueType; }
 
-    int Struct::SlotCount() const
+    int ValueType::SlotCount() const
     {
         if (slotCount == 0)
         {
@@ -47,84 +47,90 @@ namespace Analysis::Structure::DataTypes
         return slotCount;
     }
 
-    const std::string& Struct::FullName() const { return name; }
+    const string& ValueType::FullName() const
+    {
+        if (fullName.empty() && parent != nullptr)
+            fullName = parent->FullName() + "." + name;
 
-    void Struct::PushCharacteristic(Characteristic* const characteristic)
+        return fullName;
+    }
+
+    void ValueType::PushCharacteristic(Characteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    const Characteristic* Struct::FindCharacteristic(const string& name) const
+    const Characteristic* ValueType::FindCharacteristic(const string& name) const
     {
         return characteristics.contains(name) ? nullptr : characteristics.at(name);
     }
 
-    void Struct::PushFunction(FunctionDefinition* function)
+    void ValueType::PushFunction(FunctionDefinition* function)
     {
         functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
     }
 
-    const FunctionDefinition* Struct::FindFunction(const string& name, const std::vector<const DataType*>& argumentList) const
+    const FunctionDefinition* ValueType::FindFunction(const string& name, const std::vector<const DataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
 
-    void Struct::PushConstructor(ConstructorDefinition* constructor)
+    void ValueType::PushConstructor(ConstructorDefinition* constructor)
     {
         constructors[ArgumentHash(constructor)] = constructor;
     }
 
-    const ConstructorDefinition* Struct::FindConstructor(const std::vector<const DataType*>& argumentList) const
+    const ConstructorDefinition* ValueType::FindConstructor(const std::vector<const DataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return constructors.contains(hash) ? nullptr : constructors.at(hash);
     }
 
-    void Struct::PushIndexer(IndexerDefinition* indexer)
+    void ValueType::PushIndexer(IndexerDefinition* indexer)
     {
         indexers[ArgumentHash(indexer)] = indexer;
     }
 
-    const IndexerDefinition* Struct::FindIndexer(const std::vector<const DataType*>& argumentList) const
+    const IndexerDefinition* ValueType::FindIndexer(const std::vector<const DataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return indexers.contains(hash) ? nullptr : indexers.at(hash);
     }
 
-    void Struct::PushImplicitCast(CastDefinition* cast)
+    void ValueType::PushImplicitCast(CastDefinition* cast)
     {
         implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const CastDefinition* Struct::FindImplicitCast(const DataType* returnType, const DataType* fromType) const
+    const CastDefinition* ValueType::FindImplicitCast(const DataType* returnType, const DataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
     }
 
-    void Struct::PushExplicitCast(CastDefinition* cast)
+    void ValueType::PushExplicitCast(CastDefinition* cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const CastDefinition* Struct::FindExplicitCast(const DataType* returnType, const DataType* fromType) const
+    const CastDefinition* ValueType::FindExplicitCast(const DataType* returnType, const DataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
-    void Struct::PushOverload(OverloadDefinition* overload)
+    void ValueType::PushOverload(OverloadDefinition* overload)
     {
         overloads[overload->Operator()] = overload;
     }
 
-    const OverloadDefinition* Struct::FindOverload(const SyntaxKind base) const
+    const OverloadDefinition* ValueType::FindOverload(const SyntaxKind base) const
     {
         return overloads.at(base);
     }
 
-    std::vector<const Characteristic*> Struct::AllCharacteristics() const
+    std::vector<const Characteristic*> ValueType::AllCharacteristics() const
     {
         std::vector<const Characteristic*> all;
         for (const auto& characteristic : characteristics)
@@ -133,7 +139,7 @@ namespace Analysis::Structure::DataTypes
         return all;
     }
 
-    Struct::~Struct()
+    ValueType::~ValueType()
     {
         for (const auto& characteristic : characteristics)
             delete characteristic.second;
@@ -157,7 +163,7 @@ namespace Analysis::Structure::DataTypes
             delete overload.second;
     }
 
-    StructSource::StructSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : Struct(name, describer), UserDefinedType(skeleton)
+    StructSource::StructSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : ValueType(name, describer), UserDefinedType(skeleton)
     { }
 
     const string& StructSource::FullName() const

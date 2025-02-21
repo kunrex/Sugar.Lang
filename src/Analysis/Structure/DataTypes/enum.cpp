@@ -1,5 +1,14 @@
 #include "enum.h"
 
+#include <format>
+
+#include "data_type_extensions.h"
+
+#include "../Global/BuiltIn/built_in_method.h"
+#include "../Global/Functions/method_function.h"
+
+#include "../Wrappers/Generic/array.h"
+
 using namespace std;
 
 using namespace Tokens::Enums;
@@ -8,11 +17,13 @@ using namespace ParseNodes::DataTypes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : DataType(name, describer), UserDefinedType(skeleton)
+    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton, DataType* const valueImplementation) : DataType(name, describer | Describer::Static), UserDefinedType(skeleton), valueImplementation(valueImplementation)
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
@@ -27,6 +38,8 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
+    DataType* Enum::ValueImplementation() const { return valueImplementation; }
+
     void Enum::PushCharacteristic(Characteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -38,11 +51,23 @@ namespace Analysis::Structure::DataTypes
     }
 
     void Enum::PushFunction(FunctionDefinition* function)
-    { }
+    {
+        if (values == nullptr)
+            values = function;
+    }
 
     const FunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const DataType*>& argumentList) const
     {
-        return nullptr;
+        if (values == nullptr)
+            return nullptr;
+
+        if (name != values->Name())
+            return nullptr;
+
+        if (!argumentList.empty())
+            return nullptr;
+
+        return values;
     }
 
     void Enum::PushConstructor(ConstructorDefinition* constructor)

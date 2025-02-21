@@ -120,7 +120,7 @@ namespace Analysis::Creation::Binding
         const auto typeNode = generic->GetChild(0);
 
         const auto type = BindDataType(typeNode, source);
-        if (type->MemberType() != MemberType::Struct)
+        if (type->MemberType() != MemberType::ValueType)
             ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in nullable<T>.", typeNode->Index(), source));
 
         return Nullable::Instance(type);

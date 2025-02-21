@@ -1,6 +1,7 @@
 #include "project_binder.h"
 
 #include <regex>
+#include <format>
 #include <sstream>
 
 #include "binder_extensions.h"
@@ -14,7 +15,7 @@
 
 #include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/DataTypes/class.h"
-#include "../../Structure/DataTypes/struct.h"
+#include "../../Structure/DataTypes/value_type.h"
 
 using namespace Exceptions;
 
@@ -50,10 +51,14 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->Describer());
-        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node);
+
+        const auto enumValues = new Class(std::format("{}_VALUES", identifier), Describer::PublicStatic);
+        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node, enumValues);
 
         ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
+
         sourceFile->AddChild(enumSource->Name(), enumSource);
+        sourceFile->AddChild(enumValues->Name(), enumValues);
     }
 
     void CreateClass(const DataTypeNode* const node, SourceFile* const sourceFile)

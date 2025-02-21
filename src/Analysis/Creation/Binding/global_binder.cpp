@@ -31,7 +31,7 @@
 
 #include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/DataTypes/class.h"
-#include "../../Structure/DataTypes/struct.h"
+#include "../../Structure/DataTypes/value_type.h"
 
 #include "../../Structure/Global/Properties/indexer.h"
 #include "../../Structure/Global/Properties/property.h"
@@ -44,9 +44,10 @@
 #include "../../Structure/Global/Functions/void_function.h"
 #include "../../Structure/Global/Functions/method_function.h"
 #include "../../Structure/Global/Functions/operator_overload.h"
-#include "../../Structure/Global/Variables/enum_constant.h"
+#include "../../Structure/Global/Variables/enum_field.h"
 
 #include "../../Structure/Local/Variables/function_parameter.h"
+#include "../../Structure/Wrappers/Reference/object.h"
 
 #include "../../Structure/Wrappers/Value/integer.h"
 
@@ -54,6 +55,7 @@ using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
+using namespace ParseNodes;
 using namespace ParseNodes::Enums;
 using namespace ParseNodes::Values;
 using namespace ParseNodes::Groups;
@@ -110,9 +112,11 @@ namespace Analysis::Creation::Binding
             PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void BindEnumExpression(const ExpressionStatementNode* const expressionNode, DataType* const dataType)
+    void BindEnumExpression(const ParseNode* const expression, Enum* const dataType)
     {
-        switch (const auto expression = expressionNode->Expression(); expression->NodeType())
+        const auto valuesType = dataType->ValueImplementation();
+
+        switch (expression->NodeType())
         {
             case NodeType::Identifier:
                 {
@@ -126,7 +130,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumConstant(value));
+                    dataType->PushCharacteristic(new EnumField(value, valuesType));
                 }
                 break;
             case NodeType::Binary:
@@ -156,7 +160,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumConstant(value, casted.RHS()));
+                    dataType->PushCharacteristic(new EnumField(value, valuesType));
                 }
                 break;
             default:
@@ -638,7 +642,7 @@ namespace Analysis::Creation::Binding
             switch (child->NodeType())
             {
                 case NodeType::Expression:
-                    BindEnumExpression(dynamic_cast<const ExpressionStatementNode*>(child), enumSource);
+                    BindEnumExpression(child, enumSource);
                     break;
                 default:
                     PushException(new InvalidGlobalStatementException(child->Index(), enumSource->Parent()));
@@ -745,7 +749,7 @@ namespace Analysis::Creation::Binding
                 case MemberType::Class:
                     BindClass(dynamic_cast<ClassSource*>(type));
                     break;
-                case MemberType::Struct:
+                case MemberType::ValueType:
                     BindStruct(dynamic_cast<StructSource*>(type));
                     break;
                 default:
