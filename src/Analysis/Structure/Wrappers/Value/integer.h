@@ -4,11 +4,11 @@
 #include "../../../../Services/singleton_service.h"
 
 #include "../../DataTypes/value_type.h"
-#include "../../Core/Interfaces/i_built_in_type.h"
+#include "../../Core/Interfaces/DataTypes/i_built_in_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Integer : public DataTypes::ValueType, public Services::SingletonService<Integer>, public Analysis::Core::Interfaces::IBuiltInType
+    class Integer : public DataTypes::ValueType, public Services::SingletonService<Integer>, private virtual Core::Interfaces::IBuiltInType
     {
         protected:
             Integer();

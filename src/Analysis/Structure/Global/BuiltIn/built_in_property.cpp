@@ -7,7 +7,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInProperty::BuiltInProperty(const Enums::Describer describer, const string& name, const DataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : PropertyDefinition(name, describer, creationType, nullptr), readable(readable), writable(writable)
+    BuiltInProperty::BuiltInProperty(const Enums::Describer describer, const string& name, const Interfaces::IDataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : PropertyDefinition(name, describer, creationType, nullptr), readable(readable), writable(writable)
     {
         this->getInstruction = getInstruction;
         this->setInstruction = setInstruction;

@@ -14,10 +14,11 @@ using namespace ParseNodes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const DataType* const creationType, const Groups::ScopeNode* const body) : Nameable(std::format("__operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
+    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : Nameable(std::format("__operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
     { }
 
     MemberType OperatorOverload::MemberType() const { return MemberType::OperatorOverload; }
@@ -29,8 +30,4 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    unsigned long OperatorOverload::ParameterCount() const { return parameterCount; }
-
-    const DataType* OperatorOverload::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

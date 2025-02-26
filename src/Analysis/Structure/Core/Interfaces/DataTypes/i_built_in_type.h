@@ -1,7 +1,7 @@
 #ifndef I_BUILT_IN_TYPE_H
 #define I_BUILT_IN_TYPE_H
 
-namespace Analysis::Core::Interfaces
+namespace Analysis::Structure::Core::Interfaces
 {
     class IBuiltInType
     {

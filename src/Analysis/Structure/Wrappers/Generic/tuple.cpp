@@ -13,7 +13,6 @@
 
 using namespace std;
 
-using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
@@ -25,7 +24,7 @@ namespace Analysis::Structure::Wrappers
     Tuple::Tuple() : Class("Tuple", Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
     { }
 
-    const Tuple* Tuple::Instance(const std::vector<const DataType*>& types)
+    const Tuple* Tuple::Instance(const std::vector<const IDataType*>& types)
     {
         static std::map<unsigned long, const Tuple*> map;
 

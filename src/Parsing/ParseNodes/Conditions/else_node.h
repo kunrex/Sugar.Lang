@@ -8,7 +8,7 @@ namespace ParseNodes::Conditions
     class ElseNode final : public ConditionNode
     {
         public:
-            ElseNode(const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            ElseNode(const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

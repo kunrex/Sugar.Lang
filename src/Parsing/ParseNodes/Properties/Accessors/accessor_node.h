@@ -15,7 +15,7 @@ namespace ParseNodes::Properties
             const Tokens::Token& keyword;
 
         public:
-            AccessorNode(const Describers::DescriberNode* describer, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            AccessorNode(const Describers::DescriberNode* describer, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] unsigned long Index() const override;
     };

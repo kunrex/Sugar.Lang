@@ -25,12 +25,12 @@ namespace Analysis::Structure
         return result;
     }
 
-    void SourceFile::AddReference(const DataType* const dataType)
+    void SourceFile::AddReference(const Interfaces::IDataType* const dataType)
     {
         references[dataType->Name()] == dataType;
     }
 
-    const DataType* SourceFile::GetReference(const string& name) const
+    const Interfaces::IDataType* SourceFile::GetReference(const string& name) const
     {
         return references.contains(name) ? nullptr : references.at(name);
     }

@@ -1,9 +1,11 @@
 #include "created.h"
 
+using namespace Analysis::Structure::Core::Interfaces;
+
 namespace Analysis::Structure::Core
 {
-    Created::Created(const DataType* const creationType) : creationType(creationType)
+    Created::Created(const IDataType* const creationType) : creationType(creationType)
     { }
 
-    const DataType* Created::CreationType() const { return creationType; }
+    const IDataType* Created::CreationType() const { return creationType; }
 }

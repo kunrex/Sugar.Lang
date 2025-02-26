@@ -14,18 +14,18 @@ namespace Analysis::Structure::DataTypes
             mutable int slotCount;
             mutable std::string fullName;
 
-            std::map<std::string, Core::Characteristic*> characteristics;
+            std::map<std::string, Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::map<unsigned long, Creation::FunctionDefinition*> functions;
+            std::map<unsigned long, Core::Interfaces::IFunctionDefinition*> functions;
 
-            std::map<unsigned long, Creation::ConstructorDefinition*> constructors;
+            std::map<unsigned long, Core::Interfaces::IFunction*> constructors;
 
-            std::map<unsigned long, Creation::IndexerDefinition*> indexers;
+            std::map<unsigned long, Core::Interfaces::IIndexerDefinition*> indexers;
 
-            std::map<unsigned long, Creation::CastDefinition*> implicitCasts;
-            std::map<unsigned long, Creation::CastDefinition*> explicitCasts;
+            std::map<unsigned long, Core::Interfaces::IFunction*> implicitCasts;
+            std::map<unsigned long, Core::Interfaces::IFunction*> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, Creation::OverloadDefinition*> overloads;
+            std::map<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*> overloads;
 
         public:
             ValueType(const std::string& name, Enums::Describer describer);
@@ -35,27 +35,25 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            void PushCharacteristic(Core::Characteristic* characteristic) override;
-            const Core::Characteristic* FindCharacteristic(const std::string& name) const override;
+            void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
+            const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
-            void PushFunction(Creation::FunctionDefinition* function) override;
-            const Creation::FunctionDefinition* FindFunction(const std::string& name, const std::vector<const DataType*>& argumentList) const override;
+            void PushFunction(Core::Interfaces::IFunctionDefinition* function) override;
+            const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            void PushConstructor(Creation::ConstructorDefinition* constructor) override;
-            const Creation::ConstructorDefinition* FindConstructor(const std::vector<const DataType*>& argumentList) const override;
+            void PushConstructor(Core::Interfaces::IFunction* constructor) override;
+            const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
-            void PushIndexer(Creation::IndexerDefinition* indexer) override;
-            const Creation::IndexerDefinition* FindIndexer(const std::vector<const DataType*>& argumentList) const override;
+            void PushIndexer(Core::Interfaces::IIndexerDefinition* indexer) override;
+            const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 
-            void PushImplicitCast(Creation::CastDefinition* cast) override;
-            const Creation::CastDefinition* FindImplicitCast(const DataType* returnType, const DataType* fromType) const override;
-            void PushExplicitCast(Creation::CastDefinition* cast) override;
-            const Creation::CastDefinition* FindExplicitCast(const DataType* returnType, const DataType* fromType) const override;
+            void PushImplicitCast(Core::Interfaces::IFunction* cast) override;
+            const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+            void PushExplicitCast(Core::Interfaces::IFunction* cast) override;
+            const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
-            void PushOverload(Creation::OverloadDefinition* overload) override;
-            const Creation::OverloadDefinition* FindOverload(Tokens::Enums::SyntaxKind base) const override;
-
-            [[nodiscard]] std::vector<const Core::Characteristic*> AllCharacteristics() const override;
+            void PushOverload(Core::Interfaces::IOperatorOverload* overload) override;
+            const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
 
             ~ValueType() override;
     };
@@ -66,6 +64,8 @@ namespace Analysis::Structure::DataTypes
             StructSource(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            std::vector<const Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
     };
 }
 

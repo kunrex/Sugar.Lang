@@ -8,7 +8,7 @@ namespace ParseNodes::Loops
     class DoWhileNode final : public LoopNode
     {
         public:
-            DoWhileNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            DoWhileNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

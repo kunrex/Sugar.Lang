@@ -12,7 +12,7 @@ namespace Analysis::Structure::Global
             const bool writable;
 
         public:
-            BuiltInProperty(Enums::Describer describer, const std::string& name, const Core::DataType* creationType, bool readable, const std::string& getInstruction, bool writable, const std::string& setInstruction);
+            BuiltInProperty(Enums::Describer describer, const std::string& name, const Core::Interfaces::IDataType* creationType, bool readable, const std::string& getInstruction, bool writable, const std::string& setInstruction);
 
             [[nodiscard]]Enums::MemberType MemberType() const override;
 

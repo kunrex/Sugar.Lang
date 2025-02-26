@@ -4,13 +4,14 @@
 #include "../created.h"
 #include "../nameable.h"
 #include "../describable.h"
+#include "../DataTypes/data_type.h"
 
 namespace Analysis::Structure::Core
 {
-    class Variable : public Nameable, public Describable, public Created
+    class Variable : public Nameable, public Describable, public Created, public virtual Interfaces::IVariable
     {
         protected:
-            Variable(const std::string& name, Enums::Describer describer, const DataType* creationType);
+            Variable(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType);
     };
 }
 

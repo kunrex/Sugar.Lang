@@ -214,12 +214,12 @@ struct Type
 }
 
 let: a = create Type();
-let: b = a; // creates a copy
+let: b = a; // creates a copy (even without explicitly using `create`)
 
-b.Modify();
+a.Modify(); // no copies are created, the original is modified but the copy created earlier is unchanged.
 
-print(a.x) // prints 0
-print(b.x) // prints 10
+print(a.x) // prints 10
+print(b.x) // prints 0
 ```
 
 ### Enums
@@ -291,21 +291,39 @@ Describers can contain the following keywords:
 2. `public`: An access specifier for public items.
 3. `private`: An access specifier for private items.
 
-4. `ref`: Allows passing a value type by reference into a function.
+4. `ref`: Allows reference like behaviour with structs.
+
+### The `ref` keyword 
+
+`ref` is special in sugar because it lets you avoid struct copying, this is useful when you have large structs. 
+The `ref` function is used to obtain references of values. It expects one argument which must be a variable.
 
 ```cs
-void FunctionDescribers([ref] int: x)
-{
-    x = 10;
-}
+let: x = 20;
+[ref] int: y = ref(x); 
 
-int: a = 20;
-PassByReference(a);
-
-print(a); //prints 10
+y = 10;
+print(x); // prints 10
 ```
 
-> This behaviour is also applicable when functions are used as delegates
+A referenced struct is treated as a different data type. `copy` is used to create a value copy of the reference.
+
+A few more rules with references:
+1. References must be initialized and cannot be reassigned. This ensures validity of lifetimes.
+2. Member fields and properties cannot be of a reference type and functions cannot return a reference type.
+
+```cs
+int FunctionDescribers([ref] int: x)
+{
+    return copy(x = 10);
+}
+
+let: a = 20;
+let: b = PassByReference(a);
+
+print(++b); //prints 11
+print(a); //prints 10
+```
 
 ### Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
@@ -386,7 +404,7 @@ import "..directory.sub_directory.file.Class";
 
 let: x = create Class(param1, param2);
 ```
-Importing a directory imports all files whereas importing a file imports all public structures within it.
+Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 
 ## Questions ?!
 So yes there a few things here. No try-catch-finally statements, no switch statements, no generics, no destructors and may have even noticed that there is no static constructor either.
@@ -396,25 +414,25 @@ But the big question: What about OOP? In the original C# version it was included
 Will I add it? Maybe but sugar is functional. I'm not an OOP skeptic, I love it on the contrary. But it was too much for this project.
 That's not to say there's no chance of me revisiting it in the future. Here's the syntax I had planned for generics and OOP:
 ```cs
-[public]
 interface IArea<TDimension : INumeric> 
 {
     [public] TDimension Area();
 }
 
-[public, asbtract]
 class Shape<TDimension : INumeric> : IArea<TDiemsion>
 {
-    string: name { [public] get; }
+    [public] string: name { [public] get; }
     
     [protected]
     constructor(string: name) 
     {
         this.name = name;
     }
+    
+    [public, abstract]
+    TDimension Area();
 }
 
-[public]
 class Square : Shape<int>
 {
    [private] int side;
@@ -422,10 +440,9 @@ class Square : Shape<int>
    [public]
    constructor(string: name, int: side) : super(name)
    {
-       this.name = name;
        this.side = side;
    }    
    
-   [public] int Area() { return side * side; }
+   [public, override] int Area() { return side * side; }
 }
 ```

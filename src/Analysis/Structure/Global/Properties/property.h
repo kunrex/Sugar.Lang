@@ -17,8 +17,8 @@ namespace Analysis::Structure::Global
             mutable std::string setInstruction;
 
         public:
-            Property(const std::string& name, Enums::Describer describer, const Core::DataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set);
-            Property(const std::string& name, Enums::Describer describer, const Core::DataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set, const ParseNodes::ParseNode* value);
+            Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set);
+            Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set, const ParseNodes::ParseNode* value);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

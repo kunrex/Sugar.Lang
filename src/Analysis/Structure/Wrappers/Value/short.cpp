@@ -25,6 +25,8 @@ namespace Analysis::Structure::Wrappers
     Short::Short() : ValueType(cil_double, Describer::Public), SingletonService()
     { }
 
+    int Short::SlotCount() const { return 1; }
+
     void Short::InitialiseMembers()
     {
         PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "Max", &Instance(), true, "ldc.i2 32767", false, ""));

@@ -1,13 +1,11 @@
-#ifndef GENERIC_CLASS_H
-#define GENERIC_CLASS_H
+#ifndef GENERIC_TYPE_H
+#define GENERIC_TYPE_H
 
 #include <string>
 
-#include "Interfaces/i_fully_nameable.h"
-
 namespace Analysis::Structure::Core
 {
-    class GenericType : public virtual IFullyNameable
+    class GenericType
     {
         protected:
             mutable std::string genericSignature;
@@ -15,5 +13,6 @@ namespace Analysis::Structure::Core
             GenericType();
     };
 }
+
 
 #endif

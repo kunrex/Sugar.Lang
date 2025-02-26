@@ -10,6 +10,7 @@
 #include "../../Parsing/ParseNodes/Groups/source_file_node.h"
 
 #include "source_object.h"
+#include "Core/Interfaces/DataTypes/i_data_type.h"
 
 namespace Analysis::Structure
 {
@@ -21,7 +22,7 @@ namespace Analysis::Structure
 
             ParseNodes::Groups::SourceFileNode* sourceNode;
 
-            std::unordered_map<std::string, const Core::DataType*> references;
+            std::unordered_map<std::string, const Core::Interfaces::IDataType*> references;
 
         public:
             SourceFile(const std::string& name, std::string source);
@@ -30,8 +31,8 @@ namespace Analysis::Structure
 
             bool AddChild(std::string key, Core::DataType* value) override;
 
-            void AddReference(const Core::DataType* dataType);
-            [[nodiscard]] const Core::DataType* GetReference(const std::string& name) const;
+            void AddReference(const Core::Interfaces::IDataType* dataType);
+            [[nodiscard]] const Core::Interfaces::IDataType* GetReference(const std::string& name) const;
 
             [[nodiscard]] unsigned long SourceLength() const;
             [[nodiscard]] char SourceAt(unsigned long i) const;

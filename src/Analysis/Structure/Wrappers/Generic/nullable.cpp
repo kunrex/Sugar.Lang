@@ -21,12 +21,12 @@ constexpr std::string cil_nullable = "[System.Runtime]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const DataType* const nullableType) : ValueType(cil_nullable, Describer::Public), nullableType(nullableType)
+    Nullable::Nullable(const IDataType* const nullableType) : ValueType(cil_nullable, Describer::Public), nullableType(nullableType)
     {
         slotCount = 0;
     }
 
-    const Nullable* Nullable::Instance(const DataType* const dataType)
+    const Nullable* Nullable::Instance(const IDataType* const dataType)
     {
         static std::map<unsigned long, const Nullable*> map;
 

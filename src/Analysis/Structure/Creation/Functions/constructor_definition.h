@@ -8,7 +8,7 @@ namespace Analysis::Structure::Creation
     class ConstructorDefinition : public Core::Function
     {
         protected:
-            ConstructorDefinition(Enums::Describer describer, const Core::DataType* creationType);
+            ConstructorDefinition(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
     };
 }
 

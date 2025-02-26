@@ -1,11 +1,11 @@
 #ifndef DESCRIBABLE_NODE_H
 #define DESCRIBABLE_NODE_H
 
-#include "../Describers/describer_node.h"
+#include "Interfaces/i_describable_node.h"
 
 namespace ParseNodes::Core
 {
-    class DescribableNode
+    class DescribableNode : public virtual Interfaces::IDescribableNode
     {
         protected:
             const Describers::DescriberNode* describer;
@@ -13,9 +13,9 @@ namespace ParseNodes::Core
             explicit DescribableNode(const Describers::DescriberNode* describer);
 
         public:
-            [[nodiscard]] const Describers::DescriberNode* Describer() const;
+            [[nodiscard]] const Describers::DescriberNode* Describer() const override;
 
-            virtual ~DescribableNode();
+            ~DescribableNode() override;
     };
 }
 

@@ -13,10 +13,11 @@ using namespace ParseNodes::Groups;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    MethodFunction::MethodFunction(const string& name, const Enums::Describer describer, const DataType* const creationType, const ScopeNode* const body) : MethodDefinition(name, describer, creationType), Scoped(body)
+    MethodFunction::MethodFunction(const string& name, const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : MethodDefinition(name, describer, creationType), Scoped(body)
     { }
 
     MemberType MethodFunction::MemberType() const { return MemberType::MethodDefinition; }
@@ -28,8 +29,4 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    unsigned long MethodFunction::ParameterCount() const { return parameterCount; }
-
-    const DataType* MethodFunction::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

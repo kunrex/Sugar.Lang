@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    KeywordFunctionNode::KeywordFunctionNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const ScopeNode* const body, const Token& keyword) : FunctionNode(describer, type, parameters, body), keyword(keyword)
+    KeywordFunctionNode::KeywordFunctionNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const NodeCollection<ParseNode>* const body, const Token& keyword) : FunctionNode(describer, type, parameters, body), keyword(keyword)
     { }
 
     unsigned long KeywordFunctionNode::Index() const { return keyword.Index(); }

@@ -13,10 +13,11 @@ using namespace ParseNodes::Groups;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    Constructor::Constructor(const Enums::Describer describer, const DataType* const creationType, const ScopeNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
+    Constructor::Constructor(const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
     { }
 
     MemberType Constructor::MemberType() const { return MemberType::Constructor; }
@@ -28,9 +29,5 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    unsigned long Constructor::ParameterCount() const { return parameterCount; }
-
-    const DataType* Constructor::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }
 

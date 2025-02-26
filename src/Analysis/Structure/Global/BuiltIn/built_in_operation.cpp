@@ -9,7 +9,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInOperation::BuiltInOperation(const SyntaxKind baseOperator, const DataType* const creationType, const string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), parameters()
+    BuiltInOperation::BuiltInOperation(const SyntaxKind baseOperator, const Interfaces::IDataType* const creationType, const string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), BuiltInFunction()
     {
         fullName = instruction;
     }
@@ -17,13 +17,4 @@ namespace Analysis::Structure::Global
     MemberType BuiltInOperation::MemberType() const { return MemberType::BuiltInOperation; }
 
     const string& BuiltInOperation::FullName() const { return fullName; }
-
-    unsigned long BuiltInOperation::ParameterCount() const { return parameters.size(); }
-
-    const DataType* BuiltInOperation::ParameterAt(const unsigned long index) const { return parameters.at(index); }
-
-    void BuiltInOperation::PushParameterType(const DataType* type)
-    {
-        parameters.push_back(type);
-    }
 }

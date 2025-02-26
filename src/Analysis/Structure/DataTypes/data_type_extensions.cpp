@@ -18,7 +18,7 @@ namespace Analysis::Structure::DataTypes
         return typeHash * unique + (typeHash << 6) + (typeHash >> 2);
     }
 
-    unsigned long ArgumentHash(const std::vector<const DataType*>& argumentList)
+    unsigned long ArgumentHash(const std::vector<const IDataType*>& argumentList)
     {
         unsigned long typeHash = 0;
 

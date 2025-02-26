@@ -20,10 +20,10 @@ using namespace Analysis::Structure::DataTypes;
 
 namespace Analysis::Structure::Wrappers
 {
-    Array::Array(const DataType* const arrayType) : Class(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonCollection(), arrayType(arrayType)
+    Array::Array(const IDataType* const arrayType) : Class(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonCollection(), arrayType(arrayType)
     { }
 
-    const Array* Array::Instance(const DataType* const dataType)
+    const Array* Array::Instance(const IDataType* const dataType)
     {
         static std::map<unsigned long, const Array*> map;
 

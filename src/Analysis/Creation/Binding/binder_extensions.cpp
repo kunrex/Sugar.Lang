@@ -2,8 +2,6 @@
 
 #include "../../../Exceptions/log_exception.h"
 #include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/static_binding_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/type_exception.h"
 
 #include "../../../Parsing/ParseNodes/Types/Created/created_type_node.h"
@@ -51,6 +49,7 @@ using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Creation::Binding
 {
@@ -59,7 +58,7 @@ namespace Analysis::Creation::Binding
         ExceptionManager::Instance().AddChild(exception);
     }
 
-    const DataType* BindBuiltInType(const BuiltInTypeNode* node)
+    const IDataType* BindBuiltInType(const BuiltInTypeNode* node)
     {
         switch (node->Kind())
         {
@@ -88,7 +87,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const DataType* BindArray(const ArrayTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindArray(const ArrayTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
         const auto typeNode = generic->GetChild(0);
@@ -96,7 +95,7 @@ namespace Analysis::Creation::Binding
         return Array::Instance(BindDataType(typeNode, source));
     }
 
-    const DataType* BindList(const ListTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindList(const ListTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
         const auto typeNode = generic->GetChild(0);
@@ -104,7 +103,7 @@ namespace Analysis::Creation::Binding
         return List::Instance(BindDataType(typeNode, source));
     }
 
-    const DataType* BindDictionary(const DictionaryTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindDictionary(const DictionaryTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
 
@@ -114,7 +113,7 @@ namespace Analysis::Creation::Binding
         return Dictionary::Instance(BindDataType(keyNode, source), BindDataType(valueNode, source));
     }
 
-    const DataType* BindNullable(const NullableTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindNullable(const NullableTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
         const auto typeNode = generic->GetChild(0);
@@ -126,40 +125,40 @@ namespace Analysis::Creation::Binding
         return Nullable::Instance(type);
     }
 
-    const DataType* BindTuple(const TupleTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindTuple(const TupleTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
 
-        std::vector<const DataType*> types;
+        std::vector<const IDataType*> types;
         for (const auto typeNode : *generic)
             types.push_back(BindDataType(typeNode, source));
 
         return Tuple::Instance(types);
     }
 
-    const DataType* BindAction(const ActionTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindAction(const ActionTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
 
-        std::vector<const DataType*> types;
+        std::vector<const IDataType*> types;
         for (const auto typeNode : *generic)
             types.push_back(BindDataType(typeNode, source));
 
         return Action::Instance(types);
     }
 
-    const DataType* BindFunc(const FuncTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindFunc(const FuncTypeNode* const node, const SourceFile* const source)
     {
         const auto generic = node->Generic();
 
-        std::vector<const DataType*> types;
+        std::vector<const IDataType*> types;
         for (const auto typeNode : *generic)
             types.push_back(BindDataType(typeNode, source));
 
         return Func::Instance(types);
     }
 
-    const DataType* BindDataType(const ParseNode* const node, const SourceFile* const source)
+    const IDataType* BindDataType(const ParseNode* const node, const SourceFile* const source)
     {
         switch (node->NodeType())
         {

@@ -13,7 +13,7 @@ namespace ParseNodes::Conditions
 
             const Tokens::Token& keyword;
 
-            ConditionNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            ConditionNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
         public:
             [[nodiscard]] virtual const ParseNode* Condition() const;

@@ -9,10 +9,11 @@ using namespace std;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    Property::Property(const string& name, const Enums::Describer describer, const DataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set) : PropertyDefinition(name, describer, creationType, nullptr), readable(false), getInstruction(), writable(false), setInstruction()
+    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set) : PropertyDefinition(name, describer, creationType, nullptr), readable(false), getInstruction(), writable(false), setInstruction()
     {
         if (get != nullptr)
         {
@@ -23,22 +24,22 @@ namespace Analysis::Structure::Global
         if (set != nullptr)
         {
             writable = true;
-            setInstruction = std::format("call {}", set->SignatureString());
+            setInstruction = std::format("call {}", set->FullName());
         }
     }
 
-    Property::Property(const string& name, const Enums::Describer describer, const DataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set, const ParseNodes::ParseNode* const value) : PropertyDefinition(name, describer, creationType, value), readable(false), getInstruction(), writable(false), setInstruction()
+    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set, const ParseNodes::ParseNode* const value) : PropertyDefinition(name, describer, creationType, value), readable(false), getInstruction(), writable(false), setInstruction()
     {
         if (get != nullptr)
         {
             readable = true;
-            getInstruction = std::format("call {}", get->SignatureString());
+            getInstruction = std::format("call {}", get->FullName());
         }
 
         if (set != nullptr)
         {
             writable = true;
-            setInstruction = std::format("call {}", set->SignatureString());
+            setInstruction = std::format("call {}", set->FullName());
         }
     }
 

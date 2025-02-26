@@ -8,7 +8,7 @@ namespace ParseNodes::Functions::Creation
     class ConstructorCreationNode final : public KeywordFunctionNode
     {
         public:
-            ConstructorCreationNode(const Describers::DescriberNode* describer, const Groups::CompoundDeclarationNode* parameters, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            ConstructorCreationNode(const Describers::DescriberNode* describer, const Groups::CompoundDeclarationNode* parameters, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

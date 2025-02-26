@@ -9,7 +9,7 @@ namespace Analysis::Creation::Binding
 {
     void PushException(const Exceptions::LogException* exception);
 
-    const Structure::Core::DataType* BindDataType(const ParseNodes::ParseNode* node, const Structure::SourceFile* source);
+    const Structure::Core::Interfaces::IDataType* BindDataType(const ParseNodes::ParseNode* node, const Structure::SourceFile* source);
 }
 
 #endif

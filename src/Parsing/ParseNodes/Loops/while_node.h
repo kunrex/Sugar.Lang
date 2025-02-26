@@ -8,7 +8,7 @@ namespace ParseNodes::Loops
     class WhileNode final : public LoopNode
     {
         public:
-            WhileNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            WhileNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

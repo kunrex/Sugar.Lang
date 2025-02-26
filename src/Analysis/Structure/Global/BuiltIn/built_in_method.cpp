@@ -11,7 +11,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInMethod::BuiltInMethod(const string& name, const Enums::Describer describer, const DataType* const creationType, const string& instruction) : MethodDefinition(name, describer, creationType), parameters()
+    BuiltInMethod::BuiltInMethod(const string& name, const Enums::Describer describer, const Interfaces::IDataType* const creationType, const string& instruction) : MethodDefinition(name, describer, creationType), BuiltInFunction()
     {
         fullName = instruction;
     }
@@ -19,13 +19,4 @@ namespace Analysis::Structure::Global
     MemberType BuiltInMethod::MemberType() const { return MemberType::BuiltInDefinition; }
 
     const string& BuiltInMethod::FullName() const { return fullName; }
-
-    unsigned long BuiltInMethod::ParameterCount() const { return parameters.size(); }
-
-    const DataType* BuiltInMethod::ParameterAt(const unsigned long index) const { return parameters.at(index); }
-
-    void BuiltInMethod::PushParameterType(const DataType* type)
-    {
-        parameters.push_back(type);
-    }
 }

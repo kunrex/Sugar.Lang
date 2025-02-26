@@ -11,7 +11,7 @@ namespace ParseNodes::Functions::Creation
             const Tokens::Token& base;
 
         public:
-            OperatorOverloadNode(const Describers::DescriberNode* describer, const ParseNode* type, const Tokens::Token& base, const Groups::CompoundDeclarationNode* parameters, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            OperatorOverloadNode(const Describers::DescriberNode* describer, const ParseNode* type, const Tokens::Token& base, const Groups::CompoundDeclarationNode* parameters, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

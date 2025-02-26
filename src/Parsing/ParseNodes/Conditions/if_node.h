@@ -8,7 +8,7 @@ namespace ParseNodes::Conditions
     class IfNode final : public ConditionNode
     {
         public:
-            IfNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            IfNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

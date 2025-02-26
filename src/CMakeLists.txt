@@ -411,7 +411,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Wrappers/Generic/dictionary.h
         Analysis/Structure/Wrappers/Generic/tuple.cpp
         Analysis/Structure/Wrappers/Generic/tuple.h
-        Analysis/Structure/Core/Interfaces/i_built_in_type.h
         Analysis/Structure/Wrappers/Reference/object.cpp
         Analysis/Structure/Wrappers/Reference/object.h
         Analysis/Structure/Wrappers/Value/Integer.cpp
@@ -517,19 +516,35 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Creation/variable.h
         Analysis/Structure/Core/Interfaces/i_created.h
         Analysis/Structure/Core/Interfaces/i_describable.h
-        Analysis/Structure/Core/Interfaces/i_parametrized.h
         Analysis/Structure/DataTypes/data_type_extensions.cpp
         Analysis/Structure/DataTypes/data_type_extensions.h
         Analysis/Structure/Core/Interfaces/i_fully_nameable.h
-        Analysis/Structure/Core/property_signature.cpp
-        Analysis/Structure/Core/property_signature.h
         Analysis/Structure/Global/Functions/function_extensions.cpp
         Analysis/Structure/Global/Functions/function_extensions.h
         Analysis/Structure/Global/Variables/enum_field.cpp
         Analysis/Structure/Global/Variables/enum_field.h
-        Analysis/Structure/Core/Interfaces/i_built_in_parametrized.h
-        Analysis/Structure/Core/generic_type.cpp
-        Analysis/Structure/Core/generic_type.h
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h
+        Parsing/ParseNodes/Core/Interfaces/i_body_node.h
+        Parsing/ParseNodes/Core/Interfaces/i_describable_node.h
+        Parsing/ParseNodes/Core/Interfaces/i_entity_node.h
+        Parsing/ParseNodes/Core/Interfaces/i_nameable_node.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_data_type.h
+        Analysis/Structure/Core/Interfaces/i_nameable.h
+        Analysis/Structure/Core/Interfaces/Creation/i_function.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_built_in_type.h
+        Analysis/Structure/Core/Interfaces/Creation/i_parametrized.h
+        Analysis/Structure/Core/Interfaces/Creation/i_built_in_function.h
+        Analysis/Structure/Core/Interfaces/Creation/i_variable.h
+        Analysis/Structure/Core/Interfaces/Creation/i_function_definition.h
+        Analysis/Structure/Core/Interfaces/Creation/i_property_signature.h
+        Analysis/Structure/Core/Creation/property_signature.cpp
+        Analysis/Structure/Core/Creation/property_signature.h
+        Analysis/Structure/Core/DataTypes/generic_type.cpp
+        Analysis/Structure/Core/DataTypes/generic_type.h
+        Analysis/Structure/Core/Interfaces/Creation/i_indexer_definition.h
+        Analysis/Structure/Core/Interfaces/Creation/i_characteristic.h
+        Analysis/Structure/Core/Interfaces/Creation/i_operator_overload.h
+        Analysis/Structure/Core/built_in_function.cpp
+        Analysis/Structure/Core/built_in_function.h
 )

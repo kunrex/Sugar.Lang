@@ -16,7 +16,7 @@ namespace ParseNodes::Loops
             const Tokens::Token& keyword;
 
         public:
-            LoopNode(const ParseNode* condition, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            LoopNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
             [[nodiscard]] const ParseNode* Condition() const;
 

@@ -24,10 +24,10 @@ constexpr std::string cil_list = "[System.Collections.Generic]System.Collections
 
 namespace Analysis::Structure::Wrappers
 {
-    List::List(const DataType* const listType) : Class(cil_list, Describer::Public), SingletonCollection(), listType(listType)
+    List::List(const IDataType* const listType) : Class(cil_list, Describer::Public), SingletonCollection(), listType(listType)
     { }
 
-    const List* List::Instance(const DataType* const dataType)
+    const List* List::Instance(const IDataType* const dataType)
     {
         static std::map<unsigned long, const List*> map;
 

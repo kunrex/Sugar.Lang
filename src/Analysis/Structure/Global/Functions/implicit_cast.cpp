@@ -13,10 +13,11 @@ using namespace ParseNodes::Groups;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    ImplicitCast::ImplicitCast(const Enums::Describer describer, const DataType* const creationType, const ScopeNode* const body) : Nameable(std::format("__implicit__{}", creationType->Name())), CastDefinition(describer, creationType), Scoped(body)
+    ImplicitCast::ImplicitCast(const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : Nameable(std::format("__implicit__{}", creationType->Name())), CastDefinition(describer, creationType), Scoped(body)
     { }
 
     MemberType ImplicitCast::MemberType() const { return MemberType::ImplicitCast; }
@@ -28,8 +29,4 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    unsigned long ImplicitCast::ParameterCount() const { return parameterCount; }
-
-    const DataType* ImplicitCast::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }

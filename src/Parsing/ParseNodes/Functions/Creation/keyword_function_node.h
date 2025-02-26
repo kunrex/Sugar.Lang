@@ -11,7 +11,7 @@ namespace ParseNodes::Functions::Creation
         protected:
             const Tokens::Token& keyword;
 
-            KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const Groups::ScopeNode* body, const Tokens::Token& keyword);
+            KeywordFunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
 
         public:
             [[nodiscard]] unsigned long Index() const override;

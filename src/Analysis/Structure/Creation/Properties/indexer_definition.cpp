@@ -1,9 +1,10 @@
 #include "indexer_definition.h"
 
 using namespace Analysis::Structure::Core;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Creation
 {
-    IndexerDefinition::IndexerDefinition(const Enums::Describer describer, const DataType* const creationType) : GlobalNode(), Describable(describer), Created(creationType)
+    IndexerDefinition::IndexerDefinition(const Enums::Describer describer, const IDataType* const creationType) : GlobalNode(), Describable(describer), Created(creationType)
     { }
 }

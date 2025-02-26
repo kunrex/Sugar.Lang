@@ -20,7 +20,7 @@ namespace Analysis::Structure::Global
             mutable std::string setInstruction;
 
         public:
-            Indexer(Enums::Describer describer, const Core::DataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set);
+            Indexer(Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -31,7 +31,7 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& SignatureSetString() const override;
 
             [[nodiscard]] unsigned long ParameterCount() const override;
-            [[nodiscard]] const Core::DataType* ParameterAt(unsigned long index) const override;
+            [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
     };
 }
 

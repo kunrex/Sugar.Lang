@@ -8,7 +8,7 @@ namespace Analysis::Structure::Local
     class FunctionParameter final : public LocalVariable
     {
         public:
-            FunctionParameter(const std::string& name, Enums::Describer describer, const Core::DataType* creationType);
+            FunctionParameter(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
     };

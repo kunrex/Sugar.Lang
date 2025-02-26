@@ -12,7 +12,7 @@ using namespace ParseNodes::DataTypes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr int word_size = 8;
 
@@ -55,88 +55,79 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    void ValueType::PushCharacteristic(Characteristic* const characteristic)
+    void ValueType::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    const Characteristic* ValueType::FindCharacteristic(const string& name) const
+    const ICharacteristic* ValueType::FindCharacteristic(const string& name) const
     {
         return characteristics.contains(name) ? nullptr : characteristics.at(name);
     }
 
-    void ValueType::PushFunction(FunctionDefinition* function)
+    void ValueType::PushFunction(IFunctionDefinition* function)
     {
         functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
     }
 
-    const FunctionDefinition* ValueType::FindFunction(const string& name, const std::vector<const DataType*>& argumentList) const
+    const IFunctionDefinition* ValueType::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
 
-    void ValueType::PushConstructor(ConstructorDefinition* constructor)
+    void ValueType::PushConstructor(IFunction* constructor)
     {
         constructors[ArgumentHash(constructor)] = constructor;
     }
 
-    const ConstructorDefinition* ValueType::FindConstructor(const std::vector<const DataType*>& argumentList) const
+    const IFunction* ValueType::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return constructors.contains(hash) ? nullptr : constructors.at(hash);
     }
 
-    void ValueType::PushIndexer(IndexerDefinition* indexer)
+    void ValueType::PushIndexer(IIndexerDefinition* indexer)
     {
         indexers[ArgumentHash(indexer)] = indexer;
     }
 
-    const IndexerDefinition* ValueType::FindIndexer(const std::vector<const DataType*>& argumentList) const
+    const IIndexerDefinition* ValueType::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return indexers.contains(hash) ? nullptr : indexers.at(hash);
     }
 
-    void ValueType::PushImplicitCast(CastDefinition* cast)
+    void ValueType::PushImplicitCast(IFunction* cast)
     {
         implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const CastDefinition* ValueType::FindImplicitCast(const DataType* returnType, const DataType* fromType) const
+    const IFunction* ValueType::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
     }
 
-    void ValueType::PushExplicitCast(CastDefinition* cast)
+    void ValueType::PushExplicitCast(IFunction* cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const CastDefinition* ValueType::FindExplicitCast(const DataType* returnType, const DataType* fromType) const
+    const IFunction* ValueType::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
-    void ValueType::PushOverload(OverloadDefinition* overload)
+    void ValueType::PushOverload(IOperatorOverload* overload)
     {
         overloads[overload->Operator()] = overload;
     }
 
-    const OverloadDefinition* ValueType::FindOverload(const SyntaxKind base) const
+    const IOperatorOverload* ValueType::FindOverload(const SyntaxKind base) const
     {
         return overloads.at(base);
-    }
-
-    std::vector<const Characteristic*> ValueType::AllCharacteristics() const
-    {
-        std::vector<const Characteristic*> all;
-        for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
-
-        return all;
     }
 
     ValueType::~ValueType()
@@ -172,5 +163,14 @@ namespace Analysis::Structure::DataTypes
             fullName = parent->FullName() + "." + name;
 
         return fullName;
+    }
+
+    std::vector<const ICharacteristic*> StructSource::AllCharacteristics() const
+    {
+        std::vector<const ICharacteristic*> all;
+        for (const auto& characteristic : characteristics)
+            all.push_back(characteristic.second);
+
+        return all;
     }
 }

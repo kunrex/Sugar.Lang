@@ -25,10 +25,10 @@ constexpr std::string cil_dictionary = "[System.Collections.Generic]System.Colle
 
 namespace Analysis::Structure::Wrappers
 {
-    Dictionary::Dictionary(const DataType* const keyType, const DataType* const valueType) : Class(cil_dictionary, Describer::Public), SingletonCollection(), GenericType(), keyType(keyType), valueType(valueType)
+    Dictionary::Dictionary(const IDataType* const keyType, const IDataType* const valueType) : Class(cil_dictionary, Describer::Public), SingletonCollection(), GenericType(), keyType(keyType), valueType(valueType)
     { }
 
-    const Dictionary* Dictionary::Instance(const DataType* const keyType, const DataType* const valueType)
+    const Dictionary* Dictionary::Instance(const IDataType* const keyType, const IDataType* const valueType)
     {
         static std::map<unsigned long, const Dictionary*> map;
 
@@ -40,7 +40,7 @@ namespace Analysis::Structure::Wrappers
             return map.at(hash);
 
         const auto action = new Dictionary(keyType, valueType);
-        action->genericSignature = std::format("{}`{}<{}>", cil_dictionary, types.size(), MapGenericSignature(types););
+        action->genericSignature = std::format("{}`{}<{}>", cil_dictionary, types.size(), MapGenericSignature(types));
 
         action->InitialiseMembers();
 

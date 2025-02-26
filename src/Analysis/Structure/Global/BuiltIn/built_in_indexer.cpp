@@ -7,11 +7,13 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInIndexer::BuiltInIndexer(const DataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : IndexerDefinition(Describer::Public, creationType), readable(readable), writable(writable), parameters()
+    BuiltInIndexer::BuiltInIndexer(const Interfaces::IDataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : IndexerDefinition(Describer::Public, creationType), BuiltInFunction(), readable(readable), writable(writable)
     {
         this->getInstruction = getInstruction;
         this->setInstruction = setInstruction;
     }
+
+    const std::string& BuiltInIndexer::FullName() const { return creationType->Name(); }
 
     MemberType BuiltInIndexer::MemberType() const { return MemberType::BuiltInIndexer; }
 
@@ -20,14 +22,5 @@ namespace Analysis::Structure::Global
 
     const std::string& BuiltInIndexer::SignatureGetString() const { return getInstruction; }
     const std::string& BuiltInIndexer::SignatureSetString() const { return setInstruction; }
-
-    unsigned long BuiltInIndexer::ParameterCount() const { return parameters.size(); }
-
-    const DataType* BuiltInIndexer::ParameterAt(const unsigned long index) const { return parameters.at(index); }
-
-    void BuiltInIndexer::PushParameterType(const DataType* type)
-    {
-        parameters.push_back(type);
-    }
 }
 

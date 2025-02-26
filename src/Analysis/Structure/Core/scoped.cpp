@@ -10,17 +10,28 @@ using namespace Analysis::Structure::Local;
 
 namespace Analysis::Structure::Core
 {
-    Scoped::Scoped(const ScopeNode* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0)
+    Scoped::Scoped(const NodeCollection<ParseNodes::ParseNode>* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0)
     {
         scope = new Local::Scope(ScopeType::Scope, "", this);
     }
 
-    const ScopeNode* Scoped::ParseNode() const { return parseNode; }
-
-    unsigned long Scoped::ArgumentCount() const { return parameterCount; }
-    unsigned long Scoped::VariableCount() const { return children.size(); }
+    const NodeCollection<ParseNode>* Scoped::ParseNode() const { return parseNode; }
 
     Scope* Scoped::Scope() const { return scope; }
+
+    unsigned long Scoped::ParameterCount() const { return parameterCount; }
+
+    const Interfaces::IDataType* Scoped::ParameterAt(const unsigned long index) const
+    {
+        return children.at(index)->CreationType();
+    }
+
+    unsigned long Scoped::VariableCount() const { return children.size(); }
+
+    const LocalVariable* Scoped::VariableAt(const unsigned long i) const
+    {
+        return children.at(i);
+    }
 
     void Scoped::AddParameter(const LocalVariable* parameter)
     {
@@ -40,10 +51,5 @@ namespace Analysis::Structure::Core
                 return i;
 
         return std::nullopt;
-    }
-
-    const LocalVariable* Scoped::VariableAt(const unsigned long i) const
-    {
-        return children.at(i);
     }
 }

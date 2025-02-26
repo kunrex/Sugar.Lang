@@ -6,7 +6,7 @@ using namespace std;
 
 namespace Analysis::Structure::Wrappers
 {
-    string MapGenericSignature(const std::vector<const Core::DataType*>& types)
+    string MapGenericSignature(const std::vector<const Core::Interfaces::IDataType*>& types)
     {
         std::string signature;
         for (int i = 0; i < types.size(); i++)
@@ -19,7 +19,7 @@ namespace Analysis::Structure::Wrappers
         return signature;
     }
 
-    string MapGenericCallSignature(const std::vector<const Core::DataType*>& types)
+    string MapGenericCallSignature(const std::vector<const Core::Interfaces::IDataType*>& types)
     {
         std::string signature;
         for (int i = 0; i < types.size(); i++)

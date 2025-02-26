@@ -1,11 +1,11 @@
 #ifndef ENTITY_NODE_H
 #define ENTITY_NODE_H
 
-#include "../parse_node.h"
+#include "Interfaces/i_entity_node.h"
 
 namespace ParseNodes::Core
 {
-    class EntityNode
+    class EntityNode : public virtual Interfaces::IEntityNode
     {
         protected:
             const ParseNode* type;
@@ -13,9 +13,9 @@ namespace ParseNodes::Core
             explicit EntityNode(const ParseNode* type);
 
         public:
-            [[nodiscard]] const ParseNode* Type() const;
+            [[nodiscard]] const ParseNode* Type() const override;
 
-            virtual ~EntityNode();
+            ~EntityNode() override;
     };
 }
 

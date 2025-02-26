@@ -8,18 +8,18 @@ namespace Analysis::Structure::Global
     class EnumField final : public GlobalVariable
     {
         private:
-            const Core::DataType* returnType;
+            const Core::Interfaces::IDataType* returnType;
 
         public:
-            EnumField(const std::string& name, const Core::DataType* returnType);
-            EnumField(const std::string& name, const Core::DataType* returnType, const ParseNodes::ParseNode* value);
+            EnumField(const std::string& name, const Core::Interfaces::IDataType* returnType);
+            EnumField(const std::string& name, const Core::Interfaces::IDataType* returnType, const ParseNodes::ParseNode* value);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] const Core::DataType* ReturnType() const;
+            [[nodiscard]] const Core::Interfaces::IDataType* ReturnType() const;
     };
 }
 

@@ -20,6 +20,7 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
@@ -40,23 +41,23 @@ namespace Analysis::Structure::DataTypes
 
     DataType* Enum::ValueImplementation() const { return valueImplementation; }
 
-    void Enum::PushCharacteristic(Characteristic* const characteristic)
+    void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    const Characteristic* Enum::FindCharacteristic(const string& name) const
+    const ICharacteristic* Enum::FindCharacteristic(const string& name) const
     {
         return characteristics.contains(name) ? nullptr : characteristics.at(name);
     }
 
-    void Enum::PushFunction(FunctionDefinition* function)
+    void Enum::PushFunction(IFunctionDefinition* function)
     {
         if (values == nullptr)
             values = function;
     }
 
-    const FunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const DataType*>& argumentList) const
+    const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         if (values == nullptr)
             return nullptr;
@@ -70,49 +71,49 @@ namespace Analysis::Structure::DataTypes
         return values;
     }
 
-    void Enum::PushConstructor(ConstructorDefinition* constructor)
+    void Enum::PushConstructor(IFunction* constructor)
     { }
 
-    const ConstructorDefinition* Enum::FindConstructor(const std::vector<const DataType*>& argumentList) const
+    const IFunction* Enum::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return nullptr;
     }
 
-    void Enum::PushIndexer(IndexerDefinition* indexer)
+    void Enum::PushIndexer(IIndexerDefinition* indexer)
     { }
 
-    const IndexerDefinition* Enum::FindIndexer(const std::vector<const DataType*>& argumentList) const
+    const IIndexerDefinition* Enum::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         return nullptr;
     }
 
-    void Enum::PushImplicitCast(CastDefinition* cast)
+    void Enum::PushImplicitCast(IFunction* cast)
     { }
 
-    const CastDefinition* Enum::FindImplicitCast(const DataType* returnType, const DataType* fromType) const
+    const IFunction* Enum::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         return nullptr;
     }
 
-    void Enum::PushExplicitCast(CastDefinition* cast)
+    void Enum::PushExplicitCast(IFunction* cast)
     { }
 
-    const CastDefinition* Enum::FindExplicitCast(const DataType* returnType, const DataType* fromType) const
+    const IFunction* Enum::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         return nullptr;
     }
 
-    void Enum::PushOverload(OverloadDefinition* overload)
+    void Enum::PushOverload(IOperatorOverload* overload)
     { }
 
-    const OverloadDefinition* Enum::FindOverload(const SyntaxKind base) const
+    const IOperatorOverload* Enum::FindOverload(const SyntaxKind base) const
     {
         return nullptr;
     }
 
-    std::vector<const Characteristic*> Enum::AllCharacteristics() const
+    std::vector<const ICharacteristic*> Enum::AllCharacteristics() const
     {
-        std::vector<const Characteristic*> all;
+        std::vector<const ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
             all.push_back(characteristic.second);
 

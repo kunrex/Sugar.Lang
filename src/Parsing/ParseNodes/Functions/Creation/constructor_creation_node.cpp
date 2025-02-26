@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    ConstructorCreationNode::ConstructorCreationNode(const DescriberNode* const describer, const CompoundDeclarationNode* const parameters, const ScopeNode* const body, const Token& keyword) : KeywordFunctionNode(describer, nullptr, parameters, body, keyword)
+    ConstructorCreationNode::ConstructorCreationNode(const DescriberNode* const describer, const CompoundDeclarationNode* const parameters, const NodeCollection<ParseNode>* const body, const Token& keyword) : KeywordFunctionNode(describer, nullptr, parameters, body, keyword)
     { }
 
     NodeType ConstructorCreationNode::NodeType() const { return NodeType::ConstructorDeclaration; }

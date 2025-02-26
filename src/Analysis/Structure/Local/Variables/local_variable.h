@@ -10,11 +10,14 @@ namespace Analysis::Structure::Local
     class LocalVariable : public LocalNode, public Core::Variable
     {
         public:
-            LocalVariable(const std::string& name, Enums::Describer describer, const Core::DataType* creationType);
+            LocalVariable(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
     };
 }
 

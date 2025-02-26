@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Analysis::Structure::Core
+namespace Analysis::Structure::Core::Interfaces
 {
     class IFullyNameable
     {

@@ -8,10 +8,9 @@
 
 using namespace std;
 
-using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string cil_action = "[System.Runtime]System.Action";
 
@@ -20,7 +19,7 @@ namespace Analysis::Structure::Wrappers
     Action::Action() : Class(cil_action, Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
     { }
 
-    const Action* Action::Instance(const std::vector<const DataType*>& types)
+    const Action* Action::Instance(const std::vector<const IDataType*>& types)
     {
         static std::map<unsigned long, const Action*> map;
 
@@ -51,10 +50,6 @@ namespace Analysis::Structure::Wrappers
     }
 
     const std::string& Action::FullName() const { return genericSignature; }
-
-    unsigned long Action::TypeCount() const {  return types.size(); }
-
-    const Core::DataType* Action::TypeAt(const unsigned long index) const { return types.at(index); }
 
     void Action::InitialiseMembers()
     { }

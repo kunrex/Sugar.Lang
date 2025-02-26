@@ -1,21 +1,21 @@
 #ifndef BODY_NODE
 #define BODY_NODE
 
-#include "../Groups/scope_node.h"
+#include "Interfaces/i_body_node.h"
 
 namespace ParseNodes::Core
 {
-    class BodyNode
+    class BodyNode : public virtual Interfaces::IBodyNode
     {
         protected:
-            const Groups::ScopeNode* body;
+            const NodeCollection<ParseNode>* body;
 
-            explicit BodyNode(const Groups::ScopeNode* body);
+            explicit BodyNode(const NodeCollection<ParseNode>* body);
 
         public:
-            [[nodiscard]] const Groups::ScopeNode* Body() const;
+            [[nodiscard]] const NodeCollection<ParseNode>* Body() const override;
 
-            virtual ~BodyNode();
+            ~BodyNode() override;
     };
 }
 

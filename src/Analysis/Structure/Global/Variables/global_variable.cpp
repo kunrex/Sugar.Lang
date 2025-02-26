@@ -8,13 +8,14 @@ using namespace ParseNodes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* const creationType) : Characteristic(name, describer, creationType, nullptr)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType) : Characteristic(name, describer, creationType, nullptr)
     { }
 
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const DataType* const creationType, const ParseNodes::ParseNode* const value) : Characteristic(name, describer, creationType, value)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* const value) : Characteristic(name, describer, creationType, value)
     { }
 
     MemberType GlobalVariable::MemberType() const { return MemberType::Field; }

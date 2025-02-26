@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../../Core/Interfaces/i_parametrized.h"
+#include "../../Core/Interfaces/Creation/i_parametrized.h"
 
 namespace Analysis::Structure::Global
 {

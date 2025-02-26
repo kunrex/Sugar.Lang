@@ -22,7 +22,6 @@
 #include "../../../Parsing/ParseNodes/Statements/initialisation_node.h"
 #include "../../../Parsing/ParseNodes/Expressions/Binary/binary_node.h"
 #include "../../../Parsing/ParseNodes/Properties/assigned_property_node.h"
-#include "../../../Parsing/ParseNodes/Statements/expression_statement_node.h"
 #include "../../../Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h"
 #include "../../../Parsing/ParseNodes/Functions/Creation/implicit_cast_node.h"
 #include "../../../Parsing/ParseNodes/Functions/Creation/function_creation_node.h"
@@ -36,6 +35,7 @@
 #include "../../Structure/Global/Properties/indexer.h"
 #include "../../Structure/Global/Properties/property.h"
 
+#include "../../Structure/Global/Variables/enum_field.h"
 #include "../../Structure/Global/Variables/global_variable.h"
 
 #include "../../Structure/Global/Functions/constructor.h"
@@ -44,12 +44,8 @@
 #include "../../Structure/Global/Functions/void_function.h"
 #include "../../Structure/Global/Functions/method_function.h"
 #include "../../Structure/Global/Functions/operator_overload.h"
-#include "../../Structure/Global/Variables/enum_field.h"
 
 #include "../../Structure/Local/Variables/function_parameter.h"
-#include "../../Structure/Wrappers/Reference/object.h"
-
-#include "../../Structure/Wrappers/Value/integer.h"
 
 using namespace Exceptions;
 
@@ -71,8 +67,8 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Creation;
-using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string_view get_property_name = "get_Item";
 constexpr std::string_view set_property_name = "set_Item";
@@ -221,7 +217,7 @@ namespace Analysis::Creation::Binding
         dataType->PushCharacteristic(globalVariable);
     }
 
-    std::tuple<MethodDefinition*, VoidDefinition*> CreatePropertyFunctions(const GetNode* const getNode, const SetNode* const setNode, const std::string& identifier, const Describer describer, const DataType* const creationType)
+    std::tuple<MethodDefinition*, VoidDefinition*> CreatePropertyFunctions(const GetNode* const getNode, const SetNode* const setNode, const std::string& identifier, const Describer describer, const IDataType* const creationType)
     {
         MethodFunction* get; VoidFunction* set;
 
@@ -312,13 +308,13 @@ namespace Analysis::Creation::Binding
         dataType->PushCharacteristic(property);
     }
 
-    void BindFunctionParameters(const CompoundDeclarationNode* const declarationNode, std::vector<const DataType*>& parameters, const SourceFile* const source)
+    void BindFunctionParameters(const CompoundDeclarationNode* const declarationNode, std::vector<const IDataType*>& parameters, const SourceFile* const source)
     {
         for (const auto typeNode: *declarationNode)
             parameters.push_back(BindDataType(typeNode->Type(), source));
     }
 
-    void BindFunctionParameters(Scoped* const scope, const std::vector<const DataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
+    void BindFunctionParameters(Scoped* const scope, const std::vector<const IDataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
     {
         for (int i = 0; i < declarationNode->ChildCount(); i++)
         {
@@ -341,7 +337,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    std::tuple<MethodDefinition*, VoidDefinition*> CreateIndexerFunctions(const GetNode* const getNode, const SetNode* const setNode, const CompoundDeclarationNode* declarationNode, const std::vector<const DataType*>& parameters, const DataType* const creationType, const Describer describer, const SourceFile* const source)
+    std::tuple<MethodDefinition*, VoidDefinition*> CreateIndexerFunctions(const GetNode* const getNode, const SetNode* const setNode, const CompoundDeclarationNode* declarationNode, const std::vector<const IDataType*>& parameters, const IDataType* const creationType, const Describer describer, const SourceFile* const source)
     {
         MethodFunction* get; VoidFunction* set;
 
@@ -383,7 +379,7 @@ namespace Analysis::Creation::Binding
         const auto creationType = BindDataType(indexerNode->Type(), source);
         const auto declarationNode = indexerNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const Interfaces::IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindIndexer(parameters) != nullptr)
@@ -414,7 +410,7 @@ namespace Analysis::Creation::Binding
         const auto identifier = functionCreationNode->Name()->Value();
         const auto declarationNode = functionCreationNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindFunction(identifier, parameters) != nullptr)
@@ -463,7 +459,7 @@ namespace Analysis::Creation::Binding
 
         const auto declarationNode = constructorCreationNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindConstructor(parameters) != nullptr)
@@ -497,7 +493,7 @@ namespace Analysis::Creation::Binding
         const auto creationType = BindDataType(explicitCastNode->Type(), source);
         const auto declarationNode = explicitCastNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (parameters.size() != 1)
@@ -545,7 +541,7 @@ namespace Analysis::Creation::Binding
         const auto creationType = BindDataType(implicitCastNode->Type(), source);
         const auto declarationNode = implicitCastNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (parameters.size() != 1)
@@ -568,7 +564,7 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto implicitCast = new ExplicitCast(FromNode(implicitCastNode->Describer()), creationType, implicitCastNode->Body());
+        const auto implicitCast = new ImplicitCast(FromNode(implicitCastNode->Describer()), creationType, implicitCastNode->Body());
         BindFunctionParameters(implicitCast, parameters, declarationNode, source);
 
         MatchReturnAccessibility(implicitCast, index, dataType);
@@ -596,7 +592,7 @@ namespace Analysis::Creation::Binding
 
         const auto declarationNode = operatorOverloadNode->Parameters();
 
-        std::vector<const DataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         const auto& token = operatorOverloadNode->Operator();

@@ -5,10 +5,10 @@
 
 namespace Analysis::Structure::Creation
 {
-    class FunctionDefinition : public Core::Nameable, public Core::Function
+    class FunctionDefinition : public Core::Nameable, public Core::Function, public virtual Core::Interfaces::IFunctionDefinition
     {
         protected:
-            FunctionDefinition(const std::string& name, Enums::Describer describer, const Core::DataType* creationType);
+            FunctionDefinition(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
     };
 }
 

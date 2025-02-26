@@ -3,34 +3,29 @@
 
 #include <vector>
 
+#include "../../Core/built_in_function.h"
 #include "../../Creation/Properties/indexer_definition.h"
-#include "../../Core/Interfaces/i_built_in_parametrized.h"
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInIndexer final : public Creation::IndexerDefinition, public virtual Analysis::Core::Interfaces::IBuiltInParametrized
+    class BuiltInIndexer final : public Creation::IndexerDefinition, public Core::Interfaces::BuiltInFunction
     {
         protected:
             const bool readable;
             const bool writable;
 
-            std::vector<const Core::DataType*> parameters;
-
         public:
-            BuiltInIndexer(const Core::DataType* creationType, bool readable, const std::string& getInstruction, bool writable, const std::string& setInstruction);
+            BuiltInIndexer(const Core::Interfaces::IDataType* creationType, bool readable, const std::string& getInstruction, bool writable, const std::string& setInstruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] const std::string& SignatureGetString() const override;
             [[nodiscard]] const std::string& SignatureSetString() const override;
-
-            [[nodiscard]] unsigned long ParameterCount() const override;
-            [[nodiscard]] const Core::DataType* ParameterAt(unsigned long index) const override;
-
-            void PushParameterType(const Core::DataType* type) override;
     };
 }
 

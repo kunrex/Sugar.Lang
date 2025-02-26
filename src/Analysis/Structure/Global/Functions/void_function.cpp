@@ -2,6 +2,8 @@
 
 #include <format>
 
+#include "function_extensions.h"
+
 #include "../../Core/DataTypes/data_type.h"
 
 using namespace std;
@@ -15,7 +17,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    VoidFunction::VoidFunction(const string& name, const Enums::Describer describer, const ScopeNode* const body) : VoidDefinition(name, describer), Scoped(body)
+    VoidFunction::VoidFunction(const string& name, const Enums::Describer describer, const NodeCollection<ParseNodes::ParseNode>* const body) : VoidDefinition(name, describer), Scoped(body)
     { }
 
     MemberType VoidFunction::MemberType() const { return MemberType::MethodDefinition; }
@@ -27,9 +29,5 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
-
-    unsigned long VoidFunction::ParameterCount() const { return parameterCount; }
-
-    const DataType* VoidFunction::ParameterAt(const unsigned long index) const { return VariableAt(index)->CreationType(); }
 }
 

@@ -8,10 +8,9 @@
 
 using namespace std;
 
-using namespace Analysis::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string cil_func = "[System.Runtime]System.Func";
 
@@ -20,7 +19,7 @@ namespace Analysis::Structure::Wrappers
     Func::Func() : Class(cil_func, Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
     { }
 
-    const Func* Func::Instance(const std::vector<const DataType*>& types)
+    const Func* Func::Instance(const std::vector<const IDataType*>& types)
     {
         static std::map<unsigned long, const Func*> map;
 
@@ -43,10 +42,6 @@ namespace Analysis::Structure::Wrappers
     }
 
     const std::string& Func::FullName() const { return genericSignature; }
-
-    unsigned long Func::TypeCount() const {  return types.size(); }
-
-    const Core::DataType* Func::TypeAt(const unsigned long index) const { return types.at(index); }
 
     void Func::InitialiseMembers()
     { }

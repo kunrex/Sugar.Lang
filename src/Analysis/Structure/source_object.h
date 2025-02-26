@@ -15,6 +15,9 @@ namespace Analysis::Structure
 {
     class SourceObject : public Core::Nameable, public Services::Child<SourceObject>
     {
+        protected:
+            mutable std::string fullName;
+
         public:
             explicit SourceObject(const std::string& name);
 
