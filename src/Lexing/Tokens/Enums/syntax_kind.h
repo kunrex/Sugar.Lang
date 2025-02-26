@@ -33,7 +33,7 @@ namespace Tokens::Enums
         Print = 6,
         Input = 7,
         Format = 9,
-        Println = 112,
+        Println = 113,
 
         Let = 10,
 
@@ -67,6 +67,8 @@ namespace Tokens::Enums
         Static = 40,
         Public = 41,
         Private = 42,
+
+        Copy = 114,
 
         Do = 43,
         For = 44,

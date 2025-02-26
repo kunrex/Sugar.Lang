@@ -67,6 +67,8 @@ namespace Tokens
         keywordMap["public"] = { SyntaxKind::Public, KeywordType::Describer };
         keywordMap["private"] = { SyntaxKind::Private, KeywordType::Describer };
 
+        keywordMap["copy"] = { SyntaxKind::Copy, KeywordType::General };
+
         keywordMap["do"] = { SyntaxKind::Do, KeywordType::Loop };
         keywordMap["for"] = { SyntaxKind::For, KeywordType::Loop };
         keywordMap["while"] = { SyntaxKind::While, KeywordType::Loop };

@@ -112,6 +112,8 @@ namespace Tokens::Enums
                 return "Ref";
             case SyntaxKind::As:
                 return "As";
+            case SyntaxKind::Copy:
+                return "Copy";
             case SyntaxKind::Addition:
                 return "Addition";
             case SyntaxKind::Subtraction:
@@ -216,6 +218,8 @@ namespace Tokens::Enums
                 return "String";
             case SyntaxKind::Object:
                 return "Object";
+            case SyntaxKind::Math:
+                return "Math";
             case SyntaxKind::Import:
                 return "Import";
             default:

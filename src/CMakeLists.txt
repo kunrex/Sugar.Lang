@@ -547,4 +547,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/Creation/i_operator_overload.h
         Analysis/Structure/Core/built_in_function.cpp
         Analysis/Structure/Core/built_in_function.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.cpp
+        Parsing/ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h
 )

@@ -50,10 +50,12 @@ namespace ParseNodes::Enums
         FunctionDeclaration,
         ConstructorDeclaration,
 
+        Copy,
         Print,
         Input,
         Invoke,
         Format,
+        RefCall,
         Println,
         FuncRef,
         ToString,

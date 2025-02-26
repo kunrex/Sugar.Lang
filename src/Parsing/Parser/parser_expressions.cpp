@@ -208,11 +208,20 @@ namespace Parsing
                                 case SyntaxKind::As:
                                     tokens.push(&current);
                                     break;
+                                case SyntaxKind::Ref:
+                                    output.push(ParseRefCall());
+                                    break;
+                                case SyntaxKind::Copy:
+                                    output.push(ParseCopyCall());
+                                    break;
                                 case SyntaxKind::This:
                                     output.push(ParseEntity(SeparatorKind::None));
                                     break;
                                 case SyntaxKind::Input:
                                     output.push(ParsePrintCall());
+                                    break;
+                                case SyntaxKind::Format:
+                                    output.push(ParseFormatCall());
                                     break;
                                 case SyntaxKind::Invoke:
                                     output.push(ParseInvokeCall());

@@ -64,9 +64,9 @@ do { } while(condition)
 ```
 
 ### I/O Functions
-Sugar uses the `print` and `input` functions for output and input respectively.
+Sugar uses the `print`, `println` and `input` functions for output and input respectively.
 ```python
-print("hello world");
+print("hello world: ");
 string: result = input();
 ```
 
@@ -216,7 +216,7 @@ struct Type
 let: a = create Type();
 let: b = a; // creates a copy (even without explicitly using `create`)
 
-a.Modify(); // no copies are created, the original is modified but the copy created earlier is unchanged.
+a.Modify(); // the original is modified, the copy is unchanged.
 
 print(a.x) // prints 10
 print(b.x) // prints 0
@@ -295,7 +295,7 @@ Describers can contain the following keywords:
 
 ### The `ref` keyword 
 
-`ref` is special in sugar because it lets you avoid struct copying, this is useful when you have large structs. 
+`ref` is special in sugar because it lets you avoid struct copying, this is useful with have large structs. 
 The `ref` function is used to obtain references of values. It expects one argument which must be a variable.
 
 ```cs
@@ -310,7 +310,7 @@ A referenced struct is treated as a different data type. `copy` is used to creat
 
 A few more rules with references:
 1. References must be initialized and cannot be reassigned. This ensures validity of lifetimes.
-2. Member fields and properties cannot be of a reference type and functions cannot return a reference type.
+2. Member fields and properties cannot be of a referenced struct type and functions cannot return a reference type.
 
 ```cs
 int FunctionDescribers([ref] int: x)

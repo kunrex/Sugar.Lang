@@ -318,6 +318,9 @@ namespace Parsing
         index++;
 
         ParseFunctionArguments(format);
+        if (format->ChildCount() < 1)
+            ExceptionManager::Instance().AddChild(new MinimumFunctionArgumentException(1, keyword, source));
+
         return format;
     }
 
@@ -362,5 +365,31 @@ namespace Parsing
             ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
 
         return toString;
+    }
+
+    const RefCallNode* Parser::ParseRefCall()
+    {
+        const auto keyword = Current();
+        const auto ref = new RefCallNode(keyword);;
+        index++;
+
+        ParseFunctionArguments(ref);
+        if (ref->ChildCount() != 1)
+            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+
+        return ref;
+    }
+
+    const CopyCallNode* Parser::ParseCopyCall()
+    {
+        const auto keyword = Current();
+        const auto copy = new CopyCallNode(keyword);;
+        index++;
+
+        ParseFunctionArguments(copy);
+        if (copy->ChildCount() != 1)
+            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+
+        return copy;
     }
 }

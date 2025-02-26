@@ -33,6 +33,7 @@
 #include "../ParseNodes/Functions/Creation/implicit_cast_node.h"
 #include "../ParseNodes/Functions/Creation/explicit_cast_node.h"
 #include "../ParseNodes/Functions/Calling/constructor_call_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h"
 #include "../ParseNodes/Functions/Creation/operator_overload_node.h"
 #include "../ParseNodes/Functions/Creation/function_creation_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/input_node.h"
@@ -40,6 +41,7 @@
 #include "../ParseNodes/Functions/Calling/BaseFunctions/format_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/invoke_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h"
 #include "../ParseNodes/Functions/Creation/constructor_creation_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h"
 
@@ -89,8 +91,10 @@ namespace Parsing
             void ParseFunctionArguments(ParseNodes::NodeCollection<ParseNodes::ParseNode>* function);
             [[nodiscard]] const ParseNodes::Groups::CompoundDeclarationNode* ParseFunctionParameters();
 
+            [[nodiscard]] const ParseNodes::Functions::Calling::RefCallNode* ParseRefCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::PrintNode* ParsePrintCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::InputNode* ParseInputCall();
+            [[nodiscard]] const ParseNodes::Functions::Calling::CopyCallNode* ParseCopyCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FormatNode* ParseFormatCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::InvokeNode* ParseInvokeCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::PrintlnNode* ParsePrintlnCall();
