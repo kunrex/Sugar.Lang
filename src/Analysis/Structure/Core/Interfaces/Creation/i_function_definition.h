@@ -7,7 +7,8 @@ namespace Analysis::Structure::Core::Interfaces
 {
     class IFunctionDefinition : public virtual INameable, public virtual IFunction
     {
-
+        public:
+            [[nodiscard]] virtual const std::string& Signature() const = 0;
     };
 }
 

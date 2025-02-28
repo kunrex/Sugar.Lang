@@ -1,36 +1,34 @@
 #include "field_context.h"
 
-#include "../../../../Core/DataTypes/data_type.h"
-
 #include <format>
 
-using namespace Analysis::Structure::Core;
+using namespace std;
+
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    FieldContext::FieldContext(const Characteristic* characteristic) : VariableContext(characteristic)
-    {
-        if (characteristic->CheckDescriber(Describer::Static))
-        {
-            getInstruction = std::format("ldsfld {} {}", creationType->FullName(), characteristic->FullName());
-            setInstruction = std::format("stsfld {} {}", creationType->FullName(), characteristic->FullName());;
-        }
-        else
-        {
-            getInstruction = std::format("ldfld {} {}", creationType->FullName(), characteristic->FullName());
-            setInstruction = std::format("stfld {} {}", creationType->FullName(), characteristic->FullName());
-        }
-    }
+    FieldContext::FieldContext(const IVariable* const variable, const bool isLoadInstruction) : VariableContext(variable, isLoadInstruction)
+    { }
 
     MemberType FieldContext::MemberType() const { return MemberType::FieldContext; }
 
-    int FieldContext::SlotCount() const { return 1; }
+    int FieldContext::SlotCount() const { return creationType->SlotCount(); }
 
-    bool FieldContext::Readable() const { return characteristic->Readable(); }
-    bool FieldContext::Writable() const { return characteristic->Writable(); }
+    string FieldContext::CILInstruction() const
+    {
+        if (isLoadInstruction)
+        {
+            if (variable->CheckDescriber(Describer::Static))
+                return std::format("ldsfld {} {}", creationType->FullName(), variable->FullName());
 
-    std::string FieldContext::InstructionGet() const { return getInstruction; }
-    std::string FieldContext::InstructionSet() const { return setInstruction; }
+            return std::format("ldfld {} {}", creationType->FullName(), variable->FullName());
+        }
+
+        if (variable->CheckDescriber(Describer::Static))
+            return std::format("stsfld {} {}", creationType->FullName(), variable->FullName());
+
+        return std::format("stfld {} {}", creationType->FullName(), variable->FullName());
+    }
 }

@@ -3,32 +3,31 @@
 
 #include "../context_node.h"
 #include "../unary_context_node.h"
-#include "../../../../../Services/collection.h"
+
 #include "../../Creation/Properties/indexer_definition.h"
+
+#include "../../../../Services/collection.h"
 
 namespace Analysis::Structure::Context
 {
     class DefinedIndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
     {
         private:
-            mutable bool readable;
-            mutable bool writable;
-
-            mutable std::string getInstruction;
-            mutable std::string setInstruction;
+            mutable int slotCount;
+            const bool isLoadInstruction;
+            const Core::Interfaces::IIndexerDefinition* indexer;
 
         public:
-            explicit DefinedIndexerExpression(const Creation::IndexerDefinition* indexer, const ContextNode* operand);
+            DefinedIndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const ContextNode* operand, bool isLoadInstruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
-
-            [[nodiscard]] int SlotCount() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

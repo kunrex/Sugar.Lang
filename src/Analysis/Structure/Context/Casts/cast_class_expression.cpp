@@ -2,23 +2,25 @@
 
 #include <format>
 
-#include "../../../Core/DataTypes/data_type.h"
+using namespace std;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    CastClassExpression::CastClassExpression(const DataType* creationType, const ContextNode* operand) : UnaryContextNode(creationType, operand), cilInstruction(std::format("castclass {}", creationType->FullName()))
+    CastClassExpression::CastClassExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
     {
         slotCount = std::max(operand->CreationType()->SlotCount(), creationType->SlotCount());
     }
 
     MemberType CastClassExpression::MemberType() const { return MemberType::CastClass; }
 
+    int CastClassExpression::SlotCount() const { return slotCount; }
+
     bool CastClassExpression::Readable() const { return true; }
     bool CastClassExpression::Writable() const { return false; }
 
-    std::string CastClassExpression::InstructionGet() const { return cilInstruction; }
-    std::string CastClassExpression::InstructionSet() const { return ""; }
+    string CastClassExpression::CILInstruction() const { return std::format("castclass {}", creationType->FullName()); }
 }

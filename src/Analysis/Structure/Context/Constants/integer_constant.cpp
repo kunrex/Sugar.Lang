@@ -2,11 +2,13 @@
 
 #include <format>
 
-#include "../../../Wrappers/Value/boolean.h"
-#include "../../../Wrappers/Value/character.h"
-#include "../../../Wrappers/Value/integer.h"
-#include "../../../Wrappers/Value/long.h"
-#include "../../../Wrappers/Value/short.h"
+#include "../../Wrappers/Value/short.h"
+#include "../../Wrappers/Value/integer.h"
+#include "../../Wrappers/Value/long.h"
+#include "../../Wrappers/Value/boolean.h"
+#include "../../Wrappers/Value/character.h"
+
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
@@ -21,8 +23,7 @@ namespace Analysis::Structure::Context
     bool ShortConstant::Readable() const { return true; }
     bool ShortConstant::Writable() const { return false; }
 
-    std::string ShortConstant::InstructionGet() const { return std::format("ldc.i4 {}", value); }
-    std::string ShortConstant::InstructionSet() const { return ""; }
+    string ShortConstant::CILInstruction() const { return std::format("ldc.i4 {}", value); }
 
     IntegerConstant::IntegerConstant(const int value) : ContextNode(&Integer::Instance()), value(value)
     { }
@@ -32,8 +33,7 @@ namespace Analysis::Structure::Context
     bool IntegerConstant::Readable() const { return true; }
     bool IntegerConstant::Writable() const { return false; }
 
-    std::string IntegerConstant::InstructionGet() const { return std::format("ldc.i4 {}", value); }
-    std::string IntegerConstant::InstructionSet() const { return ""; }
+    string IntegerConstant::CILInstruction() const { return std::format("ldc.i4 {}", value); }
 
     LongConstant::LongConstant(const long value) : ContextNode(&Long::Instance()), value(value)
     { }
@@ -43,8 +43,7 @@ namespace Analysis::Structure::Context
     bool LongConstant::Readable() const { return true; }
     bool LongConstant::Writable() const { return false; }
 
-    std::string LongConstant::InstructionGet() const { return std::format("ldc.i8 {}", value); }
-    std::string LongConstant::InstructionSet() const { return ""; }
+    string LongConstant::CILInstruction() const { return std::format("ldc.i8 {}", value); }
 
     CharacterConstant::CharacterConstant(const char value) : ContextNode(&Character::Instance()), value(value)
     { }
@@ -54,8 +53,7 @@ namespace Analysis::Structure::Context
     bool CharacterConstant::Readable() const { return true; }
     bool CharacterConstant::Writable() const { return false; }
 
-    std::string CharacterConstant::InstructionGet() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
-    std::string CharacterConstant::InstructionSet() const { return ""; }
+    string CharacterConstant::CILInstruction() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
 
     TrueConstant::TrueConstant(): ContextNode(&Boolean::Instance())
     { }
@@ -65,8 +63,7 @@ namespace Analysis::Structure::Context
     bool TrueConstant::Readable() const { return true; }
     bool TrueConstant::Writable() const { return false; }
 
-    std::string TrueConstant::InstructionGet() const { return "ldc.i4.1"; }
-    std::string TrueConstant::InstructionSet() const { return ""; }
+    string TrueConstant::CILInstruction() const { return "ldc.i4.1"; }
 
     FalseConstant::FalseConstant(): ContextNode(&Boolean::Instance())
     { }
@@ -76,6 +73,5 @@ namespace Analysis::Structure::Context
     bool FalseConstant::Readable() const { return true; }
     bool FalseConstant::Writable() const { return false; }
 
-    std::string FalseConstant::InstructionGet() const { return "ldc.i4.0"; }
-    std::string FalseConstant::InstructionSet() const { return ""; }
+    string FalseConstant::CILInstruction() const { return "ldc.i4.0"; }
 }

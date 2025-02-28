@@ -223,49 +223,18 @@ print(b.x) // prints 0
 ```
 
 ### Enums
-Enums in sugar are a collection of immutable constant values. Members can be initialised to any compile time constant number, character, boolean, string or expression of the same. They can also be null.
+Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
 ```cs
-enum Colors
-{
-    Red = "Red",
-    Blue = "Blue",
-    Green = "Green",
-    
-    None = null
-}
-
 enum EncodingBase
 {
     Binary = 2,
-    Octal = 8,
-    Hex = 16,
-    Base64 = 64
+    Octal = Binary << 2,
+    Hex = Binary << 3,
+    Base64 = Binary << 5
 }
 ```
 
-If values are left implicit to the compiler, then the value is stored as null.
-
-An implication of this behaviour is that enum members are unique but can contain the same value. Sugar resolves this by introducing the `value` property. The `name` property returns the name of the enum value as a string.
-
-You may also get all members using the `Values` function as an array. 
-```cs
-enum MyEnum
-{
-    Elem1, // = 0, first element
-    Elem2 = 2, // would be initialised to 1 if implicit to the compiler
-    
-    Elem3 // = 2, fourth element
-}
-
-let: enumValue = MyEnum.Elem2;
-
-print(enumValue == MyEnum.Elem3); //false
-print(enumValue.value == MyEnum.Elem3.value); //true
-
-print(enumValue.name); // "Elem1"
-
-print(MyEnum.Values()); // { MyEnum.Elem1, MyEnum.Elem2, MyEnum.Elem3 }
-```
+Enums implicitly define bitwise operations and an explicit conversion to their integer value.
 
 ### Describers
 Taking inspiration from C#'s attributes, which I adore, sugar has describers.
@@ -343,6 +312,11 @@ Sugar lets you customise member fields using properties. A rather basic implemen
 [public] int: x { set; }
 ```
 - While it compiles, the above has virtually no practical use.
+```cs
+list<int> values;
+[public] int: Count { get { return values.Count; } }
+```
+- Accessors can define bodies. the `set` accessor implicitly defines the `value` parameter to represent the value assigned. 
 
 ### Special Functions
 Sugar features functions for cast overloading, operator overloading, indexers and constructors.
@@ -390,7 +364,7 @@ struct Complex
     }
 }
 ```
-Cast and operator overloads must be public and static. indexers and constructors cannot be static. All structures have a defaullt string conversion and constructor unless specified.
+Cast and operator overloads must be public and static. indexers and constructors cannot be static. All structures have a default string conversion and constructor unless specified.
 
 ### Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.

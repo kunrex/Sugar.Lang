@@ -1,32 +1,29 @@
 #include "defined_binary_expression.h"
 
-#include "../../../Core/DataTypes/data_type.h"
-
 #include <format>
 
-#include "defined_unary_expression.h"
+#include "../Entities/Functions/function_extensions.h"
+
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    DefinedBinaryExpression::DefinedBinaryExpression(const OverloadDefinition* operation, const ContextNode* lhs, const ContextNode* rhs) : BinaryContextNode(operation->CreationType(), lhs, rhs), cilExpression(std::format("call {}", operation->SignatureString()))
+    DefinedBinaryExpression::DefinedBinaryExpression(const IFunction* const operation, const ContextNode* const lhs, const ContextNode* const rhs) : BinaryContextNode(operation->CreationType(), lhs, rhs), slotCount(-1), operation(operation)
     {
-        slotCount = std::max(operation->CreationType()->SlotCount(), std::max(lhs->SlotCount(), rhs->SlotCount()));
+        slotCount = std::max(CalculateFunctionCallSlotSize(this), creationType->SlotCount());
     }
+
+    int DefinedBinaryExpression::SlotCount() const { return slotCount; }
 
     MemberType DefinedBinaryExpression::MemberType() const { return MemberType::BinaryExpression; }
 
     bool DefinedBinaryExpression::Readable() const { return true; }
     bool DefinedBinaryExpression::Writable() const { return false; }
 
-    std::string DefinedBinaryExpression::InstructionGet() const { return cilExpression; }
-    std::string DefinedBinaryExpression::InstructionSet() const { return "";}
-
-    int DefinedBinaryExpression::SlotCount() const
-    {
-        return slotCount;
-    }
+    string DefinedBinaryExpression::CILInstruction() const { return std::format("call {}", operation->FullName()); }
 }
 

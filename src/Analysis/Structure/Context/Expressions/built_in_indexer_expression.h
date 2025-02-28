@@ -2,31 +2,27 @@
 #define BUILT_IN_INDEXER_EXPRESSION_H
 
 #include "../unary_context_node.h"
-#include "../../Creation/Properties/indexer_definition.h"
 
 namespace Analysis::Structure::Context
 {
     class BuiltInIndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
     {
         private:
-            const bool readable;
-            const bool writable;
-
-            const std::string getInstruction;
-            const std::string setInstruction;
+            mutable int slotCount;
+            const bool isLoadInstruction;
+            const Core::Interfaces::IIndexerDefinition* indexer;
 
         public:
-            explicit BuiltInIndexerExpression(const Creation::IndexerDefinition* indexer, const ContextNode* operand);
+            BuiltInIndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const ContextNode* operand, bool isLoadInstruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
-
-            [[nodiscard]] int SlotCount() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

@@ -2,14 +2,16 @@
 
 #include <format>
 
-#include "../../../Wrappers/Reference/string.h"
+#include "../../Wrappers/Reference/string.h"
+
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    StringConstant::StringConstant(const std::string_view value) : ContextNode(&String::Instance()), value(value)
+    StringConstant::StringConstant(string value) : ContextNode(&String::Instance()), value(std::move(value))
     { }
 
     MemberType StringConstant::MemberType() const { return MemberType::Constant; }
@@ -17,6 +19,5 @@ namespace Analysis::Structure::Context
     bool StringConstant::Readable() const { return true; }
     bool StringConstant::Writable() const { return false; }
 
-    std::string StringConstant::InstructionGet() const { return std::format("ldstr {}", value); }
-    std::string StringConstant::InstructionSet() const { return ""; }
+    string StringConstant::CILInstruction() const { return std::format("ldstr {}", value); }
 }

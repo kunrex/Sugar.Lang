@@ -2,25 +2,26 @@
 #define BUILT_IN_BINARY_EXPRESSION_H
 
 #include "../binary_context_node.h"
-#include "../../Global/BuiltIn/built_in_operation.h"
 
 namespace Analysis::Structure::Context
 {
     class BuiltInBinaryExpression final : public BinaryContextNode
     {
         private:
-            const std::string cilExpression;
+            mutable int slotCount;
+            const Core::Interfaces::IFunction* operation;
 
         public:
-            explicit BuiltInBinaryExpression(const Creation::OverloadDefinition* operation, const ContextNode* lhs, const ContextNode* rhs);
+            explicit BuiltInBinaryExpression(const Core::Interfaces::IFunction* operation, const ContextNode* lhs, const ContextNode* rhs);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

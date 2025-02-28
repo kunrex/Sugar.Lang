@@ -24,7 +24,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton, DataType* const valueImplementation) : DataType(name, describer | Describer::Static), UserDefinedType(skeleton), valueImplementation(valueImplementation)
+    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : DataType(name, describer | Describer::Static), UserDefinedType(skeleton), explicitCasts()
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
@@ -39,8 +39,6 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    DataType* Enum::ValueImplementation() const { return valueImplementation; }
-
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -52,24 +50,10 @@ namespace Analysis::Structure::DataTypes
     }
 
     void Enum::PushFunction(IFunctionDefinition* function)
-    {
-        if (values == nullptr)
-            values = function;
-    }
+    { }
 
     const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
-    {
-        if (values == nullptr)
-            return nullptr;
-
-        if (name != values->Name())
-            return nullptr;
-
-        if (!argumentList.empty())
-            return nullptr;
-
-        return values;
-    }
+    { return nullptr;}
 
     void Enum::PushConstructor(IFunction* constructor)
     { }
@@ -96,11 +80,14 @@ namespace Analysis::Structure::DataTypes
     }
 
     void Enum::PushExplicitCast(IFunction* cast)
-    { }
+    {
+        explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
+    }
 
     const IFunction* Enum::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
-        return nullptr;
+        const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
+        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
     void Enum::PushOverload(IOperatorOverload* overload)
@@ -124,5 +111,8 @@ namespace Analysis::Structure::DataTypes
     {
         for (const auto& characteristic : characteristics)
             delete characteristic.second;
+
+        for (const auto& cast: explicitCasts)
+            delete cast.second;
     }
 }

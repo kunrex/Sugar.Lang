@@ -110,8 +110,6 @@ namespace Analysis::Creation::Binding
 
     void BindEnumExpression(const ParseNode* const expression, Enum* const dataType)
     {
-        const auto valuesType = dataType->ValueImplementation();
-
         switch (expression->NodeType())
         {
             case NodeType::Identifier:
@@ -126,7 +124,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumField(value, valuesType));
+                    dataType->PushCharacteristic(new EnumField(value));
                 }
                 break;
             case NodeType::Binary:
@@ -156,7 +154,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumField(value, valuesType));
+                    dataType->PushCharacteristic(new EnumField(value, casted.RHS()));
                 }
                 break;
             default:

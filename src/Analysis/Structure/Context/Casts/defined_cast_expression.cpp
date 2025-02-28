@@ -2,23 +2,25 @@
 
 #include <format>
 
-#include "../../../Core/DataTypes/data_type.h"
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    DefinedCastExpression::DefinedCastExpression(const CastDefinition* definition, const ContextNode* operand) : UnaryContextNode(definition->CreationType(), operand), cilInstruction(std::format("call {}", definition->SignatureString()))
+    DefinedCastExpression::DefinedCastExpression(const IFunction* const definition, const ContextNode* const operand) : UnaryContextNode(definition->CreationType(), operand), definition(definition)
     {
         slotCount = std::max(definition->CreationType()->SlotCount(), operand->CreationType()->SlotCount());
     }
 
     MemberType DefinedCastExpression::MemberType() const { return MemberType::DefinedCast; }
 
+    int DefinedCastExpression::SlotCount() const { return slotCount; }
+
     bool DefinedCastExpression::Readable() const { return true; }
     bool DefinedCastExpression::Writable() const { return false; }
 
-    std::string DefinedCastExpression::InstructionGet() const { return cilInstruction; }
-    std::string DefinedCastExpression::InstructionSet() const { return ""; }
+    string DefinedCastExpression::CILInstruction() const { return std::format("call {}", definition->FullName()); }
 }

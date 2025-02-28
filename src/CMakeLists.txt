@@ -301,8 +301,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/i_slot_size.h
         Analysis/Structure/Core/DataTypes/user_defined_type.cpp
         Analysis/Structure/Core/DataTypes/user_defined_type.h
-        Analysis/Structure/Context/Entities/indexed_context_node.cpp
-        Analysis/Structure/Context/Entities/indexed_context_node.h
+        Analysis/Structure/Context/Entities/indexed_context.cpp
+        Analysis/Structure/Context/Entities/indexed_context.h
         Analysis/Structure/Local/Variables/local_variable.cpp
         Analysis/Structure/Local/Variables/local_variable.h
         Analysis/Structure/Context/Entities/References/local_variable_context.cpp
@@ -315,8 +315,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/variable_context.h
         Analysis/Structure/Context/Entities/References/property_context.cpp
         Analysis/Structure/Context/Entities/References/property_context.h
-        Analysis/Structure/Context/Entities/Functions/function_context.cpp
-        Analysis/Structure/Context/Entities/Functions/function_context.h
+        Analysis/Structure/Context/Entities/Functions/function_call_context.cpp
+        Analysis/Structure/Context/Entities/Functions/function_call_context.h
         Analysis/Structure/Context/Expressions/dot_expression.cpp
         Analysis/Structure/Context/Expressions/dot_expression.h
         Analysis/Structure/Context/Expressions/built_in_index_expression.cpp
@@ -334,12 +334,12 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/built_in_binary_expression.cpp
         Analysis/Structure/Context/Expressions/built_in_binary_expression.h
         Analysis/Structure/Context/context_node.cpp
-        Analysis/Structure/Context/Entities/Functions/print.cpp
-        Analysis/Structure/Context/Entities/Functions/print.h
-        Analysis/Structure/Context/Entities/Functions/format.cpp
-        Analysis/Structure/Context/Entities/Functions/format.h
-        Analysis/Structure/Context/Entities/Functions/input.cpp
-        Analysis/Structure/Context/Entities/Functions/input.h
+        Analysis/Structure/Context/Entities/Functions/print_context.cpp
+        Analysis/Structure/Context/Entities/Functions/print_context.h
+        Analysis/Structure/Context/Entities/Functions/format_context.cpp
+        Analysis/Structure/Context/Entities/Functions/format_context.h
+        Analysis/Structure/Context/Entities/Functions/input_context.cpp
+        Analysis/Structure/Context/Entities/Functions/input_context.h
         Analysis/Creation/Transpiling/expression_transpiler.cpp
         Exceptions/log_exception.cpp
         Exceptions/log_exception.h
@@ -453,12 +453,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Global/Properties/property.h
         Analysis/Structure/Context/invalid_context.cpp
         Analysis/Structure/Context/invalid_context.h
-        Analysis/Structure/Context/static_reference_context.cpp
-        Analysis/Structure/Context/static_reference_context.h
-        Analysis/Structure/Context/this_context.cpp
-        Analysis/Structure/Context/this_context.h
-        Analysis/Structure/Context/Casts/invalid_cast_node.cpp
-        Analysis/Structure/Context/Casts/invalid_cast_node.h
+        Analysis/Structure/Context/Casts/invalid_cast_expression.cpp
+        Analysis/Structure/Context/Casts/invalid_cast_expression.h
         Analysis/Structure/Context/Expressions/invalid_unary_expression.cpp
         Analysis/Structure/Context/Expressions/invalid_unary_expression.h
         Analysis/Structure/Context/Expressions/invalid_binary_expression.cpp
@@ -551,4 +547,25 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.cpp
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h
+        Analysis/Structure/Core/Interfaces/Context/i_context_node.h
+        Analysis/Structure/Context/Entities/static_reference_context.cpp
+        Analysis/Structure/Context/Entities/static_reference_context.h
+        Analysis/Structure/Context/Entities/this_context.cpp
+        Analysis/Structure/Context/Entities/this_context.h
+        Analysis/Structure/Context/Entities/References/argument_address_context.cpp
+        Analysis/Structure/Context/Entities/References/argument_address_context.h
+        Analysis/Structure/Context/Entities/References/field_address_context.cpp
+        Analysis/Structure/Context/Entities/References/field_address_context.h
+        Analysis/Structure/Context/Entities/References/local_variable_address_context.cpp
+        Analysis/Structure/Context/Entities/References/local_variable_address_context.h
+        Analysis/Structure/Context/Entities/Functions/funcref_context.cpp
+        Analysis/Structure/Context/Entities/Functions/funcref_context.h
+        Analysis/Structure/Context/Entities/Functions/invoke_context.cpp
+        Analysis/Structure/Context/Entities/Functions/invoke_context.h
+        Analysis/Structure/Context/Entities/Functions/function_extensions.cpp
+        Analysis/Structure/Context/Entities/Functions/function_extensions.h
+        Analysis/Structure/Context/Expressions/assignment_expression.cpp
+        Analysis/Structure/Context/Expressions/assignment_expression.h
+        Analysis/Structure/Context/Expressions/duplicate_expression.cpp
+        Analysis/Structure/Context/Expressions/duplicate_expression.h
 )

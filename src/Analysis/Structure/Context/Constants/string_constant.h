@@ -8,18 +8,19 @@ namespace Analysis::Structure::Context
     class StringConstant final : public ContextNode
     {
         private:
-            const std::string_view value;
+            const std::string value;
 
         public:
-            explicit StringConstant(std::string_view value);
+            explicit StringConstant(std::string value);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

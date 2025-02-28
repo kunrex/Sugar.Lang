@@ -9,21 +9,20 @@ namespace Analysis::Structure::Context
     class PropertyContext final : public ContextNode
     {
         private:
+            const bool isLoadInstruction;
             const Creation::PropertyDefinition* property;
 
-            const std::string getInstruction;
-            const std::string setInstruction;
-
         public:
-            explicit PropertyContext(const Creation::PropertyDefinition* property);
+            PropertyContext(const Creation::PropertyDefinition* property, bool isLoadInstruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

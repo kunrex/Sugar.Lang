@@ -2,7 +2,10 @@
 
 #include <format>
 
-#include "../../../Wrappers/Value/float.h"
+#include "../../Wrappers/Value/float.h"
+#include "../../Wrappers/Value/double.h"
+
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
@@ -14,20 +17,22 @@ namespace Analysis::Structure::Context
 
     MemberType FloatConstant::MemberType() const { return MemberType::Constant; }
 
+    int FloatConstant::SlotCount() const { return 1; }
+
     bool FloatConstant::Readable() const { return true; }
     bool FloatConstant::Writable() const { return false; }
 
-    std::string FloatConstant::InstructionGet() const { return std::format("ldc.r4 {}", value); }
-    std::string FloatConstant::InstructionSet() const { return ""; }
+    string FloatConstant::CILInstruction() const { return std::format("ldc.r4 {}", value); }
 
-    DoubleConstant::DoubleConstant(const double value) : ContextNode(&Float::Instance()), value(value)
+    DoubleConstant::DoubleConstant(const double value) : ContextNode(&Double::Instance()), value(value)
     { }
 
     MemberType DoubleConstant::MemberType() const { return MemberType::Constant; }
 
+    int DoubleConstant::SlotCount() const { return 1; }
+
     bool DoubleConstant::Readable() const { return true; }
     bool DoubleConstant::Writable() const { return false; }
 
-    std::string DoubleConstant::InstructionGet() const { return std::format("ldc.r8 {}", value); }
-    std::string DoubleConstant::InstructionSet() const { return ""; }
+    string DoubleConstant::CILInstruction() const { return std::format("ldc.r8 {}", value); }
 }

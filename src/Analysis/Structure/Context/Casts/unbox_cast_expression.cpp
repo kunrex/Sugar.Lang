@@ -2,26 +2,29 @@
 
 #include <format>
 
-#include "../../../Wrappers/Reference/object.h"
+#include "../../Wrappers/Reference/object.h"
 #include "../../DataTypes/class.h"
 
-using namespace Analysis::Structure::Core;
+using namespace std;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Core::Interfaces;
 
-namespace Analysis::Structure::Structure
+namespace Analysis::Structure::Context
 {
-    UnboxCastExpression::UnboxCastExpression(const DataType* creationType, const ContextNode* operand) : UnaryContextNode(creationType, operand), cilInstruction(std::format("box {}", creationType->FullName()))
+    UnboxCastExpression::UnboxCastExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
     {
         slotCount = std::max(Object::Instance().SlotCount(), creationType->SlotCount());
     }
+
+    int UnboxCastExpression::SlotCount() const { return slotCount; }
 
     MemberType UnboxCastExpression::MemberType() const { return MemberType::UnboxCast; }
 
     bool UnboxCastExpression::Readable() const { return true; }
     bool UnboxCastExpression::Writable() const { return false; }
 
-    std::string UnboxCastExpression::InstructionGet() const { return cilInstruction; }
-    std::string UnboxCastExpression::InstructionSet() const { return ""; }
+    string UnboxCastExpression::CILInstruction() const { return std::format("box {}", creationType->FullName()); }
 }
 

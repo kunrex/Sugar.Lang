@@ -16,6 +16,8 @@ namespace Analysis::Structure::Wrappers
     Referenced::Referenced(const IDataType* const referencedType) : Class(std::format("{}&", referencedType->Name()), Describer::Public), referencedType(referencedType)
     { }
 
+    int Referenced::SlotCount() const { return 1; }
+
     const Referenced* Referenced::Instance(const IDataType* const dataType)
     {
         static std::map<unsigned long, const Referenced*> map;

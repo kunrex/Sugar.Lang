@@ -3,25 +3,18 @@
 
 #include <string>
 
-#include "../../Core/created.h"
-#include "../../Core/Interfaces/i_node.h"
-#include "../../Core/Interfaces/i_slot_size.h"
-#include "../../Core/Interfaces/i_read_write.h"
+#include "../Core/created.h"
+#include "../Core/Interfaces/Context/i_context_node.h"
 
 namespace Analysis::Structure::Context
 {
-    class ContextNode : public Core::Interfaces::INode, public Core::Created, public Core::Interfaces::ISlotSize, public Core::Interfaces::IReadWrite
+    class ContextNode : public Core::Created, public virtual Core::Interfaces::IContextNode
     {
         protected:
-            mutable int slotCount;
-
-            explicit ContextNode(const Core::DataType* creationType);
+            explicit ContextNode(const Core::Interfaces::IDataType* creationType);
 
         public:
-            [[nodiscard]] virtual std::string InstructionGet() const = 0;
-            [[nodiscard]] virtual std::string InstructionSet() const = 0;
-
-            [[nodiscard]] int SlotCount() const override;
+            [[nodiscard]] virtual std::string CILInstruction() const = 0;
     };
 }
 

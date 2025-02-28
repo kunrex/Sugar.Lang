@@ -17,6 +17,8 @@ namespace Analysis::Structure::Wrappers
         public:
             static const Referenced* Instance(const IDataType* dataType);
 
+            [[nodiscard]] int SlotCount() const override;
+
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;

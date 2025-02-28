@@ -1,22 +1,20 @@
 #ifndef ARGUMENT_CONTEXT_H
 #define ARGUMENT_CONTEXT_H
 
-#include "../indexed_context_node.h"
+#include "../indexed_context.h"
 
 namespace Analysis::Structure::Context
 {
-    class ArgumentContext final : public IndexedContextNode
+    class ArgumentContext final : public IndexedContext
     {
         public:
-            ArgumentContext(const Core::Characteristic* characteristic, int index);
+            ArgumentContext(const Core::Interfaces::IVariable* variable, bool isLoadInstruction, int index);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
+            [[nodiscard]] int SlotCount() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

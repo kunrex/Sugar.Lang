@@ -13,7 +13,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotSize, public virtual IReadWrite
+    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotSize
     {
         public:
             virtual void PushCharacteristic(ICharacteristic* characteristic) = 0;

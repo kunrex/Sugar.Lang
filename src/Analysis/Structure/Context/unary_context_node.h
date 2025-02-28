@@ -10,7 +10,7 @@ namespace Analysis::Structure::Context
         protected:
             const ContextNode* operand;
 
-            UnaryContextNode(const Core::DataType* creationType, const ContextNode* operand);
+            UnaryContextNode(const Core::Interfaces::IDataType* creationType, const ContextNode* operand);
 
         public:
             [[nodiscard]] const ContextNode* Operand() const;

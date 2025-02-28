@@ -1,8 +1,8 @@
 #include "null_constant.h"
 
-#include <format>
+#include "../../Wrappers/Reference/object.h"
 
-#include "../../../Wrappers/Reference/object.h"
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
@@ -14,9 +14,10 @@ namespace Analysis::Structure::Context
 
     MemberType NullConstant::MemberType() const { return MemberType::Constant; }
 
+    int NullConstant::SlotCount() const { return 0; }
+
     bool NullConstant::Readable() const { return true; }
     bool NullConstant::Writable() const { return false; }
 
-    std::string NullConstant::InstructionGet() const { return "ldnull"; }
-    std::string NullConstant::InstructionSet() const { return ""; }
+    string NullConstant::CILInstruction() const { return "ldnull"; }
 }

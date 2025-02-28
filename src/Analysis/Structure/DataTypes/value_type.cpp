@@ -20,28 +20,28 @@ namespace Analysis::Structure::DataTypes
 {
     ValueType::ValueType(const string& name, const Enums::Describer describer) : DataType(name, describer)
     {
-        slotCount = 0;
+        slotCount = -1;
     }
 
     MemberType ValueType::MemberType() const { return MemberType::ValueType; }
 
     int ValueType::SlotCount() const
     {
-        if (slotCount == 0)
+        if (slotCount < 0)
         {
-            int totalSize = 0;
-            int maxAlignment = 0;
+            int totalSize = 0, maxSize = 0;
 
             for (const auto& characteristic : characteristics)
             {
-                const auto fieldSize = characteristic.second->CreationType()->SlotCount();
-                const auto fieldAlignment = std::min(fieldSize, word_size);
+                const auto size = characteristic.second->CreationType()->SlotCount();
+                const auto actual_size = size + (word_size - 1) & ~(word_size - 1);
 
-                totalSize = (totalSize + (fieldAlignment - 1)) & ~(fieldAlignment - 1)  + fieldSize;
-                maxAlignment = std::max(maxAlignment, fieldAlignment);
+                totalSize += actual_size;
+                if (actual_size > maxSize)
+                    maxSize = actual_size;
             }
 
-            slotCount = (totalSize + (word_size - 1)) / word_size;
+            slotCount = std::ceil(totalSize + (maxSize - 1) & ~(maxSize - 1) / word_size);
         }
 
         return slotCount;

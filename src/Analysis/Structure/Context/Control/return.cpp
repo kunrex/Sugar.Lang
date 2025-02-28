@@ -1,6 +1,8 @@
 #include "return.h"
 
-#include "../../../Wrappers/Reference/object.h"
+#include "../../Wrappers/Reference/object.h"
+
+using namespace std;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -16,9 +18,10 @@ namespace Analysis::Structure::Context
 
     MemberType Return::MemberType() const { return MemberType::Return; }
 
+    int Return::SlotCount() const { return 0; }
+
     bool Return::Readable() const { return false; }
     bool Return::Writable() const { return false; }
 
-    std::string Return::InstructionGet() const { return "ret"; }
-    std::string Return::InstructionSet() const { return ""; }
+    string Return::CILInstruction() const { return "ret"; }
 }

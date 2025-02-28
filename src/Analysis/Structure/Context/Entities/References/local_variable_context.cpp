@@ -1,18 +1,24 @@
 #include "local_variable_context.h"
 
-using namespace Analysis::Structure::Core;
+using namespace std;
+
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    LocalVariableContext::LocalVariableContext(const Characteristic* characteristic, const int index) : IndexedContextNode(characteristic, index)
+    LocalVariableContext::LocalVariableContext(const IVariable* variable, const bool isLoadInstruction, const int index) : IndexedContext(variable, isLoadInstruction, index)
     { }
 
     MemberType LocalVariableContext::MemberType() const { return MemberType::LocalVariableContext; }
 
-    bool LocalVariableContext::Readable() const { return true; }
-    bool LocalVariableContext::Writable() const { return false; }
+    int LocalVariableContext::SlotCount() const { return creationType->SlotCount(); }
 
-    std::string LocalVariableContext::InstructionGet() const { return "ldloc." + index; }
-    std::string LocalVariableContext::InstructionSet() const { return "stloc." + index; }
+    string LocalVariableContext::CILInstruction() const
+    {
+        if (isLoadInstruction)
+            return "ldloc." + index;
+
+        return "stloc." + index;
+    }
 }

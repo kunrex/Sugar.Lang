@@ -2,7 +2,7 @@
 #define INVALID_INDEXER_EXPRESSION_H
 
 #include "../unary_context_node.h"
-#include "../../../../../Services/collection.h"
+#include "../../../../Services/collection.h"
 
 namespace Analysis::Structure::Context
 {
@@ -13,11 +13,12 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
+            [[nodiscard]] int SlotCount() const override;
+
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

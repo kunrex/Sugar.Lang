@@ -10,7 +10,6 @@ namespace Analysis::Structure::Enums
         ValueType,
 
         Field,
-        EnumField,
 
         Property,
         BuiltInProperty,
@@ -39,9 +38,15 @@ namespace Analysis::Structure::Enums
         While,
         DoWhile,
 
+        RefContext,
+        CopyContext,
         PrintContext,
         InputContext,
+        InvokeContext,
         FormatContext,
+        FuncRefContext,
+        FormatSingleContext,
+        FormatDoubleContext,
 
         ThisContext,
         FieldContext,
@@ -49,6 +54,7 @@ namespace Analysis::Structure::Enums
         ArrayIndex,
         LocalVariableContext,
         FunctionArgumentContext,
+        FunctionArgumentAddressContext,
 
         BoxCast,
         UnboxCast,
@@ -66,12 +72,6 @@ namespace Analysis::Structure::Enums
 
         OperationBuiltIn,
         OperationOverload,
-
-        InstanceVoidCall,
-        InstanceMethodCall,
-
-        StaticVoidCall,
-        StaticMethodCall,
 
         Invalid
 

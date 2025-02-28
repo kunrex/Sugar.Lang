@@ -2,22 +2,24 @@
 
 #include <format>
 
-#include "../../../Core/DataTypes/data_type.h"
+using namespace std;
 
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    BuiltInCastExpression::BuiltInCastExpression(const CastDefinition* definition, const ContextNode* operand) : UnaryContextNode(definition->CreationType(), operand), cilInstruction(definition->SignatureString())
+    BuiltInCastExpression::BuiltInCastExpression(const IFunction* const definition, const ContextNode* const operand) : UnaryContextNode(definition->CreationType(), operand), definition(definition)
     {
         slotCount = std::max(definition->CreationType()->SlotCount(), operand->CreationType()->SlotCount());
     }
 
     Enums::MemberType BuiltInCastExpression::MemberType() const { return Enums::MemberType::BuiltInCast; }
 
+    int BuiltInCastExpression::SlotCount() const { return slotCount;}
+
     bool BuiltInCastExpression::Readable() const { return true; }
     bool BuiltInCastExpression::Writable() const { return false; }
 
-    std::string BuiltInCastExpression::InstructionGet() const { return cilInstruction; }
-    std::string BuiltInCastExpression::InstructionSet() const { return ""; }
+    string BuiltInCastExpression::CILInstruction() const { return definition->FullName(); }
 }

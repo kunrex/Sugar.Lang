@@ -2,24 +2,26 @@
 
 #include <format>
 
-#include "../../../Core/DataTypes/data_type.h"
+using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    DefinedUnaryExpression::DefinedUnaryExpression(const OverloadDefinition* operation, const ContextNode* operand) : UnaryContextNode(operation->CreationType(), operand), cilExpression(std::format("call {}", operation->SignatureString()))
+    DefinedUnaryExpression::DefinedUnaryExpression(const IFunction* const operation, const ContextNode* const operand) : UnaryContextNode(operation->CreationType(), operand), operation(operation)
     {
-        slotCount = std::max(operation->CreationType()->SlotCount(), operand->SlotCount());
+        slotCount = std::max(creationType->SlotCount(), operand->SlotCount());
     }
 
     MemberType DefinedUnaryExpression::MemberType() const { return MemberType::UnaryExpression; }
 
+    int DefinedUnaryExpression::SlotCount() const { return slotCount; }
+
     bool DefinedUnaryExpression::Readable() const { return true; }
     bool DefinedUnaryExpression::Writable() const { return true; }
 
-    std::string DefinedUnaryExpression::InstructionGet() const { return cilExpression; }
-    std::string DefinedUnaryExpression::InstructionSet() const { return ""; }
+    string DefinedUnaryExpression::CILInstruction() const { return std::format("call {}", operation->FullName()); }
 }
 

@@ -11,6 +11,9 @@ namespace Analysis::Structure::Core
             mutable std::string genericSignature;
 
             GenericType();
+
+        public:
+            [[nodiscard]] const std::string& GenericSignature() const;
     };
 }
 

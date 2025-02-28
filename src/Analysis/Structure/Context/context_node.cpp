@@ -1,11 +1,9 @@
 #include "context_node.h"
 
-using namespace Analysis::Structure::Core;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    ContextNode::ContextNode(const DataType* creationType) : Created(creationType), slotCount(0)
+    ContextNode::ContextNode(const IDataType* const creationType) : Created(creationType)
     { }
-
-    int ContextNode::SlotCount() const { return slotCount; }
 }

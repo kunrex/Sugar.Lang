@@ -13,10 +13,6 @@ namespace Analysis::Structure::Core
     {
         protected:
             DataType(const std::string& name, Enums::Describer describer);
-
-        public:
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
     };
 }
 

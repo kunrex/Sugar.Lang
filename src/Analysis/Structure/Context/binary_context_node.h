@@ -11,7 +11,7 @@ namespace Analysis::Structure::Context
             const ContextNode* lhs;
             const ContextNode* rhs;
 
-            BinaryContextNode(const Core::DataType* creationType, const ContextNode* lhs, const ContextNode* rhs);
+            BinaryContextNode(const Core::Interfaces::IDataType* creationType, const ContextNode* lhs, const ContextNode* rhs);
 
         public:
             [[nodiscard]] const ContextNode* LHS() const;

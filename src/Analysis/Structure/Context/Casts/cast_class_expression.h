@@ -8,18 +8,19 @@ namespace Analysis::Structure::Context
     class CastClassExpression final : public UnaryContextNode
     {
         private:
-            const std::string cilInstruction;
+            mutable int slotCount;
 
         public:
-            explicit CastClassExpression(const Core::DataType* creationType, const ContextNode* operand);
+            explicit CastClassExpression(const Core::Interfaces::IDataType* creationType, const ContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string InstructionGet() const override;
-            [[nodiscard]] std::string InstructionSet() const override;
+            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 
