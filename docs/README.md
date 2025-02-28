@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../sugar.png" width="700"/>
+</p>
+
 # Sugar.Lang
 
 Sugar is a compiled (transpiled) programming language I started working on a couple of years back. It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
