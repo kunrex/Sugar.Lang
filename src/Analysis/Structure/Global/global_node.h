@@ -3,12 +3,12 @@
 
 #include "../../../Services/child.h"
 
-#include "../source_object.h"
 #include "../Core/Interfaces/i_node.h"
+#include "../Core/Interfaces/DataTypes/i_data_type.h"
 
 namespace Analysis::Structure::Global
 {
-    class GlobalNode : public virtual Core::Interfaces::INode, public Services::ConstantChild<Core::DataType>
+    class GlobalNode : public virtual Core::Interfaces::INode, public Services::ConstantChild<Core::Interfaces::IDataType>
     {
         protected:
             GlobalNode();

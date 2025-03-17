@@ -10,7 +10,7 @@ namespace Analysis::Structure::Context
         protected:
             const int index;
 
-            IndexedContext(const Core::Interfaces::IVariable* variable, bool isLoadInstruction, int index);
+            IndexedContext(const Core::Interfaces::IVariable* variable, int index);
 
         public:
             [[nodiscard]] int Index() const;

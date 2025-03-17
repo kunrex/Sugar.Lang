@@ -32,18 +32,17 @@
 #include "../ParseNodes/Functions/Calling/function_call_node.h"
 #include "../ParseNodes/Functions/Creation/implicit_cast_node.h"
 #include "../ParseNodes/Functions/Creation/explicit_cast_node.h"
-#include "../ParseNodes/Functions/Calling/constructor_call_node.h"
-#include "../ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h"
 #include "../ParseNodes/Functions/Creation/operator_overload_node.h"
 #include "../ParseNodes/Functions/Creation/function_creation_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/input_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/print_node.h"
-#include "../ParseNodes/Functions/Calling/BaseFunctions/format_node.h"
-#include "../ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/invoke_node.h"
-#include "../ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/format_node.h"
 #include "../ParseNodes/Functions/Creation/constructor_creation_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h"
+#include "../ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h"
 
 namespace Parsing
 {
@@ -80,7 +79,6 @@ namespace Parsing
             void ParseExpressionCollection(ParseNodes::NodeCollection<ParseNodes::ParseNode>* collection, Tokens::Enums::SeparatorKind breakSeparator);
 
             [[nodiscard]] const ParseNodes::Groups::GenericNode* ParseGeneric();
-            [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseScopedExpression();
             [[nodiscard]] const ParseNodes::Expressions::IndexerExpressionNode* ParseIndexerExpression(const ParseNodes::ParseNode* operand);
 
             [[nodiscard]] const ParseNodes::ParseNode* ParseType();

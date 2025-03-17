@@ -51,10 +51,8 @@ namespace Analysis::Structure::Enums
         ThisContext,
         FieldContext,
         PropertyContext,
-        ArrayIndex,
         LocalVariableContext,
-        FunctionArgumentContext,
-        FunctionArgumentAddressContext,
+        FunctionParameterContext,
 
         BoxCast,
         UnboxCast,
@@ -73,12 +71,12 @@ namespace Analysis::Structure::Enums
         OperationBuiltIn,
         OperationOverload,
 
-        Invalid
+        Invalid,
 
         UnaryExpression,
         BinaryExpression,
 
-        DefinedIndexerExpression,
+        IndexerExpression,
 
         StaticReferenceContext,
 
@@ -87,6 +85,8 @@ namespace Analysis::Structure::Enums
         BranchJump,
 
         Constant,
+
+        ThrowContext,
     };
 }
 

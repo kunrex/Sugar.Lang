@@ -14,13 +14,16 @@
 
 using namespace std;
 
+using namespace Tokens::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Array::Array(const IDataType* const arrayType) : Class(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonCollection(), arrayType(arrayType)
+    Array::Array(const IDataType* const arrayType) : BuiltInClass(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonCollection(), genericSignature(), arrayType(arrayType), length(nullptr), constructor(nullptr), indexer(nullptr)
     { }
 
     const Array* Array::Instance(const IDataType* const dataType)
@@ -36,33 +39,73 @@ namespace Analysis::Structure::Wrappers
         const auto array = new Array(dataType);
         array->genericSignature = std::format("{} {}[]", dataType->MemberType() == MemberType::Class ? "class" : "valuetype", dataType->FullName());
 
-        array->InitialiseMembers();
+        array->InitializeMembers();
 
         map[hash] = array;
         return array;
     }
 
+    TypeKind Array::Type() const { return TypeKind::Array; }
+
     const std::string& Array::FullName() const { return genericSignature; }
 
-    void Array::InitialiseMembers()
-    {
-        PushCharacteristic(new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "ldlen", false, ""));
+    const IDataType* Array::GenericType() const { return arrayType; }
 
-        const auto constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
+    string Array::ConstructorSignature() const { return FindConstructor({ })->FullName(); }
+    string Array::PushElementSignature() const { return FindIndexer({ &Integer::Instance() })->SignatureSetString(); }
+
+    void Array::InitializeMembers()
+    {
+        length = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "ldlen", false, "");
+
+        constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
         constructor->PushParameterType(&Integer::Instance());
-        PushConstructor(constructor);
 
         if (arrayType->MemberType() == MemberType::Class)
         {
-            const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.ref", true, "stelem.ref");
+            indexer = new BuiltInIndexer(arrayType, true, "ldelem.ref", true, "stelem.ref");
             indexer->PushParameterType(&Integer::Instance());
-            PushIndexer(indexer);
         }
         else
         {
-            const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem", true, "stelem");
+            indexer = new BuiltInIndexer(arrayType, true, "ldelem", true, "stelem");
             indexer->PushParameterType(&Integer::Instance());
-            PushIndexer(indexer);
         }
+    }
+
+    const ICharacteristic* Array::FindCharacteristic(const std::string& name) const
+    {
+        return length->Name() == name ? length : nullptr;
+    }
+
+    const IFunction* Array::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    {
+        return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
+    }
+
+    const IFunctionDefinition* Array::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IIndexerDefinition* Array::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    {
+        return ArgumentHash(indexer) == ArgumentHash(argumentList) ? indexer : nullptr;
+    }
+
+    const IFunction* Array::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IFunction* Array::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IOperatorOverload* Array::FindOverload(const SyntaxKind base) const
+    { return nullptr; }
+
+    Array::~Array()
+    {
+        delete length;
+
+        delete constructor;
+
+        delete indexer;
     }
 }

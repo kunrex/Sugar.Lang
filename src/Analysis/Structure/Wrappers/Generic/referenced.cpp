@@ -7,16 +7,16 @@
 
 using namespace std;
 
+using namespace Tokens::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Referenced::Referenced(const IDataType* const referencedType) : Class(std::format("{}&", referencedType->Name()), Describer::Public), referencedType(referencedType)
+    Referenced::Referenced(const IDataType* const referencedType) : BuiltInClass(std::format("{}&", referencedType->Name()), Describer::Public), referencedType(referencedType)
     { }
-
-    int Referenced::SlotCount() const { return 1; }
 
     const Referenced* Referenced::Instance(const IDataType* const dataType)
     {
@@ -33,6 +33,17 @@ namespace Analysis::Structure::Wrappers
         map[hash] = referenced;
         return referenced;
     }
+
+    int Referenced::SlotCount() const { return 1; }
+
+    const std::string& Referenced::FullName() const { return name; }
+
+    TypeKind Referenced::Type() const { return TypeKind::Referenced; }
+
+    const IDataType* Referenced::ReferencedType() const { return referencedType; }
+
+    void Referenced::InitializeMembers()
+    { }
 
     const ICharacteristic* Referenced::FindCharacteristic(const std::string& name) const
     {
@@ -53,17 +64,11 @@ namespace Analysis::Structure::Wrappers
     }
 
     const IFunction* Referenced::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    {
-        return referencedType->FindImplicitCast(returnType, fromType);
-    }
+    { return nullptr; }
 
     const IFunction* Referenced::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    {
-        return referencedType->FindImplicitCast(returnType, fromType);
-    }
+    { return nullptr; }
 
-    const IOperatorOverload* Referenced::FindOverload(const Tokens::Enums::SyntaxKind base) const
-    {
-        return referencedType->FindOverload(base);
-    }
+    const IOperatorOverload* Referenced::FindOverload(const SyntaxKind base) const
+    { return nullptr; }
 }

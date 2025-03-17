@@ -1,11 +1,15 @@
 #include "parser.h"
 
 #include "../../Exceptions/exception_manager.h"
-#include "../ParseNodes/Statements/initialisation_node.h"
-#include "../ParseNodes/Properties/assigned_property_node.h"
 #include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
 #include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
 #include "../../Exceptions/Compilation/Parsing/function_argument_exception.h"
+
+#include "../ParseNodes/Statements/initialisation_node.h"
+
+#include "../ParseNodes/Properties/assigned_property_node.h"
+
+#include "../ParseNodes/Functions/Calling/constructor_call_node.h"
 #include "../ParseNodes/Functions/Calling/collection_construction_call_node.h"
 
 using namespace Exceptions;
@@ -181,8 +185,13 @@ namespace Parsing
             case NodeType::ListType:
             case NodeType::ArrayType:
                 {
-                    if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
-                        return new CollectionConstructorCallNode(type, ParseScopedExpression());
+                    if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket, true))
+                    {
+                        const auto collectionConstructorNode = new CollectionConstructorCallNode(type);
+                        ParseExpressionCollection(collectionConstructorNode, SeparatorKind::FlowerCloseBracket);
+
+                        return collectionConstructorNode;
+                    }
                 }
                 break;
             default:

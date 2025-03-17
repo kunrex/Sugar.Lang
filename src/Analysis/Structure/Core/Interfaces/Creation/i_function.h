@@ -8,7 +8,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IFunction : public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized
+    class IFunction : public virtual INode, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized
     {
 
     };

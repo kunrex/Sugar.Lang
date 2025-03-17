@@ -1,9 +1,6 @@
 #include "./float.h"
 
-#include "../../Global/BuiltIn/built_in_cast.h"
-#include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_property.h"
-#include "../../Global/BuiltIn/built_in_operation.h"
+#include "../../DataTypes/data_type_extensions.h"
 
 #include "short.h"
 #include "integer.h"
@@ -13,134 +10,193 @@
 #include "../Reference/string.h"
 #include "../Generic/referenced.h"
 
+#include "../../Global/BuiltIn/built_in_cast.h"
+#include "../../Global/BuiltIn/built_in_method.h"
+#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_operation.h"
+
+using namespace std;
+
 using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_double = "[System.Runtime]System.Single";
+constexpr std::string cil_float = "[System.Runtime]System.Single";
 
 namespace Analysis::Structure::Wrappers
 {
-    Float::Float() : ValueType(cil_double, Describer::Public), SingletonService()
+    Float::Float() : BuiltInValueType(cil_float, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
     { }
 
     int Float::SlotCount() const { return 1; }
 
-    void Float::InitialiseMembers()
+    TypeKind Float::Type() const { return TypeKind::Float; }
+
+    void Float::InitializeMembers()
     {
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "Max", &Instance(), true, "ldc.r4 3.4028235E+38", false, ""));
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "Min", &Instance(), true, "ldc.r4 -3.4028235E+38", false, ""));
+        characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.r4 3.4028235E+38", false, "");
+        characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.r4 -3.4028235E+38", false, "");
 
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "NaN", &Instance(), true, "ldc.r4 NaN", false, ""));
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "PositiveInfinity", &Instance(), true, "ldc.r4 Infinity", false, ""));
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "NegativeInfinity", &Instance(), true, "ldc.r4 -Infinity", false, ""));
+        characteristics["NaN"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "NaN", &Instance(), true, "ldc.r4 NaN", false, "");
+        characteristics["PositiveInfinity"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "PositiveInfinity", &Instance(), true, "ldc.r4 Infinity", false, "");
+        characteristics["NegativeInfinity"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "NegativeInfinity", &Instance(), true, "ldc.r4 -Infinity", false, "");
 
-        PushCharacteristic(new BuiltInProperty(Describer::PublicStatic, "Epsilon", &Instance(), true, "ldc.r4 1.401298E-45", false, ""));
+        characteristics["Epsilon"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Epsilon", &Instance(), true, "ldc.r4 1.401298E-45", false, "");
 
-        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Single::TryParse(string, float32&)");
+        tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Single::TryParse(string, float32&)");
         tryParse->PushParameterType(&String::Instance());
         tryParse->PushParameterType(Referenced::Instance(&Instance()));
-        PushFunction(tryParse);
 
         const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2");
         explicitShort->PushParameterType(&Instance());
-        PushExplicitCast(explicitShort);
+        explicitCasts[ArgumentHash({ &Short::Instance(), &Instance() })] = explicitShort;
 
         const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4");
         explicitInteger->PushParameterType(&Instance());
-        PushExplicitCast(explicitInteger);
+        explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance() })] = explicitInteger;
 
         const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8");
         explicitLong->PushParameterType(&Instance());
-        PushExplicitCast(explicitLong);
+        explicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = explicitLong;
 
         const auto implicitDouble = new BuiltInCast(&Double::Instance(), "conv.r8");
         implicitDouble->PushParameterType(&Instance());
-        PushImplicitCast(implicitDouble);
+        implicitCasts[ArgumentHash({ &Double::Instance(), &Instance() })] = implicitDouble;
 
         const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Single::ToString()");
         explicitString->PushParameterType(&Instance());
-        PushExplicitCast(explicitString);
+        explicitCasts[ArgumentHash({ &String::Instance(), &Instance() })] = explicitString;
 
         const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "ceq");
         equals->PushParameterType(&Instance());
         equals->PushParameterType(&Instance());
-        PushOverload(equals);
+        overloads[SyntaxKind::Equals] = equals;
 
         const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "ceq ldc.i4.0 ceq");
         notEquals->PushParameterType(&Instance());
         notEquals->PushParameterType(&Instance());
-        PushOverload(notEquals);
+        overloads[SyntaxKind::NotEquals] = notEquals;
 
         const auto addition = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "add");
         addition->PushParameterType(&Instance());
         addition->PushParameterType(&Instance());
-        PushOverload(addition);
+        overloads[SyntaxKind::Addition] = addition;
 
         const auto subtraction = new BuiltInOperation(SyntaxKind::Subtraction, &Instance(), "sub");
         subtraction->PushParameterType(&Instance());
         subtraction->PushParameterType(&Instance());
-        PushOverload(subtraction);
+        overloads[SyntaxKind::Subtraction] = subtraction;
 
         const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "mul");
         multiplication->PushParameterType(&Instance());
         multiplication->PushParameterType(&Instance());
-        PushOverload(multiplication);
+        overloads[SyntaxKind::Multiplication] = multiplication;
 
         const auto division = new BuiltInOperation(SyntaxKind::Division, &Instance(), "div");
         division->PushParameterType(&Instance());
         division->PushParameterType(&Instance());
-        PushOverload(division);
+        overloads[SyntaxKind::Division] = division;
 
         const auto remainder = new BuiltInOperation(SyntaxKind::Modulus, &Instance(), "rem");
         remainder->PushParameterType(&Instance());
         remainder->PushParameterType(&Instance());
-        PushOverload(remainder);
+        overloads[SyntaxKind::Modulus] = remainder;
+
+        const auto plus = new BuiltInOperation(SyntaxKind::Plus, &Instance(), "");
+        plus->PushParameterType(&Instance());
+        overloads[SyntaxKind::Plus] = plus;
 
         const auto negation = new BuiltInOperation(SyntaxKind::Minus, &Instance(), "neg");
         negation->PushParameterType(&Instance());
-        PushOverload(negation);
+        overloads[SyntaxKind::Minus] = negation;
 
         const auto increment = new BuiltInOperation(SyntaxKind::Increment, &Instance(), "ldc.r8 1.0 add");
         increment->PushParameterType(&Instance());
         increment->PushParameterType(&Instance());
-        PushOverload(increment);
+        overloads[SyntaxKind::Increment] = increment;
+        overloads[SyntaxKind::IncrementPrefix] = increment;
 
         const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub");
         decrement->PushParameterType(&Instance());
         decrement->PushParameterType(&Instance());
-        PushOverload(remainder);
-
-        const auto incrementPrefix = new BuiltInOperation(SyntaxKind::IncrementPrefix, &Instance(), "ldc.r8 1.0 add");
-        incrementPrefix->PushParameterType(&Instance());
-        incrementPrefix->PushParameterType(&Instance());
-        PushOverload(incrementPrefix);
-
-        const auto decrementPrefix = new BuiltInOperation(SyntaxKind::DecrementPrefix, &Instance(), "ldc.r8 1.0 sub");
-        decrementPrefix->PushParameterType(&Instance());
-        decrementPrefix->PushParameterType(&Instance());
-        PushOverload(decrementPrefix);
+        overloads[SyntaxKind::Decrement] = decrement;
+        overloads[SyntaxKind::DecrementPrefix] = increment;
 
         const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt");
         greater->PushParameterType(&Instance());
         greater->PushParameterType(&Instance());
-        PushOverload(equals);
+        overloads[SyntaxKind::GreaterThan] = greater;
 
         const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, &Boolean::Instance(), "clt");
         lesser->PushParameterType(&Instance());
         lesser->PushParameterType(&Instance());
-        PushOverload(lesser);
+        overloads[SyntaxKind::LesserThan] = lesser;
 
         const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, &Boolean::Instance(), "clt ldc.i4.0 ceq");
         greaterEquals->PushParameterType(&Instance());
         greaterEquals->PushParameterType(&Instance());
-        PushOverload(greaterEquals);
+        overloads[SyntaxKind::GreaterThanEquals] = greaterEquals;
 
         const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, &Boolean::Instance(), "cgt ldc.i4.0 ceq");
         lesserEquals->PushParameterType(&Instance());
         lesserEquals->PushParameterType(&Instance());
-        PushOverload(lesserEquals);
+        overloads[SyntaxKind::LesserThanEquals] = lesserEquals;
+    }
+
+    const ICharacteristic* Float::FindCharacteristic(const string& name) const
+    {
+        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+    }
+
+    const IFunctionDefinition* Float::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
+    {
+        if (name != "TryParse" || ArgumentHash(argumentList) != ArgumentHash(tryParse))
+            return nullptr;
+
+        return tryParse;
+    }
+
+    const IFunction* Float::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IIndexerDefinition* Float::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IFunction* Float::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    {
+        const auto hash = ArgumentHash({ returnType , fromType });
+        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+    }
+
+    const IFunction* Float::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    {
+        const auto hash = ArgumentHash({ returnType , fromType });
+        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+    }
+
+    const IOperatorOverload* Float::FindOverload(const SyntaxKind base) const
+    {
+        return overloads.contains(base) ? nullptr : overloads.at(base);
+    }
+
+    Float::~Float()
+    {
+        for (const auto& characteristic: characteristics)
+            delete characteristic.second;
+
+        delete tryParse;
+
+        for (const auto cast: implicitCasts)
+            delete cast.second;
+
+        for (const auto cast: explicitCasts)
+            delete cast.second;
+
+        for (const auto overload: overloads)
+            delete overload.second;
     }
 }
 

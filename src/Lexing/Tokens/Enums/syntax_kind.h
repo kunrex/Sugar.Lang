@@ -1,8 +1,9 @@
 #ifndef SYNTAX_KIND_H
 #define SYNTAX_KIND_H
 
-#include <iostream>
+#include <string>
 
+#include "operator_kind.h"
 #include "type_kind.h"
 #include "separator_kind.h"
 
@@ -27,117 +28,51 @@ namespace Tokens::Enums
         FlowerOpenBracket = static_cast<short>(SeparatorKind::FlowerOpenBracket),
         FlowerCloseBracket = static_cast<short>(SeparatorKind::FlowerCloseBracket),
 
-        Constant = 3,
-        Identifier = 5,
+        Addition = static_cast<short>(OperatorKind::Addition),
+        Subtraction = static_cast<short>(OperatorKind::Subtraction),
+        Multiplication = static_cast<short>(OperatorKind::Multiplication),
+        Division = static_cast<short>(OperatorKind::Division),
+        Modulus = static_cast<short>(OperatorKind::Modulus),
 
-        Print = 6,
-        Input = 7,
-        Format = 9,
-        Println = 113,
+        LeftShift = static_cast<short>(OperatorKind::LeftShift),
+        RightShift = static_cast<short>(OperatorKind::RightShift),
+        BitwiseOr = static_cast<short>(OperatorKind::BitwiseOr),
+        BitwiseAnd = static_cast<short>(OperatorKind::BitwiseAnd),
+        BitwiseXor = static_cast<short>(OperatorKind::BitwiseXor),
 
-        Let = 10,
+        Increment = static_cast<short>(OperatorKind::Increment),
+        Decrement = static_cast<short>(OperatorKind::Decrement),
+        IncrementPrefix = static_cast<short>(OperatorKind::IncrementPrefix),
+        DecrementPrefix = static_cast<short>(OperatorKind::DecrementPrefix),
 
-        This = 12,
+        Not = static_cast<short>(OperatorKind::Not),
+        Plus = static_cast<short>(OperatorKind::Plus),
+        Minus = static_cast<short>(OperatorKind::Minus),
+        BitwiseNot = static_cast<short>(OperatorKind::BitwiseNot),
 
-        Get = 13,
-        Set = 14,
+        Equals = static_cast<short>(OperatorKind::Equals),
+        NotEquals = static_cast<short>(OperatorKind::NotEquals),
+        LesserThan = static_cast<short>(OperatorKind::LesserThan),
+        GreaterThan = static_cast<short>(OperatorKind::GreaterThan),
+        LesserThanEquals = static_cast<short>(OperatorKind::LesserThanEquals),
+        GreaterThanEquals = static_cast<short>(OperatorKind::GreaterThanEquals),
 
-        Create = 15,
+        Or = static_cast<short>(OperatorKind::Or),
+        And = static_cast<short>(OperatorKind::And),
 
-        Throw = 19,
+        Assignment = static_cast<short>(OperatorKind::Assignment),
 
-        Func = 21,
-        Action = 22,
-        Invoke = 23,
-        FuncRef = 24,
+        AssignmentAddition = static_cast<short>(OperatorKind::AssignmentAddition),
+        AssignmentSubtraction = static_cast<short>(OperatorKind::AssignmentSubtraction),
+        AssignmentMultiplication = static_cast<short>(OperatorKind::AssignmentMultiplication),
+        AssignmentDivision = static_cast<short>(OperatorKind::AssignmentDivision),
+        AssignmentModulus = static_cast<short>(OperatorKind::AssignmentModulus),
 
-        Enum = 25,
-        Class = 26,
-        Struct = 27,
-
-        Void = 28,
-        Indexer = 29,
-        Operator = 31,
-        Implicit = 33,
-        Explicit = 34,
-        ToString = 35,
-        Constructor = 37,
-
-        Ref = 38,
-        Static = 40,
-        Public = 41,
-        Private = 42,
-
-        Copy = 114,
-
-        Do = 43,
-        For = 44,
-        While = 45,
-
-        If = 46,
-        Else = 47,
-        Elif = 48,
-
-        Break = 49,
-        Return = 50,
-        Continue = 51,
-
-        True = 52,
-        False = 53,
-
-        Addition = 54,
-        Subtraction = 55,
-        Multiplication = 56,
-        Division = 57,
-        Modulus = 58,
-
-        LeftShift = 59,
-        RightShift = 60,
-        BitwiseOr = 61,
-        BitwiseAnd = 62,
-        BitwiseXor = 63,
-
-        Increment = 65,
-        Decrement = 66,
-        IncrementPrefix = 67,
-        DecrementPrefix = 68,
-
-        Not = 69,
-        Plus = 70,
-        Minus = 71,
-        BitwiseNot = 72,
-
-        Equals = 73,
-        NotEquals = 74,
-        LesserThan = 75,
-        GreaterThan = 76,
-        LesserThanEquals = 77,
-        GreaterThanEquals = 78,
-
-        Or = 79,
-        And = 80,
-
-        Assignment = 81,
-
-        AssignmentAddition = 82,
-        AssignmentSubtraction = 83,
-        AssignmentMultiplication = 84,
-        AssignmentDivision = 85,
-        AssignmentModulus = 86,
-
-        AssignmentBitwiseOr = 87,
-        AssignmentBitwiseAnd = 88,
-        AssignmentBitwiseXor = 89,
-        AssignmentBitwiseLeftShift = 90,
-        AssignmentBitwiseRightShift = 91,
-
-        As = 92,
-
-        Null = 93,
-
-        Import = 95,
-
-        Invalid = 96,
+        AssignmentBitwiseOr = static_cast<short>(OperatorKind::AssignmentBitwiseOr),
+        AssignmentBitwiseAnd = static_cast<short>(OperatorKind::AssignmentBitwiseAnd),
+        AssignmentBitwiseXor = static_cast<short>(OperatorKind::AssignmentBitwiseXor),
+        AssignmentBitwiseLeftShift = static_cast<short>(OperatorKind::AssignmentLeftShift),
+        AssignmentBitwiseRightShift = static_cast<short>(OperatorKind::AssignmentRightShift),
 
         Short = static_cast<short>(TypeKind::Short),
         Int = static_cast<short>(TypeKind::Int),
@@ -149,18 +84,85 @@ namespace Tokens::Enums
         Boolean = static_cast<short>(TypeKind::Boolean),
         Character = static_cast<short>(TypeKind::Character),
 
-        String = static_cast<short>(TypeKind::String),
-        Object = static_cast<short>(TypeKind::Object),
-
         Array = static_cast<short>(TypeKind::Array),
         List = static_cast<short>(TypeKind::List),
         Dictionary = static_cast<short>(TypeKind::Dictionary),
         Tuple = static_cast<short>(TypeKind::Tuple),
 
+        Func = static_cast<short>(TypeKind::Func),
+        Action = static_cast<short>(TypeKind::Action),
+
         Nullable = static_cast<short>(TypeKind::Nullable),
 
-        Exception = static_cast<short>(TypeKind::Exception),
         Math = static_cast<short>(TypeKind::Math),
+        String = static_cast<short>(TypeKind::String),
+        Exception = static_cast<short>(TypeKind::Exception),
+
+        Object = static_cast<short>(TypeKind::Object),
+
+        Constant = 51,
+        Identifier,
+
+        Copy,
+        Print,
+        Input,
+        Format,
+        Println,
+
+        Let,
+
+        This,
+
+        Get,
+        Set,
+
+        Throw,
+        Create,
+
+        Invoke = 65,
+        FuncRef,
+
+        Enum,
+        Class,
+        Struct,
+
+        Void,
+        Indexer,
+        Operator,
+        Implicit,
+        Explicit,
+        ToString,
+        Constructor,
+
+        Ref,
+        Const,
+        Static,
+        Public,
+        Private,
+        Constexpr,
+
+        Do,
+        For,
+        While,
+
+        If,
+        Else,
+        Elif,
+
+        Break,
+        Return,
+        Continue,
+
+        True,
+        False,
+
+        As,
+
+        Null,
+
+        Import,
+
+        Invalid,
     };
 
     std::string ToString(const SyntaxKind& syntaxKind);

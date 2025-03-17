@@ -17,5 +17,5 @@ namespace Analysis::Structure::Context
     bool InvalidContext::Readable() const { return false; }
     bool InvalidContext::Writable() const { return false; }
 
-    std::string InvalidContext::CILInstruction() const { return ""; }
+    std::string InvalidContext::CILData() const { return ""; }
 }

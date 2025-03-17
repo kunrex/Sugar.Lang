@@ -25,7 +25,7 @@ namespace Analysis::Structure::Context
     bool FuncRefContext::Readable() const { return false; }
     bool FuncRefContext::Writable() const { return false; }
 
-    string FuncRefContext::CILInstruction() const
+    string FuncRefContext::CILData() const
     {
         return "ldftn " + function->Signature();
     }

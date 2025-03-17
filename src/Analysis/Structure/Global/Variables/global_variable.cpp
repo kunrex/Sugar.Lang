@@ -1,7 +1,5 @@
 #include "global_variable.h"
 
-#include "../../Core/DataTypes/data_type.h"
-
 using namespace std;
 
 using namespace ParseNodes;
@@ -15,7 +13,7 @@ namespace Analysis::Structure::Global
     GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType) : Characteristic(name, describer, creationType, nullptr)
     { }
 
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* const value) : Characteristic(name, describer, creationType, value)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* const parseNode) : Characteristic(name, describer, creationType, parseNode)
     { }
 
     MemberType GlobalVariable::MemberType() const { return MemberType::Field; }

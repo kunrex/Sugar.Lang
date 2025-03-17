@@ -17,7 +17,6 @@ add_library(Sugar STATIC
 
         Lexing/Tokens/token.cpp
         Lexing/Tokens/token.h
-        Lexing/Tokens/Enums/type_kind.cpp
         Lexing/Tokens/Enums/type_kind.h
         Lexing/Tokens/Enums/token_type.cpp
         Lexing/Tokens/Enums/token_type.h
@@ -244,8 +243,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Creation/function.h
         Analysis/Structure/Local/local_node.cpp
         Analysis/Structure/Local/local_node.h
-        Analysis/Structure/Core/scoped.cpp
-        Analysis/Structure/Core/scoped.h
+        Analysis/Structure/Core/Scoped/scoped.cpp
+        Analysis/Structure/Core/Scoped/scoped.h
         Analysis/Structure/Creation/Functions/void_definition.cpp
         Analysis/Structure/Creation/Functions/void_definition.h
         Analysis/Structure/Creation/Functions/method_definition.cpp
@@ -299,16 +298,14 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/unary_context_node.h
         Analysis/Structure/Core/Interfaces/i_read_write.h
         Analysis/Structure/Core/Interfaces/i_slot_size.h
-        Analysis/Structure/Core/DataTypes/user_defined_type.cpp
-        Analysis/Structure/Core/DataTypes/user_defined_type.h
         Analysis/Structure/Context/Entities/indexed_context.cpp
         Analysis/Structure/Context/Entities/indexed_context.h
         Analysis/Structure/Local/Variables/local_variable.cpp
         Analysis/Structure/Local/Variables/local_variable.h
         Analysis/Structure/Context/Entities/References/local_variable_context.cpp
         Analysis/Structure/Context/Entities/References/local_variable_context.h
-        Analysis/Structure/Context/Entities/References/argument_context.cpp
-        Analysis/Structure/Context/Entities/References/argument_context.h
+        Analysis/Structure/Context/Entities/References/parameter_context.cpp
+        Analysis/Structure/Context/Entities/References/parameter_context.h
         Analysis/Structure/Context/Entities/References/field_context.cpp
         Analysis/Structure/Context/Entities/References/field_context.h
         Analysis/Structure/Context/Entities/variable_context.cpp
@@ -319,10 +316,8 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/Functions/function_call_context.h
         Analysis/Structure/Context/Expressions/dot_expression.cpp
         Analysis/Structure/Context/Expressions/dot_expression.h
-        Analysis/Structure/Context/Expressions/built_in_index_expression.cpp
-        Analysis/Structure/Context/Expressions/built_in_indexer_expression.h
-        Analysis/Structure/Context/Expressions/defined_indexer_expression.cpp
-        Analysis/Structure/Context/Expressions/defined_indexer_expression.h
+        Analysis/Structure/Context/Expressions/indexer_expression.cpp
+        Analysis/Structure/Context/Expressions/indexer_expression.h
         Analysis/Structure/Global/BuiltIn/built_in_indexer.cpp
         Analysis/Structure/Global/BuiltIn/built_in_indexer.h
         Analysis/Structure/Context/Expressions/built_in_unary_expression.cpp
@@ -340,7 +335,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/Functions/format_context.h
         Analysis/Structure/Context/Entities/Functions/input_context.cpp
         Analysis/Structure/Context/Entities/Functions/input_context.h
-        Analysis/Creation/Transpiling/expression_transpiler.cpp
         Exceptions/log_exception.cpp
         Exceptions/log_exception.h
         Exceptions/exception_manager.cpp
@@ -517,8 +511,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/i_fully_nameable.h
         Analysis/Structure/Global/Functions/function_extensions.cpp
         Analysis/Structure/Global/Functions/function_extensions.h
-        Analysis/Structure/Global/Variables/enum_field.cpp
-        Analysis/Structure/Global/Variables/enum_field.h
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h
         Parsing/ParseNodes/Core/Interfaces/i_body_node.h
@@ -528,7 +520,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/DataTypes/i_data_type.h
         Analysis/Structure/Core/Interfaces/i_nameable.h
         Analysis/Structure/Core/Interfaces/Creation/i_function.h
-        Analysis/Structure/Core/Interfaces/DataTypes/i_built_in_type.h
         Analysis/Structure/Core/Interfaces/Creation/i_parametrized.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_function.h
         Analysis/Structure/Core/Interfaces/Creation/i_variable.h
@@ -536,8 +527,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/Creation/i_property_signature.h
         Analysis/Structure/Core/Creation/property_signature.cpp
         Analysis/Structure/Core/Creation/property_signature.h
-        Analysis/Structure/Core/DataTypes/generic_type.cpp
-        Analysis/Structure/Core/DataTypes/generic_type.h
         Analysis/Structure/Core/Interfaces/Creation/i_indexer_definition.h
         Analysis/Structure/Core/Interfaces/Creation/i_characteristic.h
         Analysis/Structure/Core/Interfaces/Creation/i_operator_overload.h
@@ -552,12 +541,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/static_reference_context.h
         Analysis/Structure/Context/Entities/this_context.cpp
         Analysis/Structure/Context/Entities/this_context.h
-        Analysis/Structure/Context/Entities/References/argument_address_context.cpp
-        Analysis/Structure/Context/Entities/References/argument_address_context.h
-        Analysis/Structure/Context/Entities/References/field_address_context.cpp
-        Analysis/Structure/Context/Entities/References/field_address_context.h
-        Analysis/Structure/Context/Entities/References/local_variable_address_context.cpp
-        Analysis/Structure/Context/Entities/References/local_variable_address_context.h
         Analysis/Structure/Context/Entities/Functions/funcref_context.cpp
         Analysis/Structure/Context/Entities/Functions/funcref_context.h
         Analysis/Structure/Context/Entities/Functions/invoke_context.cpp
@@ -568,4 +551,37 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/assignment_expression.h
         Analysis/Structure/Context/Expressions/duplicate_expression.cpp
         Analysis/Structure/Context/Expressions/duplicate_expression.h
+        Analysis/Structure/Context/Entities/throw_context.cpp
+        Analysis/Structure/Context/Entities/throw_context.h
+        Exceptions/Compilation/Analysis/Local/non_static_reference_exception.cpp
+        Exceptions/Compilation/Analysis/Local/non_static_reference_exception.h
+        Exceptions/Compilation/Analysis/Local/accessibility_exception.cpp
+        Exceptions/Compilation/Analysis/Local/accessibility_exception.h
+        Exceptions/Compilation/Analysis/Local/func_ref_exception.cpp
+        Exceptions/Compilation/Analysis/Local/func_ref_exception.h
+        Analysis/Structure/Context/Entities/Functions/invalid_funcref_context.cpp
+        Analysis/Structure/Context/Entities/Functions/invalid_funcref_context.h
+        Analysis/Structure/Context/Entities/Functions/copy_context.cpp
+        Analysis/Structure/Context/Entities/Functions/copy_context.h
+        Analysis/Structure/Context/Entities/Functions/ref_context.cpp
+        Analysis/Structure/Context/Entities/Functions/ref_context.h
+        Analysis/Structure/Context/Entities/Functions/creation_context.cpp
+        Analysis/Structure/Context/Entities/Functions/creation_context.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_collection_type.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_user_defined_type.h
+        Analysis/Structure/Core/Interfaces/scoped/i_scoped.h
+        Analysis/Structure/Wrappers/Reference/void.cpp
+        Analysis/Structure/Wrappers/Reference/void.h
+        Analysis/Structure/Compilation/constant_compiler.cpp
+        Analysis/Structure/Compilation/constant_compiler.h
+        Analysis/Structure/Compilation/compilation_result.cpp
+        Analysis/Structure/Compilation/compilation_result.h
+        Lexing/Tokens/Enums/operator_kind.h
+        Lexing/Tokens/Enums/operator_kind.cpp
+        Analysis/Structure/Global/Variables/global_constant.cpp
+        Analysis/Structure/Global/Variables/global_constant.h
+        Exceptions/Compilation/Analysis/Local/invalid_statement_exception.cpp
+        Exceptions/Compilation/Analysis/Local/invalid_statement_exception.h
+        Exceptions/Compilation/Analysis/Local/overload_not_found_exception.cpp
+        Exceptions/Compilation/Analysis/Local/overload_not_found_exception.h
 )

@@ -45,7 +45,6 @@ namespace Tokens::Enums
                         break;
                 }
             }
-
         }
 
         return result.substr(0, result.size() - 2);

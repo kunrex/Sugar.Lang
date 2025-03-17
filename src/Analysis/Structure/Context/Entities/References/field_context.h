@@ -8,13 +8,11 @@ namespace Analysis::Structure::Context
     class FieldContext final : public VariableContext
     {
         public:
-            FieldContext(const Core::Interfaces::IVariable* variable, bool isLoadInstruction);
+            explicit FieldContext(const Core::Interfaces::IVariable* variable);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] int SlotCount() const override;
-
-            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

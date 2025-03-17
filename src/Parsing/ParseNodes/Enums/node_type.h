@@ -55,7 +55,7 @@ namespace ParseNodes::Enums
         Input,
         Invoke,
         Format,
-        RefCall,
+        Ref,
         Println,
         FuncRef,
         ToString,

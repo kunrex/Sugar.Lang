@@ -22,6 +22,6 @@ namespace Analysis::Structure::Context
     bool DefinedUnaryExpression::Readable() const { return true; }
     bool DefinedUnaryExpression::Writable() const { return true; }
 
-    string DefinedUnaryExpression::CILInstruction() const { return std::format("call {}", operation->FullName()); }
+    string DefinedUnaryExpression::CILData() const { return std::format("call {}", operation->FullName()); }
 }
 

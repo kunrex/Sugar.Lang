@@ -19,5 +19,5 @@ namespace Analysis::Structure::Context
     bool NullConstant::Readable() const { return true; }
     bool NullConstant::Writable() const { return false; }
 
-    string NullConstant::CILInstruction() const { return "ldnull"; }
+    string NullConstant::CILData() const { return "ldnull"; }
 }

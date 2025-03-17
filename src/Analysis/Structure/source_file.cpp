@@ -1,13 +1,12 @@
 #include "source_file.h"
 
-#include "Core/DataTypes/data_type.h"
+#include "Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 using namespace std;
 
 using namespace ParseNodes::Groups;
 
-using namespace Analysis::Structure::Core;
-using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Enums;using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure
 {
@@ -16,7 +15,7 @@ namespace Analysis::Structure
 
     SourceType SourceFile::SourceType() const { return SourceType::File; }
 
-    bool SourceFile::AddChild(const string key, DataType* const value)
+    bool SourceFile::AddChild(const string key, IUserDefinedType* const value)
     {
         const auto result = Dictionary::AddChild(key, value);
         if (result)
@@ -25,12 +24,12 @@ namespace Analysis::Structure
         return result;
     }
 
-    void SourceFile::AddReference(const Interfaces::IDataType* const dataType)
+    void SourceFile::AddReference(const IDataType* const dataType)
     {
-        references[dataType->Name()] == dataType;
+        references[dataType->Name()] = dataType;
     }
 
-    const Interfaces::IDataType* SourceFile::GetReference(const string& name) const
+    const IDataType* SourceFile::GetReference(const string& name) const
     {
         return references.contains(name) ? nullptr : references.at(name);
     }

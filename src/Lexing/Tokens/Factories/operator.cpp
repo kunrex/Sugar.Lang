@@ -17,6 +17,12 @@ namespace Tokens
         return { (metadata >> 8) & 0xFF, metadata & 0xFF };
     }
 
+    std::optional<SyntaxKind> Operator::IsAssignment(const SyntaxKind kind)
+    {
+        const auto operatorKind = static_cast<OperatorKind>(kind);
+        return (operatorKind & OperatorKind::Assignment) == OperatorKind::Assignment ? std::make_optional(static_cast<SyntaxKind>(operatorKind ^ OperatorKind::Assignment)) : std::nullopt;
+    }
+
     Token Operator::Unary(const unsigned long index, const SyntaxKind syntaxKind, const std::string& value, const bool leftAssociative, const int precedence)
     {
         return { index, TokenType::UnaryOperator, syntaxKind, EncodeMetadata(leftAssociative, precedence), value };

@@ -9,7 +9,7 @@ namespace Analysis::Structure::Global
     {
         public:
             GlobalVariable(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
-            GlobalVariable(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::ParseNode* value);
+            GlobalVariable(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::ParseNode* parseNode);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

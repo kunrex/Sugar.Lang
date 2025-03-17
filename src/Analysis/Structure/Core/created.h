@@ -1,7 +1,6 @@
 #ifndef CREATED_H
 #define CREATED_H
 
-#include "DataTypes/data_type.h"
 #include "Interfaces/i_created.h"
 
 namespace Analysis::Structure::Core

@@ -38,6 +38,12 @@ namespace Analysis::Structure::Enums
                     if ((final & Describer::Public) != Describer::Public)
                         final = final | Describer::Private;
                     break;
+                case SyntaxKind::Const:
+                    final = final | Describer::Const;
+                    break;
+                case SyntaxKind::Constexpr:
+                    final = final | Describer::Constexpr;
+                    break;
                 default:
                     break;
             }

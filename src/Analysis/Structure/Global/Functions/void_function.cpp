@@ -9,7 +9,6 @@
 using namespace std;
 
 using namespace ParseNodes;
-using namespace ParseNodes::Groups;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;

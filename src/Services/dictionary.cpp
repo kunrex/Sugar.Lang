@@ -1,9 +1,10 @@
 #include "dictionary.h"
 
 #include "../Analysis/Structure/source_object.h"
+#include "../Analysis/Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 using namespace Analysis::Structure;
-using namespace Analysis::Structure::Core;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Services
 {
@@ -77,5 +78,5 @@ namespace Services
     }
 
     template class Dictionary<std::string, SourceObject>;
-    template class Dictionary<std::string, DataType>;
+    template class Dictionary<std::string, IUserDefinedType>;
 }

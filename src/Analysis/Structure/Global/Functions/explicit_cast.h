@@ -1,7 +1,7 @@
 #ifndef EXPLICIT_CAST_H
 #define EXPLICIT_CAST_H
 
-#include "../../Core/scoped.h"
+#include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/cast_definition.h"
 
 namespace Analysis::Structure::Global

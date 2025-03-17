@@ -16,17 +16,16 @@ namespace Analysis::Structure::Enums
 
         Static = 8,
 
+        Const = 16,
+        Constexpr = 32 | Static,
+
         AccessModifiers = Public | Private,
+
+        PublicStatic = Public | Static,
 
         ValidEnum = AccessModifiers,
         ValidStruct = AccessModifiers,
         ValidClass = AccessModifiers | Static,
-
-        ValidGlobalMember = AccessModifiers | Static,
-
-        ValidFunctionArgument = Ref,
-
-        PublicStatic = Public | Static,
     };
 
     Describer operator & (const Describer& lhs, const Describer& rhs);

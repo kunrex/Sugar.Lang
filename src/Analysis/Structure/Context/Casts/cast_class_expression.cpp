@@ -22,5 +22,5 @@ namespace Analysis::Structure::Context
     bool CastClassExpression::Readable() const { return true; }
     bool CastClassExpression::Writable() const { return false; }
 
-    string CastClassExpression::CILInstruction() const { return std::format("castclass {}", creationType->FullName()); }
+    string CastClassExpression::CILData() const { return std::format("castclass {}", creationType->FullName()); }
 }

@@ -10,18 +10,30 @@ using namespace ParseNodes::DataTypes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
-    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer), fullName()
+    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer)
     { }
 
     MemberType Class::MemberType() const { return MemberType::Class; }
 
     int Class::SlotCount() const { return 1; }
 
-    const string& Class::FullName() const
+    BuiltInClass::BuiltInClass(const std::string& name, const Enums::Describer describer) : Class(name, describer)
+    { }
+
+    const string& BuiltInClass::FullName() const { return name; }
+
+    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : Class(name, describer), fullName(), skeleton(skeleton), staticConstructor(new Global::StaticConstructor(this)), instanceConstructor(new Global::InstanceConstructor(this))
+    { }
+
+
+    TypeKind ClassSource::Type() const { return TypeKind::Custom; }
+
+    const string& ClassSource::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = parent->FullName() + "." + name;
@@ -29,82 +41,121 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    void Class::PushCharacteristic(ICharacteristic* characteristic)
+    const DataTypeNode* ClassSource::Skeleton() const { return skeleton; }
+
+    void ClassSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    const ICharacteristic* Class::FindCharacteristic(const string& name) const
+    const ICharacteristic* ClassSource::FindCharacteristic(const string& name) const
     {
         return characteristics.contains(name) ? nullptr : characteristics.at(name);
     }
 
-    void Class::PushFunction(IFunctionDefinition* function)
+    void ClassSource::PushFunction(IFunctionDefinition* const function)
     {
         functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
     }
 
-    const IFunctionDefinition* Class::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
+    const IFunctionDefinition* ClassSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
 
-    void Class::PushConstructor(IFunction* constructor)
+    IScoped* ClassSource::StaticConstructor() const { return staticConstructor; }
+    IScoped* ClassSource::InstanceConstructor() const { return instanceConstructor; }
+
+    void ClassSource::PushConstructor(IFunction* const constructor)
     {
+        IFunction* s = constructor;
+
         constructors[ArgumentHash(constructor)] = constructor;
     }
 
-    const IFunction* Class::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* ClassSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return constructors.contains(hash) ? nullptr : constructors.at(hash);
     }
 
-    void Class::PushIndexer(IIndexerDefinition* indexer)
+    void ClassSource::PushIndexer(IIndexerDefinition* indexer)
     {
         indexers[ArgumentHash(indexer)] = indexer;
     }
 
-    const IIndexerDefinition* Class::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    const IIndexerDefinition* ClassSource::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return indexers.contains(hash) ? nullptr : indexers.at(hash);
     }
 
-    void Class::PushImplicitCast(IFunction* cast)
+    void ClassSource::PushImplicitCast(IFunction* cast)
     {
         implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const IFunction* Class::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    const IFunction* ClassSource::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
     }
 
-    void Class::PushExplicitCast(IFunction* cast)
+    void ClassSource::PushExplicitCast(IFunction* cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const IFunction* Class::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    const IFunction* ClassSource::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
-    void Class::PushOverload(IOperatorOverload* overload)
+    void ClassSource::PushOverload(IOperatorOverload* overload)
     {
         overloads[overload->Operator()] = overload;
     }
 
-    const IOperatorOverload* Class::FindOverload(const SyntaxKind base) const
+    const IOperatorOverload* ClassSource::FindOverload(const SyntaxKind base) const
     {
         return overloads.at(base);
     }
 
-    Class::~Class()
+    std::vector<const ICharacteristic*> ClassSource::AllCharacteristics() const
+    {
+        std::vector<const ICharacteristic*> all;
+
+        for (const auto& characteristic : characteristics)
+            all.push_back(characteristic.second);
+
+        return all;
+    }
+
+    std::vector<IScoped*> ClassSource::AllScoped() const
+    {
+        std::vector<IScoped*> all;
+
+        for (const auto function: functions)
+            all.push_back(function.second);
+
+        for (const auto constructor: constructors)
+            all.push_back(constructor.second);
+
+        for (const auto cast: implicitCasts)
+            all.push_back(cast.second);
+
+        for (const auto cast: explicitCasts)
+            all.push_back(cast.second);
+
+        for (const auto& overload: overloads)
+            delete overload.second;
+
+        return all;
+    }
+
+    ClassSource::~ClassSource()
     {
         for (const auto& characteristic : characteristics)
             delete characteristic.second;
@@ -126,26 +177,6 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto& overload: overloads)
             delete overload.second;
-    }
-
-    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : Class(name, describer), UserDefinedType(skeleton)
-    { }
-
-    const string& ClassSource::FullName() const
-    {
-        if (fullName.empty() && parent != nullptr)
-            fullName = parent->FullName() + "." + name;
-
-        return fullName;
-    }
-
-    std::vector<const ICharacteristic*> ClassSource::AllCharacteristics() const
-    {
-        std::vector<const ICharacteristic*> all;
-        for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
-
-        return all;
     }
 }
 

@@ -27,7 +27,7 @@ namespace Analysis::Structure::Context
     bool FormatContext::Readable() const { return true; }
     bool FormatContext::Writable() const { return false; }
 
-    string FormatContext::CILInstruction() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
+    string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
 
     FormatSingleContext::FormatSingleContext(const ContextNode* const operand) : UnaryContextNode(&String::Instance(), operand), slotCount(-1)
     { }
@@ -45,7 +45,7 @@ namespace Analysis::Structure::Context
     bool FormatSingleContext::Readable() const { return true; }
     bool FormatSingleContext::Writable() const { return false; }
 
-    string FormatSingleContext::CILInstruction() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
+    string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
 
     FormatDoubleContext::FormatDoubleContext(const ContextNode* const arg1, const ContextNode* const arg2) : BinaryContextNode(&String::Instance(), arg1, arg2), slotCount(-1)
     { }
@@ -63,5 +63,5 @@ namespace Analysis::Structure::Context
     bool FormatDoubleContext::Readable() const { return true; }
     bool FormatDoubleContext::Writable() const { return false; }
 
-    string FormatDoubleContext::CILInstruction() const { return "call string [System.Runtime]System.String::Format(string, object, object)"; }
+    string FormatDoubleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object, object)"; }
 }

@@ -17,6 +17,8 @@ namespace ParseNodes::Functions::Calling
 
             [[nodiscard]] unsigned long Index() const override;
 
+            [[nodiscard]] const Values::IdentifierNode* Identifier() const;
+
             ~FunctionCallNode() override;
     };
 }

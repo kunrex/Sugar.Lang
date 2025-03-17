@@ -4,24 +4,56 @@
 #include "../../../../Services/singleton_service.h"
 
 #include "../../DataTypes/class.h"
-#include "../../Core/DataTypes/generic_type.h"
-#include "../../Core/Interfaces/DataTypes/i_built_in_type.h"
+#include "../../Core/Interfaces/DataTypes/i_collection_type.h"
+#include "../../Global/BuiltIn/built_in_constructor.h"
+#include "../../Global/BuiltIn/built_in_indexer.h"
+#include "../../Global/BuiltIn/built_in_property.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Array final : public DataTypes::Class, public Services::SingletonCollection, public Core::GenericType, public virtual Core::Interfaces::IBuiltInType
+    class Array final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::ICollectionType
     {
         private:
+            mutable std::string genericSignature;
+
             const IDataType* arrayType;
 
+            Global::BuiltInProperty* length;
+
+            Global::BuiltInConstructor* constructor;
+
+            Global::BuiltInIndexer* indexer;
+        
             explicit Array(const IDataType* arrayType);
 
         public:
             static const Array* Instance(const IDataType* dataType);
 
+            [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
+
             [[nodiscard]] const std::string& FullName() const override;
 
-            void InitialiseMembers() override;
+            [[nodiscard]] const IDataType* GenericType() const override;
+
+            [[nodiscard]] std::string ConstructorSignature() const override;
+            [[nodiscard]] std::string PushElementSignature() const override;
+
+            void InitializeMembers() override;
+
+            [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+            [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+
+            [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
+
+            ~Array() override;
     };
 }
 

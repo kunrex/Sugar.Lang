@@ -68,40 +68,83 @@ do { } while(condition)
 ```
 
 ### I/O Functions
-Sugar uses the `print`, `println` and `input` functions for output and input respectively.
+Sugar uses the `print`, `println`, and `input` functions for output and input.
 ```python
 print("hello world: ");
 string: result = input();
 ```
 
-All data types in sugar are converted to strings using the `tostring` function. Sugar also provides built in string formatting using the `format` method.
-```js
-let: y = format("{0} ate {1}", /* 0th argument */ tostring(7), /* 1st argument */ 9);
-print(y); // "7 ate 9"
+## Data Structures
+
+Sugar supports custom data structures: `class`, `struct` and `enum`.
+
+### Memory Implications (`class` vs `struct`)
+
+Sugar is garbage collected since it compiles to CIL. The only difference between a class and a struct in sugar is how they're handled in memory.
+
+| Criteria  | Class                 | Struct                              |
+|:---------:|-----------------------|-------------------------------------|
+| Creation  | Allocated on the heap | Allocated on the stack              |
+| Arguments | Passed by reference   | Passed by value (unless using `ref`) |
+| Returning | Returned a reference  | Returns a copy                      |
+
+```cs
+class Type
+{
+    [public] int: x;
+    
+    [public] void Modify() { x = 10; }
+}
+
+let: a = create Type();
+let: b = a; // references the same instance
+
+b.Modify();
+
+print(a.x) // prints 10
+print(b.x) // prints 10
 ```
-### Data Types
+
+```cs
+struct Type
+{
+    [public] int: x;
+    
+    [public] void Modify() { x = 10; }
+}
+
+let: a = create Type();
+let: b = a; // creates a copy (even without explicitly using `create`)
+
+a.Modify(); // the original is modified, the copy is unchanged.
+
+print(a.x) // prints 10
+print(b.x) // prints 0
+```
+
+### Built In Types
 These data types are built into sugar:
 1. Integers: `short [signed 2 bytes]`, `int [signed 4 bytes]`, `long [signed 8 bytes]`
 2. Floating Point: `float [signed 7 digit precision]`, `double [signed 15 digit precision]`
 3. Characters, Booleans and Strings: `char`, `bool` and `string`. Strings are immutable.
-4. Arrays, List, Dictionaries and Tuple: `array`, `list`, `dictionary` and `tuple`.
-5. Funcs and Action: `func` and `action`.
-6. Nullable: `nullable` serves a generic type to create nullable value type equivalents.
-7. Exception: `exception` serves to represent compile time exceptions that can be thrown.
-8. Math: `math` serves as a built in static class to define mathematical constants and functions.
-9. Object: `object` serves as the base object reference for any type (as in C#).
+4. Arrays, Lists, Dictionaries and Tuples: `array`, `list`, `dictionary` and `tuple`.
+5. Func and Action: `func` and `action`.
+6. Nullable: `nullable` represents nullable value types.
+7. Exception: `exception` represents run time exceptions that can be thrown.
+8. Math: `math` is a static class that defines mathematical constants and functions.
+9. Object: `object` is the base object reference for any type (as in C#).
 
 #### Collections
 
 Sugar supports the collections mentioned above.
-1. `array`:
+1. `array`: 
 ```c++
 let: collection = create array<int>(3);
 
 collection[2] = 3;
 print(collection[2]);
 ```
-2. `list`:
+2. `list`: 
 ```c++
 let: collection = create list<int>();
 
@@ -117,7 +160,7 @@ let: list = create list<int> { 1, 2, 3, 4, 5 };
 
 3.  `dictionary`:
 ```c++
-let: collection = create dictionary<int, string>();;
+let: collection = create dictionary<int, string>();
 
 collection.Add(10, "ten");
 print(collection[10]);
@@ -130,6 +173,8 @@ let: collection = create tuple<int, string>(1, "one");
 print(collection.Element1);
 print(collection.Element2);
 ```
+
+A tuple is a value type in Sugar.
 
 #### Nullable
 ```cs
@@ -178,54 +223,6 @@ int: result = invoke(add, 10, 20);
 ```
 > Sugar technically supports generics, but only for built-in types and functions.
 
-## Data Structures
-
-Sugar supports custom data structures: `class`, `struct` and `enum`.
-
-### Memory Implications (`class` vs `struct`)
-
-Sugar is garbage collected since it compiles to CIL. The only difference between a class and a struct in sugar is how they're handled in memory.
-
-| Criteria  | Class                 | Struct                                   |
-|:---------:|-----------------------|------------------------------------------|
-| Creation  | Allocated on the heap | Allocated on the stack                   |
-| Arguments | Passed by reference   | Passed by value (unless specified using `ref`) |
-| Returning | Returned a reference  | Returns a copy                           |
-
-```cs
-class Type
-{
-    [public] int: x;
-    
-    [public] void Modify() { x = 10; }
-}
-
-let: a = create Type();
-let: b = a; // references the same instance
-
-b.Modify();
-
-print(a.x) // prints 10
-print(b.x) // prints 10
-```
-
-```cs
-struct Type
-{
-    [public] int: x;
-    
-    [public] void Modify() { x = 10; }
-}
-
-let: a = create Type();
-let: b = a; // creates a copy (even without explicitly using `create`)
-
-a.Modify(); // the original is modified, the copy is unchanged.
-
-print(a.x) // prints 10
-print(b.x) // prints 0
-```
-
 ### Enums
 Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
 ```cs
@@ -240,7 +237,7 @@ enum EncodingBase
 
 Enums implicitly define bitwise operations and an explicit conversion to their integer value.
 
-### Describers
+## Describers
 Taking inspiration from C#'s attributes, which I adore, sugar has describers.
 ```cs
 [public]
@@ -264,7 +261,23 @@ Describers can contain the following keywords:
 2. `public`: An access specifier for public items.
 3. `private`: An access specifier for private items.
 
-4. `ref`: Allows reference like behaviour with structs.
+
+4. `const`: A runtime constant.
+5. `constexpr`: A compile time constant.
+
+
+6. `ref`: Allows reference like behaviour with structs.
+
+### `const` and `constexpr`
+
+`const` is used to guarantee runtime constancy. It's implications differ based on context:
+
+1. Global Fields: `const` enforces that a global field can only be assigned to in the constructor or through inline initialisation.
+2. Function Arguments: `const` enforces a function argument cannot be assigned to.
+
+In both cases this only enforces assignment, not immutability.
+
+`constexpr` must be initialised to a compile time constant and enforces immutability. They can only be primitives or strings. It's also worth noting these values are implicitly static. 
 
 ### The `ref` keyword 
 
@@ -298,7 +311,9 @@ print(++b); //prints 11
 print(a); //prints 10
 ```
 
-### Properties
+References will inherit functions, fields and indexers defined by their base class. They do not however inherit any operator or cast overloads, to use them `copy` must be called to explicitly dereference and create a value.
+
+## Properties
 Sugar lets you customise member fields using properties. A rather basic implementation:
 ```cs
 [public] int: x { get; [private] set; }
@@ -309,20 +324,22 @@ Sugar lets you customise member fields using properties. A rather basic implemen
 ```
 - In case of conflicts like above, the describer on the field definition is given preference.
 ```cs
+list<int> values = create list<int>();
+[public] int: Count { get { return values.Count; } }
+```
+- Accessors can define bodies. the `set` accessor implicitly define the `value` parameter to represent the value assigned.
+#### Special Cases
+The absence of a body in get only and set only properties can lead to special cases.
+```cs
 [public] int: x { get; }
 ```
-- Creates a runtime constant that can only be initialised in a constructor or during creation.
+- Creates a runtime constant that can only be initialised.
 ```cs
 [public] int: x { set; }
 ```
-- While it compiles, the above has virtually no practical use.
-```cs
-list<int> values;
-[public] int: Count { get { return values.Count; } }
-```
-- Accessors can define bodies. the `set` accessor implicitly defines the `value` parameter to represent the value assigned. 
+- A set only property. This is essentially the same thing as a function.
 
-### Special Functions
+## Special Functions
 Sugar features functions for cast overloading, operator overloading, indexers and constructors.
 
 ```cs
@@ -368,9 +385,9 @@ struct Complex
     }
 }
 ```
-Cast and operator overloads must be public and static. indexers and constructors cannot be static. All structures have a default string conversion and constructor unless specified.
+Cast and operator overloads must be public and static. Constructors may be static but a class can only define one parameterless static constructor. Indexers, however, cannot be static. All structures have a default string conversion and constructor unless specified.
 
-### Import Statements
+## Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
 ```java
 import "..directory.sub_directory.file.Class";
@@ -385,7 +402,7 @@ let: x = create Class(param1, param2);
 Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 
 ## Questions ?!
-So yes there a few things here. No try-catch-finally statements, no switch statements, no generics, no destructors and may have even noticed that there is no static constructor either.
+So yes there a few things here. No try-catch-finally blocks, no switch statements, no generics and no destructors.
 
 But the big question: What about OOP? In the original C# version it was included. But even with CILs amazing features I realised I was in over my head and took it out of this version.
 

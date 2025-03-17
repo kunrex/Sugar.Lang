@@ -16,5 +16,5 @@ namespace Analysis::Structure::Context
     bool InvalidUnaryExpression::Readable() const { return false; }
     bool InvalidUnaryExpression::Writable() const { return false; }
 
-    string InvalidUnaryExpression::CILInstruction() const { return ""; }
+    string InvalidUnaryExpression::CILData() const { return ""; }
 }

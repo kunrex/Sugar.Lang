@@ -64,6 +64,10 @@ namespace Tokens::Enums
                 return "Do";
             case SyntaxKind::For:
                 return "For";
+            case SyntaxKind::Const:
+                return "Const";
+            case SyntaxKind::Constexpr:
+                return "Constexpr";
             case SyntaxKind::While:
                 return "While";
             case SyntaxKind::Enum:

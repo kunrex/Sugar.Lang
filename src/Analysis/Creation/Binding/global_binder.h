@@ -1,7 +1,7 @@
 #ifndef GLOBAL_BINDER_H
 #define GLOBAL_BINDER_H
 
-#include "../../Structure/Core/DataTypes/data_type.h"
+#include "../../Structure/source_file.h"
 
 namespace Analysis::Creation::Binding
 {

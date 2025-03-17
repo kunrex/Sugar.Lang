@@ -20,7 +20,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 
     class IntegerConstant final : public ContextNode
@@ -38,7 +38,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 
     class LongConstant final : public ContextNode
@@ -56,7 +56,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 
     class CharacterConstant final : public ContextNode
@@ -74,7 +74,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 
     class TrueConstant final : public ContextNode
@@ -89,7 +89,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 
     class FalseConstant final : public ContextNode
@@ -104,7 +104,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 }
 

@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class InvokeContext final : public ContextNode, Services::ConstantCollection<ContextNode>
+    class InvokeContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
     {
         private:
             mutable int slotCount;
@@ -22,7 +22,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 }
 

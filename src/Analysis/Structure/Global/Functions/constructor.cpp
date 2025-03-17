@@ -3,6 +3,7 @@
 #include <format>
 
 #include "function_extensions.h"
+#include "../../../../Parsing/ParseNodes/Groups/scope_node.h"
 
 #include "../../Core/DataTypes/data_type.h"
 
@@ -29,5 +30,19 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
+
+    DefaultConstructor::DefaultConstructor(const IDataType* const creationType) : Constructor(Describer::Public, creationType, new ScopeNode(0))
+    { }
+
+    DefaultConstructor::~DefaultConstructor()
+    {
+        delete parseNode;
+    }
+
+    StaticConstructor::StaticConstructor(const IDataType* const creationType) : Constructor(Describer::Private | Describer::Static, creationType, nullptr)
+    { }
+
+    InstanceConstructor::InstanceConstructor(const IDataType* const creationType) : Constructor(Describer::Private, creationType, nullptr)
+    { }
 }
 

@@ -8,6 +8,8 @@ namespace Analysis::Structure::Core::Interfaces
     class IDescribable
     {
         public:
+            [[nodiscard]] virtual Enums::Describer Describer() const = 0;
+
             [[nodiscard]] virtual bool ValidateDescriber(Enums::Describer allowed) const = 0;
 
             [[nodiscard]] virtual bool MatchDescriber(Enums::Describer expected) const = 0;

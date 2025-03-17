@@ -7,7 +7,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    StaticReferenceContext::StaticReferenceContext(const IDataType* creationType) : ContextNode(creationType)
+    StaticReferenceContext::StaticReferenceContext(const IDataType* const creationType) : ContextNode(creationType)
     { }
 
     MemberType StaticReferenceContext::MemberType() const { return MemberType::StaticReferenceContext; }
@@ -17,5 +17,5 @@ namespace Analysis::Structure::Context
     bool StaticReferenceContext::Readable() const { return true; }
     bool StaticReferenceContext::Writable() const { return false; }
 
-    string StaticReferenceContext::CILInstruction() const { return ""; }
+    string StaticReferenceContext::CILData() const { return ""; }
 }

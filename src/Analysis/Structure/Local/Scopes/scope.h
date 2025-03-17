@@ -1,6 +1,7 @@
 #ifndef SCOPE_H
 #define SCOPE_H
 
+#include <vector>
 #include <optional>
 #include <unordered_map>
 
@@ -9,9 +10,9 @@
 #include "../local_node.h"
 #include "../Variables/local_variable.h"
 
-#include "../../Core/scoped.h"
 #include "../../Enums/scope_type.h"
 #include "../../Context/context_node.h"
+#include "../../Core/Interfaces/Scoped/i_scoped.h"
 
 namespace Analysis::Structure::Local
 {
@@ -20,13 +21,13 @@ namespace Analysis::Structure::Local
         private:
             const Enums::ScopeType type;
 
-            Core::Scoped* const scoped;
+            Core::Interfaces::IScoped* const scoped;
 
             std::vector<const Scope*> nested;
             std::unordered_map<std::string, unsigned long> variableIndices;
 
         public:
-            Scope(Enums::ScopeType type, const std::string& name, Core::Scoped* scoped);
+            Scope(Enums::ScopeType type, const std::string& name, Core::Interfaces::IScoped* scoped);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

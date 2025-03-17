@@ -16,6 +16,6 @@ namespace Analysis::Structure::Context
     bool DuplicateExpression::Readable() const { return operand->Readable(); }
     bool DuplicateExpression::Writable() const { return operand->Writable(); }
 
-    string DuplicateExpression::CILInstruction() const { return "dup"; }
+    string DuplicateExpression::CILData() const { return "dup"; }
 }
 

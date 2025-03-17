@@ -9,6 +9,8 @@ namespace Analysis::Creation::Binding
 {
     void PushException(const Exceptions::LogException* exception);
 
+    void ValidateDescriber(const Structure::Core::Describable* describable, Structure::Enums::Describer allowed, unsigned long index, const Structure::SourceFile* source);
+
     const Structure::Core::Interfaces::IDataType* BindDataType(const ParseNodes::ParseNode* node, const Structure::SourceFile* source);
 }
 

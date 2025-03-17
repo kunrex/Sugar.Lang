@@ -17,5 +17,5 @@ namespace Analysis::Structure::Context
     bool InvalidCastExpression::Readable() const { return false; }
     bool InvalidCastExpression::Writable() const { return false; }
 
-    string InvalidCastExpression::CILInstruction() const { return ""; }
+    string InvalidCastExpression::CILData() const { return ""; }
 }

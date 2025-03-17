@@ -1,5 +1,5 @@
-#ifndef DEFINED_INDEXER_EXPRESSION_H
-#define DEFINED_INDEXER_EXPRESSION_H
+#ifndef INDEXER_EXPRESSION_H
+#define INDEXER_EXPRESSION_H
 
 #include "../context_node.h"
 #include "../unary_context_node.h"
@@ -10,15 +10,14 @@
 
 namespace Analysis::Structure::Context
 {
-    class DefinedIndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
+    class IndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
     {
         private:
             mutable int slotCount;
-            const bool isLoadInstruction;
             const Core::Interfaces::IIndexerDefinition* indexer;
 
         public:
-            DefinedIndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const ContextNode* operand, bool isLoadInstruction);
+            IndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const ContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -27,7 +26,9 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
+
+            [[nodiscard]] const Core::Interfaces::IIndexerDefinition* Indexer() const;
     };
 }
 

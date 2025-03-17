@@ -7,18 +7,10 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    LocalVariableContext::LocalVariableContext(const IVariable* variable, const bool isLoadInstruction, const int index) : IndexedContext(variable, isLoadInstruction, index)
+    LocalVariableContext::LocalVariableContext(const IVariable* variable, const int index) : IndexedContext(variable, index)
     { }
 
     MemberType LocalVariableContext::MemberType() const { return MemberType::LocalVariableContext; }
 
     int LocalVariableContext::SlotCount() const { return creationType->SlotCount(); }
-
-    string LocalVariableContext::CILInstruction() const
-    {
-        if (isLoadInstruction)
-            return "ldloc." + index;
-
-        return "stloc." + index;
-    }
 }

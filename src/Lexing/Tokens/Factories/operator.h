@@ -20,6 +20,8 @@ namespace Tokens
             static std::tuple<bool, int> DecodeMetadata(const Token& token);
             static short EncodeMetadata(bool leftAssociative, int precedence);
 
+            static std::optional<Enums::SyntaxKind> IsAssignment(Enums::SyntaxKind kind);
+
             static Token Addition(unsigned long i);
             static Token Subtraction(unsigned long i);
 

@@ -9,7 +9,7 @@ using namespace Analysis::Structure::Creation;
 
 namespace Analysis::Structure::Context
 {
-    PropertyContext::PropertyContext(const PropertyDefinition* const property, const bool isLoadInstruction) : ContextNode(property->CreationType()), isLoadInstruction(isLoadInstruction), property(property)
+    PropertyContext::PropertyContext(const PropertyDefinition* const property) : ContextNode(property->CreationType()), property(property)
     { }
 
     MemberType PropertyContext::MemberType() const { return MemberType::PropertyContext; }
@@ -19,11 +19,7 @@ namespace Analysis::Structure::Context
     bool PropertyContext::Readable() const { return property->Readable() && creationType->MemberType() == MemberType::Class; }
     bool PropertyContext::Writable() const { return property->Writable(); }
 
-    string PropertyContext::CILInstruction() const
-    {
-        if (isLoadInstruction)
-            return property->SignatureGetString();
+    string PropertyContext::CILData() const { return ""; }
 
-        return property->SignatureSetString();
-    }
+    const PropertyDefinition* PropertyContext::Property() const { return property; }
 }

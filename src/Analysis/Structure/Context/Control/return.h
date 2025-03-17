@@ -9,7 +9,7 @@ namespace Analysis::Structure::Context
     {
         public:
             Return();
-            explicit Return(const Core::DataType* dataType);
+            explicit Return(const Core::Interfaces::IDataType* dataType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -18,7 +18,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 }
 

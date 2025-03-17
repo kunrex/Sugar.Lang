@@ -1,7 +1,7 @@
 #ifndef OPERATOR_OVERLOAD_H
 #define OPERATOR_OVERLOAD_H
 
-#include "../../Core/scoped.h"
+#include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/overload_definition.h"
 
 namespace Analysis::Structure::Global

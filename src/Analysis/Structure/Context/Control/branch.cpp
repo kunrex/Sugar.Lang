@@ -21,5 +21,5 @@ namespace Analysis::Structure::Context
     bool Branch::Readable() const { return false; }
     bool Branch::Writable() const { return false; }
 
-    string Branch::CILInstruction() const { return cilInstruction; }
+    string Branch::CILData() const { return cilInstruction; }
 }

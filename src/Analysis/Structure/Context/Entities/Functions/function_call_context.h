@@ -10,10 +10,10 @@ namespace Analysis::Structure::Context
     {
         private:
             mutable int slotCount;
-            const Creation::FunctionDefinition* function;
+            const Core::Interfaces::IFunctionDefinition* function;
 
         public:
-            explicit FunctionCallContext(const Creation::FunctionDefinition* function);
+            explicit FunctionCallContext(const Core::Interfaces::IFunctionDefinition* function);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -22,7 +22,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
     };
 }
 

@@ -19,7 +19,7 @@ namespace Analysis::Structure::Context
     bool InvalidFunctionContext::Readable() const { return false; }
     bool InvalidFunctionContext::Writable() const { return false; }
 
-    string InvalidFunctionContext::CILInstruction() const { return ""; }
+    string InvalidFunctionContext::CILData() const { return ""; }
 }
 
 

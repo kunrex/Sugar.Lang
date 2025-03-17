@@ -15,8 +15,6 @@ namespace ParseNodes
             virtual void PrintChildren(std::string indent) const;
 
         public:
-            [[nodiscard]] bool DefinesChildren() const override;
-
             void Print(std::string indent, bool last) const override;
     };
 
@@ -27,9 +25,6 @@ namespace ParseNodes
             NodeCollection();
 
             void PrintChildren(std::string indent) const override;
-
-        public:
-            [[nodiscard]] bool DefinesChildren() const override;
     };
 }
 

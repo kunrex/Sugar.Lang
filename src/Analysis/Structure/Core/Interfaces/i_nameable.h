@@ -1,6 +1,8 @@
 #ifndef I_NAMEABLE_H
 #define I_NAMEABLE_H
 
+#include <string>
+
 namespace Analysis::Structure::Core::Interfaces
 {
     class INameable

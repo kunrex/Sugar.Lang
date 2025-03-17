@@ -4,7 +4,6 @@
 #include "../created.h"
 #include "../nameable.h"
 #include "../describable.h"
-#include "../DataTypes/data_type.h"
 
 namespace Analysis::Structure::Core
 {

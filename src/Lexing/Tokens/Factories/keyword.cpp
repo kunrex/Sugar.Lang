@@ -25,8 +25,6 @@ namespace Tokens
 
         keywordMap["throw"] = { SyntaxKind::Throw, KeywordType::General };
 
-        keywordMap["func"] = { SyntaxKind::Func, KeywordType::General };
-        keywordMap["action"] = { SyntaxKind::Action, KeywordType::General };
         keywordMap["invoke"] = { SyntaxKind::Invoke, KeywordType::General };
         keywordMap["funcref"] = { SyntaxKind::FuncRef, KeywordType::General };
 
@@ -45,15 +43,17 @@ namespace Tokens
         keywordMap["double"] = { SyntaxKind::Double, KeywordType::Type };
         keywordMap["bool"] = { SyntaxKind::Boolean, KeywordType::Type };
         keywordMap["char"] = { SyntaxKind::Character, KeywordType::Type };
+        keywordMap["func"] = { SyntaxKind::Func, KeywordType::Type };
+        keywordMap["action"] = { SyntaxKind::Action, KeywordType::Type };
+        keywordMap["array"] = { SyntaxKind::Array, KeywordType::Type };
         keywordMap["list"] = { SyntaxKind::List, KeywordType::Type };
         keywordMap["tuple"] = { SyntaxKind::Tuple, KeywordType::Type };
         keywordMap["dictionary"] = { SyntaxKind::Dictionary, KeywordType::Type };
-        keywordMap["nullable"] = { SyntaxKind::Nullable, KeywordType::Type };
-        keywordMap["array"] = { SyntaxKind::Array, KeywordType::Type };
+        keywordMap["math"] = { SyntaxKind::Math, KeywordType::Type };
         keywordMap["string"] = { SyntaxKind::String, KeywordType::Type };
         keywordMap["exception"] = { SyntaxKind::Exception, KeywordType::Type };
+        keywordMap["nullable"] = { SyntaxKind::Nullable, KeywordType::Type };
         keywordMap["object"] = { SyntaxKind::Object, KeywordType::Type };
-        keywordMap["math"] = { SyntaxKind::Math, KeywordType::Type };
 
         keywordMap["void"] = { SyntaxKind::Void, KeywordType::Function };
         keywordMap["indexer"] = { SyntaxKind::Indexer, KeywordType::Function };
@@ -63,9 +63,11 @@ namespace Tokens
         keywordMap["constructor"] = { SyntaxKind::Static, KeywordType::Function };
 
         keywordMap["ref"] = { SyntaxKind::Ref, KeywordType::Describer };
+        keywordMap["const"] = { SyntaxKind::Const, KeywordType::Describer };
         keywordMap["static"] = { SyntaxKind::Static, KeywordType::Describer };
         keywordMap["public"] = { SyntaxKind::Public, KeywordType::Describer };
         keywordMap["private"] = { SyntaxKind::Private, KeywordType::Describer };
+        keywordMap["constexpr"] = { SyntaxKind::Constexpr, KeywordType::Describer };
 
         keywordMap["copy"] = { SyntaxKind::Copy, KeywordType::General };
 

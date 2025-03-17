@@ -18,5 +18,5 @@ namespace Analysis::Structure::Context
     bool DotExpression::Readable() const { return rhs->Readable(); }
     bool DotExpression::Writable() const { return lhs->Writable() && rhs->Writable(); }
 
-    string DotExpression::CILInstruction() const { return ""; }
+    string DotExpression::CILData() const { return ""; }
 }

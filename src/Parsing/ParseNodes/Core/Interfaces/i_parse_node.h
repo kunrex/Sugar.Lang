@@ -14,8 +14,6 @@ namespace ParseNodes::Core::Interfaces
         public:
             [[nodiscard]] virtual Enums::NodeType NodeType() const = 0;
 
-            [[nodiscard]] virtual bool DefinesChildren() const = 0;
-
             [[nodiscard]] virtual unsigned long Index() const = 0;
     };
 }

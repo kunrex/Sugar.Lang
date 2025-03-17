@@ -14,6 +14,7 @@ using namespace Exceptions;
 using namespace Tokens::Enums;
 
 using namespace ParseNodes;
+using namespace ParseNodes::Groups;
 using namespace ParseNodes::DataTypes;
 using namespace ParseNodes::Describers;
 using namespace ParseNodes::Statements;
@@ -40,7 +41,11 @@ namespace Parsing
         index++;
 
         const auto identifier = ParseIdentifier(true);
-        const auto body = ParseScopedExpression();
+
+        TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
+        const auto body = new ScopeNode(index - 1);
+
+        ParseExpressionCollection(body, SeparatorKind::FlowerCloseBracket);
 
         return new EnumNode(describer, identifier, body, keyword);
     }

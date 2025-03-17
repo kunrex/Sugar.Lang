@@ -19,5 +19,5 @@ namespace Analysis::Structure::Context
     bool BuiltInBinaryExpression::Readable() const { return true; }
     bool BuiltInBinaryExpression::Writable() const { return false; }
 
-    std::string BuiltInBinaryExpression::CILInstruction() const { return operation->FullName(); }
+    std::string BuiltInBinaryExpression::CILData() const { return operation->FullName(); }
 }

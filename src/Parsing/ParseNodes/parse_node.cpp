@@ -15,8 +15,6 @@ namespace ParseNodes
     ParseNode::ParseNode() : IParseNode()
     { }
 
-    bool ParseNode::DefinesChildren() const { return false; }
-
     void ParseNode::Print(string indent, const bool last) const
     {
         cout << indent;
@@ -51,9 +49,6 @@ namespace ParseNodes
         for (const auto child : this->children)
             child->Print(indent, ++i == length);
     }
-
-    template <class TChild>
-    bool NodeCollection<TChild>::DefinesChildren() const { return true; }
 
     template class NodeCollection<ParseNode>;
     template class NodeCollection<ConditionNode>;

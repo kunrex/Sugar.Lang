@@ -6,11 +6,6 @@
 #include "Core/nameable.h"
 #include "Enums/source_type.h"
 
-namespace Analysis::Structure::Core
-{
-    class DataType;
-}
-
 namespace Analysis::Structure
 {
     class SourceObject : public Core::Nameable, public Services::Child<SourceObject>

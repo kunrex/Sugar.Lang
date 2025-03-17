@@ -4,7 +4,6 @@
 
 using namespace std;
 
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
@@ -21,5 +20,5 @@ namespace Analysis::Structure::Context
     bool BuiltInCastExpression::Readable() const { return true; }
     bool BuiltInCastExpression::Writable() const { return false; }
 
-    string BuiltInCastExpression::CILInstruction() const { return definition->FullName(); }
+    string BuiltInCastExpression::CILData() const { return definition->FullName(); }
 }

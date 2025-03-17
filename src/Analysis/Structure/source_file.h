@@ -12,9 +12,14 @@
 #include "source_object.h"
 #include "Core/Interfaces/DataTypes/i_data_type.h"
 
+namespace Analysis::Structure::Core::Interfaces
+{
+    class IUserDefinedType;
+}
+
 namespace Analysis::Structure
 {
-    class SourceFile final : public SourceObject, public Services::Dictionary<std::string, Core::DataType>
+    class SourceFile final : public SourceObject, public Services::Dictionary<std::string, Core::Interfaces::IUserDefinedType>
     {
         private:
             const std::string source;
@@ -29,7 +34,7 @@ namespace Analysis::Structure
 
             [[nodiscard]] Enums::SourceType SourceType() const override;
 
-            bool AddChild(std::string key, Core::DataType* value) override;
+            bool AddChild(std::string key, Core::Interfaces::IUserDefinedType* value) override;
 
             void AddReference(const Core::Interfaces::IDataType* dataType);
             [[nodiscard]] const Core::Interfaces::IDataType* GetReference(const std::string& name) const;

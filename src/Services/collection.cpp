@@ -10,6 +10,7 @@
 
 #include "../Analysis/Structure/source_object.h"
 #include "../Analysis/Structure/Context/context_node.h"
+#include "../Analysis/Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
 #include "../Analysis/Structure/Local/Variables/local_variable.h"
 
 using namespace std;
@@ -76,7 +77,6 @@ namespace Services
     ConstantCollection<TChild>::ConstantCollection() : Collection<const TChild>()
     { }
 
-    template class Collection<DataType>;
     template class Collection<ContextNode>;
     template class Collection<SourceObject>;
 

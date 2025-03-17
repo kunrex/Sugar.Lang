@@ -5,7 +5,6 @@
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
@@ -22,5 +21,5 @@ namespace Analysis::Structure::Context
     bool DefinedCastExpression::Readable() const { return true; }
     bool DefinedCastExpression::Writable() const { return false; }
 
-    string DefinedCastExpression::CILInstruction() const { return std::format("call {}", definition->FullName()); }
+    string DefinedCastExpression::CILData() const { return std::format("call {}", definition->FullName()); }
 }

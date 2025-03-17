@@ -24,6 +24,6 @@ namespace Analysis::Structure::Context
     bool DefinedBinaryExpression::Readable() const { return true; }
     bool DefinedBinaryExpression::Writable() const { return false; }
 
-    string DefinedBinaryExpression::CILInstruction() const { return std::format("call {}", operation->FullName()); }
+    string DefinedBinaryExpression::CILData() const { return std::format("call {}", operation->FullName()); }
 }
 

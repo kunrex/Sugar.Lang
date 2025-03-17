@@ -13,18 +13,19 @@
 
 using namespace std;
 
+using namespace Tokens::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string cil_nullable = "[System.Runtime]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const IDataType* const nullableType) : ValueType(cil_nullable, Describer::Public), nullableType(nullableType)
-    {
-        slotCount = 0;
-    }
+    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), genericSignature(), nullableType(nullableType), characteristics(), constructors()
+    { }
 
     const Nullable* Nullable::Instance(const IDataType* const dataType)
     {
@@ -39,41 +40,65 @@ namespace Analysis::Structure::Wrappers
         const auto nullable = new Nullable(dataType);
         nullable->genericSignature = std::format("{}`1<{}>", cil_nullable, dataType->FullName());
 
-        nullable->InitialiseMembers();
+        nullable->InitializeMembers();
 
         map[hash] = nullable;
         return nullable;
     }
 
-    int Nullable::SlotCount() const
-    {
-        if (slotCount == 0)
-        {
-            const auto alignment = std::min(nullableType->SlotCount(), word_size);
-            const auto size = ((1 + (alignment - 1)) & ~(alignment - 1) + nullableType->SlotCount() + (alignment - 1)) & ~(alignment - 1);
+    TypeKind Nullable::Type() const { return TypeKind::Nullable; }
 
-            slotCount = (size + (word_size - 1)) / word_size;
-        }
+    const std::string& Nullable::FullName() const { return genericSignature; }
 
-        return slotCount;
-    }
-
-    const std::string& Nullable::FullName() const {  return genericSignature; }
-
-    void Nullable::InitialiseMembers()
+    void Nullable::InitializeMembers()
     {
         const auto isNull = std::format("call instance bool valuetype {}::get_HasValue()", genericSignature);
-        PushCharacteristic(new BuiltInProperty(Describer::Public, "IsNull", &Boolean::Instance(), true, isNull, false, ""));
+        characteristics["IsNull"] = new BuiltInProperty(Describer::Public, "IsNull", &Boolean::Instance(), true, isNull, false, "");
 
         const auto value = std::format("call instance !0 valuetype {}::get_Value()", genericSignature);
-        PushCharacteristic(new BuiltInProperty(Describer::Public, "Value", nullableType, true, value, false, ""));
+        characteristics["Value"] = new BuiltInProperty(Describer::Public, "Value", nullableType, true, value, false, "");
 
         const auto constructor = new BuiltInConstructor(this, std::format("call instance void valuetype {}::.ctor(!0)", genericSignature));
         constructor->PushParameterType(nullableType);
-        PushConstructor(constructor);
+        constructors[ArgumentHash(constructor)] = constructor;
 
         const auto defaultConstructor = new BuiltInConstructor(this, std::format("initobj valuetype {}", genericSignature));
-        PushConstructor(defaultConstructor);
+        constructors[ArgumentHash(defaultConstructor)] = defaultConstructor;
+    }
+
+    const ICharacteristic* Nullable::FindCharacteristic(const std::string& name) const
+    {
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+    }
+
+    const IFunction* Nullable::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    {
+        const auto hash = ArgumentHash(argumentList);
+        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
+    }
+
+    const IFunctionDefinition* Nullable::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IIndexerDefinition* Nullable::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IFunction* Nullable::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IFunction* Nullable::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IOperatorOverload* Nullable::FindOverload(const SyntaxKind base) const
+    { return nullptr; }
+
+    Nullable::~Nullable()
+    {
+        for (const auto& characteristic: characteristics)
+            delete characteristic.second;
+
+        for (const auto& constructor: constructors)
+            delete constructor.second;
     }
 }
 

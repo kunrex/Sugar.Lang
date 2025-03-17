@@ -19,6 +19,6 @@ namespace Analysis::Structure::Context
     bool InputContext::Readable() const { return true; }
     bool InputContext::Writable() const { return false; }
 
-    string InputContext::CILInstruction() const { return "call string [System.Runtime]System.Console::ReadLine()"; }
+    string InputContext::CILData() const { return "call string [System.Runtime]System.Console::ReadLine()"; }
 }
 

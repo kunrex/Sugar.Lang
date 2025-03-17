@@ -13,7 +13,7 @@ namespace Analysis::Structure::Core
             explicit Describable(Enums::Describer describer);
 
         public:
-            [[nodiscard]] Enums::Describer Describer() const;
+            [[nodiscard]] Enums::Describer Describer() const override;
 
             [[nodiscard]] bool ValidateDescriber(Enums::Describer allowed) const override;
 

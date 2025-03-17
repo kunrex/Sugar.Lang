@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Referenced final : public DataTypes::Class, public Services::SingletonCollection
+    class Referenced final : public DataTypes::BuiltInClass, public Services::SingletonCollection
     {
         private:
             const IDataType* referencedType;
@@ -18,6 +18,14 @@ namespace Analysis::Structure::Wrappers
             static const Referenced* Instance(const IDataType* dataType);
 
             [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+
+            [[nodiscard]] const IDataType* ReferencedType() const;
+
+            void InitializeMembers() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 

@@ -4,17 +4,18 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Functions::Calling
 {
-    CollectionConstructorCallNode::CollectionConstructorCallNode(const ParseNode* const type, const Groups::ScopeNode* const scope) : ParseNode(), type(type), scope(scope)
+    CollectionConstructorCallNode::CollectionConstructorCallNode(const ParseNode* const type) : ParseNode(), type(type)
     { }
 
     NodeType CollectionConstructorCallNode::NodeType() const { return NodeType::CollectionConstructorCall; }
 
-    unsigned long CollectionConstructorCallNode::Index() const { return scope->Index(); }
+    unsigned long CollectionConstructorCallNode::Index() const { return type->Index(); }
+
+    const ParseNode* CollectionConstructorCallNode::Type() const { return type; }
 
     CollectionConstructorCallNode::~CollectionConstructorCallNode()
     {
         delete type;
-        delete scope;
     }
 }
 

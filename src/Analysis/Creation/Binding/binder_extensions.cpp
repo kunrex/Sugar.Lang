@@ -3,6 +3,7 @@
 #include "../../../Exceptions/log_exception.h"
 #include "../../../Exceptions/exception_manager.h"
 #include "../../../Exceptions/Compilation/Analysis/type_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 
 #include "../../../Parsing/ParseNodes/Types/Created/created_type_node.h"
 #include "../../../Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h"
@@ -56,6 +57,12 @@ namespace Analysis::Creation::Binding
     void PushException(const LogException* const exception)
     {
         ExceptionManager::Instance().AddChild(exception);
+    }
+
+    void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
+    {
+        if (!describable->ValidateDescriber(allowed))
+            PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
     const IDataType* BindBuiltInType(const BuiltInTypeNode* node)

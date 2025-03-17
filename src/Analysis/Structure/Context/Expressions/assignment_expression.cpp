@@ -18,5 +18,5 @@ namespace Analysis::Structure::Context
     bool AssignmentExpression::Readable() const { return lhs->Readable(); }
     bool AssignmentExpression::Writable() const { return lhs->Writable(); }
 
-    string AssignmentExpression::CILInstruction() const { return ""; }
+    string AssignmentExpression::CILData() const { return ""; }
 }

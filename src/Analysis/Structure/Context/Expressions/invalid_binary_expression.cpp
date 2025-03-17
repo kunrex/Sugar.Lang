@@ -16,6 +16,6 @@ namespace Analysis::Structure::Context
     bool InvalidBinaryExpression::Readable() const { return false; }
     bool InvalidBinaryExpression::Writable() const { return false; }
 
-    string InvalidBinaryExpression::CILInstruction() const { return ""; }
+    string InvalidBinaryExpression::CILData() const { return ""; }
 }
 

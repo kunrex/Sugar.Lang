@@ -14,7 +14,7 @@ namespace Analysis::Structure::Context
             explicit ContextNode(const Core::Interfaces::IDataType* creationType);
 
         public:
-            [[nodiscard]] virtual std::string CILInstruction() const = 0;
+            [[nodiscard]] virtual std::string CILData() const = 0;
     };
 }
 

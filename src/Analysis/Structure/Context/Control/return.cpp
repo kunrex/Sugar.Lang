@@ -1,19 +1,19 @@
 #include "return.h"
 
-#include "../../Wrappers/Reference/object.h"
+#include "../../Wrappers/Reference/void.h"
 
 using namespace std;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    Return::Return() : ContextNode(&Object::Instance())
+    Return::Return() : ContextNode(&Void::Instance())
     { }
 
-    Return::Return(const DataType* const dataType) : ContextNode(dataType)
+    Return::Return(const IDataType* const dataType) : ContextNode(dataType)
     { }
 
     MemberType Return::MemberType() const { return MemberType::Return; }
@@ -23,5 +23,5 @@ namespace Analysis::Structure::Context
     bool Return::Readable() const { return false; }
     bool Return::Writable() const { return false; }
 
-    string Return::CILInstruction() const { return "ret"; }
+    string Return::CILData() const { return "ret"; }
 }

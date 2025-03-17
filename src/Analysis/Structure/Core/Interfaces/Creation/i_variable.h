@@ -9,7 +9,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IVariable : public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IReadWrite
+    class IVariable : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IReadWrite
     {
 
     };

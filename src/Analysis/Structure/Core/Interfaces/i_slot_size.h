@@ -3,12 +3,12 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class ISlotSize
+    class ISlotCount
     {
         public:
             [[nodiscard]] virtual int SlotCount() const = 0;
 
-            virtual ~ISlotSize() = default;
+            virtual ~ISlotCount() = default;
     };
 }
 

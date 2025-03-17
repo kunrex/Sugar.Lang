@@ -51,11 +51,10 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->Describer());
-
-        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node, enumValues);
+        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
         ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
-        sourceFile->AddChild(enumSource->Name(), enumSource);
+        sourceFile->AddChild(identifier, enumSource);
     }
 
     void CreateClass(const DataTypeNode* const node, SourceFile* const sourceFile)
@@ -73,7 +72,7 @@ namespace Analysis::Creation::Binding
         const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
         ValidateDescriber(classSource, Describer::Static | Describer::AccessModifiers, index, sourceFile);
-        sourceFile->AddChild(classSource->Name(), classSource);
+        sourceFile->AddChild(identifier, classSource);
     }
 
     void CreateStruct(const DataTypeNode* const node, SourceFile* const sourceFile)
@@ -91,10 +90,10 @@ namespace Analysis::Creation::Binding
         const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
 
         ValidateDescriber(structSource, Describer::AccessModifiers, index, sourceFile);
-        sourceFile->AddChild(structSource->Name(), structSource);
+        sourceFile->AddChild(identifier, structSource);
     }
 
-    void ImportFile(const SourceFile* file, SourceFile* const sourceFile, const unsigned long index)
+    void ImportFile(const SourceFile* const file, SourceFile* const sourceFile, const unsigned long index)
     {
         for (const auto type: file->values())
         {
@@ -108,7 +107,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    void ImportDirectory(const SourceDirectory* directory, SourceFile* const sourceFile, const unsigned long index)
+    void ImportDirectory(const SourceDirectory* const directory, SourceFile* const sourceFile, const unsigned long index)
     {
         for (const auto child: directory->values())
         {

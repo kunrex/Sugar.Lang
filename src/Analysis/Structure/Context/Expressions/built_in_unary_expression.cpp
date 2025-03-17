@@ -20,5 +20,5 @@ namespace Analysis::Structure::Context
     bool BuiltInUnaryExpression::Readable() const { return true; }
     bool BuiltInUnaryExpression::Writable() const { return false; }
 
-    string BuiltInUnaryExpression::CILInstruction() const { return operation->FullName(); }
+    string BuiltInUnaryExpression::CILData() const { return operation->FullName(); }
 }

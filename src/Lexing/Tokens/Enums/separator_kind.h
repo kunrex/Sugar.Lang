@@ -1,7 +1,7 @@
 #ifndef SEPARATOR_KIND_H
 #define SEPARATOR_KIND_H
 
-#include <iostream>
+#include <string>
 
 namespace Tokens::Enums
 {

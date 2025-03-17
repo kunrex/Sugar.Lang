@@ -32,10 +32,12 @@
 #include "../../Structure/DataTypes/class.h"
 #include "../../Structure/DataTypes/value_type.h"
 
+#include "../../Structure/Global/BuiltIn/built_in_cast.h"
+
 #include "../../Structure/Global/Properties/indexer.h"
 #include "../../Structure/Global/Properties/property.h"
 
-#include "../../Structure/Global/Variables/enum_field.h"
+#include "../../Structure/Global/Variables/global_constant.h"
 #include "../../Structure/Global/Variables/global_variable.h"
 
 #include "../../Structure/Global/Functions/constructor.h"
@@ -46,6 +48,9 @@
 #include "../../Structure/Global/Functions/operator_overload.h"
 
 #include "../../Structure/Local/Variables/function_parameter.h"
+
+#include "../../Structure/Wrappers/Reference/string.h"
+#include "../../Structure/Wrappers/Value/integer.h"
 
 using namespace Exceptions;
 
@@ -66,6 +71,7 @@ using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -78,19 +84,13 @@ constexpr std::string_view set_indexer_name = "set_Indexer";
 
 namespace Analysis::Creation::Binding
 {
-    void ValidateStaticBinding(const Describable* const describable, const unsigned long index, const DataType* const dataType)
+    void ValidateStaticBinding(const Describable* const describable, const unsigned long index, const IUserDefinedType* const dataType)
     {
         if (dataType->CheckDescriber(Describer::Static) && !describable->CheckDescriber(Describer::Static))
             PushException(new StaticBindingException(index, dataType->Parent()));
     }
 
-    void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
-    {
-        if (!describable->ValidateDescriber(allowed))
-            PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
-    }
-
-    void MatchReturnAccessibility(const Characteristic* const characteristic, const unsigned long index, const DataType* const dataType)
+    void MatchReturnAccessibility(const Characteristic* const characteristic, const unsigned long index, const IUserDefinedType* const dataType)
     {
         if (characteristic->CreationType()->CheckDescriber(Describer::Public))
             return;
@@ -99,7 +99,7 @@ namespace Analysis::Creation::Binding
             PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void MatchReturnAccessibility(const Function* const function, const unsigned long index, const DataType* const dataType)
+    void MatchReturnAccessibility(const Function* const function, const unsigned long index, const IUserDefinedType* const dataType)
     {
         if (function->CreationType()->CheckDescriber(Describer::Public))
             return;
@@ -124,7 +124,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumField(value));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), nullptr));
                 }
                 break;
             case NodeType::Binary:
@@ -154,7 +154,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new EnumField(value, casted.RHS()));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), casted.RHS()));
                 }
                 break;
             default:
@@ -163,7 +163,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    void DeclareGlobalVariable(const DeclarationNode* const declarationNode, DataType* const dataType)
+    void DeclareGlobalVariable(const DeclarationNode* const declarationNode, IUserDefinedType* const dataType)
     {
         const auto index = declarationNode->Index();
         const auto source = dataType->Parent();
@@ -189,7 +189,7 @@ namespace Analysis::Creation::Binding
         dataType->PushCharacteristic(globalVariable);
     }
 
-    void InitialiseGlobalVariable(const InitialisationNode* const initialisationNode, DataType* const dataType)
+    void InitialiseGlobalVariable(const InitialisationNode* const initialisationNode, IUserDefinedType* const dataType)
     {
         const auto index = initialisationNode->Index();
         const auto source = dataType->Parent();
@@ -205,12 +205,17 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(initialisationNode->Describer());
-        const auto globalVariable = new GlobalVariable(identifier, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+
+        GlobalVariable* globalVariable;
+        if ((describer & Describer::Constexpr) == Describer::Constexpr)
+            globalVariable = new GlobalConstant(identifier, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+        else
+            globalVariable = new GlobalVariable(identifier, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
 
         MatchReturnAccessibility(globalVariable, index, dataType);
 
         ValidateStaticBinding(globalVariable, index, dataType);
-        ValidateDescriber(globalVariable, Describer::AccessModifiers | Describer::Static, index, source);
+        ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, index, source);
 
         dataType->PushCharacteristic(globalVariable);
     }
@@ -248,7 +253,7 @@ namespace Analysis::Creation::Binding
         return std::make_tuple(get, set);
     }
 
-    void CreateProperty(const BasePropertyNode* const propertyNode, DataType* const dataType)
+    void CreateProperty(const BasePropertyNode* const propertyNode, IUserDefinedType* const dataType)
     {
         const auto index = propertyNode->Index();
         const auto source = dataType->Parent();
@@ -277,7 +282,7 @@ namespace Analysis::Creation::Binding
         dataType->PushCharacteristic(property);
     }
 
-    void InitialiseProperty(const AssignedPropertyNode* const propertyNode, DataType* const dataType)
+    void InitialiseProperty(const AssignedPropertyNode* const propertyNode, IUserDefinedType* const dataType)
     {
         const auto index = propertyNode->Index();
         const auto source = dataType->Parent();
@@ -312,7 +317,7 @@ namespace Analysis::Creation::Binding
             parameters.push_back(BindDataType(typeNode->Type(), source));
     }
 
-    void BindFunctionParameters(Scoped* const scope, const std::vector<const IDataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
+    void BindFunctionParameters(IScoped* const scope, const std::vector<const IDataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
     {
         for (int i = 0; i < declarationNode->ChildCount(); i++)
         {
@@ -363,7 +368,7 @@ namespace Analysis::Creation::Binding
         return std::make_tuple(get, set);
     }
 
-    void CreateIndexer(const BaseIndexerNode* const indexerNode, DataType* const dataType)
+    void CreateIndexer(const BaseIndexerNode* const indexerNode, IUserDefinedType* const dataType)
     {
         const auto index = indexerNode->Index();
         const auto source = dataType->Parent();
@@ -377,7 +382,7 @@ namespace Analysis::Creation::Binding
         const auto creationType = BindDataType(indexerNode->Type(), source);
         const auto declarationNode = indexerNode->Parameters();
 
-        std::vector<const Interfaces::IDataType*> parameters;
+        std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
         if (dataType->FindIndexer(parameters) != nullptr)
@@ -400,7 +405,7 @@ namespace Analysis::Creation::Binding
         dataType->PushIndexer(indexer);
     }
 
-    void CreateFunction(const FunctionCreationNode* const functionCreationNode, DataType* const dataType)
+    void CreateFunction(const FunctionCreationNode* const functionCreationNode, IUserDefinedType* const dataType)
     {
         const auto index = functionCreationNode->Index();
         const auto source = dataType->Parent();
@@ -444,7 +449,7 @@ namespace Analysis::Creation::Binding
         dataType->PushFunction(function);
     }
 
-    void CreateConstructor(const ConstructorCreationNode* const constructorCreationNode, DataType* const dataType)
+    void CreateConstructor(const ConstructorCreationNode* const constructorCreationNode, IUserDefinedType* const dataType)
     {
         const auto index = constructorCreationNode->Index();
         const auto source = dataType->Parent();
@@ -477,7 +482,7 @@ namespace Analysis::Creation::Binding
         dataType->PushConstructor(constructor);
     }
 
-    void CreateExplict(const ExplicitCastNode* const explicitCastNode, DataType* const dataType)
+    void CreateExplict(const ExplicitCastNode* const explicitCastNode, IUserDefinedType* const dataType)
     {
         const auto index = explicitCastNode->Index();
         const auto source = dataType->Parent();
@@ -525,7 +530,7 @@ namespace Analysis::Creation::Binding
         dataType->PushExplicitCast(explicitCast);
     }
 
-    void CreateImplicit(const ImplicitCastNode* const implicitCastNode, DataType* const dataType)
+    void CreateImplicit(const ImplicitCastNode* const implicitCastNode, IUserDefinedType* const dataType)
     {
         const auto index = implicitCastNode->Index();
         const auto source = dataType->Parent();
@@ -573,7 +578,7 @@ namespace Analysis::Creation::Binding
         dataType->PushImplicitCast(implicitCast);
     }
 
-    void CreateOperatorOverload(const OperatorOverloadNode* const operatorOverloadNode, DataType* const dataType)
+    void CreateOperatorOverload(const OperatorOverloadNode* const operatorOverloadNode, IUserDefinedType* const dataType)
     {
         const auto index = operatorOverloadNode->Index();
         const auto source = dataType->Parent();
@@ -594,6 +599,10 @@ namespace Analysis::Creation::Binding
         BindFunctionParameters(declarationNode, parameters, source);
 
         const auto& token = operatorOverloadNode->Operator();
+
+        if ((static_cast<OperatorKind>(token.Kind()) & OperatorKind::Assignment) == OperatorKind::Assignment)
+            PushException(new LogException("Cannot overload the assignment operator or any of its derivatives", index, source));
+
         switch (token.Kind())
         {
             case SyntaxKind::Increment:
@@ -629,7 +638,7 @@ namespace Analysis::Creation::Binding
         dataType->PushOverload(operatorOverload);
     }
 
-    void BindEnum(Enum* enumSource)
+    void BindEnum(Enum* const enumSource)
     {
         for (const auto child: *enumSource->Skeleton()->Body())
         {
@@ -643,6 +652,8 @@ namespace Analysis::Creation::Binding
                     break;
             }
         }
+
+        enumSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string valuetype {}::ToString()", enumSource->FullName())));
     }
 
     void BindClass(ClassSource* const classSource)
@@ -686,6 +697,15 @@ namespace Analysis::Creation::Binding
                     break;
             }
         }
+
+        if (classSource->CheckDescriber(Describer::Static))
+            return;
+
+        if (const auto explicitString = classSource->FindExplicitCast(&String::Instance(), classSource); explicitString == nullptr)
+            classSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName())));
+
+        if (const auto defaultConstructor = classSource->FindConstructor({ }); defaultConstructor == nullptr)
+            classSource->PushConstructor(new DefaultConstructor(classSource));
     }
 
     void BindStruct(StructSource* const structSource)
@@ -729,6 +749,15 @@ namespace Analysis::Creation::Binding
                     break;
             }
         }
+
+        if (structSource->CheckDescriber(Describer::Static))
+            return;
+
+        if (const auto explicitString = structSource->FindExplicitCast(&String::Instance(), structSource); explicitString == nullptr)
+            structSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName())));
+
+        if (const auto defaultConstructor = structSource->FindConstructor({ }); defaultConstructor == nullptr)
+            structSource->PushConstructor(new DefaultConstructor(structSource));
     }
 
     void GlobalBindSourceFile(const SourceFile* const source)

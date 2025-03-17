@@ -1,7 +1,7 @@
 #ifndef VOID_FUNCTION_H
 #define VOID_FUNCTION_H
 
-#include "../../Core/scoped.h"
+#include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/void_definition.h"
 
 namespace Analysis::Structure::Global

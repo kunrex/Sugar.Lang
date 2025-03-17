@@ -24,5 +24,5 @@ namespace Analysis::Structure::Context
     bool BoxCastExpression::Readable() const { return true; }
     bool BoxCastExpression::Writable() const { return false; }
 
-    string BoxCastExpression::CILInstruction() const { return std::format("box {}", operand->CreationType()->FullName()); }
+    string BoxCastExpression::CILData() const { return std::format("box {}", operand->CreationType()->FullName()); }
 }

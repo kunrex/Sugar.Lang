@@ -7,11 +7,11 @@
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    FunctionCallContext::FunctionCallContext(const FunctionDefinition* const function) : ContextNode(function->CreationType()), slotCount(-1), function(function)
+    FunctionCallContext::FunctionCallContext(const IFunctionDefinition* const function) : ContextNode(function->CreationType()), slotCount(-1), function(function)
     { }
 
     int FunctionCallContext::SlotCount() const
@@ -30,8 +30,8 @@ namespace Analysis::Structure::Context
     MemberType FunctionCallContext::MemberType() const { return MemberType::FunctionCallContext; }
 
     bool FunctionCallContext::Readable() const { return true; }
-    bool FunctionCallContext::Writable() const { return function->CreationType() != nullptr; }
+    bool FunctionCallContext::Writable() const { return function->CreationType() != nullptr && function->CreationType()->MemberType() == MemberType::Class; }
 
-    string FunctionCallContext::CILInstruction() const { return "call " + function->FullName(); }
+    string FunctionCallContext::CILData() const { return "call " + function->FullName(); }
 }
 

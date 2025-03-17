@@ -7,7 +7,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    ThisContext::ThisContext(const IDataType* creationType) : ContextNode(creationType)
+    ThisContext::ThisContext(const IDataType* const creationType) : ContextNode(creationType)
     { }
 
     MemberType ThisContext::MemberType() const { return MemberType::ThisContext; }
@@ -17,5 +17,5 @@ namespace Analysis::Structure::Context
     bool ThisContext::Readable() const { return true; }
     bool ThisContext::Writable() const { return false; }
 
-    string ThisContext::CILInstruction() const { return "ldarg.0"; }
+    string ThisContext::CILData() const { return "ldarg.0"; }
 }

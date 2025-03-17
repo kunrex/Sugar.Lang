@@ -36,7 +36,7 @@ namespace Analysis::Structure::Context
     bool InvokeContext::Readable() const { return true; }
     bool InvokeContext::Writable() const { return creationType != nullptr; }
 
-    string InvokeContext::CILInstruction() const
+    string InvokeContext::CILData() const
     {
         string parameterString;
         for (auto i = 1; i < children.size(); i++)

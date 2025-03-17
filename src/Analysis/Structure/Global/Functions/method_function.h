@@ -1,7 +1,7 @@
 #ifndef METHOD_FUNCTION_H
 #define METHOD_FUNCTION_H
 
-#include "../../Core/scoped.h"
+#include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/method_definition.h"
 
 namespace Analysis::Structure::Global

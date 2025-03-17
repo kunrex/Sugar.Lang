@@ -16,5 +16,5 @@ namespace Analysis::Structure::Local
     const std::string& LocalVariable::FullName() const { return name; }
 
     bool LocalVariable::Readable() const { return true; }
-    bool LocalVariable::Writable() const { return true; }
+    bool LocalVariable::Writable() const { return !CheckDescriber(Describer::Const); }
 }

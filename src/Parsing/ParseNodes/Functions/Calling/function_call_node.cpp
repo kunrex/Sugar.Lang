@@ -12,6 +12,8 @@ namespace ParseNodes::Functions::Calling
 
     unsigned long FunctionCallNode::Index() const { return identifier->Index(); }
 
+    const IdentifierNode* FunctionCallNode::Identifier() const { return identifier;}
+
     FunctionCallNode::~FunctionCallNode()
     {
         delete identifier;

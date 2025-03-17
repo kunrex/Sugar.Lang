@@ -9,7 +9,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IIndexerDefinition : public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual IPropertySignature
+    class IIndexerDefinition : public virtual INode, public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual IPropertySignature
     {
 
     };

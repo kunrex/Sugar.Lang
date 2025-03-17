@@ -12,6 +12,7 @@ using namespace ParseNodes::DataTypes;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr int word_size = 8;
@@ -47,7 +48,28 @@ namespace Analysis::Structure::DataTypes
         return slotCount;
     }
 
-    const string& ValueType::FullName() const
+    const ICharacteristic* ValueType::FindCharacteristic(const string& name) const
+    {
+        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+    }
+
+    ValueType::~ValueType()
+    {
+        for (const auto& characteristic : characteristics)
+            delete characteristic.second;
+    }
+
+    BuiltInValueType::BuiltInValueType(const std::string& name, const Enums::Describer describer) : ValueType(name, describer)
+    { }
+
+    const string& BuiltInValueType::FullName() const { return name; }
+
+    StructSource::StructSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : ValueType(name, describer), fullName(), skeleton(skeleton)
+    { }
+
+    TypeKind StructSource::Type() const { return TypeKind::Custom; }
+
+    const string& StructSource::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = parent->FullName() + "." + name;
@@ -55,86 +77,114 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    void ValueType::PushCharacteristic(ICharacteristic* const characteristic)
+    const DataTypeNode* StructSource::Skeleton() const { return skeleton; }
+
+    void StructSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    const ICharacteristic* ValueType::FindCharacteristic(const string& name) const
-    {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
-    }
-
-    void ValueType::PushFunction(IFunctionDefinition* function)
+    void StructSource::PushFunction(IFunctionDefinition* function)
     {
         functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
     }
 
-    const IFunctionDefinition* ValueType::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
+    const IFunctionDefinition* StructSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
 
-    void ValueType::PushConstructor(IFunction* constructor)
+    IScoped* StructSource::StaticConstructor() const { return staticConstructor; }
+    IScoped* StructSource::InstanceConstructor() const { return instanceConstructor; }
+
+    void StructSource::PushConstructor(IFunction* constructor)
     {
         constructors[ArgumentHash(constructor)] = constructor;
     }
 
-    const IFunction* ValueType::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* StructSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return constructors.contains(hash) ? nullptr : constructors.at(hash);
     }
 
-    void ValueType::PushIndexer(IIndexerDefinition* indexer)
+    void StructSource::PushIndexer(IIndexerDefinition* indexer)
     {
         indexers[ArgumentHash(indexer)] = indexer;
     }
 
-    const IIndexerDefinition* ValueType::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    const IIndexerDefinition* StructSource::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
         return indexers.contains(hash) ? nullptr : indexers.at(hash);
     }
 
-    void ValueType::PushImplicitCast(IFunction* cast)
+    void StructSource::PushImplicitCast(IFunction* cast)
     {
         implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const IFunction* ValueType::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    const IFunction* StructSource::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
     }
 
-    void ValueType::PushExplicitCast(IFunction* cast)
+    void StructSource::PushExplicitCast(IFunction* cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
 
-    const IFunction* ValueType::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    const IFunction* StructSource::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
         return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
-    void ValueType::PushOverload(IOperatorOverload* overload)
+    void StructSource::PushOverload(IOperatorOverload* overload)
     {
         overloads[overload->Operator()] = overload;
     }
 
-    const IOperatorOverload* ValueType::FindOverload(const SyntaxKind base) const
+    const IOperatorOverload* StructSource::FindOverload(const SyntaxKind base) const
     {
         return overloads.at(base);
     }
 
-    ValueType::~ValueType()
+    std::vector<const ICharacteristic*> StructSource::AllCharacteristics() const
     {
+        std::vector<const ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
-            delete characteristic.second;
+            all.push_back(characteristic.second);
 
+        return all;
+    }
+
+    std::vector<IScoped*> StructSource::AllScoped() const
+    {
+        std::vector<IScoped*> all;
+
+        for (const auto function: functions)
+            all.push_back(function.second);
+
+        for (const auto constructor: constructors)
+            all.push_back(constructor.second);
+
+        for (const auto cast: implicitCasts)
+            all.push_back(cast.second);
+
+        for (const auto cast: explicitCasts)
+            all.push_back(cast.second);
+
+        for (const auto& overload: overloads)
+            delete overload.second;
+
+        return all;
+    }
+
+    StructSource::~StructSource()
+    {
         for (const auto function: functions)
             delete function.second;
 
@@ -152,25 +202,5 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto& overload: overloads)
             delete overload.second;
-    }
-
-    StructSource::StructSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : ValueType(name, describer), UserDefinedType(skeleton)
-    { }
-
-    const string& StructSource::FullName() const
-    {
-        if (fullName.empty() && parent != nullptr)
-            fullName = parent->FullName() + "." + name;
-
-        return fullName;
-    }
-
-    std::vector<const ICharacteristic*> StructSource::AllCharacteristics() const
-    {
-        std::vector<const ICharacteristic*> all;
-        for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
-
-        return all;
     }
 }

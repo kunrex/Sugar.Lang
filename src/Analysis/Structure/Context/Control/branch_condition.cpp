@@ -21,7 +21,7 @@ namespace Analysis::Structure::Context
     bool BranchTrue::Readable() const { return false; }
     bool BranchTrue::Writable() const { return false; }
 
-    string BranchTrue::CILInstruction() const { return cilInstruction; }
+    string BranchTrue::CILData() const { return cilInstruction; }
 
     BranchFalse::BranchFalse(const string& name) : ContextNode(&Object::Instance()), cilInstruction(std::format("brfalse {}", name))
     { }
@@ -33,6 +33,6 @@ namespace Analysis::Structure::Context
     bool BranchFalse::Readable() const { return false; }
     bool BranchFalse::Writable() const { return false; }
 
-    string BranchFalse::CILInstruction() const { return cilInstruction; }
+    string BranchFalse::CILData() const { return cilInstruction; }
 }
 

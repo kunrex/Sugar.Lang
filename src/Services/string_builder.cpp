@@ -9,36 +9,31 @@
 #include "../Exceptions/Compilation/transpile_file_exception.h"
 
 using namespace std;
-namespace fs = std::filesystem;
 
 using namespace Exceptions;
 
 namespace Services
 {
-    StringBuilder::StringBuilder(string outputFile) : value(), outputFile(std::move(outputFile))
+    StringBuilder::StringBuilder() : indent(), value()
     { }
 
-    const std::string& StringBuilder::OutputFile() const { return outputFile; }
+    int StringBuilder::Indent() const { return indent; }
+
+    string StringBuilder::Value() const { return value; }
 
     void StringBuilder::IncreaseIndent() { indent++; }
 
     void StringBuilder::DecreaseIndent() { indent--; }
 
+    void StringBuilder::SetIndent(const int indent) { this->indent = indent; }
+
+    void StringBuilder::Push(const std::string& content)
+    {
+        value += content;
+    }
+
     void StringBuilder::PushLine(const std::string& content)
     {
         value += std::format("{}{}\n", string(indent, '\t'), content);
-    }
-
-    void StringBuilder::PushValueToFile()
-    {
-        if (std::ofstream file(outputFile); file.is_open())
-        {
-            file << value;
-            file.close();
-
-            value.clear();
-        }
-        else
-            ExceptionManager::Instance().AddChild(new TranspileFileException(string(outputFile)));
     }
 }

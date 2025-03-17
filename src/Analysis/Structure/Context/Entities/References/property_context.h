@@ -9,11 +9,10 @@ namespace Analysis::Structure::Context
     class PropertyContext final : public ContextNode
     {
         private:
-            const bool isLoadInstruction;
             const Creation::PropertyDefinition* property;
 
         public:
-            PropertyContext(const Creation::PropertyDefinition* property, bool isLoadInstruction);
+            explicit PropertyContext(const Creation::PropertyDefinition* property);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -22,7 +21,9 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] std::string CILInstruction() const override;
+            [[nodiscard]] std::string CILData() const override;
+
+            [[nodiscard]] const Creation::PropertyDefinition* Property() const;
     };
 }
 

@@ -7,7 +7,7 @@ namespace Analysis::Structure::Core
     Describable::Describable(const Enums::Describer describer) : describer(describer)
     { }
 
-    Describer Describable::Describer() const { return describer;}
+    Describer Describable::Describer() const { return describer; }
 
     bool Describable::ValidateDescriber(const Enums::Describer allowed) const { return (allowed & describer) == describer; }
 

@@ -1,13 +1,15 @@
 #include "scope.h"
 
+#include "../../Core/Scoped/scoped.h"
+
 using namespace std;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Local
 {
-    Scope::Scope(const ScopeType type, const string& name, Scoped* const scoped) : LocalNode(), Nameable(name), ConstantChild(), ConstantCollection(), type(type), scoped(scoped), nested(), variableIndices()
+    Scope::Scope(const ScopeType type, const string& name, IScoped* const scoped) : LocalNode(), Nameable(name), ConstantChild(), ConstantCollection(), type(type), scoped(scoped), nested(), variableIndices()
     { }
 
     MemberType Scope::MemberType() const { return MemberType::Scope; }

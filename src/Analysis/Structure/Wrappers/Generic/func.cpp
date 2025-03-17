@@ -8,6 +8,8 @@
 
 using namespace std;
 
+using namespace Tokens::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -16,7 +18,7 @@ constexpr std::string cil_func = "[System.Runtime]System.Func";
 
 namespace Analysis::Structure::Wrappers
 {
-    Func::Func() : Class(cil_func, Describer::Public), SingletonCollection(), GenericType(), callSignature(), types()
+    Func::Func() : BuiltInClass(cil_func, Describer::Public), SingletonCollection(), genericSignature(), types()
     { }
 
     const Func* Func::Instance(const std::vector<const IDataType*>& types)
@@ -33,16 +35,42 @@ namespace Analysis::Structure::Wrappers
             func->types.push_back(type);
 
         func->genericSignature = std::format("{}`{}<{}>", cil_func, types.size(), MapGenericSignature(types));
-        func->callSignature = MapGenericCallSignature(types);
 
-        func->InitialiseMembers();
+        func->InitializeMembers();
 
         map[hash] = func;
         return func;
     }
 
+    TypeKind Func::Type() const { return TypeKind::Func; }
+
     const std::string& Func::FullName() const { return genericSignature; }
 
-    void Func::InitialiseMembers()
+    unsigned long Func::TypeCount() const { return types.size(); }
+
+    const IDataType* Func::TypeAt(const unsigned long index) const { return types.at(index); }
+
+    void Func::InitializeMembers()
     { }
+
+    const ICharacteristic* Func::FindCharacteristic(const std::string& name) const
+    { return nullptr; }
+
+    const IFunction* Func::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IFunctionDefinition* Func::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IIndexerDefinition* Func::FindIndexer(const std::vector<const IDataType*>& argumentList) const
+    { return nullptr; }
+
+    const IFunction* Func::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IFunction* Func::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
+    const IOperatorOverload* Func::FindOverload(const SyntaxKind base) const
+    { return nullptr; }
 }

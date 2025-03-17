@@ -8,13 +8,11 @@ namespace Analysis::Structure::Context
     class LocalVariableContext final : public IndexedContext
     {
         public:
-            LocalVariableContext(const Core::Interfaces::IVariable* variable, bool isLoadInstruction, int index);
+            LocalVariableContext(const Core::Interfaces::IVariable* variable, int index);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] int SlotCount() const override;
-
-            [[nodiscard]] std::string CILInstruction() const override;
     };
 }
 

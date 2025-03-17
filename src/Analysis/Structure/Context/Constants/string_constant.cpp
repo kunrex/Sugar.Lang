@@ -19,5 +19,5 @@ namespace Analysis::Structure::Context
     bool StringConstant::Readable() const { return true; }
     bool StringConstant::Writable() const { return false; }
 
-    string StringConstant::CILInstruction() const { return std::format("ldstr {}", value); }
+    string StringConstant::CILData() const { return std::format("ldstr {}", value); }
 }

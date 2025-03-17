@@ -12,6 +12,7 @@
 #include "../../Lexing/Tokens/Factories/operator.h"
 
 #include "../ParseNodes/Values/this_node.h"
+#include "../ParseNodes/Values/null_node.h"
 
 #include "../ParseNodes/Statements/empty_node.h"
 
@@ -33,7 +34,6 @@
 #include "../ParseNodes/Types/Keyword/Generic/action_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/nullable_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/dictionary_type_node.h"
-#include "../ParseNodes/Values/null_node.h"
 
 using namespace std;
 
@@ -519,18 +519,8 @@ namespace Parsing
             break;
         }
 
-        collection->AddChild(ParseInvalid(breakSeparator);
+        collection->AddChild(ParseInvalid(breakSeparator));
         TryMatchSeparator(Current(), breakSeparator);
-    }
-
-    const ScopeNode* Parser::ParseScopedExpression()
-    {
-        TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
-
-        const auto scope = new ScopeNode(index - 1);
-        ParseExpressionCollection(scope, SeparatorKind::FlowerCloseBracket);
-
-        return scope;
     }
 
     const IndexerExpressionNode* Parser::ParseIndexerExpression(const ParseNode* const operand)

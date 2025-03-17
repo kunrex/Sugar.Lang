@@ -24,12 +24,14 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : DataType(name, describer | Describer::Static), UserDefinedType(skeleton), explicitCasts()
+    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : DataType(name, describer | Describer::Static), fullName(), skeleton(skeleton), explicitCasts()
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
 
     int Enum::SlotCount() const { return 1; }
+
+    TypeKind Enum::Type() const { return TypeKind::Custom; }
 
     const string& Enum::FullName() const
     {
@@ -38,6 +40,8 @@ namespace Analysis::Structure::DataTypes
 
         return fullName;
     }
+
+    const DataTypeNode* Enum::Skeleton() const { return skeleton; }
 
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
@@ -49,11 +53,14 @@ namespace Analysis::Structure::DataTypes
         return characteristics.contains(name) ? nullptr : characteristics.at(name);
     }
 
-    void Enum::PushFunction(IFunctionDefinition* function)
+    void Enum::PushFunction(IFunctionDefinition* const function)
     { }
 
     const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr;}
+
+    IScoped* Enum::StaticConstructor() const { return nullptr; }
+    IScoped* Enum::InstanceConstructor() const { return nullptr; }
 
     void Enum::PushConstructor(IFunction* constructor)
     { }
@@ -105,6 +112,11 @@ namespace Analysis::Structure::DataTypes
             all.push_back(characteristic.second);
 
         return all;
+    }
+
+    std::vector<IScoped*> Enum::AllScoped() const
+    {
+        return { };
     }
 
     Enum::~Enum()

@@ -16,6 +16,6 @@ namespace Analysis::Structure::Context
     bool InvalidIndexerExpression::Readable() const { return false; }
     bool InvalidIndexerExpression::Writable() const { return false; }
 
-    string InvalidIndexerExpression::CILInstruction() const { return ""; }
+    string InvalidIndexerExpression::CILData() const { return ""; }
 }
 
