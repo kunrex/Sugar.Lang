@@ -53,11 +53,6 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& List::FullName() const {  return genericSignature; }
 
-    const Core::Interfaces::IDataType* List::GenericType() const { return listType; }
-
-    string List::ConstructorSignature() const { return FindConstructor({ })->FullName(); }
-    string List::PushElementSignature() const { return "callvirt " + FindFunction("Add", { listType })->FullName(); }
-
     void List::InitializeMembers()
     {
         const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);

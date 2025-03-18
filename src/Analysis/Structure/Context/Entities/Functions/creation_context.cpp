@@ -10,7 +10,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    CreationContext::CreationContext(const IFunction* constructor) : ContextNode(constructor->CreationType()), slotCount(-1), constructor(constructor)
+    CreationContext::CreationContext(const IFunction* const constructor) : ContextNode(constructor->CreationType()), slotCount(-1), constructor(constructor)
     { }
 
     int CreationContext::SlotCount() const
@@ -39,7 +39,7 @@ namespace Analysis::Structure::Context
         return "call " + constructor->FullName();
     }
 
-    CollectionCreationContext::CollectionCreationContext(const ICollectionType* collectionType) : ContextNode(collectionType), slotCount(-1), constructorCIL(collectionType->ConstructorSignature()), pushElementCIL(collectionType->PushElementSignature())
+    CollectionCreationContext::CollectionCreationContext(const IDataType* const collectionType) : ContextNode(collectionType), slotCount(-1), collectionType(collectionType)
     { }
 
     int CollectionCreationContext::SlotCount() const
@@ -55,13 +55,10 @@ namespace Analysis::Structure::Context
         return slotCount;
     }
 
-    MemberType CollectionCreationContext::MemberType() const { return MemberType::FunctionCallContext; }
+    MemberType CollectionCreationContext::MemberType() const { return MemberType::CollectorConstructorCallContext; }
 
     bool CollectionCreationContext::Readable() const { return true; }
     bool CollectionCreationContext::Writable() const { return creationType->MemberType() == MemberType::Class; }
 
     string CollectionCreationContext::CILData() const { return ""; }
-
-    const string& CollectionCreationContext::ConstructorCIL() const { return constructorCIL; }
-    const string& CollectionCreationContext::PushElementCIL() const { return pushElementCIL; }
 }

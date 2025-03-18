@@ -2,7 +2,8 @@
 #define INVOKE_H
 
 #include "../../context_node.h"
-#include "../../../Core/DataTypes/generic_type.h"
+
+#include "../../../Core/Interfaces/DataTypes/i_delegate_type.h"
 
 namespace Analysis::Structure::Context
 {
@@ -10,10 +11,10 @@ namespace Analysis::Structure::Context
     {
         private:
             mutable int slotCount;
-            const Core::GenericType* delegateType;
+            const Core::Interfaces::IDelegateType* delegateType
 
         public:
-            InvokeContext(const Core::Interfaces::IDataType* creationType, const Core::GenericType* delegateType);
+            InvokeContext(const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IDelegateType* delegateType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

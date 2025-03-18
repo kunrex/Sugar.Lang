@@ -1,20 +1,14 @@
-#ifndef BUILT_IN_CAST_EXPRESSION_H
-#define BUILT_IN_CAST_EXPRESSION_H
+#ifndef THROW_H
+#define THROW_H
 
 #include "../unary_context_node.h"
 
-#include "../../Core/Interfaces/Creation/i_function.h"
-
 namespace Analysis::Structure::Context
 {
-    class BuiltInCastExpression final : public UnaryContextNode
+    class Throw final : public UnaryContextNode
     {
-        private:
-            mutable int slotCount;
-            const Core::Interfaces::IFunction* definition;
-
         public:
-            BuiltInCastExpression(const Core::Interfaces::IFunction* definition, const ContextNode* operand);
+            explicit Throw(const ContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

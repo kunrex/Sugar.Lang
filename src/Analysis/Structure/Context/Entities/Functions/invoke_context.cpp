@@ -15,7 +15,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    InvokeContext::InvokeContext(const IDataType* const creationType, const GenericType* const delegateType) : ContextNode(creationType), slotCount(-1), delegateType(delegateType)
+    InvokeContext::InvokeContext(const IDataType* const creationType, const IDelegateType* const delegateType) : ContextNode(creationType), slotCount(-1), delegateType(delegateType)
     { }
 
     int InvokeContext::SlotCount() const
@@ -48,6 +48,6 @@ namespace Analysis::Structure::Context
                 parameterString += ", ";
         }
 
-        return std::format("callvirt instance void {}::Invoke({})", delegateType->GenericSignature(), parameterString);
+        return std::format("callvirt instance void {}::Invoke({})", delegateType->DelegateSignature(), parameterString);
     }
 }

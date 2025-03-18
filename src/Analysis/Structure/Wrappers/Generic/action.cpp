@@ -53,6 +53,8 @@ namespace Analysis::Structure::Wrappers
 
     const IDataType* Action::TypeAt(const unsigned long index) const { return types.at(index); }
 
+    const std::string& Action::DelegateSignature() const { return genericSignature; }
+
     void Action::InitializeMembers()
     { }
 

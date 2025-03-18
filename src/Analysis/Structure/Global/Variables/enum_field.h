@@ -1,5 +1,5 @@
-#ifndef GLOBAL_CONSTANT_H
-#define GLOBAL_CONSTANT_H
+#ifndef ENUM_FIELD_H
+#define ENUM_FIELD_H
 
 #include <vector>
 
@@ -9,14 +9,15 @@
 
 namespace Analysis::Structure::Global
 {
-    class GlobalConstant final : public GlobalVariable, public virtual Core::Interfaces::IConstant
+    class EnumField final : public GlobalVariable, public virtual Core::Interfaces::IConstant
     {
         private:
             bool compiled;
             std::vector<const ICharacteristic*> dependencies;
 
         public:
-            GlobalConstant(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::ParseNode* parseNode);
+            EnumField(const std::string& name, Enums::Describer describer);
+            EnumField(const std::string& name, Enums::Describer describer, const ParseNodes::ParseNode* parseNode);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

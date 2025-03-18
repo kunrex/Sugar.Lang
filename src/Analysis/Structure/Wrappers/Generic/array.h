@@ -4,14 +4,13 @@
 #include "../../../../Services/singleton_service.h"
 
 #include "../../DataTypes/class.h"
-#include "../../Core/Interfaces/DataTypes/i_collection_type.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
 #include "../../Global/BuiltIn/built_in_indexer.h"
 #include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_constructor.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Array final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::ICollectionType
+    class Array final : public DataTypes::BuiltInClass, public Services::SingletonCollection
     {
         private:
             mutable std::string genericSignature;
@@ -32,11 +31,6 @@ namespace Analysis::Structure::Wrappers
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
-
-            [[nodiscard]] const IDataType* GenericType() const override;
-
-            [[nodiscard]] std::string ConstructorSignature() const override;
-            [[nodiscard]] std::string PushElementSignature() const override;
 
             void InitializeMembers() override;
 

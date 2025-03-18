@@ -4,10 +4,11 @@
 #include "../../../../Services/singleton_service.h"
 
 #include "../../DataTypes/class.h"
+#include "../../Core/Interfaces/DataTypes/i_delegate_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Func final : public DataTypes::BuiltInClass, public Services::SingletonCollection
+    class Func final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::IDelegateType
     {
         private:
             mutable std::string genericSignature;
@@ -25,6 +26,8 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] unsigned long TypeCount() const;
             [[nodiscard]] const IDataType* TypeAt(unsigned long index) const;
+
+            [[nodiscard]] const std::string& DelegateSignature() const override;
 
             void InitializeMembers() override;
 

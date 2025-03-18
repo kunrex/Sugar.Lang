@@ -3,7 +3,6 @@
 #include <format>
 
 #include "../../Wrappers/Reference/object.h"
-#include "../../DataTypes/class.h"
 
 using namespace std;
 
@@ -20,7 +19,7 @@ namespace Analysis::Structure::Context
 
     int UnboxCastExpression::SlotCount() const { return slotCount; }
 
-    MemberType UnboxCastExpression::MemberType() const { return MemberType::UnboxCast; }
+    MemberType UnboxCastExpression::MemberType() const { return MemberType::CastExpression; }
 
     bool UnboxCastExpression::Readable() const { return true; }
     bool UnboxCastExpression::Writable() const { return false; }

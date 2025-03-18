@@ -567,7 +567,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/Functions/ref_context.h
         Analysis/Structure/Context/Entities/Functions/creation_context.cpp
         Analysis/Structure/Context/Entities/Functions/creation_context.h
-        Analysis/Structure/Core/Interfaces/DataTypes/i_collection_type.h
         Analysis/Structure/Core/Interfaces/DataTypes/i_user_defined_type.h
         Analysis/Structure/Core/Interfaces/scoped/i_scoped.h
         Analysis/Structure/Wrappers/Reference/void.cpp
@@ -584,4 +583,10 @@ add_library(Sugar STATIC
         Exceptions/Compilation/Analysis/Local/invalid_statement_exception.h
         Exceptions/Compilation/Analysis/Local/overload_not_found_exception.cpp
         Exceptions/Compilation/Analysis/Local/overload_not_found_exception.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_delegate_type.h
+        Analysis/Structure/Context/Control/throw.cpp
+        Analysis/Structure/Context/Control/throw.h
+        Analysis/Structure/Global/Variables/enum_field.cpp
+        Analysis/Structure/Global/Variables/enum_field.h
+        Analysis/Structure/Core/Interfaces/Creation/i_constant.h
 )

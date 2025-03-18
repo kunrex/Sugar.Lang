@@ -23,6 +23,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string CILData() const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* Function() const;
     };
 }
 

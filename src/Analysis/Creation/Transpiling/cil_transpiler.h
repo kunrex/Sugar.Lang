@@ -5,10 +5,9 @@
 
 #include "../../Structure/source_file.h"
 #include "../../Structure/source_directory.h"
-
-#include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
-
+#include "../../Structure/Context/context_node.h"
 #include "../../Structure/Global/Variables/enum_field.h"
+#include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 #include "../../Structure/Global/Variables/global_constant.h"
 
 namespace Analysis::Creation
@@ -37,6 +36,7 @@ namespace Analysis::Creation
             void CILTranspiler::TranspileFunctionBody(const Structure::Core::Interfaces::IScoped* scoped);
 
             void CILTranspiler::TranspileScope(const Structure::Local::Scope* scope, Services::StringBuilder& stringBuilder, int& maxSlotSize);
+
             void CILTranspiler::TranspileContext(const Structure::Context::ContextNode* context, Services::StringBuilder& stringBuilder);
 
         public:

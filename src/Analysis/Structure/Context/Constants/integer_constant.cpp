@@ -18,7 +18,7 @@ namespace Analysis::Structure::Context
     ShortConstant::ShortConstant(const short value) : ContextNode(&Short::Instance()), value(value)
     { }
 
-    MemberType ShortConstant::MemberType() const { return MemberType::Constant; }
+    MemberType ShortConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool ShortConstant::Readable() const { return true; }
     bool ShortConstant::Writable() const { return false; }
@@ -28,7 +28,7 @@ namespace Analysis::Structure::Context
     IntegerConstant::IntegerConstant(const int value) : ContextNode(&Integer::Instance()), value(value)
     { }
 
-    MemberType IntegerConstant::MemberType() const { return MemberType::Constant; }
+    MemberType IntegerConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool IntegerConstant::Readable() const { return true; }
     bool IntegerConstant::Writable() const { return false; }
@@ -38,7 +38,7 @@ namespace Analysis::Structure::Context
     LongConstant::LongConstant(const long value) : ContextNode(&Long::Instance()), value(value)
     { }
 
-    MemberType LongConstant::MemberType() const { return MemberType::Constant; }
+    MemberType LongConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool LongConstant::Readable() const { return true; }
     bool LongConstant::Writable() const { return false; }
@@ -48,7 +48,7 @@ namespace Analysis::Structure::Context
     CharacterConstant::CharacterConstant(const char value) : ContextNode(&Character::Instance()), value(value)
     { }
 
-    MemberType CharacterConstant::MemberType() const { return MemberType::Constant; }
+    MemberType CharacterConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool CharacterConstant::Readable() const { return true; }
     bool CharacterConstant::Writable() const { return false; }
@@ -58,7 +58,7 @@ namespace Analysis::Structure::Context
     TrueConstant::TrueConstant(): ContextNode(&Boolean::Instance())
     { }
 
-    MemberType TrueConstant::MemberType() const { return MemberType::Constant; }
+    MemberType TrueConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool TrueConstant::Readable() const { return true; }
     bool TrueConstant::Writable() const { return false; }
@@ -68,7 +68,7 @@ namespace Analysis::Structure::Context
     FalseConstant::FalseConstant(): ContextNode(&Boolean::Instance())
     { }
 
-    MemberType FalseConstant::MemberType() const { return MemberType::Constant; }
+    MemberType FalseConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool FalseConstant::Readable() const { return true; }
     bool FalseConstant::Writable() const { return false; }

@@ -2,6 +2,8 @@
 
 #include <format>
 
+#include "../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -14,7 +16,7 @@ namespace Analysis::Structure::Context
         slotCount = std::max(definition->CreationType()->SlotCount(), operand->CreationType()->SlotCount());
     }
 
-    MemberType DefinedCastExpression::MemberType() const { return MemberType::DefinedCast; }
+    MemberType DefinedCastExpression::MemberType() const { return MemberType::CastExpression; }
 
     int DefinedCastExpression::SlotCount() const { return slotCount; }
 

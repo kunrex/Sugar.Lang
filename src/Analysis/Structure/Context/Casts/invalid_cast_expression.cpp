@@ -10,7 +10,7 @@ namespace Analysis::Structure::Context
     InvalidCastExpression::InvalidCastExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
     { }
 
-    MemberType InvalidCastExpression::MemberType() const { return MemberType::Invalid; }
+    MemberType InvalidCastExpression::MemberType() const { return MemberType::CastExpression; }
 
     int InvalidCastExpression::SlotCount() const { return 0; }
 

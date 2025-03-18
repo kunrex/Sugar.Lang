@@ -15,7 +15,7 @@ namespace Analysis::Structure::Context
     FloatConstant::FloatConstant(const float value) : ContextNode(&Float::Instance()), value(value)
     { }
 
-    MemberType FloatConstant::MemberType() const { return MemberType::Constant; }
+    MemberType FloatConstant::MemberType() const { return MemberType::ConstantContext; }
 
     int FloatConstant::SlotCount() const { return 1; }
 
@@ -27,7 +27,7 @@ namespace Analysis::Structure::Context
     DoubleConstant::DoubleConstant(const double value) : ContextNode(&Double::Instance()), value(value)
     { }
 
-    MemberType DoubleConstant::MemberType() const { return MemberType::Constant; }
+    MemberType DoubleConstant::MemberType() const { return MemberType::ConstantContext; }
 
     int DoubleConstant::SlotCount() const { return 1; }
 

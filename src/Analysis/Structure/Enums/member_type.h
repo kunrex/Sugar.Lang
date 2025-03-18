@@ -3,13 +3,15 @@
 
 namespace Analysis::Structure::Enums
 {
-    enum class MemberType : long
+    enum class MemberType : short
     {
         Enum,
         Class,
         ValueType,
 
         Field,
+        EnumField,
+        ConstantField,
 
         Property,
         BuiltInProperty,
@@ -34,9 +36,12 @@ namespace Analysis::Structure::Enums
         LocalVariable,
         FunctionParameter,
 
-        For,
-        While,
-        DoWhile,
+        Throw,
+        Scope,
+        Return,
+        BranchJump,
+
+        ConstantContext,
 
         RefContext,
         CopyContext,
@@ -54,39 +59,21 @@ namespace Analysis::Structure::Enums
         LocalVariableContext,
         FunctionParameterContext,
 
-        BoxCast,
-        UnboxCast,
-        CastClass,
-        CastBuiltIn,
-        DefinedCast,
-
         FunctionCallContext,
-        OverloadedIndexerContext,
-
-        SingleReference,
-
-        Dot,
-        AssignmentOperation,
-
-        OperationBuiltIn,
-        OperationOverload,
-
-        Invalid,
-
-        UnaryExpression,
-        BinaryExpression,
-
-        IndexerExpression,
+        CollectorConstructorCallContext,
 
         StaticReferenceContext,
 
-        Scope,
-        Return,
-        BranchJump,
+        DotExpression,
 
-        Constant,
+        IndexerExpression,
 
-        ThrowContext,
+        CastExpression,
+        UnaryExpression,
+        BinaryExpression,
+        AssignmentExpression,
+
+        Invalid,
     };
 }
 

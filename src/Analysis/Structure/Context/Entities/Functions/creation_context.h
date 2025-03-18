@@ -1,8 +1,11 @@
 #ifndef CREATION_CONTEXT_H
 #define CREATION_CONTEXT_H
 
+#include "../../../../../Services/collection.h"
+
 #include "../../context_node.h"
-#include "../../../Core/Interfaces/DataTypes/i_collection_type.h"
+
+#include "../../../Core/Interfaces/Creation/i_function.h"
 
 namespace Analysis::Structure::Context
 {
@@ -30,11 +33,10 @@ namespace Analysis::Structure::Context
         private:
             mutable int slotCount;
 
-            const std::string constructorCIL;
-            const std::string pushElementCIL;
+            const Core::Interfaces::IDataType* collectionType;
 
         public:
-            explicit CollectionCreationContext(const Core::Interfaces::ICollectionType* collectionType);
+            explicit CollectionCreationContext(const Core::Interfaces::IDataType* collectionType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -44,9 +46,6 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string CILData() const override;
-
-            [[nodiscard]] const std::string& ConstructorCIL() const;
-            [[nodiscard]] const std::string& PushElementCIL() const;
     };
 }
 

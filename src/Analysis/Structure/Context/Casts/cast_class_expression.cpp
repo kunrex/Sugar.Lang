@@ -2,6 +2,8 @@
 
 #include <format>
 
+#include "../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Core;
@@ -15,7 +17,7 @@ namespace Analysis::Structure::Context
         slotCount = std::max(operand->CreationType()->SlotCount(), creationType->SlotCount());
     }
 
-    MemberType CastClassExpression::MemberType() const { return MemberType::CastClass; }
+    MemberType CastClassExpression::MemberType() const { return MemberType::CastExpression; }
 
     int CastClassExpression::SlotCount() const { return slotCount; }
 

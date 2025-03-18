@@ -17,7 +17,7 @@ namespace Analysis::Structure::Context
         slotCount = std::max(Object::Instance().SlotCount(), operand->SlotCount());
     }
 
-    MemberType BoxCastExpression::MemberType() const { return MemberType::BoxCast; }
+    MemberType BoxCastExpression::MemberType() const { return MemberType::CastExpression; }
 
     int BoxCastExpression::SlotCount() const { return slotCount; }
 

@@ -12,10 +12,25 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependencies(), value()
+    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), compiled(false), dependencies()
     { }
 
+    MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
+
+    const std::string& GlobalConstant::FullName() const { return fullName; }
+
+    bool GlobalConstant::Readable() const { return compiled; }
+
     bool GlobalConstant::Writable() const { return false; }
+
+    void GlobalConstant::Compile(const std::string& value)
+    {
+        if (!compiled)
+        {
+            fullName = value;
+            compiled = true;
+        }
+    }
 
     void GlobalConstant::PushDependency(const ICharacteristic* const constant)
     {
@@ -29,31 +44,6 @@ namespace Analysis::Structure::Global
                 return true;
 
         return false;
-    }
-
-    void GlobalConstant::WithValue(long value) const
-    {
-        this->value = value;
-    }
-
-    void GlobalConstant::WithValue(double value) const
-    {
-        this->value = value;
-    }
-
-    void GlobalConstant::WithValue(const string& value) const
-    {
-        this->value = value;
-    }
-
-    template <typename TType>
-    optional<TType> GlobalConstant::Value() const
-    {
-        if (const TType* v = std::get_if<TType>(&value)) {
-            return *v;
-        }
-
-        return std::nullopt;
     }
 }
 

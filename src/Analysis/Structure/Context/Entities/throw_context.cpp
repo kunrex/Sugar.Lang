@@ -13,7 +13,7 @@ namespace Analysis::Structure::Context
     ThrowContext::ThrowContext() : ContextNode(&Object::Instance())
     { }
 
-    MemberType ThrowContext::MemberType() const { return MemberType::ThrowContext; }
+    MemberType ThrowContext::MemberType() const { return MemberType::Throw; }
 
     int ThrowContext::SlotCount() const { return 1; }
 

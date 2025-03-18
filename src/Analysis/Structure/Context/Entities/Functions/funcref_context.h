@@ -3,6 +3,8 @@
 
 #include "../../unary_context_node.h"
 
+#include "../../../Core/Interfaces/Creation/i_function_definition.h"
+
 namespace Analysis::Structure::Context
 {
     class FuncRefContext final : public UnaryContextNode

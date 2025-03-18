@@ -38,6 +38,7 @@
 #include "../../../Parsing/ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h"
 #include "../../../Parsing/ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h"
 #include "../../../Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h"
+#include "../../../Parsing/ParseNodes/Statements/throw_statement_node.h"
 
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 
@@ -64,6 +65,7 @@
 #include "../../Structure/Context/Entities/Functions/input_context.h"
 #include "../../Structure/Context/Entities/Functions/invoke_context.h"
 #include "../../Structure/Context/Entities/static_reference_context.h"
+#include "../../Structure/Context/Entities/throw_context.h"
 #include "../../Structure/Context/Entities/Functions/format_context.h"
 #include "../../Structure/Context/Entities/References/field_context.h"
 #include "../../Structure/Context/Expressions/assignment_expression.h"
@@ -101,6 +103,7 @@
 #include "../../Structure/Wrappers/Reference/object.h"
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Generic/referenced.h"
+#include "../../Structure/Wrappers/Reference/void.h"
 
 using namespace Services;
 
@@ -654,7 +657,7 @@ namespace Analysis::Creation::Binding
         return new PrintObjectContext(operand, ln);
     }
 
-    const ContextNode* BindInvoke(const IDataType* creationType, const IDataType* delegateType, const std::vector<const ContextNode*>& arguments)
+    const ContextNode* BindInvoke(const IDataType* creationType, const IDelegateType* delegateType, const std::vector<const ContextNode*>& arguments)
     {
         const auto invoke = new InvokeContext(creationType, delegateType);
         for (int i = 1; i < arguments.size(); i++)
@@ -757,7 +760,7 @@ namespace Analysis::Creation::Binding
                         }
 
                         if (!invalid)
-                            return BindInvoke(nullptr, action, arguments);
+                            return BindInvoke(&Void::Instance(), action, arguments);
                     }
                     else if (delegateType->Type() == TypeKind::Action)
                     {
@@ -774,7 +777,7 @@ namespace Analysis::Creation::Binding
                             return BindInvoke(func->TypeAt(func->TypeCount() - 1), func, arguments);
                     }
 
-
+                    PushException(new LogException("Arguments do not match delegate signature", invokeNode->Index(), dataType->Parent()));
                     return new InvokeContext(&Object::Instance(), nullptr);
                 }
                 break;
@@ -1105,6 +1108,13 @@ namespace Analysis::Creation::Binding
                 case NodeType::Declaration:
                 case NodeType::Initialisation:
                     BindStatement(child, current, scoped, dataType);
+                    break;
+                case NodeType::Throw:
+                    {
+                        const auto throwNode = dynamic_cast<const ThrowStatementNode*>(child);
+                        current->AddChild(BindExpression(throwNode->Exception(), scoped, scope, dataType));
+                        current->AddChild(new ThrowContext());
+                    }
                     break;
                 case NodeType::Break:
                     {

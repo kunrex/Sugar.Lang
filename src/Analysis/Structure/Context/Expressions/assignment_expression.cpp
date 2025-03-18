@@ -11,7 +11,7 @@ namespace Analysis::Structure::Context
         slotCount = std::max(lhs->SlotCount(), rhs->SlotCount());
     }
 
-    MemberType AssignmentExpression::MemberType() const { return MemberType::AssignmentOperation; }
+    MemberType AssignmentExpression::MemberType() const { return MemberType::AssignmentExpression; }
 
     int AssignmentExpression::SlotCount() const { return slotCount; }
 

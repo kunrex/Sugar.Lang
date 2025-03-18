@@ -2,6 +2,8 @@
 
 #include "function_extensions.h"
 
+#include "../../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;

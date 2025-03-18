@@ -33,5 +33,7 @@ namespace Analysis::Structure::Context
     bool FunctionCallContext::Writable() const { return function->CreationType() != nullptr && function->CreationType()->MemberType() == MemberType::Class; }
 
     string FunctionCallContext::CILData() const { return "call " + function->FullName(); }
+
+    const IFunctionDefinition* FunctionCallContext::Function() const { return function; }
 }
 
