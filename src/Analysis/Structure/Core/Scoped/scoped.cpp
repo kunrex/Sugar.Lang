@@ -2,19 +2,17 @@
 
 #include "../../Local/Scopes/scope.h"
 
-using namespace ParseNodes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 
 namespace Analysis::Structure::Core
 {
-    Scoped::Scoped(const NodeCollection<ParseNodes::ParseNode>* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0), scope(new Local::Scope(ScopeType::Scope, "", this))
+    Scoped::Scoped(const IParseNode* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0), scope(new Local::Scope(ScopeType::Scope, "", this))
     { }
 
-    S
-
-    const NodeCollection<ParseNode>* Scoped::ParseNode() const { return parseNode; }
+    const IParseNode* Scoped::ParseNode() const { return parseNode; }
 
     Scope* Scoped::Scope() const { return scope; }
 

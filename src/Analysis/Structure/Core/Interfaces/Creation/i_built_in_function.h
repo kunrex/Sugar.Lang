@@ -1,16 +1,14 @@
 #ifndef I_BUILT_IN_FUNCTION_H
 #define I_BUILT_IN_FUNCTION_H
 
-#include "../DataTypes/i_data_type.h"
+#include "i_built_in_function.h"
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IBuiltInFunction
+    class IBuiltInFunction : public virtual IFunction
     {
         public:
             virtual void PushParameterType(const IDataType* type) = 0;
-
-            virtual ~IBuiltInFunction() = default;
     };
 }
 

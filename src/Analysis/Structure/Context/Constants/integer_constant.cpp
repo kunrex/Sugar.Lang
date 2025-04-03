@@ -20,6 +20,8 @@ namespace Analysis::Structure::Context
 
     MemberType ShortConstant::MemberType() const { return MemberType::ConstantContext; }
 
+    int ShortConstant::SlotCount() const { return 1; }
+
     bool ShortConstant::Readable() const { return true; }
     bool ShortConstant::Writable() const { return false; }
 
@@ -29,6 +31,8 @@ namespace Analysis::Structure::Context
     { }
 
     MemberType IntegerConstant::MemberType() const { return MemberType::ConstantContext; }
+
+    int IntegerConstant::SlotCount() const { return 1; }
 
     bool IntegerConstant::Readable() const { return true; }
     bool IntegerConstant::Writable() const { return false; }
@@ -40,6 +44,8 @@ namespace Analysis::Structure::Context
 
     MemberType LongConstant::MemberType() const { return MemberType::ConstantContext; }
 
+    int LongConstant::SlotCount() const { return 1; }
+
     bool LongConstant::Readable() const { return true; }
     bool LongConstant::Writable() const { return false; }
 
@@ -49,6 +55,8 @@ namespace Analysis::Structure::Context
     { }
 
     MemberType CharacterConstant::MemberType() const { return MemberType::ConstantContext; }
+
+    int CharacterConstant::SlotCount() const { return 1; }
 
     bool CharacterConstant::Readable() const { return true; }
     bool CharacterConstant::Writable() const { return false; }
@@ -60,6 +68,8 @@ namespace Analysis::Structure::Context
 
     MemberType TrueConstant::MemberType() const { return MemberType::ConstantContext; }
 
+    int TrueConstant::SlotCount() const { return 1; }
+
     bool TrueConstant::Readable() const { return true; }
     bool TrueConstant::Writable() const { return false; }
 
@@ -69,6 +79,8 @@ namespace Analysis::Structure::Context
     { }
 
     MemberType FalseConstant::MemberType() const { return MemberType::ConstantContext; }
+
+    int FalseConstant::SlotCount() const { return 1; }
 
     bool FalseConstant::Readable() const { return true; }
     bool FalseConstant::Writable() const { return false; }

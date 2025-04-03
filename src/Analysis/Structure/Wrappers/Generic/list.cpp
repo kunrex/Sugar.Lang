@@ -53,6 +53,8 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& List::FullName() const {  return genericSignature; }
 
+    const IDataType* List::GenericType() const { return listType; }
+
     void List::InitializeMembers()
     {
         const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
@@ -92,7 +94,7 @@ namespace Analysis::Structure::Wrappers
         const auto defaultConstructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor()", genericSignature));
         constructors[ArgumentHash(defaultConstructor)] = defaultConstructor;
 
-        const auto constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor(int32)", genericSignature));
+        const auto constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor(int32)", genericSignature));
         constructor->PushParameterType(&Integer::Instance());
         constructors[ArgumentHash(constructor)] = constructor;
     }

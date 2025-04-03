@@ -32,7 +32,7 @@ namespace Parsing
                 ExceptionManager::Instance().AddChild(new ParsingException("Local path expected (as a string).", path, source));
 
         TryMatchToken(Current(), SyntaxKind::Semicolon);
-        return new ImportStatementNode(path, keyword, Current());
+        return new ImportStatementNode(path);
     }
 
     const ParseNode* Parser::ParseEnumDefinition(const DescriberNode* const describer)
@@ -43,7 +43,7 @@ namespace Parsing
         const auto identifier = ParseIdentifier(true);
 
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
-        const auto body = new ScopeNode(index - 1);
+        const auto body = new ScopeNode(source->TokenAt(index - 1));
 
         ParseExpressionCollection(body, SeparatorKind::FlowerCloseBracket);
 

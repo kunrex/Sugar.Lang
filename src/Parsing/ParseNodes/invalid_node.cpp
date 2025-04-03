@@ -6,10 +6,8 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes
 {
-    InvalidNode::InvalidNode(const unsigned long index) : NodeCollection(), index(index)
+    InvalidNode::InvalidNode(const Tokens::Token& token) : DynamicNodeCollection(token)
     { }
 
     NodeType InvalidNode::NodeType() const { return NodeType::Invalid; }
-
-    unsigned long InvalidNode::Index() const { return index; }
 }

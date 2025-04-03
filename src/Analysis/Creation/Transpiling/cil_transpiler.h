@@ -18,6 +18,8 @@ namespace Analysis::Creation
             const std::string projectName;
             const std::string projectDirectory;
 
+            std::string projectLocation;
+
             const Structure::SourceDirectory* source;
 
             Services::StringBuilder stringBuilder;
@@ -42,7 +44,7 @@ namespace Analysis::Creation
         public:
             CILTranspiler(std::string name, std::string directory, const Structure::SourceDirectory* source);
 
-            void Transpile() const;
+            void Transpile();
             [[nodiscard]] const std::string& OutputFile() const;
     };
 }

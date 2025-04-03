@@ -3,11 +3,10 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Types
 {
-    FuncTypeNode::FuncTypeNode(const Token& keyword, const Groups::GenericNode* generic) : GenericTypeNode(keyword, generic)
+    FuncTypeNode::FuncTypeNode(const Tokens::Token& keyword) : DynamicNodeCollection(keyword)
     { }
 
     NodeType FuncTypeNode::NodeType() const { return NodeType::FuncType; }

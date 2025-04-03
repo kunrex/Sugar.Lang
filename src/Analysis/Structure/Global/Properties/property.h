@@ -18,7 +18,7 @@ namespace Analysis::Structure::Global
 
         public:
             Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set);
-            Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set, const ParseNodes::ParseNode* value);
+            Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Creation::MethodDefinition* get, const Creation::VoidDefinition* set, const ParseNodes::Core::Interfaces::IParseNode* value);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

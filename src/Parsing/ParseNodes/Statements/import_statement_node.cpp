@@ -8,10 +8,8 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ImportStatementNode::ImportStatementNode(const Token& path, const Token& keyword, const Token& separator) : StatementNode(separator), path(path), keyword(keyword)
+    ImportStatementNode::ImportStatementNode(const Tokens::Token& path) : ParseNode(path)
     { }
 
     NodeType ImportStatementNode::NodeType() const { return NodeType::Import; }
-
-    string ImportStatementNode::Path() const { return string(*path.Value<std::string_view>()); }
 }

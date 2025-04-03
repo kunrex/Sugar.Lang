@@ -24,8 +24,8 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            [[nodiscard]] unsigned long TypeCount() const;
-            [[nodiscard]] const IDataType* TypeAt(unsigned long index) const;
+            [[nodiscard]] unsigned long TypeCount() const override;
+            [[nodiscard]] const IDataType* TypeAt(unsigned long index) const override;
 
             [[nodiscard]] const std::string& DelegateSignature() const override;
 

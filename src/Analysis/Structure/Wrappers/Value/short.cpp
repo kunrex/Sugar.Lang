@@ -47,18 +47,22 @@ namespace Analysis::Structure::Wrappers
         const auto implicitInt = new BuiltInCast(&Integer::Instance(), "conv.i4");
         implicitInt->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInt;
+        explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInt;
 
         const auto implicitLong = new BuiltInCast(&Long::Instance(), "conv.i8");
         implicitLong->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Long::Instance(), &Instance()})] = implicitLong;
+        explicitCasts[ArgumentHash({ &Long::Instance(), &Instance()})] = implicitLong;
 
         const auto implicitFloat = new BuiltInCast(&Float::Instance(), "conv.r4");
         implicitFloat->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Float::Instance(), &Instance()})] = implicitFloat;
+        explicitCasts[ArgumentHash({ &Float::Instance(), &Instance()})] = implicitFloat;
 
         const auto implicitDouble = new BuiltInCast(&Double::Instance(), "conv.r8");
         implicitDouble->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Double::Instance(), &Instance()})] = implicitDouble;
+        explicitCasts[ArgumentHash({ &Double::Instance(), &Instance()})] = implicitDouble;
 
         const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Int16::ToString()");
         explicitString->PushParameterType(&Instance());
@@ -111,13 +115,11 @@ namespace Analysis::Structure::Wrappers
         increment->PushParameterType(&Instance());
         increment->PushParameterType(&Instance());
         overloads[SyntaxKind::Increment] = increment;
-        overloads[SyntaxKind::IncrementPrefix] = increment;
 
         const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub");
         decrement->PushParameterType(&Instance());
         decrement->PushParameterType(&Instance());
         overloads[SyntaxKind::Decrement] = decrement;
-        overloads[SyntaxKind::DecrementPrefix] = decrement;
 
         const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt");
         greater->PushParameterType(&Instance());

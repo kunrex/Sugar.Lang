@@ -1,11 +1,11 @@
 #ifndef VOID_TYPE_H
 #define VOID_TYPE_H
 
-#include "keyword_type_node.h"
+#include "../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class VoidTypeNode final : public KeywordTypeNode
+    class VoidTypeNode final : public ParseNode
     {
         public:
             explicit VoidTypeNode(const Tokens::Token& keyword);

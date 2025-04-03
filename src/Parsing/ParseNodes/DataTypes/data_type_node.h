@@ -2,26 +2,16 @@
 #define DATA_TYPE_NODE_H
 
 #include "../parse_node.h"
+#include "../Core/body_node.h"
 #include "../Core/nameable_node.h"
 #include "../Core/describable_node.h"
 
 namespace ParseNodes::DataTypes
 {
-    class DataTypeNode : public ParseNode, public Core::DescribableNode, public Core::NameableNode
+    class DataTypeNode : public virtual FixedNodeCollection<3>, public Core::DescribableNode<3>, public Core::NameableNode<3>, public Core::BodyNode<3>
     {
         protected:
-            const NodeCollection<ParseNode>* body;
-
-            const Tokens::Token& keyword;
-
-            DataTypeNode(const Describers::DescriberNode* describer, const Values::IdentifierNode* identifier, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
-
-        public:
-            [[nodiscard]] const NodeCollection<ParseNode>* Body() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~DataTypeNode() override;
+            DataTypeNode(const Describers::DescriberNode* describer, const Values::IdentifierNode* identifier, const DynamicNodeCollection* body, const Tokens::Token& keyword);
     };
 }
 

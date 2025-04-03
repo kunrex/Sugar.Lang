@@ -8,7 +8,7 @@ namespace ParseNodes::DataTypes
     class EnumNode final : public DataTypeNode
     {
         public:
-            EnumNode(const Describers::DescriberNode* describer, const Values::IdentifierNode* identifier, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
+            EnumNode(const Describers::DescriberNode* describer, const Values::IdentifierNode* identifier, const DynamicNodeCollection* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

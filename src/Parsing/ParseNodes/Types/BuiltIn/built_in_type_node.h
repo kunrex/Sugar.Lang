@@ -1,17 +1,16 @@
 #ifndef BUILT_IN_TYPE_H
 #define BUILT_IN_TYPE_H
 
-#include "../Keyword/keyword_type_node.h"
+#include "../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class BuiltInTypeNode final : public KeywordTypeNode
+    class BuiltInTypeNode final : public ParseNode
     {
         public:
             explicit BuiltInTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-            [[nodiscard]] Tokens::Enums::SyntaxKind Kind() const;
     };
 }
 

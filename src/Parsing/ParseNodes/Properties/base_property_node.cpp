@@ -8,10 +8,8 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    BasePropertyNode::BasePropertyNode(const DescriberNode* const describer, const ParseNode* type, const IdentifierNode* identifier, const GetNode* const get, const SetNode* const set) : ParseNode(), CharacteristicNode(describer, type, identifier), PropertyNode(get, set)
+    BasePropertyNode::BasePropertyNode(const DescriberNode* const describer, const ParseNode* type, const IdentifierNode* identifier, const GetNode* const get, const SetNode* const set) : FixedNodeCollection(identifier->Token()), DescribableNode(describer), EntityNode(type), NameableNode(identifier), PropertyNode(get, set)
     { }
 
     NodeType BasePropertyNode::NodeType() const { return NodeType::Property; }
-
-    unsigned long BasePropertyNode::Index() const { return name->Index(); }
 }

@@ -67,6 +67,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4");
         implicitInteger->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
+        explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
 
         const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2");
         explicitShort->PushParameterType(&Instance());
@@ -79,6 +80,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()");
         implicitString->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
+        explicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
 
         const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()");
         explicitString->PushParameterType(&Instance());

@@ -6,10 +6,11 @@
 #include "compilation_result.h"
 
 #include "../source_file.h"
+#include "../Core/Interfaces/Creation/i_constant.h"
 
 namespace Analysis::Structure::Compilation
 {
-    std::optional<CompilationResult> CompileExpression(const ParseNodes::ParseNode* expressionNode, const SourceFile* source);
+    void CompileExpression(const Core::Interfaces::IConstant* constant, const Core::Interfaces::IDataType* dataType);
 }
 
 #endif

@@ -1,11 +1,11 @@
 #ifndef CONTINUE_NODE_H
 #define CONTINUE_NODE_H
 
-#include "../statement_node.h"
+#include "../../parse_node.h"
 
 namespace ParseNodes::Statements
 {
-    class ContinueNode final : public StatementNode
+    class ContinueNode final : public ParseNode
     {
         public:
             explicit ContinueNode(const Tokens::Token& separator);

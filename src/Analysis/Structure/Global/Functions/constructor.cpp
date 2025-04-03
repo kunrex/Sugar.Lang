@@ -11,14 +11,17 @@ using namespace std;
 
 using namespace ParseNodes;
 using namespace ParseNodes::Groups;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
+const auto defaultConstructor = Tokens::Token(0, Tokens::Enums::TokenType::Constant, Tokens::Enums::SyntaxKind::Constant, 0.0);
+
 namespace Analysis::Structure::Global
 {
-    Constructor::Constructor(const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
+    Constructor::Constructor(const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
     { }
 
     MemberType Constructor::MemberType() const { return MemberType::Constructor; }
@@ -26,23 +29,17 @@ namespace Analysis::Structure::Global
     const string& Constructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("call instance void {} {}::{}{}", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("{} instance void {} {}::{}{}", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
 
-    DefaultConstructor::DefaultConstructor(const IDataType* const creationType) : Constructor(Describer::Public, creationType, new ScopeNode(0))
+    DefaultConstructor::DefaultConstructor(const IDataType* const creationType) : Constructor(Describer::Public, creationType, new ScopeNode(defaultConstructor))
     { }
 
     DefaultConstructor::~DefaultConstructor()
     {
         delete parseNode;
     }
-
-    StaticConstructor::StaticConstructor(const IDataType* const creationType) : Constructor(Describer::Private | Describer::Static, creationType, nullptr)
-    { }
-
-    InstanceConstructor::InstanceConstructor(const IDataType* const creationType) : Constructor(Describer::Private, creationType, nullptr)
-    { }
 }
 

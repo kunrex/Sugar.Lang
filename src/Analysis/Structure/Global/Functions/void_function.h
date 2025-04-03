@@ -9,7 +9,7 @@ namespace Analysis::Structure::Global
     class VoidFunction final : public Creation::VoidDefinition, public Core::Scoped
     {
         public:
-            VoidFunction(const std::string& name, Enums::Describer describer, const ParseNodes::NodeCollection<ParseNodes::ParseNode>* body);
+            VoidFunction(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* body);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

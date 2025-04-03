@@ -1,14 +1,15 @@
 #include "describable_node.h"
 
+#include "../Enums/child_code.h"
+
+using namespace ParseNodes::Enums;
+using namespace ParseNodes::Describers;
+
 namespace ParseNodes::Core
 {
-    DescribableNode::DescribableNode(const Describers::DescriberNode* const describer) : describer(describer)
-    { }
-
-    const Describers::DescriberNode* DescribableNode::Describer() const { return describer; }
-
-    DescribableNode::~DescribableNode()
+    template <int childCount>
+    DescribableNode<childCount>::DescribableNode(const DescriberNode* const describer)
     {
-        delete describer;
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Describer, describer);
     }
 }

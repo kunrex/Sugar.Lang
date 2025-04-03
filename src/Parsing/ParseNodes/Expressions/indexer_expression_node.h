@@ -5,21 +5,12 @@
 
 namespace ParseNodes::Expressions
 {
-    class IndexerExpressionNode final : public NodeCollection<ParseNode>
+    class IndexerExpressionNode final : public DynamicNodeCollection
     {
-        private:
-            const ParseNode* operand;
-
         public:
             explicit IndexerExpressionNode(const ParseNode* operand);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] const ParseNode* Operand() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~IndexerExpressionNode() override;
     };
 }
 

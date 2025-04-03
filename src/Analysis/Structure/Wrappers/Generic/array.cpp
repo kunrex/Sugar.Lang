@@ -49,6 +49,8 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Array::FullName() const { return genericSignature; }
 
+    const IDataType* Array::GenericType() const { return arrayType; }
+
     void Array::InitializeMembers()
     {
         length = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "ldlen", false, "");

@@ -9,17 +9,11 @@
 
 namespace ParseNodes::Core
 {
-    class FunctionNode : public DescribableNode, public EntityNode, public BodyNode
+    template <int childCount>
+    class FunctionNode : public DescribableNode<childCount>, public EntityNode<childCount>, public BodyNode<childCount>
     {
         protected:
-            const Groups::CompoundDeclarationNode* parameters;
-
-            FunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const NodeCollection<ParseNode>* body);
-
-        public:
-            [[nodiscard]] const Groups::CompoundDeclarationNode* Parameters() const;
-
-            ~FunctionNode() override;
+            FunctionNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body);
     };
 }
 

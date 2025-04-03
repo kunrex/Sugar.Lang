@@ -1,14 +1,14 @@
 #ifndef DICTIONARY_TYPE_NODE_H
 #define DICTIONARY_TYPE_NODE_H
 
-#include "generic_type_node.h"
+#include "../../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class DictionaryTypeNode final : public GenericTypeNode
+    class DictionaryTypeNode final : public DynamicNodeCollection
     {
         public:
-            DictionaryTypeNode(const Tokens::Token& keyword, const Groups::GenericNode* generic);
+            explicit DictionaryTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

@@ -5,17 +5,12 @@
 
 namespace ParseNodes
 {
-    class InvalidNode final : public NodeCollection<ParseNode>
+    class InvalidNode final : public DynamicNodeCollection
     {
-        private:
-            const unsigned long index;
-
         public:
-            explicit InvalidNode(unsigned long index);
+            explicit InvalidNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

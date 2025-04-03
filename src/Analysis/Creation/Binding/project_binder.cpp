@@ -1,7 +1,6 @@
 #include "project_binder.h"
 
 #include <regex>
-#include <format>
 #include <sstream>
 
 #include "binder_extensions.h"
@@ -17,11 +16,12 @@
 #include "../../Structure/DataTypes/class.h"
 #include "../../Structure/DataTypes/value_type.h"
 
+using namespace std;
+
 using namespace Exceptions;
 
-using namespace ParseNodes::DataTypes;
-using namespace ParseNodes::Statements;
-using namespace ParseNodes::Describers;
+using namespace ParseNodes::Enums;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
@@ -39,10 +39,10 @@ namespace Analysis::Creation::Binding
             PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
-    void CreateEnum(const DataTypeNode* const node, SourceFile* const sourceFile)
+    void CreateEnum(const IParseNode* const node, SourceFile* const sourceFile)
     {
-        const auto index = node->Index();
-        const auto identifier = node->Name()->Value();
+        const auto index = node->Token().Index();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
@@ -50,17 +50,17 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto describer = FromNode(node->Describer());
-        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node);
+        const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, enumSource);
     }
 
-    void CreateClass(const DataTypeNode* const node, SourceFile* const sourceFile)
+    void CreateClass(const IParseNode* const node, SourceFile* const sourceFile)
     {
-        const auto index = node->Index();
-        const auto identifier = node->Name()->Value();
+        const auto index = node->Token().Index();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
@@ -68,17 +68,17 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto describer = FromNode(node->Describer());
-        const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
+        const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(classSource, Describer::Static | Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, classSource);
     }
 
-    void CreateStruct(const DataTypeNode* const node, SourceFile* const sourceFile)
+    void CreateStruct(const IParseNode* const node, SourceFile* const sourceFile)
     {
-        const auto index = node->Index();
-        const auto identifier = node->Name()->Value();
+        const auto index = node->Token().Index();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
@@ -86,8 +86,8 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto describer = FromNode(node->Describer());
-        const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Private : describer, node);
+        const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(structSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, structSource);
@@ -116,10 +116,10 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    void ImportStatement(const ImportStatementNode* const statement, SourceFile* const sourceFile)
+    void ImportStatement(const ParseNodes::ParseNode* const statement, SourceFile* const sourceFile)
     {
-        const auto path = statement->Path();
-        const auto index = statement->Index();
+        const auto path = *statement->Token().Value<string>();
+        const auto index = statement->Token().Index();
 
         if (!std::regex_match(path, pathRegex))
         {

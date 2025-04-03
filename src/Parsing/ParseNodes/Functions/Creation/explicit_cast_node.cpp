@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    ExplicitCastNode::ExplicitCastNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const NodeCollection<ParseNode>* const body, const Token& keyword) : KeywordFunctionNode(describer, type, parameters, body, keyword)
+    ExplicitCastNode::ExplicitCastNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword), FunctionNode(describer, type, parameters, body)
     { }
 
     NodeType ExplicitCastNode::NodeType() const { return NodeType::ExplicitDeclaration; }

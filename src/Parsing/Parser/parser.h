@@ -19,7 +19,6 @@
 #include "../ParseNodes/Loops/for_loop_node.h"
 
 #include "../ParseNodes/Groups/scope_node.h"
-#include "../ParseNodes/Groups/generic_node.h"
 #include "../ParseNodes/Groups/if_chain_node.h"
 
 #include "../ParseNodes/Values/identifier_node.h"
@@ -76,9 +75,9 @@ namespace Parsing
             void ClearStack(const Tokens::Token& top, std::stack<const ParseNodes::ParseNode*>& output);
             void ClearStack(std::stack<const Tokens::Token*>& stack, std::stack<const ParseNodes::ParseNode*>& output);
 
-            void ParseExpressionCollection(ParseNodes::NodeCollection<ParseNodes::ParseNode>* collection, Tokens::Enums::SeparatorKind breakSeparator);
+            void ParseExpressionCollection(ParseNodes::DynamicNodeCollection* collection, Tokens::Enums::SeparatorKind breakSeparator);
 
-            [[nodiscard]] const ParseNodes::Groups::GenericNode* ParseGeneric();
+            void ParseGeneric(ParseNodes::DynamicNodeCollection* generic);
             [[nodiscard]] const ParseNodes::Expressions::IndexerExpressionNode* ParseIndexerExpression(const ParseNodes::ParseNode* operand);
 
             [[nodiscard]] const ParseNodes::ParseNode* ParseType();
@@ -86,7 +85,7 @@ namespace Parsing
 
             [[nodiscard]] const ParseNodes::Values::IdentifierNode* ParseIdentifier(bool increment = false);
 
-            void ParseFunctionArguments(ParseNodes::NodeCollection<ParseNodes::ParseNode>* function);
+            void ParseFunctionArguments(ParseNodes::DynamicNodeCollection* function);
             [[nodiscard]] const ParseNodes::Groups::CompoundDeclarationNode* ParseFunctionParameters();
 
             [[nodiscard]] const ParseNodes::Functions::Calling::RefCallNode* ParseRefCall();

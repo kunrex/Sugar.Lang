@@ -8,10 +8,8 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Values
 {
-    IdentifierNode::IdentifierNode(const Token& identifier) : ValueNode(identifier)
+    IdentifierNode::IdentifierNode(const Tokens::Token& identifier) : ParseNode(identifier)
     { }
 
     NodeType IdentifierNode::NodeType() const { return NodeType::Identifier; }
-
-    string IdentifierNode::Value() const { return *token.Value<std::string>(); }
 }

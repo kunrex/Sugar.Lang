@@ -8,7 +8,7 @@
 
 using namespace std;
 
-using namespace ParseNodes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
@@ -16,7 +16,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Global
 {
-    VoidFunction::VoidFunction(const string& name, const Enums::Describer describer, const NodeCollection<ParseNodes::ParseNode>* const body) : VoidDefinition(name, describer), Scoped(body)
+    VoidFunction::VoidFunction(const string& name, const Enums::Describer describer, const IParseNode* const body) : VoidDefinition(name, describer), Scoped(body)
     { }
 
     MemberType VoidFunction::MemberType() const { return MemberType::MethodDefinition; }

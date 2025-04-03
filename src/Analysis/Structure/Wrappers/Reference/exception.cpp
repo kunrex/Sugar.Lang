@@ -26,7 +26,7 @@ namespace Analysis::Structure::Wrappers
 
     void Exception::InitializeMembers()
     {
-        constructor = new BuiltInConstructor(this, "call instance void class [System.Runtime]System.Exception::.ctor(string)");
+        constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
         constructor->PushParameterType(&String::Instance());
     }
 

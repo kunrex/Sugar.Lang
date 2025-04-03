@@ -5,27 +5,12 @@
 
 namespace ParseNodes::Expressions
 {
-    class TernaryNode final : public ParseNode
+    class TernaryNode final : public FixedNodeCollection<3>
     {
-        private:
-            const ParseNode* condition;
-
-            const ParseNode* trueValue;
-            const ParseNode* falseValue;
-
         public:
-            TernaryNode(const ParseNode* condition, const ParseNode* trueValue, const ParseNode* falseValue);
+            TernaryNode(const ParseNode* condition, const ParseNode* trueValue, const ParseNode* falseValue, const Tokens::Token& questionMark);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] const ParseNode* Condition() const;
-
-            [[nodiscard]] const ParseNode* True() const;
-            [[nodiscard]] const ParseNode* False() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~TernaryNode() override;
     };
 }
 

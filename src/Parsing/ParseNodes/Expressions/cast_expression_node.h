@@ -8,7 +8,7 @@ namespace ParseNodes::Expressions
     class CastExpressionNode final : public DotExpressionNode
     {
         public:
-            CastExpressionNode(const ParseNode* lhs, const ParseNode* rhs);
+            CastExpressionNode(const ParseNode* lhs, const ParseNode* rhs, const Tokens::Token& as);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

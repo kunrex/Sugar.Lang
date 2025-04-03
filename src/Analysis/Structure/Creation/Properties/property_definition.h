@@ -9,7 +9,7 @@ namespace Analysis::Structure::Creation
     class PropertyDefinition : public Core::Characteristic, public Core::PropertySignature
     {
         protected:
-            PropertyDefinition(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::ParseNode* parseNode);
+            PropertyDefinition(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
     };
 }
 

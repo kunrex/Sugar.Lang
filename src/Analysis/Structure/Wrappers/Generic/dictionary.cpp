@@ -77,7 +77,7 @@ namespace Analysis::Structure::Wrappers
         const auto values = new BuiltInMethod("Values", Describer::Public, List::Instance(valueType), "");
         functions[std::hash<string>()("Values") ^ ArgumentHash(values)] = values;
 
-        constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor()", genericSignature));
+        constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor()", genericSignature));
     }
 
     const ICharacteristic* Dictionary::FindCharacteristic(const std::string& name) const

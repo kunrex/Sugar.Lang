@@ -1,11 +1,11 @@
 #ifndef NULL_NODE_H
 #define NULL_NODE_H
 
-#include "value_node.h"
+#include "../parse_node.h"
 
 namespace ParseNodes::Values
 {
-    class NullNode final : public ValueNode
+    class NullNode final : public ParseNode
     {
         public:
             explicit NullNode(const Tokens::Token& keyword);

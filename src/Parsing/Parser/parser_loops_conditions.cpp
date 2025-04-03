@@ -15,7 +15,7 @@ namespace Parsing
     {
         bool flag = false;
 
-        const auto chain = new IfChainNode();
+        const auto chain = new IfChainNode(Current());
         for (; index < source->TokenCount(); index++)
         {
             const auto keyword = Current();

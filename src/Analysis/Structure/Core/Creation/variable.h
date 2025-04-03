@@ -4,6 +4,7 @@
 #include "../created.h"
 #include "../nameable.h"
 #include "../describable.h"
+#include "../Interfaces/Creation/i_variable.h"
 
 namespace Analysis::Structure::Core
 {

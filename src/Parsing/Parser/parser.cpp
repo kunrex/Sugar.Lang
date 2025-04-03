@@ -113,7 +113,7 @@ namespace Parsing
 
     InvalidNode* Parser::ParseInvalid(const SeparatorKind breakOut)
     {
-        const auto start = index;
+        const auto start = Current();
         const SeparatorKind extra = SeparatorKind::Semicolon | SeparatorKind::FlowerOpenBracket | SeparatorKind::FlowerCloseBracket;
         const SeparatorKind match = breakOut | extra;
 

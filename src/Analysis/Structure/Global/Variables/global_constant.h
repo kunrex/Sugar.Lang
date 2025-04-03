@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "global_variable.h"
+#include "../../Compilation/compilation_result.h"
 
 #include "../../Core/Interfaces/Creation/i_constant.h"
 
@@ -12,11 +13,12 @@ namespace Analysis::Structure::Global
     class GlobalConstant final : public GlobalVariable, public virtual Core::Interfaces::IConstant
     {
         private:
-            bool compiled;
-            std::vector<const ICharacteristic*> dependencies;
+            mutable bool compiled;
+            mutable std::vector<const IConstant*> dependencies;
+            mutable std::variant<long, double, std::string> value;
 
         public:
-            GlobalConstant(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::ParseNode* parseNode);
+            GlobalConstant(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -25,10 +27,11 @@ namespace Analysis::Structure::Global
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            void Compile(const std::string& value) override;
+            void PushDependency(const IConstant* constant) const override;
+            [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
 
-            void PushDependency(const ICharacteristic* constant) override;
-            [[nodiscard]] bool IsDependent(const ICharacteristic* constant) const override;
+            void Compile(Compilation::CompilationResult result) const override;
+            [[nodiscard]] Compilation::CompilationResult AsCompilationResult() const override;
     };
 }
 

@@ -218,7 +218,7 @@ int Add(int x, int y)
     return x + y;
 }
 
-func</* first arg is the return type */ int, int, int>: add = funcref<int, int>(Add);
+func<int, int, int /* last argument is the return type */>: add = funcref<int, int>(Add);
 int: result = invoke(add, 10, 20);
 ```
 > Sugar technically supports generics, but only for built-in types and functions.
@@ -273,7 +273,7 @@ Describers can contain the following keywords:
 `const` is used to guarantee runtime constancy. It's implications differ based on context:
 
 1. Global Fields: `const` enforces that a global field can only be assigned to in the constructor or through inline initialisation.
-2. Function Arguments: `const` enforces a function argument cannot be assigned to.
+2. Local Variables: `const` enforces a function argument or local variable cannot be reassigned to.
 
 In both cases this only enforces assignment, not immutability.
 
@@ -385,7 +385,7 @@ struct Complex
     }
 }
 ```
-Cast and operator overloads must be public and static. Constructors may be static but a class can only define one parameterless static constructor. Indexers, however, cannot be static. All structures have a default string conversion and constructor unless specified.
+Cast and operator overloads must be public and static. Indexers and constructors, however, cannot be static. All structures have a default string conversion and parameterless constructor unless specified.
 
 ## Import Statements
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.

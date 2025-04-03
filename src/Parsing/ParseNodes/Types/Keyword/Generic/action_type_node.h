@@ -1,14 +1,14 @@
 #ifndef ACTION_TYPE_H
 #define ACTION_TYPE_H
 
-#include "generic_type_node.h"
+#include "../../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class ActionTypeNode final : public GenericTypeNode
+    class ActionTypeNode final : public DynamicNodeCollection
     {
         public:
-            ActionTypeNode(const Tokens::Token& keyword, const Groups::GenericNode* generic);
+            explicit ActionTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

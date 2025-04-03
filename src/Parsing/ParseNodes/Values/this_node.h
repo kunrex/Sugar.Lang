@@ -1,11 +1,11 @@
 #ifndef THIS_NODE_H
 #define THIS_NODE_H
 
-#include "value_node.h"
+#include "../parse_node.h"
 
 namespace ParseNodes::Values
 {
-    class ThisNode final : public ValueNode
+    class ThisNode final : public ParseNode
     {
         public:
             explicit ThisNode(const Tokens::Token& keyword);

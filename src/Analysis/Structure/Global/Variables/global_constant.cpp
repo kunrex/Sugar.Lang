@@ -4,15 +4,16 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), compiled(false), dependencies()
+    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), compiled(false), dependencies()
     { }
 
     MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
@@ -20,30 +21,31 @@ namespace Analysis::Structure::Global
     const std::string& GlobalConstant::FullName() const { return fullName; }
 
     bool GlobalConstant::Readable() const { return compiled; }
-
     bool GlobalConstant::Writable() const { return false; }
 
-    void GlobalConstant::Compile(const std::string& value)
-    {
-        if (!compiled)
-        {
-            fullName = value;
-            compiled = true;
-        }
-    }
-
-    void GlobalConstant::PushDependency(const ICharacteristic* const constant)
+    void GlobalConstant::PushDependency(const IConstant* const constant) const
     {
         dependencies.push_back(constant);
     }
 
-    bool GlobalConstant::IsDependent(const ICharacteristic* const constant) const
+    bool GlobalConstant::IsDependent(const IConstant* const constant) const
     {
         for (const auto dependency : dependencies)
-            if (dependency == constant)
+            if (dependency == constant || dependency->IsDependent(constant))
                 return true;
 
         return false;
     }
+
+    void GlobalConstant::Compile(const CompilationResult result) const
+    {
+        if (!compiled)
+        {
+            compiled = true;
+            value = result.data;
+        }
+    }
+
+    CompilationResult GlobalConstant::AsCompilationResult() const { return { creationType->Type(), value }; }
 }
 

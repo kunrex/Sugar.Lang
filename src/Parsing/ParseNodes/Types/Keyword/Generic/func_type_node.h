@@ -1,14 +1,14 @@
 #ifndef FUNC_TYPE_H
 #define FUNC_TYPE_H
 
-#include "generic_type_node.h"
+#include "../../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class FuncTypeNode final : public GenericTypeNode
+    class FuncTypeNode final : public DynamicNodeCollection
     {
         public:
-            FuncTypeNode(const Tokens::Token& keyword, const Groups::GenericNode* generic);
+            explicit FuncTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

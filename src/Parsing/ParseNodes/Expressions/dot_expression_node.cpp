@@ -4,19 +4,11 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    DotExpressionNode::DotExpressionNode(const ParseNode* const lhs, const ParseNode* const rhs) : ParseNode(), lhs(lhs), rhs(rhs)
-    { }
+    DotExpressionNode::DotExpressionNode(const ParseNode* const lhs, const ParseNode* const rhs, const Tokens::Token& dot) : FixedNodeCollection(dot)
+    {
+        AddChild(ChildCode::LHS, lhs);
+        AddChild(ChildCode::RHS, rhs);
+    }
 
     NodeType DotExpressionNode::NodeType() const { return NodeType::Dot; }
-
-    const ParseNode* DotExpressionNode::LHS() const { return lhs; }
-    const ParseNode* DotExpressionNode::RHS() const { return rhs; }
-
-    unsigned long DotExpressionNode::Index() const { return lhs->Index(); }
-
-    DotExpressionNode::~DotExpressionNode()
-    {
-        delete lhs;
-        delete rhs;
-    }
 }

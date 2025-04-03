@@ -9,15 +9,10 @@
 
 namespace ParseNodes::Properties
 {
-    class AccessorNode : public ParseNode, public Core::DescribableNode, public Core::BodyNode
+    class AccessorNode : public virtual FixedNodeCollection<2>, public Core::DescribableNode<2>, public Core::BodyNode<2>
     {
-        private:
-            const Tokens::Token& keyword;
-
         public:
-            AccessorNode(const Describers::DescriberNode* describer, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
-
-            [[nodiscard]] unsigned long Index() const override;
+            AccessorNode(const Describers::DescriberNode* describer, const DynamicNodeCollection* body, const Tokens::Token& keyword);
     };
 }
 

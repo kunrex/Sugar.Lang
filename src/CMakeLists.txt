@@ -38,7 +38,6 @@ add_library(Sugar STATIC
         Lexing/Lexer/lexer.cpp
         Lexing/Lexer/lexer.h
 
-        Parsing/ParseNodes/Core/Interfaces/i_parse_node.h
         Parsing/ParseNodes/Enums/node_type.h
 
         Parsing/ParseNodes/parse_node.cpp
@@ -58,8 +57,6 @@ add_library(Sugar STATIC
 
         Parsing/ParseNodes/Types/Keyword/void_type_node.cpp
         Parsing/ParseNodes/Types/Keyword/void_type_node.h
-        Parsing/ParseNodes/Types/Keyword/keyword_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/keyword_type_node.h
         Parsing/ParseNodes/Types/Created/created_type_node.cpp
         Parsing/ParseNodes/Types/Created/created_type_node.h
         Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.cpp
@@ -78,8 +75,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.h
         Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.cpp
         Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.h
-        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.cpp
-        Parsing/ParseNodes/Types/Keyword/Generic/generic_type_node.h
         Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.cpp
         Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.h
 
@@ -93,13 +88,9 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Expressions/Ternary/ternary_node.h
         Parsing/ParseNodes/Expressions/cast_expression_node.cpp
         Parsing/ParseNodes/Expressions/cast_expression_node.h
-        Parsing/ParseNodes/Expressions/operation_expression_node.cpp
-        Parsing/ParseNodes/Expressions/operation_expression_node.h
 
         Parsing/ParseNodes/Statements/empty_node.cpp
         Parsing/ParseNodes/Statements/empty_node.h
-        Parsing/ParseNodes/Statements/statement_node.cpp
-        Parsing/ParseNodes/Statements/statement_node.h
         Parsing/ParseNodes/Statements/declaration_node.cpp
         Parsing/ParseNodes/Statements/declaration_node.h
         Parsing/ParseNodes/Statements/Control/break_node.cpp
@@ -143,8 +134,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h
         Parsing/ParseNodes/Functions/Creation/implicit_cast_node.cpp
         Parsing/ParseNodes/Functions/Creation/implicit_cast_node.h
-        Parsing/ParseNodes/Functions/Creation/keyword_function_node.cpp
-        Parsing/ParseNodes/Functions/Creation/keyword_function_node.h
         Parsing/ParseNodes/Functions/Creation/operator_overload_node.cpp
         Parsing/ParseNodes/Functions/Creation/operator_overload_node.h
         Parsing/ParseNodes/Functions/Creation/function_creation_node.cpp
@@ -158,15 +147,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Core/entity_node.h
         Parsing/ParseNodes/Core/function_node.cpp
         Parsing/ParseNodes/Core/function_node.h
-        Parsing/ParseNodes/Core/nameable_node.cpp
-        Parsing/ParseNodes/Core/nameable_node.h
-        Parsing/ParseNodes/Core/property_node.cpp
-        Parsing/ParseNodes/Core/property_node.h
-        Parsing/ParseNodes/Core/describable_node.cpp
-        Parsing/ParseNodes/Core/describable_node.h
-        Parsing/ParseNodes/Core/characteristic_node.cpp
-        Parsing/ParseNodes/Core/characteristic_node.h
-        Parsing/ParseNodes/Core/Interfaces/i_parse_node.cpp
 
         Parsing/ParseNodes/DataTypes/class_node.cpp
         Parsing/ParseNodes/DataTypes/class_node.h
@@ -181,8 +161,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Conditions/if_node.h
         Parsing/ParseNodes/Conditions/else_node.cpp
         Parsing/ParseNodes/Conditions/else_node.h
-        Parsing/ParseNodes/Conditions/condition_node.cpp
-        Parsing/ParseNodes/Conditions/condition_node.h
 
         Parsing/ParseNodes/Loops/loop_node.cpp
         Parsing/ParseNodes/Loops/loop_node.h
@@ -361,8 +339,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Groups/compound_declaration_node.h
         Parsing/ParseNodes/Groups/scope_node.cpp
         Parsing/ParseNodes/Groups/scope_node.h
-        Parsing/ParseNodes/Groups/generic_node.cpp
-        Parsing/ParseNodes/Groups/generic_node.h
         Parsing/ParseNodes/Groups/expression_list_node.cpp
         Parsing/ParseNodes/Groups/expression_list_node.h
         Exceptions/Compilation/Parsing/invalid_expression_exception.cpp
@@ -513,10 +489,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Global/Functions/function_extensions.h
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h
-        Parsing/ParseNodes/Core/Interfaces/i_body_node.h
-        Parsing/ParseNodes/Core/Interfaces/i_describable_node.h
-        Parsing/ParseNodes/Core/Interfaces/i_entity_node.h
-        Parsing/ParseNodes/Core/Interfaces/i_nameable_node.h
         Analysis/Structure/Core/Interfaces/DataTypes/i_data_type.h
         Analysis/Structure/Core/Interfaces/i_nameable.h
         Analysis/Structure/Core/Interfaces/Creation/i_function.h
@@ -589,4 +561,24 @@ add_library(Sugar STATIC
         Analysis/Structure/Global/Variables/enum_field.cpp
         Analysis/Structure/Global/Variables/enum_field.h
         Analysis/Structure/Core/Interfaces/Creation/i_constant.h
+        Analysis/Structure/Context/Expressions/ternary_expression.cpp
+        Analysis/Structure/Context/Expressions/ternary_expression.h
+        Analysis/Structure/Context/Expressions/invalid_ternary_expression.cpp
+        Analysis/Structure/Context/Expressions/invalid_ternary_expression.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_collection_type.h
+        Parsing/ParseNodes/Core/Interfaces/i_parse_node.h
+        Parsing/ParseNodes/Enums/child_code.h
+        Parsing/ParseNodes/Core/describable_node.cpp
+        Parsing/ParseNodes/Core/describable_node.h
+        Parsing/ParseNodes/Core/nameable_node.cpp
+        Parsing/ParseNodes/Core/nameable_node.h
+        Parsing/ParseNodes/Core/characteristic_node.cpp
+        Parsing/ParseNodes/Core/characteristic_node.h
+        Parsing/ParseNodes/Core/property_node.cpp
+        Parsing/ParseNodes/Core/property_node.h
+        Parsing/ParseNodes/Expressions/indexer_expression_node.cpp
+        Parsing/ParseNodes/Describers/describer_keyword_node.cpp
+        Parsing/ParseNodes/Describers/describer_keyword_node.h
+        Analysis/Structure/Core/Scoped/default_scoped.cpp
+        Analysis/Structure/Core/Scoped/default_scoped.h
 )

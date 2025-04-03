@@ -33,7 +33,7 @@ namespace Analysis::Structure::DataTypes
     class ClassSource final : public Class, public virtual Core::Interfaces::IUserDefinedType
     {
         private:
-            const ParseNodes::DataTypes::DataTypeNode* skeleton;
+            const ParseNodes::Core::Interfaces::IParseNode* skeleton;
 
             mutable std::string fullName;
 
@@ -41,8 +41,6 @@ namespace Analysis::Structure::DataTypes
 
             std::map<unsigned long, Core::Interfaces::IFunctionDefinition*> functions;
 
-            Global::StaticConstructor* const staticConstructor;
-            Global::InstanceConstructor* const instanceConstructor;
             std::map<unsigned long, Core::Interfaces::IFunction*> constructors;
 
             std::map<unsigned long, Core::Interfaces::IIndexerDefinition*> indexers;
@@ -53,22 +51,19 @@ namespace Analysis::Structure::DataTypes
             std::map<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*> overloads;
 
         public:
-            ClassSource(const std::string& name, Enums::Describer describer, const ParseNodes::DataTypes::DataTypeNode* skeleton);
+            ClassSource(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            [[nodiscard]] const ParseNodes::DataTypes::DataTypeNode* Skeleton() const override;
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const override;
 
             void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
             void PushFunction(Core::Interfaces::IFunctionDefinition* function) override;
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
-
-            [[nodiscard]] Core::Interfaces::IScoped* StaticConstructor() const override;
-            [[nodiscard]] Core::Interfaces::IScoped* InstanceConstructor() const override;
 
             void PushConstructor(Core::Interfaces::IFunction* constructor) override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
@@ -84,7 +79,7 @@ namespace Analysis::Structure::DataTypes
             void PushOverload(Core::Interfaces::IOperatorOverload* overload) override;
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
 
-            [[nodiscard]] std::vector<const Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
+            [[nodiscard]] std::vector<Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
             [[nodiscard]] std::vector<Core::Interfaces::IScoped*> AllScoped() const override;
 
             ~ClassSource() override;

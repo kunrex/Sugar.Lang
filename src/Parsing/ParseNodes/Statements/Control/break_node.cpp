@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    BreakNode::BreakNode(const Token& separator) : StatementNode(separator)
+    BreakNode::BreakNode(const Tokens::Token& separator) : ParseNode(separator)
     { }
 
     NodeType BreakNode::NodeType() const { return NodeType::Break; }

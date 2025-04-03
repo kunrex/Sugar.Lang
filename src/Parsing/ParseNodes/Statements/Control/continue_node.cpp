@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ContinueNode::ContinueNode(const Token& separator) : StatementNode(separator)
+    ContinueNode::ContinueNode(const Tokens::Token& separator) : ParseNode(separator)
     { }
 
     NodeType ContinueNode::NodeType() const { return NodeType::Continue; }

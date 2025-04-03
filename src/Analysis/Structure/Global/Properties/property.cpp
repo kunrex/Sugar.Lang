@@ -6,6 +6,8 @@
 
 using namespace std;
 
+using namespace ParseNodes::Core::Interfaces;
+
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
@@ -28,7 +30,7 @@ namespace Analysis::Structure::Global
         }
     }
 
-    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set, const ParseNodes::ParseNode* const value) : PropertyDefinition(name, describer, creationType, value), readable(false), getInstruction(), writable(false), setInstruction()
+    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType, const MethodDefinition* const get, const VoidDefinition* const set, const IParseNode* const value) : PropertyDefinition(name, describer, creationType, value), readable(false), getInstruction(), writable(false), setInstruction()
     {
         if (get != nullptr)
         {

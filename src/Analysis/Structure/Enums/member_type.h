@@ -71,6 +71,7 @@ namespace Analysis::Structure::Enums
         CastExpression,
         UnaryExpression,
         BinaryExpression,
+        TernaryExpression,
         AssignmentExpression,
 
         Invalid,

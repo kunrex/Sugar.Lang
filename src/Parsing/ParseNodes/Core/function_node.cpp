@@ -1,17 +1,16 @@
 #include "function_node.h"
 
+#include "../Enums/child_code.h"
+
+using namespace ParseNodes::Enums;
 using namespace ParseNodes::Groups;
 using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Core
 {
-    FunctionNode::FunctionNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const NodeCollection<ParseNode>* const body) : DescribableNode(describer), EntityNode(type), BodyNode(body), parameters(parameters)
-    { }
-
-    const CompoundDeclarationNode* FunctionNode::Parameters() const { return parameters; }
-
-    FunctionNode::~FunctionNode()
+    template <int childCount>
+    FunctionNode<childCount>::FunctionNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const DynamicNodeCollection* const body) : DescribableNode<childCount>(describer), EntityNode<childCount>(type), BodyNode<childCount>(body)
     {
-        delete parameters;
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Parameters, parameters);
     }
 }

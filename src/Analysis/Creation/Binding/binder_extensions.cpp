@@ -38,13 +38,14 @@
 #include "../../Structure/Wrappers/Generic/nullable.h"
 #include "../../Structure/Wrappers/Generic/dictionary.h"
 
+using namespace std;
+
 using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes;
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Types;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
@@ -65,9 +66,9 @@ namespace Analysis::Creation::Binding
             PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
-    const IDataType* BindBuiltInType(const BuiltInTypeNode* node)
+    const IDataType* BindBuiltInType(const IParseNode* node)
     {
-        switch (node->Kind())
+        switch (node->Token().Kind())
         {
             case SyntaxKind::Short:
                 return &Short::Instance();
@@ -94,104 +95,82 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const IDataType* BindArray(const ArrayTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindArray(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-        const auto typeNode = generic->GetChild(0);
-
-        return Array::Instance(BindDataType(typeNode, source));
+        return Array::Instance(BindDataType(node->GetChild(0), source));
     }
 
-    const IDataType* BindList(const ListTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindList(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-        const auto typeNode = generic->GetChild(0);
-
-        return List::Instance(BindDataType(typeNode, source));
+        return List::Instance(BindDataType(node->GetChild(0), source));
     }
 
-    const IDataType* BindDictionary(const DictionaryTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindDictionary(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-
-        const auto keyNode = generic->GetChild(0);
-        const auto valueNode = generic->GetChild(1);
-
-        return Dictionary::Instance(BindDataType(keyNode, source), BindDataType(valueNode, source));
+        return Dictionary::Instance(BindDataType(node->GetChild(0), source), BindDataType(node->GetChild(1), source));
     }
 
-    const IDataType* BindNullable(const NullableTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindNullable(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-        const auto typeNode = generic->GetChild(0);
-
+        const auto typeNode = node->GetChild(0);
         const auto type = BindDataType(typeNode, source);
         if (type->MemberType() != MemberType::ValueType)
-            ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in nullable<T>.", typeNode->Index(), source));
+            ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in nullable<T>.", typeNode->Token().Index(), source));
 
         return Nullable::Instance(type);
     }
 
-    const IDataType* BindTuple(const TupleTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindTuple(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-
         std::vector<const IDataType*> types;
-        for (const auto typeNode : *generic)
-            types.push_back(BindDataType(typeNode, source));
+        for (auto i = 0; i < node->ChildCount(); i++)
+            types.push_back(BindDataType(node->GetChild(i), source));
 
         return Tuple::Instance(types);
     }
 
-    const IDataType* BindAction(const ActionTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindAction(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-
         std::vector<const IDataType*> types;
-        for (const auto typeNode : *generic)
-            types.push_back(BindDataType(typeNode, source));
+        for (auto i = 0; i < node->ChildCount(); i++)
+            types.push_back(BindDataType(node->GetChild(i), source));
 
         return Action::Instance(types);
     }
 
-    const IDataType* BindFunc(const FuncTypeNode* const node, const SourceFile* const source)
+    const IDataType* BindFunc(const IParseNode* const node, const SourceFile* const source)
     {
-        const auto generic = node->Generic();
-
         std::vector<const IDataType*> types;
-        for (const auto typeNode : *generic)
-            types.push_back(BindDataType(typeNode, source));
+        for (auto i = 0; i < node->ChildCount(); i++)
+            types.push_back(BindDataType(node->GetChild(i), source));
 
         return Func::Instance(types);
     }
 
-    const IDataType* BindDataType(const ParseNode* const node, const SourceFile* const source)
+    const IDataType* BindDataType(const IParseNode* const node, const SourceFile* const source)
     {
         switch (node->NodeType())
         {
             case NodeType::BuiltInType:
-                return BindBuiltInType(dynamic_cast<const BuiltInTypeNode*>(node));
+                return BindBuiltInType(node);
             case NodeType::CreatedType:
-                {
-                    const auto casted = dynamic_cast<const CreatedTypeNode*>(node);
-                    return source->GetReference(casted->Identifier()->Value());
-                }
+                return source->GetReference(*node->Token().Value<string>());
             case NodeType::FuncType:
-                return BindFunc(dynamic_cast<const FuncTypeNode*>(node), source);
+                return BindFunc(node, source);
             case NodeType::ListType:
-                return BindList(dynamic_cast<const ListTypeNode*>(node), source);
+                return BindList(node, source);
             case NodeType::TupleType:
-                return BindTuple(dynamic_cast<const TupleTypeNode*>(node), source);
+                return BindTuple(node, source);
             case NodeType::ArrayType:
-                return BindArray(dynamic_cast<const ArrayTypeNode*>(node), source);
+                return BindArray(node, source);
             case NodeType::ActionType:
-                return BindAction(dynamic_cast<const ActionTypeNode*>(node), source);
+                return BindAction(node, source);
             case NodeType::NullableType:
-                return BindNullable(dynamic_cast<const NullableTypeNode*>(node), source);
+                return BindNullable(node, source);
             case NodeType::DictionaryType:
-                return BindDictionary(dynamic_cast<const DictionaryTypeNode*>(node), source);
+                return BindDictionary(node, source);
             default:
-                ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Index(), source));
+                ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Token().Index(), source));
                 return &Object::Instance();
         }
     }

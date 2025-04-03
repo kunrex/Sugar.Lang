@@ -1,10 +1,11 @@
 #ifndef EMPTY_NODE_H
 #define EMPTY_NODE_H
-#include "statement_node.h"
+
+#include "../parse_node.h"
 
 namespace ParseNodes::Statements
 {
-    class EmptyNode final : public StatementNode
+    class EmptyNode final : public ParseNode
     {
         public:
             explicit EmptyNode(const Tokens::Token& separator);

@@ -7,23 +7,12 @@
 
 namespace ParseNodes::Functions::Calling
 {
-    class ConstructorCallNode final : public NodeCollection<ParseNode>
+    class ConstructorCallNode final : public DynamicNodeCollection
     {
-        protected:
-            const ParseNode* type;
-
-            const Tokens::Token& keyword;
-
         public:
             ConstructorCallNode(const ParseNode* type, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] const ParseNode* Type() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~ConstructorCallNode() override;
     };
 }
 

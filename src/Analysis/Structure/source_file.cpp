@@ -6,7 +6,8 @@ using namespace std;
 
 using namespace ParseNodes::Groups;
 
-using namespace Analysis::Structure::Enums;using namespace Analysis::Structure::Core::Interfaces;
+using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure
 {

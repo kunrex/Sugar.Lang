@@ -5,17 +5,12 @@
 
 namespace ParseNodes::Groups
 {
-    class ExpressionListNode final : public NodeCollection<ParseNode>
+    class ExpressionListNode final : public DynamicNodeCollection
     {
-        private:
-            const unsigned long index;
-
         public:
-            explicit ExpressionListNode(unsigned long index);
+            explicit ExpressionListNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

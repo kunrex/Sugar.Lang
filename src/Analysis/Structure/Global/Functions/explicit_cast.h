@@ -9,7 +9,7 @@ namespace Analysis::Structure::Global
     class ExplicitCast final : public Core::Nameable, public Creation::CastDefinition, public Core::Scoped
     {
         public:
-            ExplicitCast(Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::NodeCollection<ParseNodes::ParseNode>* body);
+            ExplicitCast(Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

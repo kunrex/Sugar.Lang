@@ -5,20 +5,22 @@
 
 #include "../../Local/Variables/local_variable.h"
 
+#include "../../../../Services/collection.h"
+
 namespace Analysis::Structure::Core
 {
     class Scoped : Services::ConstantCollection<Local::LocalVariable>, public virtual Interfaces::IScoped
     {
         protected:
-            const ParseNodes::NodeCollection<ParseNodes::ParseNode>* parseNode;
+            const ParseNodes::Core::Interfaces::IParseNode* parseNode;
 
             mutable unsigned long parameterCount;
             mutable Local::Scope* scope;
 
-            explicit Scoped(const ParseNodes::NodeCollection<ParseNodes::ParseNode>* parseNode);
+            explicit Scoped(const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
         public:
-            [[nodiscard]] const ParseNodes::NodeCollection<ParseNodes::ParseNode>* ParseNode() const override;
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
 
             [[nodiscard]] Local::Scope* Scope() const override;
 

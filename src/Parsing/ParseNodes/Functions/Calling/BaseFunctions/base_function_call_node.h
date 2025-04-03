@@ -6,15 +6,10 @@
 
 namespace ParseNodes::Functions::Calling
 {
-    class BaseFunctionCallNode : public NodeCollection<ParseNode>
+    class BaseFunctionCallNode : public DynamicNodeCollection
     {
-        private:
-            const Tokens::Token& keyword;
-
         public:
             explicit BaseFunctionCallNode(const Tokens::Token& keyword);
-
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

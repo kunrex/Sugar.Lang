@@ -1,11 +1,11 @@
 #ifndef ANONYMOUS_TYPE_H
 #define ANONYMOUS_TYPE_H
 
-#include "keyword_type_node.h"
+#include "../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class AnonymousTypeNode final : public KeywordTypeNode
+    class AnonymousTypeNode final : public ParseNode
     {
         public:
             explicit AnonymousTypeNode(const Tokens::Token& keyword);

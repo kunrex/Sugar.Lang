@@ -14,12 +14,17 @@ namespace Analysis::Structure::Core
         protected:
             mutable std::string fullName;
 
-            const ParseNodes::ParseNode* parseNode;
+            const ParseNodes::Core::Interfaces::IParseNode* parseNode;
 
-            Characteristic(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType, const ParseNodes::ParseNode* parseNode);
+            const Context::ContextNode* context;
+
+            Characteristic(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
         public:
-            [[nodiscard]] const ParseNodes::ParseNode* ParseNode() const override;
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
+
+            void WithContext(const Context::ContextNode* context) override;
+            [[nodiscard]] const Context::ContextNode* Context() const override;
     };
 }
 

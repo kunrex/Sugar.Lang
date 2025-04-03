@@ -1,22 +1,17 @@
 #include "throw_statement_node.h"
 
+#include "../Enums/child_code.h"
+
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ThrowStatementNode::ThrowStatementNode(const ParseNode* const exception, const Token& keyword, const Token& separator) : StatementNode(separator), exception(exception), keyword(keyword)
-    { }
+    ThrowStatementNode::ThrowStatementNode(const ParseNode* const exception, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    {
+        AddChild(ChildCode::Expression, exception);
+    }
 
     NodeType ThrowStatementNode::NodeType() const { return NodeType::Throw; }
-
-    const ParseNode* ThrowStatementNode::Exception() const { return exception; }
-
-    unsigned long ThrowStatementNode::Index() const { return exception->Index(); }
-
-    ThrowStatementNode::~ThrowStatementNode()
-    {
-        delete exception;
-    }
 }

@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Types
 {
-    VoidTypeNode::VoidTypeNode(const Tokens::Token& keyword) : KeywordTypeNode(keyword)
+    VoidTypeNode::VoidTypeNode(const Tokens::Token& keyword) : ParseNode(keyword)
     { }
 
     NodeType VoidTypeNode::NodeType() const { return NodeType::VoidType; }

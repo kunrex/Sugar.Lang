@@ -1,21 +1,15 @@
 #ifndef BODY_NODE
 #define BODY_NODE
 
-#include "Interfaces/i_body_node.h"
+#include "../parse_node.h"
 
 namespace ParseNodes::Core
 {
-    class BodyNode : public virtual Interfaces::IBodyNode
+    template <int childCount>
+    class BodyNode : public virtual FixedNodeCollection<childCount>
     {
         protected:
-            const NodeCollection<ParseNode>* body;
-
-            explicit BodyNode(const NodeCollection<ParseNode>* body);
-
-        public:
-            [[nodiscard]] const NodeCollection<ParseNode>* Body() const override;
-
-            ~BodyNode() override;
+            explicit BodyNode(const DynamicNodeCollection* body);
     };
 }
 

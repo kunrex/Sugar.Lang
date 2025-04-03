@@ -6,17 +6,10 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Functions::Calling
 {
-    ConstructorCallNode::ConstructorCallNode(const ParseNode* const type, const Token& keyword) : NodeCollection(), type(type), keyword(keyword)
-    { }
+    ConstructorCallNode::ConstructorCallNode(const ParseNode* const type, const Tokens::Token& keyword) : DynamicNodeCollection(keyword)
+    {
+        AddChild(type);
+    }
 
     NodeType ConstructorCallNode::NodeType() const { return NodeType::ConstructorCall; }
-
-    const ParseNode* ConstructorCallNode::Type() const { return type; }
-
-    unsigned long ConstructorCallNode::Index() const { return keyword.Index(); }
-
-    ConstructorCallNode::~ConstructorCallNode()
-    {
-        delete type;
-    }
 }

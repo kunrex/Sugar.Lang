@@ -3,11 +3,10 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Groups;
 
 namespace ParseNodes::Types
 {
-    NullableTypeNode::NullableTypeNode(const Token& keyword, const GenericNode* generic) : GenericTypeNode(keyword, generic)
+    NullableTypeNode::NullableTypeNode(const Tokens::Token& keyword) : DynamicNodeCollection(keyword)
     { }
 
     NodeType NullableTypeNode::NodeType() const { return NodeType::NullableType; }

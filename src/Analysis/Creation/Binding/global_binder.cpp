@@ -52,19 +52,14 @@
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Value/integer.h"
 
+using namespace std;
+
 using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes;
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Values;
-using namespace ParseNodes::Groups;
-using namespace ParseNodes::DataTypes;
-using namespace ParseNodes::Properties;
-using namespace ParseNodes::Statements;
-using namespace ParseNodes::Expressions;
-using namespace ParseNodes::Functions::Creation;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
@@ -108,19 +103,18 @@ namespace Analysis::Creation::Binding
             PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void BindEnumExpression(const ParseNode* const expression, Enum* const dataType)
+    void BindEnumExpression(const IParseNode* const expression, IUserDefinedType* const dataType)
     {
         switch (expression->NodeType())
         {
             case NodeType::Identifier:
                 {
-                    const auto identifier = *dynamic_cast<const IdentifierNode*>(expression);
-                    const auto value = identifier.Value();
-                    const auto index = identifier.Index();
+                    const auto identifier = expression->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+                    const auto value = *identifier.Value<string>();
 
                     if (dataType->FindCharacteristic(value) != nullptr)
                     {
-                        PushException(new DuplicateVariableDefinitionException(index, dataType->Parent()));
+                        PushException(new DuplicateVariableDefinitionException(identifier.Index(), dataType->Parent()));
                         return;
                     }
 
@@ -129,238 +123,239 @@ namespace Analysis::Creation::Binding
                 break;
             case NodeType::Binary:
                 {
-                    const auto casted = *dynamic_cast<const BinaryNode*>(expression);
-                    const auto index = casted.Index();
+                    const auto operation = expression->Token();
 
-                    if (casted.Base().Kind() != SyntaxKind::Assignment)
+                    if (operation.Kind() != SyntaxKind::Assignment)
                     {
-                        PushException(new InvalidGlobalStatementException(index, dataType->Parent()));
+                        PushException(new InvalidGlobalStatementException(operation.Index(), dataType->Parent()));
                         return;
                     }
 
-                    const auto lhs = casted.LHS();
+                    const auto lhs = expression->GetChild(static_cast<int>(ChildCode::LHS));
                     if (lhs->NodeType() != NodeType::Identifier)
                     {
-                        PushException(new InvalidGlobalStatementException(index, dataType->Parent()));
+                        PushException(new InvalidGlobalStatementException(lhs->Token().Index(), dataType->Parent()));
                         return;
                     }
 
-                    const auto identifier = *dynamic_cast<const IdentifierNode*>(lhs);
-                    const auto value = identifier.Value();
-
+                    const auto identifier = lhs->Token();
+                    const auto value = *identifier.Value<string>();
                     if (dataType->FindCharacteristic(value) != nullptr)
                     {
-                        PushException(new DuplicateVariableDefinitionException(index, dataType->Parent()));
+                        PushException(new DuplicateVariableDefinitionException(identifier.Index(), dataType->Parent()));
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), casted.RHS()));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), expression->GetChild(static_cast<int>(ChildCode::RHS))));
                 }
                 break;
             default:
-                PushException(new InvalidGlobalStatementException(expression->Index(), dataType->Parent()));
+                PushException(new InvalidGlobalStatementException(expression->Token().Index(), dataType->Parent()));
                 break;
         }
     }
 
-    void DeclareGlobalVariable(const DeclarationNode* const declarationNode, IUserDefinedType* const dataType)
+    void DeclareGlobalVariable(const IParseNode* const declarationNode, IUserDefinedType* const dataType)
     {
-        const auto index = declarationNode->Index();
         const auto source = dataType->Parent();
 
-        const auto identifier = declarationNode->Name()->Value();
+        const auto identifier = declarationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
 
-        const auto creationType = BindDataType(declarationNode->Type(), source);
+        const auto value = *identifier.Value<string>();
+        const auto creationType = BindDataType(declarationNode->GetChild(static_cast<int>(ChildCode::Type)), source);
 
-        if (dataType->FindCharacteristic(identifier) != nullptr)
+        if (dataType->FindCharacteristic(value) != nullptr)
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            PushException(new DuplicateVariableDefinitionException(identifier.Index(), source));
             return;
         }
 
-        const auto describer = FromNode(declarationNode->Describer());
-        const auto globalVariable = new GlobalVariable(identifier, describer == Describer::None ? Describer::Private : describer, creationType);
+        const auto describer = FromNode(declarationNode->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType);
 
-        MatchReturnAccessibility(globalVariable, index, dataType);
+        MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
 
-        ValidateStaticBinding(globalVariable, index, dataType);
-        ValidateDescriber(globalVariable, Describer::AccessModifiers | Describer::Static, index, source);
+        ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
+        ValidateDescriber(globalVariable, Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
         dataType->PushCharacteristic(globalVariable);
     }
 
-    void InitialiseGlobalVariable(const InitialisationNode* const initialisationNode, IUserDefinedType* const dataType)
+    void InitialiseGlobalVariable(const IParseNode* const initialisationNode, IUserDefinedType* const dataType)
     {
-        const auto index = initialisationNode->Index();
         const auto source = dataType->Parent();
 
-        const auto identifier = initialisationNode->Name()->Value();
+        const auto identifier = initialisationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
 
-        const auto creationType = BindDataType(initialisationNode->Type(), source);
+        const auto value = *identifier.Value<string>();
+        const auto creationType = BindDataType(initialisationNode->GetChild(static_cast<int>(ChildCode::Type)), source);
 
-        if (dataType->FindCharacteristic(identifier) != nullptr)
+        if (dataType->FindCharacteristic(value) != nullptr)
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            PushException(new DuplicateVariableDefinitionException(identifier.Index(), source));
             return;
         }
 
-        const auto describer = FromNode(initialisationNode->Describer());
+        const auto describer = FromNode(initialisationNode->GetChild(static_cast<int>(ChildCode::Describer)));
 
         GlobalVariable* globalVariable;
         if ((describer & Describer::Constexpr) == Describer::Constexpr)
-            globalVariable = new GlobalConstant(identifier, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+            globalVariable = new GlobalConstant(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
         else
-            globalVariable = new GlobalVariable(identifier, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+            globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
 
-        MatchReturnAccessibility(globalVariable, index, dataType);
+        MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
 
-        ValidateStaticBinding(globalVariable, index, dataType);
+        ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
         ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, index, source);
 
         dataType->PushCharacteristic(globalVariable);
     }
 
-    std::tuple<MethodDefinition*, VoidDefinition*> CreatePropertyFunctions(const GetNode* const getNode, const SetNode* const setNode, const std::string& identifier, const Describer describer, const IDataType* const creationType)
+    std::tuple<MethodDefinition*, VoidDefinition*> CreatePropertyFunctions(const IParseNode* const getNode, const IParseNode* const setNode, const std::string& identifier, const Describer describer, const IDataType* const creationType)
     {
         MethodFunction* get; VoidFunction* set;
 
         if (getNode != nullptr)
         {
             const auto getName = std::format("{}_{}", get_property_name, identifier);
-            const auto getDescriber = FromNode(getNode->Describer());
+            const auto getDescriber = FromNode(getNode->GetChild(static_cast<int>(ChildCode::Describer)));
 
             auto actualDescriber = (getDescriber & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
             if ((describer & Describer::Static) == Describer::Static)
                 actualDescriber = actualDescriber | Describer::Static;
 
-            get = new MethodFunction(getName, actualDescriber, creationType, getNode->Body());
+            get = new MethodFunction(getName, actualDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         }
 
         if (setNode != nullptr)
         {
             const auto setName  = std::format("{}_{}", set_property_name, identifier);
-            const auto setDescriber = FromNode(setNode->Describer());
+            const auto setDescriber = FromNode(setNode->GetChild(static_cast<int>(ChildCode::Describer)));
 
             auto actualDescriber = (setDescriber & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
 
             if ((describer & Describer::Static) == Describer::Static)
                 actualDescriber = actualDescriber | Describer::Static;
 
-            set = new VoidFunction(setName, actualDescriber, setNode->Body());
+            set = new VoidFunction(setName, actualDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
             set->AddParameter(new FunctionParameter("value", Describer::None, creationType));
         }
 
         return std::make_tuple(get, set);
     }
 
-    void CreateProperty(const BasePropertyNode* const propertyNode, IUserDefinedType* const dataType)
+    void CreateProperty(const IParseNode* const propertyNode, IUserDefinedType* const dataType)
     {
-        const auto index = propertyNode->Index();
         const auto source = dataType->Parent();
 
-        const auto identifier = propertyNode->Name()->Value();
+        const auto identifier = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
 
-        const auto creationType = BindDataType(propertyNode->Type(), source);
+        const auto value = *identifier.Value<string>();
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
 
-        if (dataType->FindCharacteristic(identifier) != nullptr)
+        if (dataType->FindCharacteristic(value) != nullptr)
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            PushException(new DuplicateVariableDefinitionException(identifier.Index(), source));
             return;
         }
 
-        const auto provided = FromNode(propertyNode->Describer());
+        const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto actual = provided == Describer::None ? Describer::Private : provided;
 
-        const auto result =  CreatePropertyFunctions(propertyNode->Get(), propertyNode->Set(), identifier, actual, creationType);
-        const auto property = new Property(identifier, actual, creationType, std::get<0>(result), std::get<1>(result));
+        const auto result =  CreatePropertyFunctions(propertyNode->GetChild(static_cast<int>(ChildCode::Get)), propertyNode->GetChild(static_cast<int>(ChildCode::Set)), value, actual, creationType);
+        const auto property = new Property(value, actual, creationType, std::get<0>(result), std::get<1>(result));
 
-        MatchReturnAccessibility(property, index, dataType);
+        MatchReturnAccessibility(property, identifier.Index(), dataType);
 
-        ValidateStaticBinding(property, index, dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, index, source);
+        ValidateStaticBinding(property, identifier.Index(), dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
 
         dataType->PushCharacteristic(property);
     }
 
-    void InitialiseProperty(const AssignedPropertyNode* const propertyNode, IUserDefinedType* const dataType)
+    void InitialiseProperty(const IParseNode* const propertyNode, IUserDefinedType* const dataType)
     {
-        const auto index = propertyNode->Index();
         const auto source = dataType->Parent();
 
-        const auto identifier = propertyNode->Name()->Value();
+        const auto identifier = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
 
-        const auto creationType = BindDataType(propertyNode->Type(), source);
+        const auto value = *identifier.Value<string>();
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
 
-        if (dataType->FindCharacteristic(identifier) != nullptr)
+        if (dataType->FindCharacteristic(value) != nullptr)
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            PushException(new DuplicateVariableDefinitionException(identifier.Index(), source));
             return;
         }
 
-        const auto provided = FromNode(propertyNode->Describer());
+        const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto actual = provided == Describer::None ? Describer::Private : provided;
 
-        const auto result =  CreatePropertyFunctions(propertyNode->Get(), propertyNode->Set(), identifier, actual, creationType);
-        const auto property = new Property(identifier, actual, creationType, std::get<0>(result), std::get<1>(result), propertyNode->Value());
+        const auto result =  CreatePropertyFunctions(propertyNode->GetChild(static_cast<int>(ChildCode::Get)), propertyNode->GetChild(static_cast<int>(ChildCode::Set)), value, actual, creationType);
+        const auto property = new Property(value, actual, creationType, std::get<0>(result), std::get<1>(result), propertyNode->GetChild(static_cast<int>(ChildCode::Expression)));
 
-        MatchReturnAccessibility(property, index, dataType);
+        MatchReturnAccessibility(property, identifier.Index(), dataType);
 
-        ValidateStaticBinding(property, index, dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, index, source);
+        ValidateStaticBinding(property, identifier.Index(), dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
 
         dataType->PushCharacteristic(property);
     }
 
-    void BindFunctionParameters(const CompoundDeclarationNode* const declarationNode, std::vector<const IDataType*>& parameters, const SourceFile* const source)
+    void BindFunctionParameters(const IParseNode* const declarationNode, std::vector<const IDataType*>& parameters, const SourceFile* const source)
     {
-        for (const auto typeNode: *declarationNode)
-            parameters.push_back(BindDataType(typeNode->Type(), source));
+        const auto count = declarationNode->ChildCount();
+        for (auto i = 0; i < count; ++i)
+            parameters.push_back(BindDataType(declarationNode->GetChild(i)->GetChild(static_cast<int>(ChildCode::Type)), source));
     }
 
-    void BindFunctionParameters(IScoped* const scope, const std::vector<const IDataType*>& parameters, const CompoundDeclarationNode* const declarationNode, const SourceFile* const source)
+    void BindFunctionParameters(IScoped* const scope, const std::vector<const IDataType*>& parameters, const IParseNode* const declarationNode, const SourceFile* const source)
     {
-        for (int i = 0; i < declarationNode->ChildCount(); i++)
+        const auto count = declarationNode->ChildCount();
+        for (int i = 0; i < count; i++)
         {
-            const auto current = *declarationNode->GetChild(i);
+            const auto current = declarationNode->GetChild(i);
 
-            const auto index = current.Index();
-            const auto identifier = current.Name()->Value();
+            const auto identifier = current->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+
+            const auto value = *identifier.Value<string>();
             const auto creationType = parameters.at(i);
 
-            if (scope->GetParameterIndex(identifier))
+            if (scope->GetParameterIndex(value))
             {
-                PushException(new DuplicateVariableDefinitionException(index, source));
+                PushException(new DuplicateVariableDefinitionException(identifier.Index(), source));
                 continue;
             }
 
-            const auto parameter = new FunctionParameter(identifier, FromNode(current.Describer()), creationType);
-            ValidateDescriber(parameter, creationType->MemberType() == MemberType::Class ? Describer::None : Describer::Ref, index, source);
+            const auto parameter = new FunctionParameter(value, FromNode(current->GetChild(static_cast<int>(ChildCode::Describer))), creationType);
+            ValidateDescriber(parameter, creationType->MemberType() == MemberType::Class ? Describer::None : Describer::Ref, identifier.Index(), source);
 
             scope->AddParameter(parameter);
         }
     }
 
-    std::tuple<MethodDefinition*, VoidDefinition*> CreateIndexerFunctions(const GetNode* const getNode, const SetNode* const setNode, const CompoundDeclarationNode* declarationNode, const std::vector<const IDataType*>& parameters, const IDataType* const creationType, const Describer describer, const SourceFile* const source)
+    std::tuple<MethodDefinition*, VoidDefinition*> CreateIndexerFunctions(const IParseNode* const getNode, const IParseNode* const setNode, const IParseNode* declarationNode, const std::vector<const IDataType*>& parameters, const IDataType* const creationType, const Describer describer, const SourceFile* const source)
     {
         MethodFunction* get; VoidFunction* set;
 
         if (getNode != nullptr)
         {
-            const auto actualDescriber = (FromNode(getNode->Describer()) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
+            const auto actualDescriber = (FromNode(getNode->GetChild(static_cast<int>(ChildCode::Describer))) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
 
-            get = new MethodFunction(std::string(get_indexer_name), actualDescriber, creationType, getNode->Body());
+            get = new MethodFunction(std::string(get_indexer_name), actualDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(get, parameters, declarationNode, source);
         }
 
         if (setNode != nullptr)
         {
-            const auto actualDescriber = (FromNode(setNode->Describer()) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
+            const auto actualDescriber = (FromNode(setNode->GetChild(static_cast<int>(ChildCode::Describer))) & describer & Describer::Public) == Describer::Public ? Describer::Public : Describer::Private;
 
-            set = new VoidFunction(std::string(set_indexer_name), actualDescriber, setNode->Body());
+            set = new VoidFunction(std::string(set_indexer_name), actualDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(set, parameters, declarationNode, source);
 
             if (set->GetParameterIndex("value"))
-                PushException(new DuplicateVariableDefinitionException(declarationNode->Index(), source));
+                PushException(new DuplicateVariableDefinitionException(declarationNode->Token().Index(), source));
             else
                 set->AddParameter(new FunctionParameter("value", Describer::None, creationType));
         }
@@ -368,9 +363,9 @@ namespace Analysis::Creation::Binding
         return std::make_tuple(get, set);
     }
 
-    void CreateIndexer(const BaseIndexerNode* const indexerNode, IUserDefinedType* const dataType)
+    void CreateIndexer(const IParseNode* const indexerNode, IUserDefinedType* const dataType)
     {
-        const auto index = indexerNode->Index();
+        const auto index = indexerNode->Token().Index();
         const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
@@ -379,8 +374,8 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto creationType = BindDataType(indexerNode->Type(), source);
-        const auto declarationNode = indexerNode->Parameters();
+        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto declarationNode = indexerNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
@@ -391,10 +386,10 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto provided = FromNode(indexerNode->Describer());
+        const auto provided = FromNode(indexerNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto actual = provided == Describer::None ? Describer::Private : provided;
 
-        const auto result = CreateIndexerFunctions(indexerNode->Get(), indexerNode->Set(), declarationNode, parameters, creationType, actual, source);
+        const auto result = CreateIndexerFunctions(indexerNode->GetChild(static_cast<int>(ChildCode::Get)), indexerNode->GetChild(static_cast<int>(ChildCode::Set)), declarationNode, parameters, creationType, actual, source);
         const auto indexer = new Indexer(actual, creationType, std::get<0>(result), std::get<1>(result));
 
         if (!creationType->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public) && indexer->CheckDescriber(Describer::Public))
@@ -405,53 +400,54 @@ namespace Analysis::Creation::Binding
         dataType->PushIndexer(indexer);
     }
 
-    void CreateFunction(const FunctionCreationNode* const functionCreationNode, IUserDefinedType* const dataType)
+    void CreateFunction(const IParseNode* const functionCreationNode, IUserDefinedType* const dataType)
     {
-        const auto index = functionCreationNode->Index();
         const auto source = dataType->Parent();
 
-        const auto identifier = functionCreationNode->Name()->Value();
-        const auto declarationNode = functionCreationNode->Parameters();
+        const auto identifier = functionCreationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+
+        const auto value = *identifier.Value<string>();
+        const auto declarationNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
-        if (dataType->FindFunction(identifier, parameters) != nullptr)
+        if (dataType->FindFunction(value, parameters) != nullptr)
         {
-            PushException(new DuplicateFunctionDefinition(index, source));
+            PushException(new DuplicateFunctionDefinition(identifier.Index(), source));
             return;
         }
 
-        const auto provided = FromNode(functionCreationNode->Describer());
+        const auto provided = FromNode(functionCreationNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
 
         FunctionDefinition* function;
-        if (const auto typeNode = functionCreationNode->Type(); typeNode->NodeType() == NodeType::VoidType)
+        if (const auto typeNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType() == NodeType::VoidType)
         {
-            const auto voidDefinition = new VoidFunction(identifier, describer, functionCreationNode->Body());
+            const auto voidDefinition = new VoidFunction(value, describer, functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(voidDefinition, parameters, declarationNode, source);
 
             function = voidDefinition;
         }
         else
         {
-            const auto methodDefinition = new MethodFunction(identifier, describer, BindDataType(typeNode, source), functionCreationNode->Body());
+            const auto methodDefinition = new MethodFunction(value, describer, BindDataType(typeNode, source), functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(methodDefinition, parameters, declarationNode, source);
 
             function = methodDefinition;
         }
 
-        MatchReturnAccessibility(function, index, dataType);
+        MatchReturnAccessibility(function, identifier.Index(), dataType);
 
-        ValidateStaticBinding(function, index, dataType);
-        ValidateDescriber(function, Describer::Static | Describer::AccessModifiers, index, source);
+        ValidateStaticBinding(function, identifier.Index(), dataType);
+        ValidateDescriber(function, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
 
         dataType->PushFunction(function);
     }
 
-    void CreateConstructor(const ConstructorCreationNode* const constructorCreationNode, IUserDefinedType* const dataType)
+    void CreateConstructor(const IParseNode* const constructorCreationNode, IUserDefinedType* const dataType)
     {
-        const auto index = constructorCreationNode->Index();
+        const auto index = constructorCreationNode->Token().Index();
         const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
@@ -460,7 +456,7 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto declarationNode = constructorCreationNode->Parameters();
+        const auto declarationNode = constructorCreationNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
@@ -471,10 +467,10 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto provided = FromNode(constructorCreationNode->Describer());
+        const auto provided = FromNode(constructorCreationNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
 
-        const auto constructor = new Constructor(describer, dataType, constructorCreationNode->Body());
+        const auto constructor = new Constructor(describer, dataType, constructorCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
         BindFunctionParameters(constructor, parameters, declarationNode, source);
 
         ValidateDescriber(constructor, Describer::AccessModifiers, index, source);
@@ -482,9 +478,9 @@ namespace Analysis::Creation::Binding
         dataType->PushConstructor(constructor);
     }
 
-    void CreateExplict(const ExplicitCastNode* const explicitCastNode, IUserDefinedType* const dataType)
+    void CreateExplict(const IParseNode* const explicitCastNode, IUserDefinedType* const dataType)
     {
-        const auto index = explicitCastNode->Index();
+        const auto index = explicitCastNode->Token().Index();
         const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
@@ -493,8 +489,8 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto creationType = BindDataType(explicitCastNode->Type(), source);
-        const auto declarationNode = explicitCastNode->Parameters();
+        const auto creationType = BindDataType(explicitCastNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto declarationNode = explicitCastNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
@@ -519,7 +515,7 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto explicitCast = new ExplicitCast(FromNode(explicitCastNode->Describer()), creationType, explicitCastNode->Body());
+        const auto explicitCast = new ExplicitCast(FromNode(explicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, explicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
         BindFunctionParameters(explicitCast, parameters, declarationNode, source);
 
         MatchReturnAccessibility(explicitCast, index, dataType);
@@ -530,9 +526,9 @@ namespace Analysis::Creation::Binding
         dataType->PushExplicitCast(explicitCast);
     }
 
-    void CreateImplicit(const ImplicitCastNode* const implicitCastNode, IUserDefinedType* const dataType)
+    void CreateImplicit(const IParseNode* const implicitCastNode, IUserDefinedType* const dataType)
     {
-        const auto index = implicitCastNode->Index();
+        const auto index = implicitCastNode->Token().Index();
         const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
@@ -541,8 +537,8 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto creationType = BindDataType(implicitCastNode->Type(), source);
-        const auto declarationNode = implicitCastNode->Parameters();
+        const auto creationType = BindDataType(implicitCastNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto declarationNode = implicitCastNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
@@ -567,7 +563,7 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto implicitCast = new ImplicitCast(FromNode(implicitCastNode->Describer()), creationType, implicitCastNode->Body());
+        const auto implicitCast = new ImplicitCast(FromNode(implicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, implicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
         BindFunctionParameters(implicitCast, parameters, declarationNode, source);
 
         MatchReturnAccessibility(implicitCast, index, dataType);
@@ -578,32 +574,31 @@ namespace Analysis::Creation::Binding
         dataType->PushImplicitCast(implicitCast);
     }
 
-    void CreateOperatorOverload(const OperatorOverloadNode* const operatorOverloadNode, IUserDefinedType* const dataType)
+    void CreateOperatorOverload(const IParseNode* const operatorOverloadNode, IUserDefinedType* const dataType)
     {
-        const auto index = operatorOverloadNode->Index();
+        const auto& base = operatorOverloadNode->Token();
         const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
         {
-            PushException(new NonStaticMemberDefinitionException(index, source));
+            PushException(new NonStaticMemberDefinitionException(base.Index(), source));
             return;
         }
 
-        const auto creationType = BindDataType(operatorOverloadNode->Type(), source);
+        const auto creationType = BindDataType(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Type)), source);
         if (creationType != dataType)
-            PushException(new LogException(std::format("Expected return type: {}.", dataType->FullName()), index, source));
+            PushException(new LogException(std::format("Expected return type: {}.", dataType->FullName()), base.Index(), source));
 
-        const auto declarationNode = operatorOverloadNode->Parameters();
+        const auto declarationNode = operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters))();
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
-        const auto& token = operatorOverloadNode->Operator();
 
-        if ((static_cast<OperatorKind>(token.Kind()) & OperatorKind::Assignment) == OperatorKind::Assignment)
-            PushException(new LogException("Cannot overload the assignment operator or any of its derivatives", index, source));
+        if ((static_cast<OperatorKind>(base.Kind()) & OperatorKind::Assignment) == OperatorKind::Assignment)
+            PushException(new LogException("Cannot overload the assignment operator or any of its derivatives", base.Index(), source));
 
-        switch (token.Kind())
+        switch (base.Kind())
         {
             case SyntaxKind::Increment:
             case SyntaxKind::Decrement:
@@ -616,39 +611,42 @@ namespace Analysis::Creation::Binding
             case SyntaxKind::BitwiseAnd:
                 {
                     if (parameters.size() != 1)
-                        PushException(new LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), index, source));
+                        PushException(new LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), base.Index(), source));
                 }
                 break;
             default:
                 {
                     if (parameters.size() != 2)
-                        PushException(new LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), index, source));
+                        PushException(new LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), base.Index(), source));
                 }
                 break;
         }
 
-        const auto operatorOverload = new OperatorOverload(token.Kind(), FromNode(operatorOverloadNode->Describer()), creationType, operatorOverloadNode->Body());
-        BindFunctionParameters(operatorOverload, parameters, operatorOverloadNode->Parameters(), source);
+        const auto operatorOverload = new OperatorOverload(base.Kind(), FromNode(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Body)));
+        BindFunctionParameters(operatorOverload, parameters, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters)), source);
 
-        MatchReturnAccessibility(operatorOverload, index, dataType);
+        MatchReturnAccessibility(operatorOverload, base.Index(), dataType);
 
         if (!operatorOverload->MatchDescriber(Describer::PublicStatic))
-            PushException(new ExpectedDescriberException(Describer::PublicStatic, index, source));
+            PushException(new ExpectedDescriberException(Describer::PublicStatic, base.Index(), source));
 
         dataType->PushOverload(operatorOverload);
     }
 
-    void BindEnum(Enum* const enumSource)
+    void BindEnum(IUserDefinedType* const enumSource)
     {
-        for (const auto child: *enumSource->Skeleton()->Body())
+        const auto skeleton = enumSource->Skeleton();
+
+        const auto count = skeleton->ChildCount();
+        for (auto i = 0; i < count; i++)
         {
-            switch (child->NodeType())
+            switch (const auto child = skeleton->GetChild(i); child->NodeType())
             {
                 case NodeType::Expression:
                     BindEnumExpression(child, enumSource);
                     break;
                 default:
-                    PushException(new InvalidGlobalStatementException(child->Index(), enumSource->Parent()));
+                    PushException(new InvalidGlobalStatementException(child->Token().Index(), enumSource->Parent()));
                     break;
             }
         }
@@ -656,44 +654,47 @@ namespace Analysis::Creation::Binding
         enumSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string valuetype {}::ToString()", enumSource->FullName())));
     }
 
-    void BindClass(ClassSource* const classSource)
+    void BindClass(IUserDefinedType* const classSource)
     {
-        for (const auto child: *classSource->Skeleton()->Body())
+        const auto skeleton = classSource->Skeleton();
+
+        const auto count = skeleton->ChildCount();
+        for (auto i = 0; i < count; i++)
         {
-            switch (child->NodeType())
+            switch (const auto child = skeleton->GetChild(i); child->NodeType())
             {
                 case NodeType::Declaration:
-                    DeclareGlobalVariable(dynamic_cast<const DeclarationNode*>(child), classSource);
+                    DeclareGlobalVariable(child, classSource);
                     break;
                 case NodeType::Initialisation:
-                    InitialiseGlobalVariable(dynamic_cast<const InitialisationNode*>(child), classSource);
+                    InitialiseGlobalVariable(child, classSource);
                     break;
                 case NodeType::Property:
-                    CreateProperty(dynamic_cast<const BasePropertyNode*>(child), classSource);
+                    CreateProperty(child, classSource);
                     break;
                 case NodeType::PropertyInitialisation:
-                    InitialiseProperty(dynamic_cast<const AssignedPropertyNode*>(child), classSource);
+                    InitialiseProperty(child, classSource);
                     break;
                 case NodeType::Indexer:
-                    CreateIndexer(dynamic_cast<const BaseIndexerNode*>(child), classSource);
+                    CreateIndexer(child, classSource);
                     break;
                 case NodeType::FunctionDeclaration:
-                    CreateFunction(dynamic_cast<const FunctionCreationNode*>(child), classSource);
+                    CreateFunction(child, classSource);
                     break;
                 case NodeType::ConstructorDeclaration:
-                    CreateConstructor(dynamic_cast<const ConstructorCreationNode*>(child), classSource);
+                    CreateConstructor(child, classSource);
                     break;
                 case NodeType::ImplicitDeclaration:
-                    CreateImplicit(dynamic_cast<const ImplicitCastNode*>(child), classSource);
+                    CreateImplicit(child, classSource);
                     break;
                 case NodeType::ExplicitDeclaration:
-                    CreateExplict(dynamic_cast<const ExplicitCastNode*>(child), classSource);
+                    CreateExplict(child, classSource);
                     break;
                 case NodeType::OperatorOverload:
-                    CreateOperatorOverload(dynamic_cast<const OperatorOverloadNode*>(child), classSource);
+                    CreateOperatorOverload(child, classSource);
                     break;
                 default:
-                    PushException(new InvalidGlobalStatementException(child->Index(), classSource->Parent()));
+                    PushException(new InvalidGlobalStatementException(child->Token().Index(), classSource->Parent()));
                     break;
             }
         }
@@ -708,44 +709,47 @@ namespace Analysis::Creation::Binding
             classSource->PushConstructor(new DefaultConstructor(classSource));
     }
 
-    void BindStruct(StructSource* const structSource)
+    void BindStruct(IUserDefinedType* const structSource)
     {
-        for (const auto child: *structSource->Skeleton()->Body())
+        const auto skeleton = structSource->Skeleton();
+
+        const auto count = skeleton->ChildCount();
+        for (auto i = 0; i < count; i++)
         {
-            switch (child->NodeType())
+            switch (const auto child = skeleton->GetChild(i); child->NodeType())
             {
                 case NodeType::Declaration:
-                    DeclareGlobalVariable(dynamic_cast<const DeclarationNode*>(child), structSource);
+                    DeclareGlobalVariable(child, structSource);
                     break;
                 case NodeType::Initialisation:
-                    InitialiseGlobalVariable(dynamic_cast<const InitialisationNode*>(child), structSource);
+                    InitialiseGlobalVariable(child, structSource);
                     break;
                 case NodeType::Property:
-                    CreateProperty(dynamic_cast<const BasePropertyNode*>(child), structSource);
+                    CreateProperty(child, structSource);
                     break;
                 case NodeType::PropertyInitialisation:
-                    InitialiseProperty(dynamic_cast<const AssignedPropertyNode*>(child), structSource);
+                    InitialiseProperty(child, structSource);
                     break;
                 case NodeType::Indexer:
-                    CreateIndexer(dynamic_cast<const BaseIndexerNode*>(child), structSource);
+                    CreateIndexer(child, structSource);
                     break;
                 case NodeType::FunctionDeclaration:
-                    CreateFunction(dynamic_cast<const FunctionCreationNode*>(child), structSource);
+                    CreateFunction(child, structSource);
                     break;
                 case NodeType::ConstructorDeclaration:
-                    CreateConstructor(dynamic_cast<const ConstructorCreationNode*>(child), structSource);
+                    CreateConstructor(child, structSource);
                     break;
                 case NodeType::ImplicitDeclaration:
-                    CreateImplicit(dynamic_cast<const ImplicitCastNode*>(child), structSource);
+                    CreateImplicit(child, structSource);
                     break;
                 case NodeType::ExplicitDeclaration:
-                    CreateExplict(dynamic_cast<const ExplicitCastNode*>(child), structSource);
+                    CreateExplict(child, structSource);
                     break;
                 case NodeType::OperatorOverload:
-                    CreateOperatorOverload(dynamic_cast<const OperatorOverloadNode*>(child), structSource);
+                    CreateOperatorOverload(child, structSource);
                     break;
                 default:
-                    PushException(new InvalidGlobalStatementException(child->Index(), structSource->Parent()));
+                    PushException(new InvalidGlobalStatementException(child->Token().Index(), structSource->Parent()));
                     break;
             }
         }
@@ -767,13 +771,13 @@ namespace Analysis::Creation::Binding
             switch (type->MemberType())
             {
                 case MemberType::Enum:
-                    BindEnum(dynamic_cast<Enum*>(type));
+                    BindEnum(type);
                     break;
                 case MemberType::Class:
-                    BindClass(dynamic_cast<ClassSource*>(type));
+                    BindClass(type);
                     break;
                 case MemberType::ValueType:
-                    BindStruct(dynamic_cast<StructSource*>(type));
+                    BindStruct(type);
                     break;
                 default:
                     break;

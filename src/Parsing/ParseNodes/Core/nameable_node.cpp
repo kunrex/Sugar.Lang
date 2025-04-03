@@ -1,16 +1,15 @@
 #include "nameable_node.h"
 
+#include "../Enums/child_code.h"
+
+using namespace ParseNodes::Enums;
 using namespace ParseNodes::Values;
 
 namespace ParseNodes::Core
 {
-    NameableNode::NameableNode(const IdentifierNode* const identifier) : name(identifier)
-    { }
-
-    const IdentifierNode* NameableNode::Name() const { return name; }
-
-    NameableNode::~NameableNode()
+    template <int childCount>
+    NameableNode<childCount>::NameableNode(const IdentifierNode* const identifier)
     {
-        delete name;
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Identifier, identifier);;
     }
 }

@@ -10,12 +10,13 @@ namespace Analysis::Structure::Compilation
     struct CompilationResult
     {
         public:
-            const TypeCode creationType;
+            const Tokens::Enums::TypeKind creationType;
             const std::variant<long, double, std::string> data;
 
-            CompilationResult(TypeCode creationType, long data);
-            CompilationResult(TypeCode creationType, double data);
-            CompilationResult(TypeCode creationType, const std::string& data);
+            CompilationResult(Tokens::Enums::TypeKind creationType, long data);
+            CompilationResult(Tokens::Enums::TypeKind creationType, double data);
+            CompilationResult(Tokens::Enums::TypeKind creationType, const std::string& data);
+            CompilationResult(Tokens::Enums::TypeKind creationType, std::variant<long, double, std::string>& data);
     };
 }
 

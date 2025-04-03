@@ -5,17 +5,13 @@
 
 namespace ParseNodes::Groups
 {
-    class ScopeNode final : public NodeCollection<ParseNode>
+    class ScopeNode final : public DynamicNodeCollection
     {
-        private:
-            const unsigned long index;
-
         public:
-            explicit ScopeNode(unsigned long index);
+            explicit ScopeNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

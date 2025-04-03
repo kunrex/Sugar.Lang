@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    GetNode::GetNode(const DescriberNode* const describer, const NodeCollection<ParseNode>* const body, const Token& keyword) : AccessorNode(describer, body, keyword)
+    GetNode::GetNode(const DescriberNode* const describer, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : AccessorNode(describer, body, keyword)
     { }
 
     NodeType GetNode::NodeType() const { return NodeType::Get; }

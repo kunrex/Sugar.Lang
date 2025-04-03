@@ -6,17 +6,12 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Loops
 {
-    ForLoopNode::ForLoopNode(const ParseNode* const pre, const ParseNode* const condition, const ParseNode* const post, const NodeCollection<ParseNode>* const body, const Token& keyword) : LoopNode(condition, body, keyword), pre(pre), post(post)
-    { }
+    ForLoopNode::ForLoopNode(const ParseNode* const pre, const ParseNode* const condition, const ParseNode* const post, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword), BodyNode(body)
+    {
+        AddChild(ChildCode::Expression, condition);
+        AddChild(ChildCode::Pre, pre);
+        AddChild(ChildCode::Post, post);
+    }
 
     NodeType ForLoopNode::NodeType() const { return NodeType::For; }
-
-    const ParseNode* ForLoopNode::Pre() const { return pre; }
-    const ParseNode* ForLoopNode::Post() const { return post; }
-
-    ForLoopNode::~ForLoopNode()
-    {
-        delete pre;
-        delete post;
-    }
 }

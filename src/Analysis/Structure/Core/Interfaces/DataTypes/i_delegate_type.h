@@ -9,6 +9,9 @@ namespace Analysis::Structure::Core::Interfaces
     {
         public:
             [[nodiscard]] virtual const std::string& DelegateSignature() const = 0;
+
+            [[nodiscard]] virtual unsigned long TypeCount() const = 0;
+            [[nodiscard]] virtual const IDataType* TypeAt(unsigned long index) const = 0;
     };
 }
 

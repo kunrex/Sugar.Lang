@@ -6,14 +6,12 @@
 
 namespace ParseNodes::Groups
 {
-    class CompoundDeclarationNode final : public NodeCollection<Statements::DeclarationNode>
+    class CompoundDeclarationNode final : public DynamicNodeCollection
     {
         public:
-            CompoundDeclarationNode();
+            explicit CompoundDeclarationNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

@@ -11,7 +11,7 @@ namespace Analysis::Structure::Context
     {
         private:
             mutable int slotCount;
-            const Core::Interfaces::IDelegateType* delegateType
+            const Core::Interfaces::IDelegateType* delegateType;
 
         public:
             InvokeContext(const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IDelegateType* delegateType);

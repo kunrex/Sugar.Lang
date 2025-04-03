@@ -13,7 +13,7 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes::DataTypes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -24,7 +24,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : DataType(name, describer | Describer::Static), fullName(), skeleton(skeleton), explicitCasts()
+    Enum::Enum(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : DataType(name, describer | Describer::Static), skeleton(skeleton), fullName(), explicitCasts()
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
@@ -41,7 +41,7 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    const DataTypeNode* Enum::Skeleton() const { return skeleton; }
+    const IParseNode* Enum::Skeleton() const { return skeleton; }
 
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
@@ -58,9 +58,6 @@ namespace Analysis::Structure::DataTypes
 
     const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr;}
-
-    IScoped* Enum::StaticConstructor() const { return nullptr; }
-    IScoped* Enum::InstanceConstructor() const { return nullptr; }
 
     void Enum::PushConstructor(IFunction* constructor)
     { }
@@ -105,9 +102,9 @@ namespace Analysis::Structure::DataTypes
         return nullptr;
     }
 
-    std::vector<const ICharacteristic*> Enum::AllCharacteristics() const
+    std::vector<ICharacteristic*> Enum::AllCharacteristics() const
     {
-        std::vector<const ICharacteristic*> all;
+        std::vector<ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
             all.push_back(characteristic.second);
 

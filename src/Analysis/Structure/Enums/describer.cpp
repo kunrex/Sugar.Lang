@@ -4,7 +4,7 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes::Describers;
+using namespace ParseNodes::Core::Interfaces;
 
 namespace Analysis::Structure::Enums
 {
@@ -18,12 +18,14 @@ namespace Analysis::Structure::Enums
         return static_cast<Describer>(static_cast<short>(lhs) | static_cast<short>(rhs));
     }
 
-    Describer FromNode(const DescriberNode* const node)
+    Describer FromNode(const IParseNode* const node)
     {
         auto final = Describer::None;
-        for (int i = 0; i < node->TokenCount(); i++)
+
+        const auto count = node->ChildCount();
+        for (int i = 0; i < count; i++)
         {
-            switch (node->TokenAt(i).Kind())
+            switch (node->GetChild(i)->Token().Kind())
             {
                 case SyntaxKind::Ref:
                     final = final | Describer::Ref;

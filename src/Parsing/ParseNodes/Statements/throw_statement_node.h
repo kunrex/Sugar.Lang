@@ -1,27 +1,16 @@
 #ifndef THROW_STATEMENT_NODE_H
 #define THROW_STATEMENT_NODE_H
 
-#include "statement_node.h"
+#include "../parse_node.h"
 
 namespace ParseNodes::Statements
 {
-    class ThrowStatementNode final : public StatementNode
+    class ThrowStatementNode final : public FixedNodeCollection<1>
     {
-        private:
-            const ParseNode* exception;
-
-            const Tokens::Token& keyword;
-
         public:
-            ThrowStatementNode(const ParseNode* exception, const Tokens::Token& keyword, const Tokens::Token& separator);
+            ThrowStatementNode(const ParseNode* exception, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] const ParseNode* Exception() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~ThrowStatementNode() override;
     };
 }
 

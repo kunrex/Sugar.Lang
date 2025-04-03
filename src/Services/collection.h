@@ -6,7 +6,19 @@
 namespace Services
 {
     template <typename TChild>
-    class Collection
+    class ICollection
+    {
+        public:
+            [[nodiscard]] virtual int ChildCount() const = 0;
+
+            [[nodiscard]] virtual TChild* GetChild(int index) const = 0;
+            virtual void AddChild(TChild* child) = 0;
+
+            virtual ~ICollection() = default;
+    };
+
+    template <typename TChild>
+    class Collection : public virtual ICollection<TChild>
     {
         protected:
             std::vector<TChild*> children;
@@ -14,15 +26,15 @@ namespace Services
             Collection();
 
         public:
-            [[nodiscard]] int ChildCount() const;
+            [[nodiscard]] int ChildCount() const override;
 
-            [[nodiscard]] TChild* GetChild(int index) const;
-            virtual void AddChild(TChild* child);
+            [[nodiscard]] TChild* GetChild(int index) const override;
+            void AddChild(TChild* child) override;
 
-            typename std::vector<TChild*>::const_iterator begin() const;
-            typename std::vector<TChild*>::const_iterator end() const;
+            typename std::vector<TChild*>::const_iterator begin() const override;
+            typename std::vector<TChild*>::const_iterator end() const override;
 
-            virtual ~Collection();
+            ~Collection() override;
     };
 
     template <typename TChild>

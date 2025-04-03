@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Functions::Calling
 {
-    CopyCallNode::CopyCallNode(const Token& keyword) : BaseFunctionCallNode(keyword)
+    CopyCallNode::CopyCallNode(const Tokens::Token& keyword) : BaseFunctionCallNode(keyword)
     { }
 
     NodeType CopyCallNode::NodeType() const { return NodeType::Copy; }

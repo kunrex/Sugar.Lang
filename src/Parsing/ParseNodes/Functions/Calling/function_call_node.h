@@ -5,21 +5,12 @@
 
 namespace ParseNodes::Functions::Calling
 {
-    class FunctionCallNode final : public NodeCollection<ParseNode>
+    class FunctionCallNode final : public DynamicNodeCollection
     {
-        private:
-            const Values::IdentifierNode* identifier;
-
         public:
             explicit FunctionCallNode(const Values::IdentifierNode* identifier);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            [[nodiscard]] const Values::IdentifierNode* Identifier() const;
-
-            ~FunctionCallNode() override;
     };
 }
 

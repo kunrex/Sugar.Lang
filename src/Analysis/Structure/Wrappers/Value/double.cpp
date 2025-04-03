@@ -117,13 +117,11 @@ namespace Analysis::Structure::Wrappers
         increment->PushParameterType(&Instance());
         increment->PushParameterType(&Instance());
         overloads[SyntaxKind::Increment] = increment;
-        overloads[SyntaxKind::IncrementPrefix] = increment;
 
         const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub");
         decrement->PushParameterType(&Instance());
         decrement->PushParameterType(&Instance());
         overloads[SyntaxKind::Decrement] = decrement;
-        overloads[SyntaxKind::DecrementPrefix] = decrement;
 
         const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt");
         greater->PushParameterType(&Instance());

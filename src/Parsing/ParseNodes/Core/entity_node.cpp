@@ -1,16 +1,15 @@
 #include "entity_node.h"
 
-#include "characteristic_node.h"
+#include "../parse_node.h"
+#include "../Enums/child_code.h"
+
+using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Core
 {
-    EntityNode::EntityNode(const ParseNode* const type) : type(type)
-    { }
-
-    const ParseNode* EntityNode::Type() const { return type; }
-
-    EntityNode::~EntityNode()
+    template <int childCount>
+    EntityNode<childCount>::EntityNode(const ParseNode* const type)
     {
-        delete type;
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Type, type);
     }
 }

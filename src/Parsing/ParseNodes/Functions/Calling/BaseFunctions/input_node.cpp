@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Functions::Calling
 {
-    InputNode::InputNode(const Token& keyword) : BaseFunctionCallNode(keyword)
+    InputNode::InputNode(const Tokens::Token& keyword) : BaseFunctionCallNode(keyword)
     { }
 
     NodeType InputNode::NodeType() const { return NodeType::Input; }

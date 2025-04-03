@@ -6,9 +6,7 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes::DataTypes;
-
-using namespace ParseNodes::DataTypes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -64,7 +62,7 @@ namespace Analysis::Structure::DataTypes
 
     const string& BuiltInValueType::FullName() const { return name; }
 
-    StructSource::StructSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : ValueType(name, describer), fullName(), skeleton(skeleton)
+    StructSource::StructSource(const string& name, const Enums::Describer describer, const IParseNode* const skeleton) : ValueType(name, describer), skeleton(skeleton), fullName()
     { }
 
     TypeKind StructSource::Type() const { return TypeKind::Custom; }
@@ -77,7 +75,7 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    const DataTypeNode* StructSource::Skeleton() const { return skeleton; }
+    const IParseNode* StructSource::Skeleton() const { return skeleton; }
 
     void StructSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
@@ -94,9 +92,6 @@ namespace Analysis::Structure::DataTypes
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
-
-    IScoped* StructSource::StaticConstructor() const { return staticConstructor; }
-    IScoped* StructSource::InstanceConstructor() const { return instanceConstructor; }
 
     void StructSource::PushConstructor(IFunction* constructor)
     {
@@ -152,9 +147,9 @@ namespace Analysis::Structure::DataTypes
         return overloads.at(base);
     }
 
-    std::vector<const ICharacteristic*> StructSource::AllCharacteristics() const
+    std::vector<ICharacteristic*> StructSource::AllCharacteristics() const
     {
-        std::vector<const ICharacteristic*> all;
+        std::vector<ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
             all.push_back(characteristic.second);
 

@@ -1,18 +1,16 @@
 #include "property_node.h"
 
+#include "../Enums/child_code.h"
+
+using namespace ParseNodes::Enums;
 using namespace ParseNodes::Properties;
 
 namespace ParseNodes::Core
 {
-    PropertyNode::PropertyNode(const GetNode* const get, const SetNode* const set) : get(get), set(set)
-    { }
-
-    const GetNode* PropertyNode::Get() const { return get; }
-    const SetNode* PropertyNode::Set() const { return set; }
-
-    PropertyNode::~PropertyNode()
+    template <int childCount>
+    PropertyNode<childCount>::PropertyNode(const GetNode* const get, const SetNode* const set)
     {
-        delete get;
-        delete set;
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Get, get);
+        FixedNodeCollection<childCount>::AddChild(ChildCode::Set, set);
     }
 }

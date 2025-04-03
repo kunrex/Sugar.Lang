@@ -1,11 +1,11 @@
 #ifndef BREAK_NODE_H
 #define BREAK_NODE_H
 
-#include "../statement_node.h"
+#include "../../parse_node.h"
 
 namespace ParseNodes::Statements
 {
-    class BreakNode final : public StatementNode
+    class BreakNode final : public ParseNode
     {
         public:
             explicit BreakNode(const Tokens::Token& separator);

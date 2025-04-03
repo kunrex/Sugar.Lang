@@ -28,7 +28,6 @@ using namespace Exceptions;
 using namespace Lexing;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::DataTypes;
 using namespace ParseNodes::Statements;
 
 using namespace Parsing;
@@ -45,7 +44,8 @@ void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
 {
     const auto path = fs::path(strPath);
 
-    if (!exists(path) || !is_directory(path)) {
+    if (!exists(path) || !is_directory(path))
+    {
         ExceptionManager::Instance().AddChild(new SourceFileException(path));
         return;
     }
@@ -110,13 +110,13 @@ void StructureDataTypes(const SourceDirectory* const directory)
             switch (node->NodeType())
             {
                 case NodeType::Enum:
-                    CreateEnum(dynamic_cast<const DataTypeNode*>(node), file);
+                    CreateEnum(node, file);
                     break;
                 case NodeType::Class:
-                    CreateClass(dynamic_cast<const DataTypeNode*>(node), file);
+                    CreateClass(node, file);
                     break;
                 case NodeType::Struct:
-                    CreateStruct(dynamic_cast<const DataTypeNode*>(node), file);
+                    CreateStruct(node, file);
                     break;
                 default:
                     break;
@@ -145,7 +145,7 @@ void ManageImportStatements(const SourceDirectory* const directory)
                 case NodeType::Struct:
                     break;
                 case NodeType::Import:
-                    ImportStatement(dynamic_cast<const ImportStatementNode*>(node), file);
+                    ImportStatement(node, file);
                     break;
                 default:
                     ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Index(), file));
@@ -225,7 +225,7 @@ void Compiler::Compile() const
         }
     }
 
-    const CILTranspiler transpiler(name, sourcePath, source);
+    CILTranspiler transpiler(name, sourcePath, source);
     transpiler.Transpile();
 
     if (!ExceptionManager::Instance().LogAllExceptions())

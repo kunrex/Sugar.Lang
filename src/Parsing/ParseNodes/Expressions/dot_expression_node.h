@@ -5,24 +5,13 @@
 
 namespace ParseNodes::Expressions
 {
-    class DotExpressionNode : public ParseNode
+    class DotExpressionNode : public FixedNodeCollection<2>
     {
-        private:
-            const ParseNode* lhs;
-            const ParseNode* rhs;
-
         public:
-            DotExpressionNode(const ParseNode* lhs, const ParseNode* rhs);
-
-            [[nodiscard]] const ParseNode* LHS() const;
-            [[nodiscard]] const ParseNode* RHS() const;
+            DotExpressionNode(const ParseNode* lhs, const ParseNode* rhs, const Tokens::Token& dot);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~DotExpressionNode() override;
     };
 }
 
-#endif //DOT_EXPRESSION_NODE_H
+#endif

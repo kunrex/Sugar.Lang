@@ -6,12 +6,12 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Functions::Calling
 {
-    PrintNode::PrintNode(const Token& keyword) : BaseFunctionCallNode(keyword)
+    PrintNode::PrintNode(const Tokens::Token& keyword) : BaseFunctionCallNode(keyword)
     { }
 
     NodeType PrintNode::NodeType() const { return NodeType::Print; }
 
-    PrintlnNode::PrintlnNode(const Token& keyword) : BaseFunctionCallNode(keyword)
+    PrintlnNode::PrintlnNode(const Tokens::Token& keyword) : BaseFunctionCallNode(keyword)
     { }
 
     NodeType PrintlnNode::NodeType() const { return NodeType::Println; }

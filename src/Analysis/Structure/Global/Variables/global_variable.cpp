@@ -2,7 +2,7 @@
 
 using namespace std;
 
-using namespace ParseNodes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -13,7 +13,7 @@ namespace Analysis::Structure::Global
     GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType) : Characteristic(name, describer, creationType, nullptr)
     { }
 
-    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType, const ParseNodes::ParseNode* const parseNode) : Characteristic(name, describer, creationType, parseNode)
+    GlobalVariable::GlobalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const parseNode) : Characteristic(name, describer, creationType, parseNode)
     { }
 
     MemberType GlobalVariable::MemberType() const { return MemberType::Field; }

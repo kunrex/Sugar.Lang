@@ -29,6 +29,8 @@
 #include "../../Structure/Global/Functions/function_extensions.h"
 
 #include "../../Structure/Local/Scopes/scope.h"
+#include "../../Structure/Wrappers/Generic/array.h"
+#include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Reference/void.h"
 #include "../../Structure/Wrappers/Value/integer.h"
 
@@ -165,7 +167,11 @@ namespace Analysis::Creation
         const auto field = fieldContext->Variable();
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
-        if (field->CheckDescriber(Describer::Static))
+        if (field->CheckDescriber(Describer::Constexpr))
+        {
+
+        }
+        else if (field->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(std::format("lds{} {} {}", instruction, field->CreationType()->FullName(), field->FullName()));
         else
         {
@@ -179,7 +185,11 @@ namespace Analysis::Creation
         const auto field = fieldContext->Variable();
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
-        if (field->CheckDescriber(Describer::Static))
+        if (field->CheckDescriber(Describer::Constexpr))
+        {
+
+        }
+        else if (field->CheckDescriber(Describer::Static))
         {
             if (context->MemberType() != MemberType::StaticReferenceContext)
                 stringBuilder.PushLine(pop);
@@ -430,6 +440,7 @@ namespace Analysis::Creation
                     TranspileLoadDotLHS(dotExpression->LHS(), stringBuilder);
                     TranspileLoad(dotExpression->RHS(), dotExpression->LHS(), stringBuilder);
                 }
+                break;
             case MemberType::FieldContext:
                 TranspileLoadField(dynamic_cast<const FieldContext*>(context), stringBuilder, false);
                 break;
@@ -651,7 +662,7 @@ namespace Analysis::Creation
         }
     }
 
-    CILTranspiler::CILTranspiler(string name, string directory, const SourceDirectory* const source) : projectName(std::move(name)), projectDirectory(std::move(directory)), source(source), stringBuilder()
+    CILTranspiler::CILTranspiler(string name, string directory, const SourceDirectory* const source) : projectName(std::move(name)), projectDirectory(std::move(directory)), projectLocation(), source(source), stringBuilder()
     {
         const auto outputDirectory = fs::path(std::format("{}/{}/bin", projectDirectory, projectName));
         if (!exists(outputDirectory))
@@ -665,34 +676,71 @@ namespace Analysis::Creation
             }
         }
 
-        std::string outputFile;
-        if (const auto programSource = source->GetChild("program"); programSource != nullptr)
+        const auto programSource = source->GetChild("program");
+        if (programSource == nullptr || programSource->SourceType() != SourceType::File)
         {
-            const auto sourceFile = dynamic_cast<const SourceFile*>(programSource);
-
-            if (const auto programFile = sourceFile->GetChild("Program"); programFile != nullptr)
-            {
-                if (const auto main = programFile->FindFunction("Main", { }); main != nullptr && main->CheckDescriber(Describer::PublicStatic))
-                {
-                    outputFile = std::format("{}.{}", projectName, "exe");
-                }
-            }
+            //exception
+            return;
         }
 
-        if (outputFile.empty())
-            outputFile = std::format("{}.{}", projectName, "dll");
+        const auto sourceFile = dynamic_cast<const SourceFile*>(programSource);
+        const auto program = sourceFile->GetChild("Program");
 
-        if (const auto result = CreateOutputFile(outputDirectory, outputFile); result)
-            stringBuilder = new StringBuilder(*result);
+        if (program == nullptr)
+        {
+            //exception
+            return;
+        }
+
+        const auto main = program->FindFunction("Main", { Array::Instance(&String::Instance()) });
+        if (main == nullptr)
+        {
+            //exception
+            return;
+        }
+
+        const auto result = CreateOutputFile(outputDirectory, std::format("{}.{}", projectName, "dll"));
+        if (!result)
+        {
+            //exception
+            return;
+        }
+
+        projectLocation = *result;
+        stringBuilder.PushLine(std::format(".assembly {} {}", projectName, "{}"));
+        stringBuilder.PushLine(".assembly extern mscorelib");
+        stringBuilder.PushLine(".assembly extern System.Runtime {}");
+        stringBuilder.PushLine(".assembly extern  System.Collections.Generic.Runtime {}");
+
+
+        stringBuilder.PushLine("");
+        stringBuilder.PushLine("class public auto ansi beforefieldinit EntryPoint extends [mscorlib]System.Object");
+
+        stringBuilder.PushLine(open_flower);
+        stringBuilder.IncreaseIndent();
+
+        stringBuilder.PushLine(".method public hidebysig static void Main() cil managed");
+
+        stringBuilder.PushLine(open_flower);
+        stringBuilder.IncreaseIndent();
+
+        stringBuilder.PushLine(".entrypoint");
+        stringBuilder.PushLine("maxstack 8");
+        stringBuilder.PushLine(main->FullName());
+        stringBuilder.PushLine("ret");
+
+        stringBuilder.PushLine(close_flower);
+        stringBuilder.IncreaseIndent();
+
+        stringBuilder.PushLine(close_flower);
+        stringBuilder.IncreaseIndent();
     }
 
+    const std::string& CILTranspiler::OutputFile() const { return projectLocation; }
 
-    void CILTranspiler::Transpile() const
+    void CILTranspiler::Transpile()
     {
-        if (isExecutable)
-        {
-            //map program
-        }
+        TranspileDirectory(source);
     }
 
     void CILTranspiler::TranspileDirectory(const SourceDirectory* const directory)
@@ -714,16 +762,19 @@ namespace Analysis::Creation
 
     void CILTranspiler::TranspileConstant(const GlobalConstant* const constant)
     {
+        stringBuilder.PushLine("");
         stringBuilder.PushLine(std::format(".field public static literal valuetype {} {} = {}", constant->Parent()->FullName(), constant->Name(), constant->ValueString()));
     }
 
     void CILTranspiler::TranspileCharacteristic(const ICharacteristic* const characteristic)
     {
+        stringBuilder.PushLine("");
         stringBuilder.PushLine(std::format(".field {} {} {}", FieldDescriberString(characteristic), characteristic->CreationType()->FullName(), characteristic->Name()));
     }
 
     void CILTranspiler::TranspileFunction(const IScoped* const function)
     {
+        stringBuilder.PushLine("");
         stringBuilder.PushLine(std::format(".method {} final {} {} {}({}) cil managed", AccessibilityString(function), FunctionCallConventionString(function), function->CreationType()->FullName(), function->Name(), FunctionParameterString(function)));
         stringBuilder.PushLine(open_flower);
 
@@ -737,6 +788,7 @@ namespace Analysis::Creation
 
     void CILTranspiler::TranspileConstructor(const IScoped* const constructor)
     {
+        stringBuilder.PushLine("");
         stringBuilder.PushLine(std::format(".method {} hidebysig specialname rtspecialname {} void {}({}) cil managed", AccessibilityString(constructor), FunctionStaticDtring(scoped), constructor->Name(), ParameterString(constructor)));
         stringBuilder.PushLine(open_flower);
 
@@ -802,7 +854,8 @@ namespace Analysis::Creation
             default:
                 {
                     TranspileExpression(context, stringBuilder);
-                    stringBuilder.PushLine(pop);
+                    if (context->Readable())
+                        stringBuilder.PushLine(pop);
                 }
                 break;
         }
@@ -810,6 +863,7 @@ namespace Analysis::Creation
 
     void CILTranspiler::TranspileDataType(const IUserDefinedType* const dataType)
     {
+        stringBuilder.PushLine("");
         switch (dataType->MemberType())
         {
             case MemberType::Enum:

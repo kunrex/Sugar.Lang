@@ -8,10 +8,8 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Statements
 {
-    DeclarationNode::DeclarationNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const Token& separator) : StatementNode(separator), CharacteristicNode(describer, type, identifier)
+    DeclarationNode::DeclarationNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const Tokens::Token& separator) : FixedNodeCollection(separator), CharacteristicNode(describer, type, identifier)
     { }
 
     NodeType DeclarationNode::NodeType() const { return NodeType::Declaration; }
-
-    unsigned long DeclarationNode::Index() const { return name->Index(); }
 }

@@ -5,14 +5,12 @@
 
 namespace ParseNodes::Groups
 {
-    class SourceFileNode final : public NodeCollection<ParseNode>
+    class SourceFileNode final : public DynamicNodeCollection
     {
         public:
             SourceFileNode();
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
-
-            [[nodiscard]] unsigned long Index() const override;
     };
 }
 

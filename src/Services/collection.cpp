@@ -77,6 +77,15 @@ namespace Services
     ConstantCollection<TChild>::ConstantCollection() : Collection<const TChild>()
     { }
 
+    template class ICollection<ContextNode>;
+    template class ICollection<SourceObject>;
+    template class ICollection<const Token>;
+    template class ICollection<const ParseNode>;
+    template class ICollection<const ConditionNode>;
+    template class ICollection<const LocalVariable>;
+    template class ICollection<const DeclarationNode>;
+    template class ICollection<const CompileException>;
+
     template class Collection<ContextNode>;
     template class Collection<SourceObject>;
 

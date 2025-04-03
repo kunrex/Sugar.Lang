@@ -51,6 +51,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitLong = new BuiltInCast(&Long::Instance(), "conv.i8");
         implicitLong->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = implicitLong;
+        explicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = implicitLong;
 
         const auto explicitFloat = new BuiltInCast(&Float::Instance(), "conv.r4");
         explicitFloat->PushParameterType(&Instance());
@@ -59,6 +60,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitDouble = new BuiltInCast(&Double::Instance(), "conv.r8");
         implicitDouble->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ { &Double::Instance(), &Instance() }})] = implicitDouble;
+        explicitCasts[ArgumentHash({ { &Double::Instance(), &Instance() }})] = implicitDouble;
 
         const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Int32::ToString()");
         explicitString->PushParameterType(&Instance());
@@ -111,13 +113,11 @@ namespace Analysis::Structure::Wrappers
         increment->PushParameterType(&Instance());
         increment->PushParameterType(&Instance());
         overloads[SyntaxKind::Increment] = increment;
-        overloads[SyntaxKind::IncrementPrefix] = increment;
 
         const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub");
         decrement->PushParameterType(&Instance());
         decrement->PushParameterType(&Instance());
         overloads[SyntaxKind::Decrement] = decrement;
-        overloads[SyntaxKind::DecrementPrefix] = increment;
 
         const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt");
         greater->PushParameterType(&Instance());

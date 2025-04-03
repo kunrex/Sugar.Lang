@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Loops
 {
-    DoWhileNode::DoWhileNode(const ParseNode* const condition, const NodeCollection<ParseNode>* const body, const Token& keyword) : LoopNode(condition, body, keyword)
+    DoWhileNode::DoWhileNode(const ParseNode* const condition, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : LoopNode(condition, body, keyword)
     { }
 
     NodeType DoWhileNode::NodeType() const { return NodeType::DoWhile; }

@@ -7,7 +7,8 @@
 
 namespace ParseNodes::Core
 {
-    class CharacteristicNode : public DescribableNode, public EntityNode, public NameableNode
+    template <int childCount>
+    class CharacteristicNode : public DescribableNode<childCount>, public EntityNode<childCount>, public NameableNode<childCount>
     {
         protected:
             CharacteristicNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier);

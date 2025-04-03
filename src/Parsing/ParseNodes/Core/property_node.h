@@ -6,19 +6,11 @@
 
 namespace ParseNodes::Core
 {
-    class PropertyNode
+    template <int childCount>
+    class PropertyNode : public virtual FixedNodeCollection<childCount>
     {
         protected:
-            const Properties::GetNode* get;
-            const Properties::SetNode* set;
-
-        public:
             PropertyNode(const Properties::GetNode* get, const Properties::SetNode* set);
-
-            [[nodiscard]] const Properties::GetNode* Get() const;
-            [[nodiscard]] const Properties::SetNode* Set() const;
-
-            virtual ~PropertyNode();
     };
 }
 

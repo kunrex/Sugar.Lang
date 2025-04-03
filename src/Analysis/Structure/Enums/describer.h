@@ -1,7 +1,9 @@
 #ifndef DESCRIBER_H
 #define DESCRIBER_H
 
-#include "../../../Parsing/ParseNodes/Describers/describer_node.h"
+#include <string>
+
+#include "../../../Parsing/ParseNodes/Core/Interfaces/i_parse_node.h"
 
 namespace Analysis::Structure::Enums
 {
@@ -31,7 +33,7 @@ namespace Analysis::Structure::Enums
     Describer operator & (const Describer& lhs, const Describer& rhs);
     Describer operator | (const Describer& lhs, const Describer& rhs);
 
-    Describer FromNode(const ParseNodes::Describers::DescriberNode* node);
+    Describer FromNode(const ParseNodes::Core::Interfaces::IParseNode* node);
 
     std::string ToString(const Describer& describer);
 }

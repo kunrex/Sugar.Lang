@@ -4,19 +4,11 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Expressions
 {
-    BinaryNode::BinaryNode(const Tokens::Token& base, const ParseNode* const lhs, const ParseNode* const rhs) : OperatorExpressionNode(base), lhs(lhs), rhs(rhs)
-    { }
+    BinaryNode::BinaryNode(const Tokens::Token& base, const ParseNode* const lhs, const ParseNode* const rhs) : FixedNodeCollection<2>(base)
+    {
+        AddChild(ChildCode::LHS, lhs);
+        AddChild(ChildCode::RHS, rhs);
+    }
 
     NodeType BinaryNode::NodeType() const { return NodeType::Binary; }
-
-    const ParseNode* BinaryNode::LHS() const { return lhs; }
-    const ParseNode* BinaryNode::RHS() const { return rhs; }
-
-    unsigned long BinaryNode::Index() const { return lhs->Index(); }
-
-    BinaryNode::~BinaryNode()
-    {
-        delete lhs;
-        delete rhs;
-    }
 }

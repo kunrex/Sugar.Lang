@@ -25,6 +25,7 @@ namespace ParseNodes::Enums
         ActionType,
         CreatedType,
         BuiltInType,
+        GenericType,
         NullableType,
         AnonymousType,
         DictionaryType,

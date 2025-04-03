@@ -4,8 +4,6 @@ using namespace Tokens;
 
 namespace ParseNodes::Functions::Calling
 {
-    BaseFunctionCallNode::BaseFunctionCallNode(const Token& keyword) : NodeCollection(), keyword(keyword)
+    BaseFunctionCallNode::BaseFunctionCallNode(const Tokens::Token& keyword) : DynamicNodeCollection(keyword)
     { }
-
-    unsigned long BaseFunctionCallNode::Index() const { return keyword.Index(); }
 }

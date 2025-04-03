@@ -36,7 +36,7 @@ namespace Parsing
         const GetNode* get = nullptr;
         const SetNode* set = nullptr;
 
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
+        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Get))
         {
             const auto current = Current();
@@ -49,7 +49,7 @@ namespace Parsing
             index++;
         }
 
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
+        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Set))
         {
             const auto current = Current();
@@ -91,7 +91,7 @@ namespace Parsing
         const GetNode* get = nullptr;
         const SetNode* set = nullptr;
 
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
+        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Get))
         {
             const auto current = Current();
@@ -104,7 +104,7 @@ namespace Parsing
             index++;
         }
 
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(index);
+        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Set))
         {
             const auto current = Current();
@@ -128,7 +128,7 @@ namespace Parsing
     {
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
 
-        const auto parameters = new CompoundDeclarationNode();
+        const auto parameters = new CompoundDeclarationNode(source->TokenAt(index - 1));
 
         while (index < source->TokenCount())
         {
@@ -139,7 +139,7 @@ namespace Parsing
                 index++;
             }
             else
-                describer = new DescriberNode(index);
+                describer = new DescriberNode(Current());
 
             const auto type = ParseType();
             index++;
@@ -166,7 +166,7 @@ namespace Parsing
         return parameters;
     }
 
-    void Parser::ParseFunctionArguments(NodeCollection<ParseNode>* const function)
+    void Parser::ParseFunctionArguments(DynamicNodeCollection* const function)
     {
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
         ParseExpressionCollection(function, SeparatorKind::CloseBracket);
@@ -187,7 +187,7 @@ namespace Parsing
                 {
                     if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket, true))
                     {
-                        const auto collectionConstructorNode = new CollectionConstructorCallNode(type);
+                        const auto collectionConstructorNode = new CollectionConstructorCallNode(type, keyword);
                         ParseExpressionCollection(collectionConstructorNode, SeparatorKind::FlowerCloseBracket);
 
                         return collectionConstructorNode;
@@ -264,7 +264,6 @@ namespace Parsing
 
     const OperatorOverloadNode* Parser::ParseOperatorOverload(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
         index++;
 
         const auto type = ParseType();
@@ -278,7 +277,7 @@ namespace Parsing
         index++;
 
         const auto body = ParseScope();
-        return new OperatorOverloadNode(describer, type, baseOperator, parameters, body, keyword);;
+        return new OperatorOverloadNode(describer, type, baseOperator, parameters, body);
     }
 
     const PrintNode* Parser::ParsePrintCall()
@@ -349,16 +348,16 @@ namespace Parsing
     const FuncRefNode* Parser::ParseFuncRefCall()
     {
         const auto keyword = Current();
+        const auto funcRef = new FuncRefNode(keyword);
         index++;
 
-        const auto generic = ParseGeneric();
-        index++;
+        ParseGeneric(funcRef);
 
-        const auto funcRef = new FuncRefNode(generic, keyword);
-
+        const auto genericLength = funcRef->ChildCount();
         ParseFunctionArguments(funcRef);
-        if (funcRef->ChildCount() != 2)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+
+        if (funcRef->ChildCount() - genericLength != 2)
+            ExceptionManager::Instance().AddChild(new FunctionArgumentException(2, keyword, source));
 
         return funcRef;
     }

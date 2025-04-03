@@ -6,8 +6,10 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Conditions
 {
-    ElseNode::ElseNode(const NodeCollection<ParseNode>* const body, const Token& keyword) : ConditionNode(nullptr, body, keyword)
-    { }
+    ElseNode::ElseNode(const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    {
+        AddChild(ChildCode::Body, body);
+    }
 
     NodeType ElseNode::NodeType() const { return NodeType::Else; }
 }

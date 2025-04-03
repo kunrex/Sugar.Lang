@@ -8,21 +8,10 @@
 
 namespace ParseNodes::Loops
 {
-    class LoopNode : public ParseNode, public Core::BodyNode
+    class LoopNode : public virtual FixedNodeCollection<2>, public Core::BodyNode<2>
     {
-        protected:
-            const ParseNode* condition;
-
-            const Tokens::Token& keyword;
-
         public:
-            LoopNode(const ParseNode* condition, const NodeCollection<ParseNode>* body, const Tokens::Token& keyword);
-
-            [[nodiscard]] const ParseNode* Condition() const;
-
-            [[nodiscard]] unsigned long Index() const override;
-
-            ~LoopNode() override;
+            LoopNode(const ParseNode* condition, const DynamicNodeCollection* body, const Tokens::Token& keyword);
     };
 }
 

@@ -6,18 +6,15 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Statements
 {
-    ReturnNode::ReturnNode(const Token& separator) : StatementNode(separator), value(nullptr)
-    { }
+    ReturnNode::ReturnNode(const Tokens::Token& separator) : FixedNodeCollection(separator)
+    {
+        AddChild(ChildCode::Expression, nullptr);
+    }
 
-    ReturnNode::ReturnNode(const ParseNode* const value, const Token& separator) : StatementNode(separator), value(value)
-    { }
+    ReturnNode::ReturnNode(const ParseNode* const value, const Tokens::Token& separator) : FixedNodeCollection(separator)
+    {
+        AddChild(ChildCode::Expression, value);
+    }
 
     NodeType ReturnNode::NodeType() const { return NodeType::Return; }
-
-    const ParseNode* ReturnNode::Value() const { return value;}
-
-    ReturnNode::~ReturnNode()
-    {
-        delete value;
-    }
 }

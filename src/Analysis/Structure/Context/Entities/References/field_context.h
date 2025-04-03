@@ -7,12 +7,17 @@ namespace Analysis::Structure::Context
 {
     class FieldContext final : public VariableContext
     {
+        private:
+            const bool writable;
+
         public:
-            explicit FieldContext(const Core::Interfaces::IVariable* variable);
+            FieldContext(const Core::Interfaces::IVariable* variable, bool bypassWrite);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] bool Writable() const override;
     };
 }
 

@@ -1,14 +1,14 @@
 #ifndef TUPLE_TYPE_NODE_H
 #define TUPLE_TYPE_NODE_H
 
-#include "generic_type_node.h"
+#include "../../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class TupleTypeNode final : public GenericTypeNode
+    class TupleTypeNode final : public DynamicNodeCollection
     {
         public:
-            TupleTypeNode(const Tokens::Token& keyword, const Groups::GenericNode* generic);
+            explicit TupleTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

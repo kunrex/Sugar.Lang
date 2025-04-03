@@ -10,7 +10,7 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -18,7 +18,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const IDataType* const creationType, const NodeCollection<ParseNodes::ParseNode>* const body) : Nameable(std::format("__operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
+    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(std::format("__operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
     { }
 
     MemberType OperatorOverload::MemberType() const { return MemberType::OperatorOverload; }

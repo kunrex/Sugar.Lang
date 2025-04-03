@@ -9,7 +9,7 @@ namespace Analysis::Structure::Global
     class OperatorOverload final : public Core::Nameable, public Creation::OverloadDefinition, public Core::Scoped
     {
         public:
-            OperatorOverload(Tokens::Enums::SyntaxKind baseOperator, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::NodeCollection<ParseNodes::ParseNode>* body);
+            OperatorOverload(Tokens::Enums::SyntaxKind baseOperator, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

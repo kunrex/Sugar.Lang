@@ -1,14 +1,14 @@
 #ifndef NULLABLE_TYPE_NODE_H
 #define NULLABLE_TYPE_NODE_H
 
-#include "generic_type_node.h"
+#include "../../../parse_node.h"
 
 namespace ParseNodes::Types
 {
-    class NullableTypeNode final : public GenericTypeNode
+    class NullableTypeNode final : public DynamicNodeCollection
     {
         public:
-            NullableTypeNode(const Tokens::Token& keyword, const Groups::GenericNode* generic);
+            explicit NullableTypeNode(const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

@@ -7,8 +7,6 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    AccessorNode::AccessorNode(const DescriberNode* const describer, const NodeCollection<ParseNode>* const body, const Token& keyword) : ParseNode(), DescribableNode(describer), BodyNode(body), keyword(keyword)
+    AccessorNode::AccessorNode(const DescriberNode* const describer, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword), DescribableNode(describer), BodyNode(body)
     { }
-
-    unsigned long AccessorNode::Index() const { return keyword.Index(); }
 }

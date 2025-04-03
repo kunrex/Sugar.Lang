@@ -10,17 +10,12 @@
 
 #include "../Scoped/i_scoped.h"
 
-#include "../../../../../Parsing/ParseNodes/DataTypes/data_type_node.h"
-
 namespace Analysis::Structure::Core::Interfaces
 {
     class IUserDefinedType : public Services::Child<SourceFile>, public virtual IDataType
     {
         public:
-            [[nodiscard]] virtual const ParseNodes::DataTypes::DataTypeNode* Skeleton() const = 0;
-
-            [[nodiscard]] virtual IScoped* StaticConstructor() const = 0;
-            [[nodiscard]] virtual IScoped* InstanceConstructor() const = 0;
+            [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const = 0;
 
             virtual void PushCharacteristic(ICharacteristic* characteristic) = 0;
 
@@ -35,7 +30,7 @@ namespace Analysis::Structure::Core::Interfaces
 
             virtual void PushOverload(IOperatorOverload* overload) = 0;
 
-            [[nodiscard]] virtual std::vector<const ICharacteristic*> AllCharacteristics() const = 0;
+            [[nodiscard]] virtual std::vector<ICharacteristic*> AllCharacteristics() const = 0;
             [[nodiscard]] virtual std::vector<IScoped*> AllScoped() const = 0 ;
     };
 }

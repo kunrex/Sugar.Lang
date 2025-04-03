@@ -6,7 +6,7 @@ using namespace std;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes::DataTypes;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -27,7 +27,7 @@ namespace Analysis::Structure::DataTypes
 
     const string& BuiltInClass::FullName() const { return name; }
 
-    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const DataTypeNode* skeleton) : Class(name, describer), fullName(), skeleton(skeleton), staticConstructor(new Global::StaticConstructor(this)), instanceConstructor(new Global::InstanceConstructor(this))
+    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
     { }
 
 
@@ -41,7 +41,7 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    const DataTypeNode* ClassSource::Skeleton() const { return skeleton; }
+    const IParseNode* ClassSource::Skeleton() const { return skeleton; }
 
     void ClassSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
@@ -63,9 +63,6 @@ namespace Analysis::Structure::DataTypes
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
         return functions.contains(hash) ? nullptr : functions.at(hash);
     }
-
-    IScoped* ClassSource::StaticConstructor() const { return staticConstructor; }
-    IScoped* ClassSource::InstanceConstructor() const { return instanceConstructor; }
 
     void ClassSource::PushConstructor(IFunction* const constructor)
     {
@@ -123,9 +120,9 @@ namespace Analysis::Structure::DataTypes
         return overloads.at(base);
     }
 
-    std::vector<const ICharacteristic*> ClassSource::AllCharacteristics() const
+    std::vector<ICharacteristic*> ClassSource::AllCharacteristics() const
     {
-        std::vector<const ICharacteristic*> all;
+        std::vector<ICharacteristic*> all;
 
         for (const auto& characteristic : characteristics)
             all.push_back(characteristic.second);
