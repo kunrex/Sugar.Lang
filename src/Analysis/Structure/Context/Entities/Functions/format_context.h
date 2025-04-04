@@ -8,7 +8,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class FormatContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class FormatContext final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;
@@ -29,10 +29,10 @@ namespace Analysis::Structure::Context
     class FormatSingleContext final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            explicit FormatSingleContext(const ContextNode* operand);
+            explicit FormatSingleContext(const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -50,7 +50,7 @@ namespace Analysis::Structure::Context
             mutable int slotCount;
 
         public:
-            explicit FormatDoubleContext(const ContextNode* arg1, const ContextNode* arg2);
+            explicit FormatDoubleContext(const IContextNode* arg1, const IContextNode* arg2);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

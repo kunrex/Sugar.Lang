@@ -25,7 +25,7 @@ namespace ParseNodes::Core::Interfaces
 
             [[nodiscard]] virtual const Tokens::Token& Token() const = 0;
 
-            [[nodiscard]] virtual int ChildCount() const = 0;
+            [[nodiscard]] virtual unsigned long ChildCount() const = 0;
             [[nodiscard]] virtual const IParseNode* GetChild(int index) const = 0;
     };
 }

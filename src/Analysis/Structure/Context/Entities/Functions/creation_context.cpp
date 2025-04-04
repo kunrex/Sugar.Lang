@@ -10,7 +10,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    CreationContext::CreationContext(const IFunction* const constructor) : ContextNode(constructor->CreationType()), slotCount(-1), constructor(constructor)
+    CreationContext::CreationContext(const IFunction* const constructor) : DynamicContextCollection(constructor->CreationType()), slotCount(-1), constructor(constructor)
     { }
 
     int CreationContext::SlotCount() const
@@ -39,7 +39,7 @@ namespace Analysis::Structure::Context
         return "call " + constructor->FullName();
     }
 
-    CollectionCreationContext::CollectionCreationContext(const IDataType* const collectionType) : ContextNode(collectionType), slotCount(-1), collectionType(collectionType)
+    CollectionCreationContext::CollectionCreationContext(const IDataType* const collectionType) : DynamicContextCollection(collectionType), slotCount(-1), collectionType(collectionType)
     { }
 
     int CollectionCreationContext::SlotCount() const

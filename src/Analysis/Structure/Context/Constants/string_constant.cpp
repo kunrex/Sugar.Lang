@@ -14,7 +14,9 @@ namespace Analysis::Structure::Context
     StringConstant::StringConstant(string value) : ContextNode(&String::Instance()), value(std::move(value))
     { }
 
-    MemberType StringConstant::MemberType() const { return MemberType::Constant; }
+    int StringConstant::SlotCount() const { return 1; }
+
+    MemberType StringConstant::MemberType() const { return MemberType::ConstantContext; }
 
     bool StringConstant::Readable() const { return true; }
     bool StringConstant::Writable() const { return false; }

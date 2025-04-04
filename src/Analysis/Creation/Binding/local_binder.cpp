@@ -16,6 +16,7 @@
 
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 
+#include "../../Structure/Context/Control/throw.h"
 #include "../../Structure/Context/Control/branch.h"
 #include "../../Structure/Context/Control/return.h"
 #include "../../Structure/Context/invalid_context.h"
@@ -33,13 +34,11 @@
 #include "../../Structure/Context/Casts/invalid_cast_expression.h"
 #include "../../Structure/Context/Expressions/indexer_expression.h"
 #include "../../Structure/Context/Entities/Functions/ref_context.h"
-#include "../../Structure/Context/Casts/built_in_cast_expression.h"
 #include "../../Structure/Context/Entities/Functions/copy_context.h"
 #include "../../Structure/Context/Entities/Functions/print_context.h"
 #include "../../Structure/Context/Entities/Functions/input_context.h"
 #include "../../Structure/Context/Entities/Functions/invoke_context.h"
 #include "../../Structure/Context/Entities/static_reference_context.h"
-#include "../../Structure/Context/Entities/throw_context.h"
 #include "../../Structure/Context/Entities/Functions/format_context.h"
 #include "../../Structure/Context/Entities/References/field_context.h"
 #include "../../Structure/Context/Expressions/assignment_expression.h"
@@ -49,10 +48,8 @@
 #include "../../Structure/Context/Expressions/defined_unary_expression.h"
 #include "../../Structure/Context/Entities/References/property_context.h"
 #include "../../Structure/Context/Expressions/defined_binary_expression.h"
-#include "../../Structure/Context/Expressions/built_in_unary_expression.h"
 #include "../../Structure/Context/Entities/References/parameter_context.h"
 #include "../../Structure/Context/Expressions/invalid_binary_expression.h"
-#include "../../Structure/Context/Expressions/built_in_binary_expression.h"
 #include "../../Structure/Context/Expressions/invalid_indexer_expression.h"
 #include "../../Structure/Context/Entities/Functions/function_call_context.h"
 #include "../../Structure/Context/Entities/References/local_variable_context.h"
@@ -72,16 +69,15 @@
 #include "../../Structure/Wrappers/Value/float.h"
 #include "../../Structure/Wrappers/Value/short.h"
 #include "../../Structure/Wrappers/Generic/func.h"
-#include "../../Structure/Wrappers/Generic/list.h"
 #include "../../Structure/Wrappers/Value/double.h"
 #include "../../Structure/Wrappers/Value/integer.h"
 #include "../../Structure/Wrappers/Value/boolean.h"
+#include "../../Structure/Wrappers/Reference/void.h"
 #include "../../Structure/Wrappers/Generic/action.h"
 #include "../../Structure/Wrappers/Value/character.h"
 #include "../../Structure/Wrappers/Reference/object.h"
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Generic/referenced.h"
-#include "../../Structure/Wrappers/Reference/void.h"
 
 using namespace std;
 
@@ -118,10 +114,10 @@ constexpr std::string_view CONTINUATION = "T";
 
 namespace Analysis::Creation::Binding
 {
-    const ContextNode* BindEntity(const IParseNode* entity, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
-    const ContextNode* BindEntity(const IParseNode* entity, const ContextNode* context, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
+    const IContextNode* BindEntity(const IParseNode* entity, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
+    const IContextNode* BindEntity(const IParseNode* entity, const IContextNode* context, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
 
-    const ContextNode* BindExpression(const IParseNode* expression, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
+    const IContextNode* BindExpression(const IParseNode* expression, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
 
     bool VariableExists(const IParseNode* identifier, const IScoped* const scoped, const Scope* scope)
     {
@@ -169,15 +165,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const ContextNode* BindCast(const IFunction* const definition, const ContextNode* const operand)
-    {
-        if (definition->MemberType() == MemberType::BuiltInCast)
-            return new BuiltInCastExpression(definition, operand);
-
-        return new DefinedCastExpression(definition, operand);
-    }
-
-    const ContextNode* BindCast(const ContextNode* const operand, const IDataType* const type, const IFunction* const operandCast, const IFunction* const typeCast, const unsigned long index, const SourceFile* const source)
+    const IContextNode* BindCast(const IContextNode* const operand, const IDataType* const type, const IFunction* const operandCast, const IFunction* const typeCast, const unsigned long index, const SourceFile* const source)
     {
         const auto operandValid = operandCast != nullptr;
         const auto typeValid = typeCast != nullptr;
@@ -190,10 +178,10 @@ namespace Analysis::Creation::Binding
                  return new InvalidCastExpression(type, operand);
             }
 
-            return BindCast(operandCast, operand);
+            return new DefinedCastExpression(operandCast, operand);
         }
         if (typeValid)
-            return BindCast(typeCast, operand);
+            return new DefinedCastExpression(operandCast, operand);
 
         PushException(new LogException(std::format("No appropriate cast found from: `{}` to `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
         return new InvalidCastExpression(type, operand);
@@ -276,7 +264,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const ContextNode* BindConstant(const IParseNode* const constant)
+    const IContextNode* BindConstant(const IParseNode* const constant)
     {
         switch (const auto& token = constant->Token(); static_cast<TypeKind>(token.Metadata()))
         {
@@ -308,7 +296,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const ContextNode* BindIdentifier(const IParseNode* identifier, const IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindIdentifier(const IParseNode* identifier, const IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto value = *identifier->Token().Value<string>();
 
@@ -343,7 +331,7 @@ namespace Analysis::Creation::Binding
         return nullptr;
     }
 
-    void BindArgumentContexts(const IParseNode* const functionNode, const int offset, std::vector<const ContextNode*>& arguments, std::vector<const IDataType*>& argumentTypes, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    void BindArgumentContexts(const IParseNode* const functionNode, const int offset, std::vector<const IContextNode*>& arguments, std::vector<const IDataType*>& argumentTypes, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         for (int i = offset; i < functionNode->ChildCount(); i++)
         {
@@ -355,7 +343,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const ContextNode* CreateFunctionContext(const IFunctionDefinition* function, const std::vector<const ContextNode*>& arguments)
+    const IContextNode* CreateFunctionContext(const IFunctionDefinition* function, const std::vector<const IContextNode*>& arguments)
     {
         const auto functionContext = new FunctionCallContext(function);
         for (const auto argument: arguments)
@@ -364,7 +352,7 @@ namespace Analysis::Creation::Binding
         return functionContext;
     }
 
-    const ContextNode* CreateInvalidFunctionContext(const std::vector<const ContextNode*>& arguments, const std::string& identifier, const unsigned long index, const SourceFile* const source)
+    const IContextNode* CreateInvalidFunctionContext(const std::vector<const IContextNode*>& arguments, const std::string& identifier, const unsigned long index, const SourceFile* const source)
     {
         const auto functionContext = new InvalidFunctionContext();
         for (const auto argument: arguments)
@@ -374,14 +362,14 @@ namespace Analysis::Creation::Binding
         return functionContext;
     }
 
-    const ContextNode* BindFunctionCall(const IParseNode* const functionNode, IScoped* const scoped, const Scope* scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindFunctionCall(const IParseNode* const functionNode, IScoped* const scoped, const Scope* scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
 
         const auto identifier = functionNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
         const auto value = *identifier.Value<string>();
 
-        std::vector<const ContextNode*> arguments;
+        std::vector<const IContextNode*> arguments;
         std::vector<const IDataType*> argumentTypes;
         BindArgumentContexts(functionNode, 1, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -396,12 +384,12 @@ namespace Analysis::Creation::Binding
         return CreateInvalidFunctionContext(arguments, value, identifier.Index(), source);
     }
 
-    const ContextNode* BindIndexerExpression(const IParseNode* const indexerNode, const ContextNode* const operand, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindIndexerExpression(const IParseNode* const indexerNode, const IContextNode* const operand, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
         const auto index = indexerNode->Token().Index();
 
-        std::vector<const ContextNode*> arguments;
+        std::vector<const IContextNode*> arguments;
         std::vector<const IDataType*> argumentTypes;
         BindArgumentContexts(indexerNode, 1, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -426,7 +414,7 @@ namespace Analysis::Creation::Binding
         return invalidIndexer;
     }
 
-    const ContextNode* BindDotLHS(const IParseNode* const lhs, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindDotLHS(const IParseNode* const lhs, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         switch (lhs->NodeType())
         {
@@ -470,7 +458,7 @@ namespace Analysis::Creation::Binding
         return new InvalidContext();
     }
 
-    const ContextNode* BindStaticDotRHS(const IParseNode* rhs, const ContextNode* context, IScoped* scoped, const Scope* scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindStaticDotRHS(const IParseNode* rhs, const IContextNode* context, IScoped* scoped, const Scope* scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
         const auto index = rhs->Token().Index();
@@ -515,7 +503,7 @@ namespace Analysis::Creation::Binding
                 {
                     const auto identifier = *rhs->GetChild(0)->Token().Value<string>();
 
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(rhs, 1, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -539,7 +527,7 @@ namespace Analysis::Creation::Binding
         return new DotExpression(context, new InvalidContext());
     }
 
-    const ContextNode* BindEntity(const IParseNode* const entity, const ContextNode* const context, IScoped* const scoped, const Scope* scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindEntity(const IParseNode* const entity, const IContextNode* const context, IScoped* const scoped, const Scope* scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
         const auto index = entity->Token().Index();
@@ -576,7 +564,7 @@ namespace Analysis::Creation::Binding
                 {
                     const auto identifier = *entity->GetChild(0)->Token().Value<string>();
 
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(entity, 1, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -600,7 +588,7 @@ namespace Analysis::Creation::Binding
         return new DotExpression(context, new InvalidContext());
     }
 
-    const ContextNode* BindPrint(const ContextNode* const operand, const bool ln)
+    const IContextNode* BindPrint(const IContextNode* const operand, const bool ln)
     {
         if (operand->CreationType() == &Short::Instance())
             return new PrintShortContext(operand, ln);
@@ -622,7 +610,7 @@ namespace Analysis::Creation::Binding
         return new PrintObjectContext(operand, ln);
     }
 
-    const ContextNode* BindInvoke(const IDataType* creationType, const IDelegateType* delegateType, const std::vector<const ContextNode*>& arguments)
+    const IContextNode* BindInvoke(const IDataType* creationType, const IDelegateType* delegateType, const std::vector<const IContextNode*>& arguments)
     {
         const auto invoke = new InvokeContext(creationType, delegateType);
         for (int i = 1; i < arguments.size(); i++)
@@ -631,7 +619,7 @@ namespace Analysis::Creation::Binding
         return invoke;
     }
 
-    const ContextNode* BindEntity(const IParseNode* entity, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindEntity(const IParseNode* entity, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         switch (entity->NodeType())
         {
@@ -690,7 +678,7 @@ namespace Analysis::Creation::Binding
                 break;
             case NodeType::Format:
                 {
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(entity, 0, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -702,12 +690,11 @@ namespace Analysis::Creation::Binding
                 }
             case NodeType::Invoke:
                 {
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(entity, 0, arguments, argumentTypes, scoped, scope, dataType);
 
-                    const auto delegate = arguments.at(0);
-                    switch (delegate->CreationType()->Type())
+                    switch (const auto delegate = arguments.at(0); delegate->CreationType()->Type())
                     {
                         case TypeKind::Func:
                         case TypeKind::Action:
@@ -754,7 +741,7 @@ namespace Analysis::Creation::Binding
                     const auto identifier = *functionCallNode->Token().Value<string>();
 
                     bool flag = false;
-                    const ContextNode* objectContext = nullptr;
+                    const IContextNode* objectContext = nullptr;
                     if (objectNode->NodeType() == NodeType::Identifier)
                     {
                         if (const auto type = BindDataType(objectNode, dataType->Parent()); type != nullptr)
@@ -823,7 +810,7 @@ namespace Analysis::Creation::Binding
 
                     const auto creationType = BindDataType(entity->GetChild(0), source);
 
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(entity, 1, arguments, argumentTypes, scoped, scope, dataType);
 
@@ -847,7 +834,7 @@ namespace Analysis::Creation::Binding
                     const auto collectionType = dynamic_cast<const ICollectionType*>(creationType);
                     const auto genericType = collectionType->GenericType();
 
-                    std::vector<const ContextNode*> arguments;
+                    std::vector<const IContextNode*> arguments;
                     for (int i = 1; i < entity->ChildCount(); i++)
                     {
                         const auto child = entity->GetChild(i);
@@ -870,23 +857,7 @@ namespace Analysis::Creation::Binding
         return new InvalidContext();
     }
 
-    const ContextNode* BindBinaryExpression(const IFunction* const definition, const ContextNode* lhs, const ContextNode* rhs)
-    {
-        if (definition->MemberType() == MemberType::BuiltInOperation)
-            return new BuiltInBinaryExpression(definition, lhs, rhs);
-
-        return new DefinedBinaryExpression(definition, lhs, rhs);
-    }
-
-    const ContextNode* BindUnaryExpression(const IFunction* const definition, const ContextNode* operand)
-    {
-        if (definition->MemberType() == MemberType::BuiltInOperation)
-            return new BuiltInUnaryExpression(definition, operand);
-
-        return new DefinedUnaryExpression(definition, operand);
-    }
-
-    const ContextNode* BindExpression(const IParseNode* expression, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    const IContextNode* BindExpression(const IParseNode* expression, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
         const auto index = expression->Token().Index();
@@ -914,7 +885,7 @@ namespace Analysis::Creation::Binding
                             return new InvalidUnaryExpression(operand);
                         }
 
-                        return new AssignmentExpression(operand, BindUnaryExpression(definition, operand));
+                        return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, operand));
                     }
 
                     const IOperatorOverload* definition;
@@ -939,7 +910,7 @@ namespace Analysis::Creation::Binding
                         return new InvalidUnaryExpression(operand);
                     }
 
-                    return BindUnaryExpression(definition, operand);
+                    return new DefinedUnaryExpression(definition, operand);
                 }
             case NodeType::Binary:
                 {
@@ -966,7 +937,7 @@ namespace Analysis::Creation::Binding
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
-                        return new AssignmentExpression(lhs, BindBinaryExpression(definition, lhs, rhs));
+                        return new AssignmentExpression(lhs, new DefinedBinaryExpression(definition, lhs, rhs));
                     }
 
                     const auto lhsCreationType = lhs->CreationType();
@@ -975,7 +946,7 @@ namespace Analysis::Creation::Binding
                     if (lhsCreationType == rhsCreationType)
                     {
                         if (const auto definition = lhsCreationType->FindOverload(kind); definition != nullptr)
-                            return BindBinaryExpression(definition, lhs, rhs);
+                            return new DefinedBinaryExpression(definition, lhs, rhs);
 
                         PushException(new OverloadNotFoundException(kind, index, source));
                         return new InvalidBinaryExpression(lhs, rhs);
@@ -998,10 +969,10 @@ namespace Analysis::Creation::Binding
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
-                        return BindBinaryExpression(rhsOperation, lhs, BindCast(lhsCast, rhs));
+                        return new DefinedBinaryExpression(rhsOperation, lhs, new DefinedCastExpression(lhsCast, rhs));
                     }
                     if (rhsValid)
-                        return BindBinaryExpression(rhsOperation, BindCast(rhsCast, lhs), rhs);
+                        return new DefinedBinaryExpression(rhsOperation, new DefinedCastExpression(rhsCast, lhs), rhs);
 
                     PushException(new LogException(std::format("No overload found for types: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
                     return new InvalidBinaryExpression(lhs, rhs);
@@ -1054,10 +1025,10 @@ namespace Analysis::Creation::Binding
                             return new InvalidTernaryExpression(condition, trueValue, falseValue);
                         }
 
-                        return new TernaryExpression(trueType, condition, trueValue, BindCast(trueValid, falseValue));
+                        return new TernaryExpression(trueType, condition, trueValue, new DefinedCastExpression(trueValid, falseValue));
                     }
                     if (falseValid != nullptr)
-                        return new TernaryExpression(falseType, condition, BindCast(falseValid, trueValue), falseValue);
+                        return new TernaryExpression(falseType, condition, new DefinedCastExpression(falseValid, trueValue), falseValue);
 
                     PushException(new LogException("Invalid Ternary Expression. True and False values must have same return type", index, source));
                     return new InvalidTernaryExpression(condition, trueValue, falseValue);
@@ -1103,7 +1074,7 @@ namespace Analysis::Creation::Binding
                 case NodeType::Throw:
                     {
                         current->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType));
-                        current->AddChild(new ThrowContext());
+                        current->AddChild(new Throw());
                     }
                     break;
                 case NodeType::Break:

@@ -12,7 +12,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    DefinedBinaryExpression::DefinedBinaryExpression(const IFunction* const operation, const ContextNode* const lhs, const ContextNode* const rhs) : BinaryContextNode(operation->CreationType(), lhs, rhs), slotCount(-1), operation(operation)
+    DefinedBinaryExpression::DefinedBinaryExpression(const IFunction* const operation, const IContextNode* const lhs, const IContextNode* const rhs) : BinaryContextNode(operation->CreationType(), lhs, rhs), slotCount(), operation(operation),
     {
         slotCount = std::max(CalculateFunctionCallSlotSize(this), creationType->SlotCount());
     }
@@ -24,6 +24,6 @@ namespace Analysis::Structure::Context
     bool DefinedBinaryExpression::Readable() const { return true; }
     bool DefinedBinaryExpression::Writable() const { return false; }
 
-    string DefinedBinaryExpression::CILData() const { return std::format("call {}", operation->FullName()); }
+    string DefinedBinaryExpression::CILData() const { return operation->MemberType() == MemberType::BuiltInOperation ? operation->FullName() : std::format("call {}", operation->FullName()); }
 }
 

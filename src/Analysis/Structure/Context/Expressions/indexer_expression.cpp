@@ -4,16 +4,19 @@
 
 #include "../Entities/Functions/function_extensions.h"
 
+#include "../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const ContextNode* const operand) : UnaryContextNode(indexer->CreationType(), operand), slotCount(-1), indexer(indexer)
-    { }
+    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const IContextNode* const operand) : DynamicContextCollection(indexer->CreationType()), slotCount(-1), indexer(indexer)
+    {
+        AddChild(operand);
+    }
 
     MemberType IndexerExpression::MemberType() const { return MemberType::IndexerExpression; }
 
@@ -35,7 +38,7 @@ namespace Analysis::Structure::Context
 
     string IndexerExpression::CILData() const { return ""; }
 
-    const IIndexerDefinition* IndexerExpression::Indexer() const { return indexer; }
+    uintptr_t IndexerExpression::Metadata() const { return reinterpret_cast<uintptr_t>(indexer); }
 }
 
 

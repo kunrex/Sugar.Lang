@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class CastClassExpression final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            explicit CastClassExpression(const Core::Interfaces::IDataType* creationType, const ContextNode* operand);
+            CastClassExpression(const Core::Interfaces::IDataType* creationType, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

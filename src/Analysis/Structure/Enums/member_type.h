@@ -74,6 +74,8 @@ namespace Analysis::Structure::Enums
         TernaryExpression,
         AssignmentExpression,
 
+        DuplicateExpression,
+
         Invalid,
     };
 }

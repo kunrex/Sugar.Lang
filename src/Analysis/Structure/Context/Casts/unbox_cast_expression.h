@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class UnboxCastExpression final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            UnboxCastExpression(const Core::Interfaces::IDataType* creationType, const ContextNode* operand);
+            UnboxCastExpression(const Core::Interfaces::IDataType* creationType, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

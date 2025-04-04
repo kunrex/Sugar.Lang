@@ -11,10 +11,8 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    DefinedCastExpression::DefinedCastExpression(const IFunction* const definition, const ContextNode* const operand) : UnaryContextNode(definition->CreationType(), operand), definition(definition)
-    {
-        slotCount = std::max(definition->CreationType()->SlotCount(), operand->CreationType()->SlotCount());
-    }
+    DefinedCastExpression::DefinedCastExpression(const IFunction* const definition, const IContextNode* const operand) : UnaryContextNode(definition->CreationType(), operand), slotCount(std::max(definition->CreationType()->SlotCount(), operand->CreationType()->SlotCount())), definition(definition)
+    { }
 
     MemberType DefinedCastExpression::MemberType() const { return MemberType::CastExpression; }
 
@@ -23,5 +21,5 @@ namespace Analysis::Structure::Context
     bool DefinedCastExpression::Readable() const { return true; }
     bool DefinedCastExpression::Writable() const { return false; }
 
-    string DefinedCastExpression::CILData() const { return std::format("call {}", definition->FullName()); }
+    string DefinedCastExpression::CILData() const { return definition->MemberType() == MemberType::BuiltInCast ? definition->FullName : std::format("call {}", definition->FullName()); }
 }

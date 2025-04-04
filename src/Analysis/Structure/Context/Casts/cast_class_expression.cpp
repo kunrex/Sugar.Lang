@@ -12,10 +12,8 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    CastClassExpression::CastClassExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
-    {
-        slotCount = std::max(operand->CreationType()->SlotCount(), creationType->SlotCount());
-    }
+    CastClassExpression::CastClassExpression(const IDataType* const creationType, const IContextNode* const operand) : UnaryContextNode(creationType, operand), slotCount(std::max(operand->CreationType()->SlotCount(), creationType->SlotCount()))
+    { }
 
     MemberType CastClassExpression::MemberType() const { return MemberType::CastExpression; }
 

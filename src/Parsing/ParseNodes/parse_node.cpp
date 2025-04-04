@@ -1,6 +1,5 @@
 #include "parse_node.h"
 
-#include "Conditions/condition_node.h"
 #include "Statements/declaration_node.h"
 
 using namespace std;
@@ -10,7 +9,6 @@ using namespace Tokens;
 using namespace Services;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Conditions;
 using namespace ParseNodes::Statements;
 using namespace ParseNodes::Core::Interfaces;
 
@@ -21,7 +19,7 @@ namespace ParseNodes
 
     const Token& ParseNode::Token() const { return token; }
 
-    int ParseNode::ChildCount() const { return 0; }
+    unsigned long ParseNode::ChildCount() const { return 0; }
     const IParseNode* ParseNode::GetChild(const int index) const { return nullptr; }
 
     template <int childCount>
@@ -29,7 +27,7 @@ namespace ParseNodes
     { }
 
     template <int childCount>
-    int FixedNodeCollection<childCount>::ChildCount() const { return childCount; }
+    unsigned long FixedNodeCollection<childCount>::ChildCount() const { return childCount; }
 
     template <int childCount>
     const IParseNode* FixedNodeCollection<childCount>::GetChild(const int index) const
@@ -52,10 +50,17 @@ namespace ParseNodes
             }
     }
 
+    template <int childCount>
+    FixedNodeCollection<childCount>::~FixedNodeCollection()
+    {
+        for (const auto child: children)
+            delete std::get<1>(child);
+    }
+
     DynamicNodeCollection::DynamicNodeCollection(const Tokens::Token& token) : ParseNode(token), children()
     { }
 
-    int DynamicNodeCollection::ChildCount() const { return static_cast<int>(children.size()); }
+    unsigned long DynamicNodeCollection::ChildCount() const { return static_cast<int>(children.size()); }
 
     const IParseNode* DynamicNodeCollection::GetChild(const int index) const
     {
@@ -65,5 +70,11 @@ namespace ParseNodes
     void DynamicNodeCollection::AddChild(const IParseNode* const child)
     {
         children.push_back(child);
+    }
+
+    DynamicNodeCollection::~DynamicNodeCollection()
+    {
+        for (const auto child: children)
+            delete child;
     }
 }

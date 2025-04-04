@@ -15,7 +15,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    InvokeContext::InvokeContext(const IDataType* const creationType, const IDelegateType* const delegateType) : ContextNode(creationType), slotCount(-1), delegateType(delegateType)
+    InvokeContext::InvokeContext(const IDataType* const creationType, const IDelegateType* const delegateType) : DynamicContextCollection(creationType), slotCount(-1), delegateType(delegateType)
     { }
 
     int InvokeContext::SlotCount() const

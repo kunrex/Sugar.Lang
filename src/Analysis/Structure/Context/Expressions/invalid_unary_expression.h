@@ -8,7 +8,7 @@ namespace Analysis::Structure::Context
     class InvalidUnaryExpression final : public UnaryContextNode
     {
         public:
-            explicit InvalidUnaryExpression(const ContextNode* operand);
+            explicit InvalidUnaryExpression(const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

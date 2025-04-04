@@ -5,19 +5,10 @@
 
 namespace Analysis::Structure::Context
 {
-    class BinaryContextNode : public ContextNode
+    class BinaryContextNode : public FixedContextCollection<2>
     {
         protected:
-            const ContextNode* lhs;
-            const ContextNode* rhs;
-
-            BinaryContextNode(const Core::Interfaces::IDataType* creationType, const ContextNode* lhs, const ContextNode* rhs);
-
-        public:
-            [[nodiscard]] const ContextNode* LHS() const;
-            [[nodiscard]] const ContextNode* RHS() const;
-
-            ~BinaryContextNode() override;
+            BinaryContextNode(const Core::Interfaces::IDataType* creationType, const IContextNode* lhs, const IContextNode* rhs);
     };
 }
 

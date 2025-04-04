@@ -5,10 +5,10 @@
 
 namespace Analysis::Structure::Context
 {
-    class DuplicateExpression final : public UnaryContextNode
+    class DuplicateExpression final : UnaryContextNode
     {
         public:
-            explicit DuplicateExpression(const ContextNode* operand);
+            explicit DuplicateExpression(const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

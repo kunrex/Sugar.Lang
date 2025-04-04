@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class FunctionCallContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class FunctionCallContext final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;
@@ -22,9 +22,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
-
-            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* Function() const;
     };
 }
 

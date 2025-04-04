@@ -12,10 +12,8 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    UnboxCastExpression::UnboxCastExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
-    {
-        slotCount = std::max(Object::Instance().SlotCount(), creationType->SlotCount());
-    }
+    UnboxCastExpression::UnboxCastExpression(const IDataType* const creationType, const IContextNode* const operand) : UnaryContextNode(creationType, operand), slotCount(std::max(Object::Instance().SlotCount(), creationType->SlotCount()))
+    { }
 
     int UnboxCastExpression::SlotCount() const { return slotCount; }
 

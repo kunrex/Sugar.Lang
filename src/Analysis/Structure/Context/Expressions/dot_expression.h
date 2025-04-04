@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class DotExpression final : public BinaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            DotExpression(const ContextNode* lhs, const ContextNode* rhs);
+            DotExpression(const IContextNode* lhs, const IContextNode* rhs);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

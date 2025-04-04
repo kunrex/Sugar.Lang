@@ -10,11 +10,11 @@ namespace Analysis::Structure::Context
     class DefinedCastExpression final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
             const Core::Interfaces::IFunction* definition;
 
         public:
-            DefinedCastExpression(const Core::Interfaces::IFunction* definition, const ContextNode* operand);
+            DefinedCastExpression(const Core::Interfaces::IFunction* definition, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

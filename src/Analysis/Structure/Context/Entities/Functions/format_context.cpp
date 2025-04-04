@@ -6,12 +6,14 @@
 
 using namespace std;
 
+using namespace ParseNodes::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    FormatContext::FormatContext() : ContextNode(&String::Instance()), ConstantCollection(), slotCount(-1)
+    FormatContext::FormatContext() : DynamicContextCollection(&String::Instance()), slotCount(-1)
     { }
 
     int FormatContext::SlotCount() const
@@ -29,16 +31,10 @@ namespace Analysis::Structure::Context
 
     string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
 
-    FormatSingleContext::FormatSingleContext(const ContextNode* const operand) : UnaryContextNode(&String::Instance(), operand), slotCount(-1)
+    FormatSingleContext::FormatSingleContext(const IContextNode* const operand) : UnaryContextNode(&String::Instance(), operand), slotCount(std::max(String::Instance().SlotCount(), operand->SlotCount()))
     { }
 
-    int FormatSingleContext::SlotCount() const
-    {
-        if (slotCount < 0)
-            slotCount = std::max(String::Instance().SlotCount(), operand->SlotCount());
-
-        return slotCount;
-    }
+    int FormatSingleContext::SlotCount() const { return slotCount; }
 
     MemberType FormatSingleContext::MemberType() const { return MemberType::FormatSingleContext; }
 
@@ -47,7 +43,7 @@ namespace Analysis::Structure::Context
 
     string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
 
-    FormatDoubleContext::FormatDoubleContext(const ContextNode* const arg1, const ContextNode* const arg2) : BinaryContextNode(&String::Instance(), arg1, arg2), slotCount(-1)
+    FormatDoubleContext::FormatDoubleContext(const IContextNode* const arg1, const IContextNode* const arg2) : BinaryContextNode(&String::Instance(), arg1, arg2), slotCount(-1)
     { }
 
     int FormatDoubleContext::SlotCount() const

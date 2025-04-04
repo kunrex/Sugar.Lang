@@ -6,7 +6,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
 {
-    InvalidBinaryExpression::InvalidBinaryExpression(const ContextNode* const lhs, const ContextNode* const rhs) : BinaryContextNode(rhs->CreationType(), lhs, rhs)
+    InvalidBinaryExpression::InvalidBinaryExpression(const IContextNode* const lhs, const IContextNode* const rhs) : BinaryContextNode(rhs->CreationType(), lhs, rhs)
     { }
 
     MemberType InvalidBinaryExpression::MemberType() const { return MemberType::Invalid; }

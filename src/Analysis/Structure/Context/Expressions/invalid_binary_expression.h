@@ -8,7 +8,7 @@ namespace Analysis::Structure::Context
     class InvalidBinaryExpression final : public BinaryContextNode
     {
         public:
-            InvalidBinaryExpression(const ContextNode* lhs, const ContextNode* rhs);
+            InvalidBinaryExpression(const IContextNode* lhs, const IContextNode* rhs);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

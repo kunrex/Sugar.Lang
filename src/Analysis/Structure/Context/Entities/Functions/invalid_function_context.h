@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class InvalidFunctionContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class InvalidFunctionContext final : public DynamicContextCollection
     {
         public:
             InvalidFunctionContext();

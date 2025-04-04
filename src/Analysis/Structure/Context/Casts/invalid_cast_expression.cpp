@@ -7,7 +7,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    InvalidCastExpression::InvalidCastExpression(const IDataType* const creationType, const ContextNode* const operand) : UnaryContextNode(creationType, operand)
+    InvalidCastExpression::InvalidCastExpression(const IDataType* const creationType, const IContextNode* const operand) : UnaryContextNode(creationType, operand)
     { }
 
     MemberType InvalidCastExpression::MemberType() const { return MemberType::CastExpression; }

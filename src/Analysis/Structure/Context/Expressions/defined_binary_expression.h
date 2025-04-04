@@ -13,7 +13,7 @@ namespace Analysis::Structure::Context
             const Core::Interfaces::IFunction* operation;
 
         public:
-            DefinedBinaryExpression(const Core::Interfaces::IFunction* operation, const ContextNode* lhs, const ContextNode* rhs);
+            DefinedBinaryExpression(const Core::Interfaces::IFunction* operation, const IContextNode* lhs, const IContextNode* rhs);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

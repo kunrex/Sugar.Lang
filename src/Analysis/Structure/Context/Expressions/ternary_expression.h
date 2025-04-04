@@ -5,17 +5,13 @@
 
 namespace Analysis::Structure::Context
 {
-    class TernaryExpression : public ContextNode
+    class TernaryExpression : public FixedContextCollection<3>
     {
         protected:
-            const ContextNode* condition;
-            const ContextNode* trueValue;
-            const ContextNode* falseValue;
-
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            TernaryExpression(const Core::Interfaces::IDataType* creationType, const ContextNode* condition, const ContextNode* trueValue, const ContextNode* falseValue);
+            TernaryExpression(const Core::Interfaces::IDataType* creationType, const IContextNode* condition, const IContextNode* trueValue, const IContextNode* falseValue);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
             
@@ -23,14 +19,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
-         
-            [[nodiscard]] const ContextNode* Condition() const;
-            [[nodiscard]] const ContextNode* TrueValue() const;
-            [[nodiscard]] const ContextNode* FalseValue() const;
 
             [[nodiscard]] std::string CILData() const override;
-
-            ~TernaryExpression() override;
     };
 }
 

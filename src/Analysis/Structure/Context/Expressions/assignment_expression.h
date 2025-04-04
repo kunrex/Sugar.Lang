@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class AssignmentExpression final : public BinaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            AssignmentExpression(const ContextNode* lhs, const ContextNode* rhs);
+            AssignmentExpression(const IContextNode* lhs, const IContextNode* rhs);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

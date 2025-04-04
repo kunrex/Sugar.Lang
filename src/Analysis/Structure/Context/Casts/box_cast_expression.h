@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class BoxCastExpression final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            explicit BoxCastExpression(const ContextNode* operand);
+            explicit BoxCastExpression(const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

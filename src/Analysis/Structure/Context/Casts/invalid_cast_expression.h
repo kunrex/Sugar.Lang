@@ -8,7 +8,7 @@ namespace Analysis::Structure::Context
     class InvalidCastExpression final : public UnaryContextNode
     {
         public:
-            InvalidCastExpression(const Core::Interfaces::IDataType* creationType, const ContextNode* operand);
+            InvalidCastExpression(const Core::Interfaces::IDataType* creationType, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

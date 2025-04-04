@@ -16,7 +16,7 @@
 
 namespace Analysis::Structure::Local
 {
-    class Scope final : public LocalNode, public Core::Nameable, Services::ConstantChild<Scope>, public Services::ConstantCollection<Context::ContextNode>
+    class Scope final : public LocalNode, public Core::Nameable, Services::ConstantChild<Scope>, public Services::ConstantCollection<Core::Interfaces::IContextNode>
     {
         private:
             const Enums::ScopeType type;

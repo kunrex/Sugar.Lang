@@ -6,7 +6,7 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
 {
-    InvalidUnaryExpression::InvalidUnaryExpression(const ContextNode* const operand) : UnaryContextNode(operand->CreationType(), operand)
+    InvalidUnaryExpression::InvalidUnaryExpression(const IContextNode* const operand) : UnaryContextNode(operand->CreationType(), operand)
     { }
 
     MemberType InvalidUnaryExpression::MemberType() const { return MemberType::Invalid; }

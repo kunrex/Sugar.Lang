@@ -200,14 +200,14 @@ namespace Analysis::Creation::Binding
 
         GlobalVariable* globalVariable;
         if ((describer & Describer::Constexpr) == Describer::Constexpr)
-            globalVariable = new GlobalConstant(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+            globalVariable = new GlobalConstant(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
         else
-            globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->Value());
+            globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
 
         MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
 
         ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
-        ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, index, source);
+        ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
         dataType->PushCharacteristic(globalVariable);
     }

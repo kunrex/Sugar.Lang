@@ -8,7 +8,7 @@ namespace Analysis::Structure::Context
     class InvalidFuncRefContext final : public UnaryContextNode
     {
         public:
-            explicit InvalidFuncRefContext(const ContextNode* objectContext);
+            explicit InvalidFuncRefContext(const IContextNode* objectContext);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

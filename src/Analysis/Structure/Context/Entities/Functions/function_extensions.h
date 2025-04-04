@@ -8,7 +8,7 @@
 namespace Analysis::Structure::Context
 {
     int CalculateFunctionCallSlotSize(const BinaryContextNode* binaryContext);
-    int CalculateFunctionCallSlotSize(const Services::ConstantCollection<ContextNode>* function);
+    int CalculateFunctionCallSlotSize(const DynamicContextCollection* function);
 }
 
 #endif

@@ -7,6 +7,6 @@ namespace Analysis::Structure::Context
     IndexedContext::IndexedContext(const IVariable* const variable, const int index) : VariableContext(variable), index(index)
     { }
 
-    int IndexedContext::Index() const { return index; }
+    uintptr_t IndexedContext::Metadata() const { return index; }
 }
 

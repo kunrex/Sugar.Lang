@@ -8,7 +8,7 @@ namespace Analysis::Structure::Context
     class InvalidTernaryExpression final : public TernaryExpression
     {
         public:
-            InvalidTernaryExpression(const ContextNode* condition, const ContextNode* trueValue, const ContextNode* falseValue);
+            InvalidTernaryExpression(const IContextNode* condition, const IContextNode* trueValue, const IContextNode* falseValue);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

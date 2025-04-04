@@ -2,22 +2,19 @@
 #define INDEXER_EXPRESSION_H
 
 #include "../context_node.h"
-#include "../unary_context_node.h"
 
-#include "../../Creation/Properties/indexer_definition.h"
-
-#include "../../../../Services/collection.h"
+#include "../../Core/Interfaces/Creation/i_indexer_definition.h"
 
 namespace Analysis::Structure::Context
 {
-    class IndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
+    class IndexerExpression final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;
             const Core::Interfaces::IIndexerDefinition* indexer;
 
         public:
-            IndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const ContextNode* operand);
+            IndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -27,8 +24,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string CILData() const override;
-
-            [[nodiscard]] const Core::Interfaces::IIndexerDefinition* Indexer() const;
+            [[nodiscard]] uintptr_t Metadata() const override;
     };
 }
 

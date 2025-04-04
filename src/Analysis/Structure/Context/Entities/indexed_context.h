@@ -13,7 +13,7 @@ namespace Analysis::Structure::Context
             IndexedContext(const Core::Interfaces::IVariable* variable, int index);
 
         public:
-            [[nodiscard]] int Index() const;
+            [[nodiscard]] uintptr_t Metadata() const override;
     };
 }
 

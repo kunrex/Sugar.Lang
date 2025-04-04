@@ -5,10 +5,8 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    CopyContext::CopyContext(const ContextNode* const context, const Referenced* const referenced) : UnaryContextNode(referenced->ReferencedType(), context), referencedType(referenced->ReferencedType())
-    {
-        slotCount = std::max(1, referencedType->SlotCount());
-    }
+    CopyContext::CopyContext(const IContextNode* const context, const Referenced* const referenced) : UnaryContextNode(referenced->ReferencedType(), context), slotCount(std::max(1, referenced->SlotCount())), referencedType(referenced->ReferencedType())
+    { }
 
     int CopyContext::SlotCount() const { return slotCount; }
 

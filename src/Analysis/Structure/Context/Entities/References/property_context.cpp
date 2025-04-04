@@ -19,7 +19,6 @@ namespace Analysis::Structure::Context
     bool PropertyContext::Readable() const { return property->Readable() && creationType->MemberType() == MemberType::Class; }
     bool PropertyContext::Writable() const { return property->Writable(); }
 
+    uintptr_t PropertyContext::Metadata() const { return reinterpret_cast<uintptr_t>(property); }
     string PropertyContext::CILData() const { return ""; }
-
-    const PropertyDefinition* PropertyContext::Property() const { return property; }
 }

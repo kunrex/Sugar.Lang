@@ -6,10 +6,10 @@
 
 namespace Analysis::Structure::Context
 {
-    class InvalidIndexerExpression final : public UnaryContextNode, public Services::ConstantCollection<ContextNode>
+    class InvalidIndexerExpression final : public DynamicContextCollection
     {
         public:
-            explicit InvalidIndexerExpression(const ContextNode* operand);
+            explicit InvalidIndexerExpression(const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

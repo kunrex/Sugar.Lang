@@ -9,7 +9,7 @@ namespace ParseNodes::Statements
     class InitialisationNode final : public DeclarationNode
     {
         public:
-            InitialisationNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier, const ParseNode* value, const Tokens::Token& separator);
+            InitialisationNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier, const IParseNode* value, const Tokens::Token& separator);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
     };

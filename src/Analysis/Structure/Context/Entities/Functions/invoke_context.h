@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class InvokeContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class InvokeContext final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;

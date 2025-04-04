@@ -1,16 +1,13 @@
 #include "unary_context_node.h"
 
+using namespace ParseNodes::Enums;
+
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    UnaryContextNode::UnaryContextNode(const IDataType* const creationType, const ContextNode* const operand) : ContextNode(creationType), operand(operand)
-    { }
-
-    const ContextNode* UnaryContextNode::Operand() const { return operand; }
-
-    UnaryContextNode::~UnaryContextNode()
+    UnaryContextNode::UnaryContextNode(const IDataType* const creationType, const IContextNode* const operand) : FixedContextCollection(creationType)
     {
-        delete operand;
+        AddChild(ChildCode::Expression, operand);
     }
 }

@@ -266,8 +266,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Casts/box_cast_expression.h
         Analysis/Structure/Context/Casts/unbox_cast_expression.cpp
         Analysis/Structure/Context/Casts/unbox_cast_expression.h
-        Analysis/Structure/Context/Casts/built_in_cast_expression.cpp
-        Analysis/Structure/Context/Casts/built_in_cast_expression.h
         Analysis/Structure/Context/Casts/defined_cast_expression.cpp
         Analysis/Structure/Context/Casts/defined_cast_expression.h
         Analysis/Structure/Context/binary_context_node.cpp
@@ -298,14 +296,10 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/indexer_expression.h
         Analysis/Structure/Global/BuiltIn/built_in_indexer.cpp
         Analysis/Structure/Global/BuiltIn/built_in_indexer.h
-        Analysis/Structure/Context/Expressions/built_in_unary_expression.cpp
-        Analysis/Structure/Context/Expressions/built_in_unary_expression.h
         Analysis/Structure/Context/Expressions/defined_unary_expression.cpp
         Analysis/Structure/Context/Expressions/defined_unary_expression.h
         Analysis/Structure/Context/Expressions/defined_binary_expression.cpp
         Analysis/Structure/Context/Expressions/defined_binary_expression.h
-        Analysis/Structure/Context/Expressions/built_in_binary_expression.cpp
-        Analysis/Structure/Context/Expressions/built_in_binary_expression.h
         Analysis/Structure/Context/context_node.cpp
         Analysis/Structure/Context/Entities/Functions/print_context.cpp
         Analysis/Structure/Context/Entities/Functions/print_context.h
@@ -523,8 +517,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/assignment_expression.h
         Analysis/Structure/Context/Expressions/duplicate_expression.cpp
         Analysis/Structure/Context/Expressions/duplicate_expression.h
-        Analysis/Structure/Context/Entities/throw_context.cpp
-        Analysis/Structure/Context/Entities/throw_context.h
         Exceptions/Compilation/Analysis/Local/non_static_reference_exception.cpp
         Exceptions/Compilation/Analysis/Local/non_static_reference_exception.h
         Exceptions/Compilation/Analysis/Local/accessibility_exception.cpp
@@ -581,4 +573,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Describers/describer_keyword_node.h
         Analysis/Structure/Core/Scoped/default_scoped.cpp
         Analysis/Structure/Core/Scoped/default_scoped.h
+        Analysis/Structure/Global/BuiltIn/built_in_constant.cpp
+        Analysis/Structure/Global/BuiltIn/built_in_constant.h
 )

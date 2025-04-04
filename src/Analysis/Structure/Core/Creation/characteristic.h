@@ -16,15 +16,15 @@ namespace Analysis::Structure::Core
 
             const ParseNodes::Core::Interfaces::IParseNode* parseNode;
 
-            const Context::ContextNode* context;
+            const Interfaces::IContextNode* context;
 
             Characteristic(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
         public:
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
 
-            void WithContext(const Context::ContextNode* context) override;
-            [[nodiscard]] const Context::ContextNode* Context() const override;
+            void WithContext(const Interfaces::IContextNode* context) override;
+            [[nodiscard]] const Interfaces::IContextNode* Context() const override;
     };
 }
 

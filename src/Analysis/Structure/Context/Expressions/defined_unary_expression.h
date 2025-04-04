@@ -9,11 +9,11 @@ namespace Analysis::Structure::Context
     class DefinedUnaryExpression final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
             const Core::Interfaces::IFunction* operation;
 
         public:
-            DefinedUnaryExpression(const Core::Interfaces::IFunction* operation, const ContextNode* operand);
+            DefinedUnaryExpression(const Core::Interfaces::IFunction* operation, const IContextNode* operand);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

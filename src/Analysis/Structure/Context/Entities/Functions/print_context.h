@@ -13,7 +13,7 @@ namespace Analysis::Structure::Context
 
         public:
             explicit PrintContext(bool ln);
-            PrintContext(const ContextNode* operand, bool ln);
+            PrintContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
@@ -29,7 +29,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintCharContext(bool ln);
-            PrintCharContext(const ContextNode* operand, bool ln);
+            PrintCharContext(const IContextNode* operand, bool ln);
 
         [[nodiscard]] std::string CILData() const override;
     };
@@ -38,7 +38,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintBoolContext(bool ln);
-            PrintBoolContext(const ContextNode* operand, bool ln);
+            PrintBoolContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -47,7 +47,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintShortContext(bool ln);
-            PrintShortContext(const ContextNode* operand, bool ln);
+            PrintShortContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -56,7 +56,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintIntContext(bool ln);
-            PrintIntContext(const ContextNode* operand, bool ln);
+            PrintIntContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -65,7 +65,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintLongContext(bool ln);
-            PrintLongContext(const ContextNode* operand, bool ln);
+            PrintLongContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -74,7 +74,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintFloatContext(bool ln);
-            PrintFloatContext(const ContextNode* operand, bool ln);
+            PrintFloatContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -83,7 +83,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintDoubleContext(bool ln);
-            PrintDoubleContext(const ContextNode* operand, bool ln);
+            PrintDoubleContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -92,7 +92,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintStringContext(bool ln);
-            PrintStringContext(const ContextNode* operand, bool ln);
+            PrintStringContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };
@@ -101,7 +101,7 @@ namespace Analysis::Structure::Context
     {
         public:
             explicit PrintObjectContext(bool ln);
-            PrintObjectContext(const ContextNode* operand, bool ln);
+            PrintObjectContext(const IContextNode* operand, bool ln);
 
             [[nodiscard]] std::string CILData() const override;
     };

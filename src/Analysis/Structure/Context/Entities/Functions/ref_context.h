@@ -8,10 +8,10 @@ namespace Analysis::Structure::Context
     class RefContext final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
 
         public:
-            explicit RefContext(const ContextNode* context);
+            explicit RefContext(const IContextNode* context);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

@@ -5,10 +5,10 @@
 
 namespace Analysis::Structure::Context
 {
-    class Throw final : public UnaryContextNode
+    class Throw final : public ContextNode
     {
         public:
-            explicit Throw(const ContextNode* operand);
+            Throw();
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

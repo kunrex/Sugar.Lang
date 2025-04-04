@@ -6,8 +6,10 @@ using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
 {
-    InvalidIndexerExpression::InvalidIndexerExpression(const ContextNode* const operand) : UnaryContextNode(operand->CreationType(), operand)
-    { }
+    InvalidIndexerExpression::InvalidIndexerExpression(const IContextNode* const operand) : DynamicContextCollection(operand->CreationType())
+    {
+        AddChild(operand);
+    }
 
     MemberType InvalidIndexerExpression::MemberType() const { return MemberType::Invalid; }
 

@@ -1,15 +1,13 @@
 #ifndef CREATION_CONTEXT_H
 #define CREATION_CONTEXT_H
 
-#include "../../../../../Services/collection.h"
-
 #include "../../context_node.h"
 
 #include "../../../Core/Interfaces/Creation/i_function.h"
 
 namespace Analysis::Structure::Context
 {
-    class CreationContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class CreationContext final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;
@@ -28,7 +26,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] std::string CILData() const override;
     };
 
-    class CollectionCreationContext final : public ContextNode, public Services::ConstantCollection<ContextNode>
+    class CollectionCreationContext final : public DynamicContextCollection
     {
         private:
             mutable int slotCount;

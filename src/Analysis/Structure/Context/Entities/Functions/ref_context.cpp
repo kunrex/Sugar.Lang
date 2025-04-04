@@ -7,10 +7,8 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    RefContext::RefContext(const ContextNode* const context) : UnaryContextNode(Referenced::Instance(context->CreationType()), context)
-    {
-        slotCount = std::max(1, context->CreationType()->SlotCount());
-    }
+    RefContext::RefContext(const IContextNode* const context) : UnaryContextNode(Referenced::Instance(context->CreationType()), context), slotCount(std::max(1, context->CreationType()->SlotCount()))
+    { }
 
     int RefContext::SlotCount() const { return slotCount; }
 

@@ -1,13 +1,16 @@
 #include "throw.h"
 
+#include "../../Wrappers/Reference/object.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    Throw::Throw(const ContextNode* const operand) : UnaryContextNode(operand->CreationType(), operand)
+    Throw::Throw() : ContextNode(&Object::Instance())
     { }
 
     MemberType Throw::MemberType() const { return MemberType::Throw; }

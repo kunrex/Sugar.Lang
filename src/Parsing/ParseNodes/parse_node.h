@@ -21,7 +21,7 @@ namespace ParseNodes
         public:
             [[nodiscard]] const Tokens::Token& Token() const override;
 
-            [[nodiscard]] int ChildCount() const override;
+            [[nodiscard]] unsigned long ChildCount() const override;
             [[nodiscard]] const IParseNode* GetChild(int index) const override;
     };
 
@@ -36,8 +36,10 @@ namespace ParseNodes
             explicit FixedNodeCollection(const Tokens::Token& token);
 
         public:
-            [[nodiscard]] int ChildCount() const override;
+            [[nodiscard]] unsigned long ChildCount() const override;
             [[nodiscard]] const IParseNode* GetChild(int index) const override;
+
+            ~FixedNodeCollection() override;
     };
 
     class DynamicNodeCollection : public ParseNode
@@ -48,10 +50,12 @@ namespace ParseNodes
             explicit DynamicNodeCollection(const Tokens::Token& token);
 
         public:
-            [[nodiscard]] int ChildCount() const override;
+            [[nodiscard]] unsigned long ChildCount() const override;
             [[nodiscard]] const IParseNode* GetChild(int index) const override;
 
             void AddChild(const IParseNode* child);
+
+            ~DynamicNodeCollection() override;
     };
 }
 

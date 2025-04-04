@@ -9,11 +9,11 @@ namespace Analysis::Structure::Context
     class CopyContext final : public UnaryContextNode
     {
         private:
-            mutable int slotCount;
+            const int slotCount;
             const Core::Interfaces::IDataType* referencedType;
 
         public:
-            CopyContext(const ContextNode* context, const Wrappers::Referenced* referenced);
+            CopyContext(const IContextNode* context, const Wrappers::Referenced* referenced);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

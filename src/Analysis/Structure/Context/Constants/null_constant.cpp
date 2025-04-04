@@ -12,7 +12,7 @@ namespace Analysis::Structure::Context
     NullConstant::NullConstant() : ContextNode(&Object::Instance())
     { }
 
-    MemberType NullConstant::MemberType() const { return MemberType::Constant; }
+    MemberType NullConstant::MemberType() const { return MemberType::ConstantContext; }
 
     int NullConstant::SlotCount() const { return 0; }
 
