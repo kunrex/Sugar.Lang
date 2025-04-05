@@ -1,5 +1,6 @@
 #include "./string.h"
 
+#include "../../Compilation/compilation_result.h"
 #include "../../DataTypes/data_type_extensions.h"
 
 #include "../Value/integer.h"
@@ -19,12 +20,33 @@ using namespace Tokens::Enums;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string cil_string = "[System.Runtime]System.String";
 
 namespace Analysis::Structure::Wrappers
 {
+    CompilationResult Concatenation(const std::vector<CompilationResult>& arguments)
+    {
+        string result;
+        for (const auto& argument: arguments)
+            result += std::get<string>(argument.data);
+
+        return { &String::Instance(), result };
+    }
+
+    CompilationResult StringMultiply(const std::vector<CompilationResult>& arguments)
+    {
+        string result;
+        const auto lhs = std::get<string>(arguments[0].data);
+        const auto rhs = std::get<long>(arguments[1].data);
+        for (auto i = 0; i < rhs; i++)
+            result += lhs;
+
+        return { &String::Instance(), result };
+    }
+
     String::String() : BuiltInClass(cil_string, Describer::Public), SingletonService(), characteristics(), functions(), indexer(nullptr), overloads()
     { }
 
@@ -96,12 +118,12 @@ namespace Analysis::Structure::Wrappers
         indexer = new BuiltInIndexer(&Character::Instance(), true, "instance char class [System.Runtime]System.String::get_Chars(int32)", false, "");
         indexer->PushParameterType(&Integer::Instance());
 
-        const auto concatenation = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "call string class [System.Runtime]System.String::Concat(string, string)");
+        const auto concatenation = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "call string class [System.Runtime]System.String::Concat(string, string)", Concatenation);
         concatenation->PushParameterType(&Instance());
         concatenation->PushParameterType(&Instance());
         overloads[SyntaxKind::Addition] = concatenation;
 
-        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "call class [System.Linq]System.Collections.Generic.IEnumerable`1<string> [System.Linq]System.Linq.Enumerable::Repeat<string>(!!0, int32) call string [System.Runtime]System.String::Concat(class [System.Runtime]System.Collections.Generic.IEnumerable`1<string>)");
+        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "call class [System.Linq]System.Collections.Generic.IEnumerable`1<string> [System.Linq]System.Linq.Enumerable::Repeat<string>(!!0, int32) call string [System.Runtime]System.String::Concat(class [System.Runtime]System.Collections.Generic.IEnumerable`1<string>)", StringMultiply);
         multiplication->PushParameterType(&Instance());
         multiplication->PushParameterType(&Integer::Instance());
         overloads[SyntaxKind::Multiplication] = multiplication;
@@ -133,7 +155,15 @@ namespace Analysis::Structure::Wrappers
     const IFunction* String::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     { return nullptr; }
 
+    const IBuiltInCast* String::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
+    { return nullptr; }
+
     const IOperatorOverload* String::FindOverload(const SyntaxKind base) const
+    {
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
+    }
+
+    const IBuiltInOverload* String::FindBuiltInOverload(const SyntaxKind base) const
     {
         return overloads.contains(base) ? overloads.at(base) : nullptr;
     }

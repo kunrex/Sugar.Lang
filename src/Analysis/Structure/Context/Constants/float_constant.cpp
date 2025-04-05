@@ -22,6 +22,7 @@ namespace Analysis::Structure::Context
     bool FloatConstant::Readable() const { return true; }
     bool FloatConstant::Writable() const { return false; }
 
+    uintptr_t FloatConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string FloatConstant::CILData() const { return std::format("ldc.r4 {}", value); }
 
     DoubleConstant::DoubleConstant(const double value) : ContextNode(&Double::Instance()), value(value)
@@ -34,5 +35,6 @@ namespace Analysis::Structure::Context
     bool DoubleConstant::Readable() const { return true; }
     bool DoubleConstant::Writable() const { return false; }
 
+    uintptr_t DoubleConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string DoubleConstant::CILData() const { return std::format("ldc.r8 {}", value); }
 }

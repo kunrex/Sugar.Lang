@@ -23,8 +23,10 @@ namespace Analysis::Structure::Core
         public:
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
 
-            void WithContext(const Interfaces::IContextNode* context) override;
+            void WithContext(const Interfaces::IContextNode* context) const override;
             [[nodiscard]] const Interfaces::IContextNode* Context() const override;
+
+            ~Characteristic() override;
     };
 }
 

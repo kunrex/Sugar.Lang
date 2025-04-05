@@ -21,5 +21,6 @@ namespace Analysis::Structure::Context
     bool StringConstant::Readable() const { return true; }
     bool StringConstant::Writable() const { return false; }
 
+    uintptr_t StringConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string StringConstant::CILData() const { return std::format("ldstr {}", value); }
 }

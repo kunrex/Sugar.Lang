@@ -20,4 +20,9 @@ namespace Analysis::Structure::Core
     }
 
     const IContextNode* Characteristic::Context() const { return context; }
+
+    Characteristic::~Characteristic()
+    {
+        delete context;
+    }
 }

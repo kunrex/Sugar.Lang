@@ -20,7 +20,6 @@
 #include "../../Structure/Context/Entities/References/parameter_context.h"
 #include "../../Structure/Context/Entities/References/property_context.h"
 #include "../../Structure/Context/Expressions/assignment_expression.h"
-#include "../../Structure/Context/Expressions/built_in_binary_expression.h"
 #include "../../Structure/Context/Expressions/dot_expression.h"
 #include "../../Structure/Context/Expressions/indexer_expression.h"
 #include "../../Structure/Core/DataTypes/data_type.h"
@@ -167,13 +166,11 @@ namespace Analysis::Creation
 
     void TranspileLoadField(const IContextNode* const fieldContext, StringBuilder& stringBuilder, const bool loadAddress)
     {
-        const auto field = reinterpret_cast<const IVariable*>(fieldContext->Metadata());
+        const auto field = reinterpret_cast<const ICharacteristic*>(fieldContext->Metadata());
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
         if (field->CheckDescriber(Describer::Constexpr))
-        {
-
-        }
+            stringBuilder.PushLine(field->Context()->CILData());
         else if (field->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(std::format("lds{} {} {}", instruction, field->CreationType()->FullName(), field->FullName()));
         else
@@ -185,12 +182,15 @@ namespace Analysis::Creation
 
     void TranspileLoadField(const IContextNode* const fieldContext, const IContextNode* const context, StringBuilder& stringBuilder, const bool loadAddress)
     {
-        const auto field = reinterpret_cast<const IVariable*>(fieldContext->Metadata());
+        const auto field = reinterpret_cast<const ICharacteristic*>(fieldContext->Metadata());
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
         if (field->CheckDescriber(Describer::Constexpr))
         {
+            if (context->MemberType() != MemberType::StaticReferenceContext)
+                stringBuilder.PushLine(pop);
 
+            stringBuilder.PushLine(field->Context()->CILData());
         }
         else if (field->CheckDescriber(Describer::Static))
         {
@@ -400,7 +400,7 @@ namespace Analysis::Creation
                         break;
                     case MemberType::FieldContext:
                         {
-                            if (const auto field = reinterpret_cast<const IVariable*>(current->Metadata()); field->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+                            if (const auto field = reinterpret_cast<const ICharacteristic*>(current->Metadata()); field->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
                                 stringBuilder.PushLine(pop);
                         }
                         break;
@@ -526,7 +526,7 @@ namespace Analysis::Creation
                     {
                         case MemberType::FieldContext:
                             {
-                                const auto field = reinterpret_cast<const IVariable*>(finalContext->Metadata());
+                                const auto field = reinterpret_cast<const ICharacteristic*>(finalContext->Metadata());
                                 stringBuilder.PushLine(std::format("ld{}flda {} {}", field->CheckDescriber(Describer::Static) ? "s" : "", field->CreationType()->FullName(), field->FullName()));
                             }
                             break;
@@ -621,7 +621,7 @@ namespace Analysis::Creation
                     {
                         case MemberType::FieldContext:
                             {
-                                const auto field = reinterpret_cast<const IVariable*>(finalContext->Metadata());
+                                const auto field = reinterpret_cast<const ICharacteristic*>(finalContext->Metadata());
                                 stringBuilder.PushLine(std::format("st{}fld {} {}", field->CheckDescriber(Describer::Static) ? "s" : "", field->CreationType()->FullName(), field->FullName()));
                             }
                             break;

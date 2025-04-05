@@ -5,12 +5,15 @@
 
 #include "../../../../Services/singleton_service.h"
 
+#include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
+#include "../../Core/Interfaces/Creation/i_built_in_overload.h"
+
 #include "../../DataTypes/class.h"
 #include "../../Global/BuiltIn/built_in_indexer.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class String final : public DataTypes::BuiltInClass, public Services::SingletonService<String>
+    class String final : public DataTypes::BuiltInClass, public Services::SingletonService<String>, public virtual Core::Interfaces::IPrimitiveType
     {
         protected:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
@@ -19,7 +22,7 @@ namespace Analysis::Structure::Wrappers
 
             Global::BuiltInIndexer* indexer;
 
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*> overloads;
+            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
 
             String();
 
@@ -39,7 +42,11 @@ namespace Analysis::Structure::Wrappers
             [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
+            [[nodiscard]] const Core::Interfaces::IBuiltInCast* FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const override;
+
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
+
+            [[nodiscard]] const Core::Interfaces::IBuiltInOverload* FindBuiltInOverload(Tokens::Enums::SyntaxKind base) const override;
 
             ~String() override;
     };

@@ -14,6 +14,7 @@
 #include "../../../Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.h"
 #include "../../../Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.h"
 #include "../../../Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.h"
+#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
 
 #include "../../Structure/Wrappers/Value/long.h"
 #include "../../Structure/Wrappers/Value/short.h"
@@ -66,7 +67,7 @@ namespace Analysis::Creation::Binding
             PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
-    const IDataType* BindBuiltInType(const IParseNode* node)
+    const IPrimitiveType* BindBuiltInType(const IParseNode* node)
     {
         switch (node->Token().Kind())
         {

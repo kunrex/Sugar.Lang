@@ -1,5 +1,6 @@
 #include "constant_compiler.h"
 
+#include "compilation_result.h"
 #include "../../../Exceptions/exception_manager.h"
 #include "../../../Exceptions/Compilation/Analysis/Local/accessibility_exception.h"
 #include "../../../Parsing/ParseNodes/Constants/constant_node.h"
@@ -9,9 +10,14 @@
 #include "../../../Parsing/ParseNodes/Expressions/Unary/unary_node.h"
 #include "../../Creation/Binding/binder_extensions.h"
 #include "../Context/context_node.h"
+#include "../Context/Constants/float_constant.h"
+#include "../Context/Constants/integer_constant.h"
+#include "../Context/Constants/string_constant.h"
+#include "../Core/Interfaces/Creation/i_built_in_cast.h"
 #include "../Core/Interfaces/Creation/i_constant.h"
 #include "../Core/Interfaces/DataTypes/i_user_defined_type.h"
 #include "../Wrappers/Reference/object.h"
+#include "../Wrappers/Reference/string.h"
 #include "../Wrappers/Value/boolean.h"
 #include "../Wrappers/Value/character.h"
 #include "../Wrappers/Value/double.h"
@@ -29,6 +35,8 @@ using namespace Tokens::Enums;
 using namespace ParseNodes::Enums;
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Wrappers;
@@ -36,182 +44,159 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Compilation
 {
-    std::optional<long> BinaryOperation(const SyntaxKind operation, const long a, const long b)
+    std::optional<CompilationResult> AsCompilationResult(const IConstant* const constant)
     {
-        switch (operation)
+        switch (constant->CreationType()->Type())
         {
-            case SyntaxKind::Addition: return a + b;
-            case SyntaxKind::Subtraction: return a - b;
-            case SyntaxKind::Multiplication: return a * b;
-            case SyntaxKind::Division: return b != 0 ? a / b : std::nullopt;
-            case SyntaxKind::Modulus: return b != 0 ? a % b : std::nullopt;
+        case TypeKind::Short:
+                return CompilationResult(&Short::Instance(), static_cast<long>(*reinterpret_cast<const short*>(constant->Context()->Metadata())));
+            case TypeKind::Int:
+                return CompilationResult(&Integer::Instance(), static_cast<long>(*reinterpret_cast<const int*>(constant->Context()->Metadata())));
+            case TypeKind::Long:
+                return CompilationResult(&Long::Instance(), *reinterpret_cast<const long*>(constant->Context()->Metadata()));
+            case TypeKind::Float:
+                return CompilationResult(&Float::Instance(), *reinterpret_cast<const float*>(constant->Context()->Metadata()));
+            case TypeKind::Double:
+                return CompilationResult(&Double::Instance(), *reinterpret_cast<const double*>(constant->Context()->Metadata()));
+            case TypeKind::Boolean:
+                return CompilationResult(&Boolean::Instance(), static_cast<long>(*reinterpret_cast<const bool*>(constant->Context()->Metadata())));
+            case TypeKind::Character:
+                return CompilationResult(&Character::Instance(), static_cast<long>(*reinterpret_cast<const char*>(constant->Context()->Metadata())));
+            case TypeKind::String:
+                return CompilationResult(&String::Instance(), *reinterpret_cast<const string*>(constant->Context()->Metadata()));
+            default:
+                return std::nullopt;
+        }
+    }
 
-            case SyntaxKind::BitwiseAnd: return a & b;
-            case SyntaxKind::BitwiseOr: return a | b;
-            case SyntaxKind::BitwiseXor: return a ^ b;
-            case SyntaxKind::LeftShift: return a << b;
-            case SyntaxKind::RightShift: return a >> b;
+    std::optional<CompilationResult> TryCompileConstant(const IParseNode* const identifierNode, const IConstant* const constant, const IDataType* const creationType, const IUserDefinedType* const dataType)
+    {
+        switch (const auto characteristic = creationType->FindCharacteristic(*identifierNode->Token().Value<string>()); characteristic->MemberType())
+        {
+            case MemberType::EnumField:
+            case MemberType::ConstantField:
+                {
+                    const auto constField = dynamic_cast<const IConstant*>(characteristic);
+                    if (constField->IsDependent(constant))
+                    {
+                        //exception
+                        return std::nullopt;
+                    }
 
-            case SyntaxKind::Equals:return a == b;
-            case SyntaxKind::NotEquals:return a != b;
-            case SyntaxKind::LesserThan:return a < b;
-            case SyntaxKind::GreaterThan:return a > b;
-            case SyntaxKind::LesserThanEquals:return a <= b;
-            case SyntaxKind::GreaterThanEquals:return a >= b;
+                    constant->PushDependency(constField);
+
+                    if (!constField->Compiled())
+                        CompileExpression(constField, dataType);
+
+                    return AsCompilationResult(constField);
+                }
+                break;
             default:
                 //exception
                 return std::nullopt;
         }
     }
 
-    std::optional<double> BinaryOperation(const SyntaxKind operation, const double a, const double b)
-    {
-        switch (operation)
-        {
-            case SyntaxKind::Addition: return a + b;
-            case SyntaxKind::Subtraction: return a - b;
-            case SyntaxKind::Multiplication: return a * b;
-            case SyntaxKind::Division: return b != 0.0 ? a / b : std::nullopt;
-
-            case SyntaxKind::Equals: return a == b;
-            case SyntaxKind::NotEquals: return a != b;
-            case SyntaxKind::LesserThan: return a < b;
-            case SyntaxKind::GreaterThan: return a > b;
-            case SyntaxKind::LesserThanEquals: return a <= b;
-            case SyntaxKind::GreaterThanEquals: return a >= b;
-            default:
-                //exception
-                return std::nullopt;
-        }
-    }
-
-    std::optional<long> UnaryOperation(const SyntaxKind operation, const long a)
-    {
-        switch (operation)
-        {
-            case SyntaxKind::Plus: return a;
-            case SyntaxKind::Minus: return -a;
-            case SyntaxKind::BitwiseNot: return ~a;
-            case SyntaxKind::Not: return !a;
-            default:
-                //exception
-                return std::nullopt;
-        }
-    }
-
-    std::optional<double> UnaryOperation(const SyntaxKind operation, const double a)
-    {
-        switch (operation)
-        {
-            case SyntaxKind::Plus: return a;
-            case SyntaxKind::Minus: return -a;
-            case SyntaxKind::Not: return !a;
-            default:
-                //exception
-                return std::nullopt;
-        }
-    }
-
-    string Concat(const string& a, const string& b) { return a + b; }
-    string StrMultiply(const string& a, const long b)
-    {
-        string result;
-        for (auto i = 0; i < b; i++)
-            result += a;
-
-        return result;
-    }
-
-    const IDataType* BindDataType(const TypeKind typeKind)
-    {
-
-    }
-
-    std::optional<CompilationResult> CompileExpression(const IParseNode* const parseNode, const IConstant* const constant, const IDataType* const dataType)
+    std::optional<CompilationResult> CompileExpression(const IParseNode* const parseNode, const IConstant* const constant, const IUserDefinedType* const dataType)
     {
         switch (parseNode->NodeType())
         {
             case NodeType::Dot:
                 {
+                    const IDataType* currentType = dataType;
+                    auto current = parseNode;
 
+                    while (true)
+                    {
+                        if (current->NodeType() == NodeType::Identifier)
+                            return TryCompileConstant(current, constant, currentType, dataType);
+
+                        if (current->NodeType() != NodeType::Dot)
+                        {
+                            //exception
+                            return std::nullopt;
+                        }
+
+                        if (auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
+                        {
+                            const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<string>());
+                            if (characteristic == nullptr)
+                            {
+                                //exception
+                                return std::nullopt;
+                            }
+
+                            currentType = characteristic->CreationType();
+                        }
+
+                        //exception
+                        return std::nullopt;
+                    }
                 }
                 break;
             case NodeType::Constant:
                 {
-                    const auto token = parseNode->Token();
-                    switch (token.Kind())
+                    switch (const auto& token = parseNode->Token(); token.Kind())
                     {
                         case SyntaxKind::Short:
-                        case SyntaxKind::Int:
-                        case SyntaxKind::Long:
-                        case SyntaxKind::Character:
-                        case SyntaxKind::Boolean:
-                            return CompilationResult(static_cast<TypeKind>(token.Kind()), *token.Value<long>());
-                        case SyntaxKind::Float:
-                        case SyntaxKind::Double:
-                            return CompilationResult(static_cast<TypeKind>(token.Kind()), *token.Value<double>());
-                        case SyntaxKind::String:
-                            return CompilationResult(static_cast<TypeKind>(token.Kind()), *token.Value<string>());
-                        default:
-                            //exception
-                            return std::nullopt;
+                                return CompilationResult(&Short::Instance(), *token.Value<long>());
+                            case SyntaxKind::Int:
+                                return CompilationResult(&Integer::Instance(), *token.Value<long>());
+                            case SyntaxKind::Long:
+                                return CompilationResult(&Long::Instance(), *token.Value<long>());
+                            case SyntaxKind::Character:
+                                return CompilationResult(&Character::Instance(), *token.Value<long>());
+                            case SyntaxKind::Boolean:
+                                return CompilationResult(&Boolean::Instance(), *token.Value<long>());
+                            case SyntaxKind::Float:
+                                return CompilationResult(&Float::Instance(), *token.Value<long>());
+                            case SyntaxKind::Double:
+                                return CompilationResult(&Double::Instance(), *token.Value<long>());
+                            case SyntaxKind::String:
+                                return CompilationResult(&String::Instance(), *token.Value<long>());
+                            default:
+                                //exception
+                                return std::nullopt;
                     }
                 }
             case NodeType::Identifier:
+                return TryCompileConstant(parseNode, constant, dataType, dataType);
+            case NodeType::Cast:
                 {
-                    switch (const auto characteristic = dataType->FindCharacteristic(*parseNode->Token().Value<string>()); characteristic->MemberType())
-                    {
-                        case MemberType::EnumField:
-                        case MemberType::ConstantField:
-                            {
-                                const auto constField = dynamic_cast<const IConstant*>(characteristic);
-                                constant->PushDependency(constField);
+                    const auto operand = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::Expression)), constant, dataType);
+                    if (!operand)
+                        return std::nullopt;
 
-                                if (!constField->Readable())
-                                    CompileExpression(constField, dataType);
+                    const auto type = BindBuiltInType(parseNode->GetChild(static_cast<int>(ChildCode::RHS)));
 
-                                if (!constField->Readable())
-                                {
-                                    //exception
-                                    return std::nullopt;
-                                }
+                    if (const auto cast = operand->creationType->FindBuiltInCast(type, operand->creationType); cast != nullptr)
+                        return cast->StaticCompile(*operand);
 
-                                return constField->AsCompiledExpression();
-                            }
-                            break;
-                        default:
-                            //exception
-                            return std::nullopt;
-                    }
+                    //exception
+                    return std::nullopt;
                 }
-                break;
             case NodeType::Unary:
                 {
                     const auto operand = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::Expression)), constant, dataType);
                     if (!operand)
                         return std::nullopt;
 
-                    if (const auto operation = parseNode->Token().Kind(); BindDataType(operand->creationType)->FindOverload(operation))
+                    const auto operation = parseNode->Token().Kind();
+                    if (operation == SyntaxKind::Increment || operation == SyntaxKind::Decrement)
                     {
-                        switch (operand->creationType)
-                        {
-                            case SyntaxKind::Short:
-                            case SyntaxKind::Int:
-                            case SyntaxKind::Long:
-                            case SyntaxKind::Character:
-                            case SyntaxKind::Boolean:
-                                return UnaryOperation(operation, std::get<long>(operand.value));
-                            case SyntaxKind::Float:
-                            case SyntaxKind::Double:
-                                return UnaryOperation(operation, std::get<double>(operand.value));
-                            default:
-                                //exception
-                                    return std::nullopt;
-                        }
+                        //exception
+                        return std::nullopt;
                     }
 
-                    //exception
-                    return std::nullopt;
+                    const auto overload = operand->creationType->FindBuiltInOverload(operation);
+
+                    if (overload == nullptr)
+                    {
+                        //exception;
+                        return std::nullopt;
+                    }
+
+                    return overload->StaticCompile({ *operand });
                 }
                 break;
             case NodeType::Binary:
@@ -221,47 +206,57 @@ namespace Analysis::Structure::Compilation
                         return std::nullopt;
 
                     const auto rhs = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::RHS)), constant, dataType);
-                    if (!rhs)
+                    if (!rhs) {
                         return std::nullopt;
-
-                    if (lhs->creationType == rhs->creationType)
-                    {
-                        if (const auto operation = parseNode->Token().Kind(); BindDataType(lhs->creationType)->FindOverload(operation))
-                        {
-                            switch (lhs->creationType)
-                            {
-                                case SyntaxKind::Short:
-                                case SyntaxKind::Int:
-                                case SyntaxKind::Long:
-                                case SyntaxKind::Character:
-                                case SyntaxKind::Boolean:
-                                    return BinaryOperation(operation, std::get<long>(lhs.value), std::get<long>(rhs.value));
-                                case SyntaxKind::Float:
-                                case SyntaxKind::Double:
-                                    return BinaryOperation(operation, std::get<double>(lhs.value), std::get<double>(rhs.value));
-                                case SyntaxKind::String:
-                                    {
-                                        if (operation == SyntaxKind::Addition)
-                                            return CompilationResult(TypeKind::String, Concat(std::get<string>(lhs.value), std::get<string>(rhs.value)));
-
-                                        return CompilationResult(TypeKind::String, StrMultiply(std::get<string>(lhs.value), std::get<long>(rhs.value)));
-                                    }
-                                default:
-                                    //exception
-                                    return std::nullopt;
-                            }
-                        }
                     }
 
-                    //exception
-                    return std::nullopt;
+                    if (lhs->creationType != rhs->creationType)
+                    {
+                        //exception
+                        return std::nullopt;
+                    }
+
+                    const auto overload = lhs->creationType->FindBuiltInOverload(parseNode->Token().Kind());
+
+                    if (overload == nullptr)
+                    {
+                        //exception;
+                        return std::nullopt;
+                    }
+
+                    return overload->StaticCompile({ *lhs, *rhs });
                 }
                 break;
         }
     }
 
-    void CompileExpression(const IConstant* const constant, const IDataType* const dataType)
+    void CompileExpression(const IConstant* const constant, const IUserDefinedType* const dataType)
     {
-        CompileExpression(constant->ParseNode(), constant, dataType);
+        const auto result = CompileExpression(constant->ParseNode(), constant, dataType);
+        if (!result)
+            return;
+
+        switch (result->creationType)
+        {
+            case TypeKind::Short:
+                constant->WithContext(new ShortConstant(static_cast<short>(std::get<long>(result->data))));
+            case TypeKind::Int:
+                constant->WithContext(new IntegerConstant(static_cast<int>(std::get<long>(result->data))));
+            case TypeKind::Long:
+                constant->WithContext(new LongConstant(std::get<long>(result->data)));
+            case TypeKind::Float:
+                constant->WithContext(new FloatConstant(static_cast<float>(std::get<double>(result->data))));
+            case TypeKind::Double:
+                constant->WithContext(new DoubleConstant(std::get<double>(result->data)));
+            case TypeKind::Boolean:
+                constant->WithContext(std::get<long>(result->data) == 0 ? new FalseConstant() : new TrueConstant());
+            case TypeKind::Character:
+                constant->WithContext(new CharacterConstant(static_cast<char>(std::get<long>(result->data))));
+            case TypeKind::String:
+                constant->WithContext(new StringConstant(std::get<string>(result->data)));
+                break;
+            default:
+                break;
+        }
     }
 }

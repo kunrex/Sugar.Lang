@@ -9,13 +9,17 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    LocalVariableContext::LocalVariableContext(const IVariable* variable, const int index) : IndexedContext(variable, index)
+    LocalVariableContext::LocalVariableContext(const IVariable* variable, const int index) : ContextNode(variable->CreationType()), variable(variable), index(index)
     { }
 
     MemberType LocalVariableContext::MemberType() const { return MemberType::LocalVariableContext; }
 
     int LocalVariableContext::SlotCount() const { return creationType->SlotCount(); }
 
-    std::string LocalVariableContext::CILData() const { return std::to_string(index); }
 
+    bool LocalVariableContext::Readable() const { return variable->Readable(); }
+    bool LocalVariableContext::Writable() const { return variable->Writable(); }
+
+    uintptr_t LocalVariableContext::Metadata() const { return reinterpret_cast<uintptr_t>(variable); }
+    std::string LocalVariableContext::CILData() const { return std::to_string(index); }
 }

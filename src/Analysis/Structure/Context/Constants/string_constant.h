@@ -20,6 +20,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 }

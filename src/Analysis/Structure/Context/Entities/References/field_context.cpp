@@ -11,12 +11,16 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    FieldContext::FieldContext(const IVariable* const variable, const bool bypassWrite) : VariableContext(variable), writable(variable->Writable() && (variable->CheckDescriber(Describer::Const) && bypassWrite))
+    FieldContext::FieldContext(const ICharacteristic* const characteristic, const bool bypassWrite) : ContextNode(characteristic->CreationType()),writable(characteristic->Writable() && (characteristic->CheckDescriber(Describer::Const) && bypassWrite)), characteristic(characteristic)
     { }
 
     MemberType FieldContext::MemberType() const { return MemberType::FieldContext; }
 
     int FieldContext::SlotCount() const { return creationType->SlotCount(); }
 
+    bool FieldContext::Readable() const { return true; }
     bool FieldContext::Writable() const { return writable; }
+
+    uintptr_t FieldContext::Metadata() const { return reinterpret_cast<uintptr_t>(characteristic); }
+    std::string FieldContext::CILData() const { return ""; }
 }

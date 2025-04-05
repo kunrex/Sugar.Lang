@@ -5,11 +5,14 @@
 
 #include "../../../../Services/singleton_service.h"
 
+#include "../../Core/Interfaces/Creation/i_built_in_cast.h"
+#include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
+
 #include "../../DataTypes/value_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService<Character>
+    class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService<Character>, public virtual Core::Interfaces::IPrimitiveType
     {
         protected:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
@@ -17,9 +20,9 @@ namespace Analysis::Structure::Wrappers
             std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
 
             std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, const Core::Interfaces::IFunction*> explicitCasts;
+            std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*> overloads;
+            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
 
             Character();
 
@@ -41,7 +44,11 @@ namespace Analysis::Structure::Wrappers
             [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
+            [[nodiscard]] const Core::Interfaces::IBuiltInCast* FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const override;
+
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
+
+            [[nodiscard]] const Core::Interfaces::IBuiltInOverload* FindBuiltInOverload(Tokens::Enums::SyntaxKind base) const override;
 
             ~Character() override;
     };

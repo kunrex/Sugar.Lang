@@ -8,6 +8,8 @@
 #include "boolean.h"
 #include "../Reference/string.h"
 
+#include "../../Compilation/compilation_result.h"
+
 #include "../../Global/BuiltIn/built_in_cast.h"
 #include "../../Global/BuiltIn/built_in_method.h"
 #include "../../Global/BuiltIn/built_in_property.h"
@@ -20,12 +22,22 @@ using namespace Tokens::Enums;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string cil_character = "[System.Runtime]System.Char";
 
 namespace Analysis::Structure::Wrappers
 {
+    CompilationResult ImplicitInteger(const CompilationResult& argument) { return  { &Integer::Instance(), std::get<long>(argument.data) }; }
+    CompilationResult ExplicitShort(const CompilationResult& argument) { return  { &Short::Instance(), std::get<long>(argument.data) }; }
+    CompilationResult ExplicitLong(const CompilationResult& argument) { return  { &Long::Instance(), std::get<long>(argument.data) }; }
+
+    CompilationResult ImplicitString(const CompilationResult& argument) { return  { &String::Instance(), std::to_string(static_cast<char>(std::get<long>(argument.data))) }; }
+
+    CompilationResult Equals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data == arguments[1].data)} ; }
+    CompilationResult NotEquals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data != arguments[1].data)} ; }
+
     Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), characteristics(), functions(), implicitCasts(), explicitCasts(), overloads()
     { }
 
@@ -64,34 +76,30 @@ namespace Analysis::Structure::Wrappers
         const auto toLower = new BuiltInMethod("ToLower()", Describer::Public, &Instance(), "instance char valuetype [System.Runtime]System.Char::ToLower()");
         functions[std::hash<string>()("ToLower") ^ ArgumentHash(toLower)] = toLower;
 
-        const auto implicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4");
+        const auto implicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", ImplicitInteger);
         implicitInteger->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
         explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
 
-        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2");
+        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ExplicitShort);
         explicitShort->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Short::Instance(), &Instance()})] = explicitShort;
 
-        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8");
+        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", ExplicitLong);
         explicitLong->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Long::Instance(), &Instance()})] = explicitLong;
 
-        const auto implicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()");
+        const auto implicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()", ImplicitString);
         implicitString->PushParameterType(&Instance());
         implicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
         explicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
 
-        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()");
-        explicitString->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = explicitString;
-
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Instance(), "ceq");
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Instance(), "ceq", Equals);
         equals->PushParameterType(&Instance());
         equals->PushParameterType(&Instance());
         overloads[SyntaxKind::Equals] = equals;
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Instance(), "ceq ldc.i4.0 ceq");
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Instance(), "ceq ldc.i4.0 ceq", NotEquals);
         notEquals->PushParameterType(&Instance());
         notEquals->PushParameterType(&Instance());
         overloads[SyntaxKind::NotEquals] = notEquals;
@@ -122,11 +130,21 @@ namespace Analysis::Structure::Wrappers
 
     const IFunction* Character::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
+       return FindBuiltInCast(returnType, fromType);
+    }
+
+    const IBuiltInCast* Character::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
+    {
         const auto hash = ArgumentHash({ returnType , fromType });
         return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
     }
 
     const IOperatorOverload* Character::FindOverload(const SyntaxKind base) const
+    {
+        return overloads.contains(base) ? nullptr : overloads.at(base);
+    }
+
+    const IBuiltInOverload* Character::FindBuiltInOverload(const SyntaxKind base) const
     {
         return overloads.contains(base) ? nullptr : overloads.at(base);
     }

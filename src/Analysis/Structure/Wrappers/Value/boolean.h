@@ -5,17 +5,20 @@
 
 #include "../../../../Services/singleton_service.h"
 
+#include "../../Core/Interfaces/Creation/i_built_in_cast.h"
+#include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
+
 #include "../../DataTypes/value_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService<Boolean>
+    class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService<Boolean>, public virtual Core::Interfaces::IPrimitiveType
     {
         protected:
             std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, const Core::Interfaces::IFunction*> explicitCasts;
+            std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*> overloads;
+            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
 
             Boolean();
 
@@ -37,7 +40,11 @@ namespace Analysis::Structure::Wrappers
             [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
+            [[nodiscard]] const Core::Interfaces::IBuiltInCast* FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const override;
+
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
+
+            [[nodiscard]] const Core::Interfaces::IBuiltInOverload* FindBuiltInOverload(Tokens::Enums::SyntaxKind base) const override;
 
             ~Boolean() override;
     };

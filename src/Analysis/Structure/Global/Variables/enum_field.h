@@ -12,9 +12,7 @@ namespace Analysis::Structure::Global
     class EnumField final : public GlobalVariable, public virtual Core::Interfaces::IConstant
     {
         private:
-            mutable bool compiled;
             mutable std::vector<const IConstant*> dependencies;
-            mutable std::variant<long, double, std::string> value;
 
         public:
             EnumField(const std::string& name, Enums::Describer describer);
@@ -27,11 +25,10 @@ namespace Analysis::Structure::Global
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] bool Compiled() const override;
+
             void PushDependency(const IConstant* constant) const override;
             [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
-
-            void Compile(Compilation::CompilationResult result) const override;
-            [[nodiscard]] Compilation::CompilationResult AsCompilationResult() const override;
     };
 }
 

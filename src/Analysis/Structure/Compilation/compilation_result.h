@@ -3,20 +3,20 @@
 
 #include <variant>
 
-#include "../Core/Interfaces/DataTypes/i_data_type.h"
+#include "../Core/Interfaces/DataTypes/i_primitive_type.h"
 
 namespace Analysis::Structure::Compilation
 {
     struct CompilationResult
     {
         public:
-            const Tokens::Enums::TypeKind creationType;
+            const Core::Interfaces::IPrimitiveType* creationType;
             const std::variant<long, double, std::string> data;
 
-            CompilationResult(Tokens::Enums::TypeKind creationType, long data);
-            CompilationResult(Tokens::Enums::TypeKind creationType, double data);
-            CompilationResult(Tokens::Enums::TypeKind creationType, const std::string& data);
-            CompilationResult(Tokens::Enums::TypeKind creationType, std::variant<long, double, std::string>& data);
+            CompilationResult(const Core::Interfaces::IPrimitiveType* creationType, long data);
+            CompilationResult(const Core::Interfaces::IPrimitiveType* creationType, double data);
+            CompilationResult(const Core::Interfaces::IPrimitiveType*, const std::string& data);
+            CompilationResult(const Core::Interfaces::IPrimitiveType*, const std::variant<long, double, std::string>& data);
     };
 }
 

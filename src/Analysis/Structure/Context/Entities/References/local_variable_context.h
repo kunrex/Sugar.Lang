@@ -1,12 +1,18 @@
 #ifndef LOCAL_VARIABLE_CONTEXT_H
 #define LOCAL_VARIABLE_CONTEXT_H
 
-#include "../indexed_context.h"
+#include "../../context_node.h"
+
+#include "../../../Core/Interfaces/Creation/i_variable.h"
 
 namespace Analysis::Structure::Context
 {
-    class LocalVariableContext final : public IndexedContext
+    class LocalVariableContext : public ContextNode
     {
+        protected:
+            const int index;
+            const Core::Interfaces::IVariable* variable;
+
         public:
             LocalVariableContext(const Core::Interfaces::IVariable* variable, int index);
 
@@ -14,6 +20,10 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] int SlotCount() const override;
 
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 }

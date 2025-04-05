@@ -6,7 +6,6 @@
 #include "../../../source_file.h"
 
 #include "../../Creation/characteristic.h"
-#include "../../../Global/Properties/indexer.h"
 
 #include "../Scoped/i_scoped.h"
 

@@ -2,6 +2,7 @@
 #define PROPERTY_CONTEXT_H
 
 #include "../../context_node.h"
+
 #include "../../../Creation/Properties/property_definition.h"
 
 namespace Analysis::Structure::Context

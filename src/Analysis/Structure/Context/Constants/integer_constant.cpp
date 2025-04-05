@@ -25,6 +25,7 @@ namespace Analysis::Structure::Context
     bool ShortConstant::Readable() const { return true; }
     bool ShortConstant::Writable() const { return false; }
 
+    uintptr_t ShortConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string ShortConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
     IntegerConstant::IntegerConstant(const int value) : ContextNode(&Integer::Instance()), value(value)
@@ -37,6 +38,7 @@ namespace Analysis::Structure::Context
     bool IntegerConstant::Readable() const { return true; }
     bool IntegerConstant::Writable() const { return false; }
 
+    uintptr_t IntegerConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string IntegerConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
     LongConstant::LongConstant(const long value) : ContextNode(&Long::Instance()), value(value)
@@ -49,6 +51,7 @@ namespace Analysis::Structure::Context
     bool LongConstant::Readable() const { return true; }
     bool LongConstant::Writable() const { return false; }
 
+    uintptr_t LongConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string LongConstant::CILData() const { return std::format("ldc.i8 {}", value); }
 
     CharacterConstant::CharacterConstant(const char value) : ContextNode(&Character::Instance()), value(value)
@@ -61,9 +64,15 @@ namespace Analysis::Structure::Context
     bool CharacterConstant::Readable() const { return true; }
     bool CharacterConstant::Writable() const { return false; }
 
+    uintptr_t CharacterConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string CharacterConstant::CILData() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
 
-    TrueConstant::TrueConstant(): ContextNode(&Boolean::Instance())
+    BoolConstant::BoolConstant(const bool value) : ContextNode(&Boolean::Instance()), value(value)
+    { }
+
+    uintptr_t BoolConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
+
+    TrueConstant::TrueConstant(): BoolConstant(true)
     { }
 
     MemberType TrueConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -75,7 +84,7 @@ namespace Analysis::Structure::Context
 
     string TrueConstant::CILData() const { return "ldc.i4.1"; }
 
-    FalseConstant::FalseConstant(): ContextNode(&Boolean::Instance())
+    FalseConstant::FalseConstant(): BoolConstant(false)
     { }
 
     MemberType FalseConstant::MemberType() const { return MemberType::ConstantContext; }

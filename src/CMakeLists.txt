@@ -274,8 +274,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/unary_context_node.h
         Analysis/Structure/Core/Interfaces/i_read_write.h
         Analysis/Structure/Core/Interfaces/i_slot_size.h
-        Analysis/Structure/Context/Entities/indexed_context.cpp
-        Analysis/Structure/Context/Entities/indexed_context.h
         Analysis/Structure/Local/Variables/local_variable.cpp
         Analysis/Structure/Local/Variables/local_variable.h
         Analysis/Structure/Context/Entities/References/local_variable_context.cpp
@@ -284,8 +282,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Entities/References/parameter_context.h
         Analysis/Structure/Context/Entities/References/field_context.cpp
         Analysis/Structure/Context/Entities/References/field_context.h
-        Analysis/Structure/Context/Entities/variable_context.cpp
-        Analysis/Structure/Context/Entities/variable_context.h
         Analysis/Structure/Context/Entities/References/property_context.cpp
         Analysis/Structure/Context/Entities/References/property_context.h
         Analysis/Structure/Context/Entities/Functions/function_call_context.cpp
@@ -575,4 +571,7 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Scoped/default_scoped.h
         Analysis/Structure/Global/BuiltIn/built_in_constant.cpp
         Analysis/Structure/Global/BuiltIn/built_in_constant.h
+        Analysis/Structure/Core/Interfaces/DataTypes/i_primitive_type.h
+        Analysis/Structure/Core/Interfaces/Creation/i_built_in_overload.h
+        Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h
 )

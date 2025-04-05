@@ -13,6 +13,7 @@
 #include "../../../Exceptions/Compilation/Analysis/Local/non_static_reference_exception.h"
 
 #include "../../../Lexing/Tokens/Factories/operator.h"
+#include "../../Structure/Compilation/constant_compiler.h"
 
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 
@@ -99,6 +100,7 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr std::string_view CHECK = "C";
@@ -723,7 +725,6 @@ namespace Analysis::Creation::Binding
                     PushException(new LogException("Arguments do not match delegate signature", entity->Token().Index(), dataType->Parent()));
                     return new InvokeContext(&Object::Instance(), Action::Instance({ }));
                 }
-                break;
             case NodeType::FuncRef:
                 {
                     const auto source = dataType->Parent();
@@ -1288,6 +1289,32 @@ namespace Analysis::Creation::Binding
 
     void LocalBindDataType(const IUserDefinedType* const dataType)
     {
+        if (const auto characteristics = dataType->AllCharacteristics(); !characteristics.empty())
+        {
+            auto staticScope = DefaultScoped(Describer::Static), instanceScope = DefaultScoped(Describer::Private);
+
+            for (const auto characteristic: characteristics)
+            {
+                switch (characteristic->MemberType())
+                {
+                    case MemberType::EnumField:
+                    case MemberType::ConstantField:
+                        CompileExpression(dynamic_cast<const IConstant*>(characteristic), dataType);
+                        break;
+                    case MemberType::Field:
+                        {
+                            if (characteristic->CheckDescriber(Describer::Static))
+                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &staticScope, staticScope.Scope(), dataType));
+                            else
+                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &instanceScope, instanceScope.Scope(), dataType));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         for (const auto function: dataType->AllScoped())
         {
             BindScope(function->ParseNode(), function->Scope(), function, dataType);
@@ -1308,35 +1335,6 @@ namespace Analysis::Creation::Binding
                     break;
                 default:
                     break;
-            }
-        }
-
-        if (dataType->MemberType() == MemberType::Enum)
-            return;
-
-        if (const auto characteristics = dataType->AllCharacteristics(); !characteristics.empty())
-        {
-            auto staticScope = DefaultScoped(Describer::Static), instanceScope = DefaultScoped(Describer::Private);
-
-            for (const auto characteristic: dataType->AllCharacteristics())
-            {
-                switch (characteristic->MemberType())
-                {
-                    case MemberType::EnumField:
-                    case MemberType::ConstantField:
-                        //static compile
-                        break;
-                    case MemberType::Field:
-                        {
-                            if (characteristic->CheckDescriber(Describer::Static))
-                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &staticScope, staticScope.Scope(), dataType));
-                            else
-                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &instanceScope, instanceScope.Scope(), dataType));
-                        }
-                        break;
-                    default:
-                        break;
-                }
             }
         }
     }

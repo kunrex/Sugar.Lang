@@ -1,4 +1,3 @@
-
 #ifndef I_COLLECTION_TYPE_H
 #define I_COLLECTION_TYPE_H
 

@@ -8,20 +8,21 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), compiled(false), dependencies()
+    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependencies()
     { }
 
     MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
 
     const std::string& GlobalConstant::FullName() const { return fullName; }
 
-    bool GlobalConstant::Readable() const { return compiled; }
+    bool GlobalConstant::Readable() const { return true; }
     bool GlobalConstant::Writable() const { return false; }
+
+    bool GlobalConstant::Compiled() const { return context != nullptr; }
 
     void GlobalConstant::PushDependency(const IConstant* const constant) const
     {
@@ -36,16 +37,5 @@ namespace Analysis::Structure::Global
 
         return false;
     }
-
-    void GlobalConstant::Compile(const CompilationResult result) const
-    {
-        if (!compiled)
-        {
-            compiled = true;
-            value = result.data;
-        }
-    }
-
-    CompilationResult GlobalConstant::AsCompilationResult() const { return { creationType->Type(), value }; }
 }
 

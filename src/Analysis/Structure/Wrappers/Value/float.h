@@ -5,12 +5,15 @@
 
 #include "../../../../Services/singleton_service.h"
 
+#include "../../Core/Interfaces/Creation/i_built_in_cast.h"
+#include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
+
 #include "../../DataTypes/value_type.h"
 #include "../../Global/BuiltIn/built_in_method.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Float final : public DataTypes::BuiltInValueType, public Services::SingletonService<Float>
+    class Float final : public DataTypes::BuiltInValueType, public Services::SingletonService<Float>, public virtual Core::Interfaces::IPrimitiveType
     {
         protected:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
@@ -18,9 +21,9 @@ namespace Analysis::Structure::Wrappers
             Global::BuiltInMethod* tryParse;
 
             std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, const Core::Interfaces::IFunction*> explicitCasts;
+            std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*> overloads;
+            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
 
             Float();
 
@@ -42,7 +45,11 @@ namespace Analysis::Structure::Wrappers
             [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
+            [[nodiscard]] const Core::Interfaces::IBuiltInCast* FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const override;
+
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
+
+            [[nodiscard]] const Core::Interfaces::IBuiltInOverload* FindBuiltInOverload(Tokens::Enums::SyntaxKind base) const override;
 
             ~Float() override;
     };

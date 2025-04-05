@@ -20,6 +20,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 
@@ -38,6 +39,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 
@@ -56,6 +58,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 
@@ -74,10 +77,21 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
+            [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
     };
 
-    class TrueConstant final : public ContextNode
+    class BoolConstant : public ContextNode
+    {
+        protected:
+            const bool value;
+            explicit BoolConstant(bool value);
+
+        public:
+            [[nodiscard]] uintptr_t Metadata() const override;
+    };
+
+    class TrueConstant final : public BoolConstant
     {
         public:
             TrueConstant();
@@ -92,7 +106,7 @@ namespace Analysis::Structure::Context
             [[nodiscard]] std::string CILData() const override;
     };
 
-    class FalseConstant final : public ContextNode
+    class FalseConstant final : public BoolConstant
     {
         public:
             FalseConstant();

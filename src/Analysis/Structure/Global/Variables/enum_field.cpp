@@ -8,23 +8,24 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
-using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    EnumField::EnumField(const string& name, const Enums::Describer describer) : GlobalVariable(name, describer, &Integer::Instance()), compiled(false), dependencies()
+    EnumField::EnumField(const string& name, const Enums::Describer describer) : GlobalVariable(name, describer, &Integer::Instance()), dependencies()
     { }
 
-    EnumField::EnumField(const string& name, const Enums::Describer describer, const IParseNode* const parseNode) : GlobalVariable(name, describer, &Integer::Instance(), parseNode), compiled(false), dependencies()
+    EnumField::EnumField(const string& name, const Enums::Describer describer, const IParseNode* const parseNode) : GlobalVariable(name, describer, &Integer::Instance(), parseNode), dependencies()
     { }
 
     MemberType EnumField::MemberType() const { return MemberType::EnumField; }
 
     const std::string& EnumField::FullName() const { return fullName; }
 
-    bool EnumField::Readable() const { return compiled; }
+    bool EnumField::Readable() const { return true; }
     bool EnumField::Writable() const { return false; }
+
+    bool EnumField::Compiled() const { return context != nullptr; }
 
     void EnumField::PushDependency(const IConstant* constant) const
     {
@@ -39,15 +40,4 @@ namespace Analysis::Structure::Global
 
         return false;
     }
-
-    void EnumField::Compile(const CompilationResult result) const
-    {
-        if (!compiled)
-        {
-            compiled = true;
-            value = result.data;
-        }
-    }
-
-    CompilationResult EnumField::AsCompilationResult() const { return { creationType->Type(), value }; }
 }

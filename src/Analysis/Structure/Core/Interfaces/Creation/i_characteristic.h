@@ -11,7 +11,7 @@ namespace Analysis::Structure::Core::Interfaces
         public:
             [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const = 0;
 
-            virtual void WithContext(const IContextNode* context) = 0;
+            virtual void WithContext(const IContextNode* context) const = 0;
             [[nodiscard]] virtual const IContextNode* Context() const = 0;
     };
 }

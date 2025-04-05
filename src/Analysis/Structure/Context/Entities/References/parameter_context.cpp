@@ -9,12 +9,10 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    ParameterContext::ParameterContext(const IVariable* const variable, const int index) : IndexedContext(variable, index)
+    ParameterContext::ParameterContext(const IVariable* const variable, const int index) : LocalVariableContext(variable, index)
     { }
 
     MemberType ParameterContext::MemberType() const { return MemberType::FunctionParameterContext; }
-
-    int ParameterContext::SlotCount() const { return creationType->SlotCount(); }
 
     std::string ParameterContext::CILData() const { return std::to_string(index); }
 }
