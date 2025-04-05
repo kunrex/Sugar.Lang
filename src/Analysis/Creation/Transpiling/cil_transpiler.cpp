@@ -43,6 +43,8 @@ using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
+using namespace ParseNodes::Enums;
+
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
@@ -50,6 +52,7 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr string open_flower = "\n{\n";
@@ -157,14 +160,14 @@ namespace Analysis::Creation
         return value;
     }
 
-    void TranspileLoad(const ContextNode* context, StringBuilder& stringBuilder);
-    void TranspileLoad(const ContextNode* current, const ContextNode* context, StringBuilder& stringBuilder);
+    void TranspileLoad(const IContextNode* context, StringBuilder& stringBuilder);
+    void TranspileLoad(const IContextNode* current, const IContextNode* context, StringBuilder& stringBuilder);
 
-    void TranspileExpression(const ContextNode* context, StringBuilder& stringBuilder);
+    void TranspileExpression(const IContextNode* context, StringBuilder& stringBuilder);
 
-    void TranspileLoadField(const FieldContext* const fieldContext, StringBuilder& stringBuilder, const bool loadAddress)
+    void TranspileLoadField(const IContextNode* const fieldContext, StringBuilder& stringBuilder, const bool loadAddress)
     {
-        const auto field = fieldContext->Variable();
+        const auto field = reinterpret_cast<const IVariable*>(fieldContext->Metadata());
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
         if (field->CheckDescriber(Describer::Constexpr))
@@ -180,9 +183,9 @@ namespace Analysis::Creation
         }
     }
 
-    void TranspileLoadField(const FieldContext* const fieldContext, const ContextNode* const context, StringBuilder& stringBuilder, bool loadAddress)
+    void TranspileLoadField(const IContextNode* const fieldContext, const IContextNode* const context, StringBuilder& stringBuilder, const bool loadAddress)
     {
-        const auto field = fieldContext->Variable();
+        const auto field = reinterpret_cast<const IVariable*>(fieldContext->Metadata());
         const auto instruction = loadAddress && field->CreationType()->MemberType() != MemberType::Class ? "flda" : "fld";
 
         if (field->CheckDescriber(Describer::Constexpr))
@@ -200,134 +203,130 @@ namespace Analysis::Creation
             stringBuilder.PushLine(std::format("ld{} {} {}", instruction, field->CreationType()->FullName(), field->FullName()));
     }
 
-    void TranspileLoadProperty(const PropertyContext* const propertyContext, StringBuilder& stringBuilder)
+    void TranspileLoadProperty(const IContextNode* const propertyContext, StringBuilder& stringBuilder)
     {
-        const auto property = propertyContext->Property();
+        const auto property = reinterpret_cast<const PropertyDefinition*>(propertyContext->Metadata());
         if (!property->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(load_this);
 
         stringBuilder.PushLine(property->SignatureGetString());
     }
 
-    void TranspileLoadProperty(const PropertyContext* const propertyContext, const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileLoadProperty(const IContextNode* const propertyContext, const IContextNode* const context, StringBuilder& stringBuilder)
     {
-        const auto property = propertyContext->Property();
-
+        const auto property = reinterpret_cast<const PropertyDefinition*>(propertyContext->Metadata());
         if (property->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
             stringBuilder.PushLine(pop);
 
         stringBuilder.PushLine(property->SignatureGetString());
     }
 
-    void TranspileLoadArguments(const ConstantCollection<ContextNode>& arguments, StringBuilder& stringBuilder)
+    void TranspileLoadArguments(const IContextNode* const arguments, const int offset, StringBuilder& stringBuilder)
     {
-        for (const auto argument: arguments)
-            TranspileExpression(argument, stringBuilder);
+        const auto childCount = arguments->ChildCount();
+
+        for (auto i = offset; i < childCount; i++)
+            TranspileExpression(arguments->GetChild(i), stringBuilder);
     }
 
-    void TranspileFunctionCall(const FunctionCallContext& functionCallContext, StringBuilder& stringBuilder)
+    void TranspileFunctionCall(const IContextNode* const functionCallContext, StringBuilder& stringBuilder)
     {
-        TranspileLoadArguments(functionCallContext, stringBuilder);
-        if (!functionCallContext.Function()->CheckDescriber(Describer::Static))
+        TranspileLoadArguments(functionCallContext, 1, stringBuilder);
+        if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); !function->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(load_this);
 
-        stringBuilder.PushLine(functionCallContext.CILData());
+        stringBuilder.PushLine(functionCallContext->CILData());
     }
 
-    void TranspileFunctionCall(const FunctionCallContext& functionCallContext, const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileFunctionCall(const IContextNode* const functionCallContext, const IContextNode* const context, StringBuilder& stringBuilder)
     {
-        if (functionCallContext.Function()->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+        if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
             stringBuilder.PushLine(pop);
 
-        stringBuilder.PushLine(functionCallContext.CILData());
+        stringBuilder.PushLine(functionCallContext->CILData());
     }
 
-    void TranspileIndexerExpression(const IndexerExpression& indexerExpression, StringBuilder& stringBuilder)
+    void TranspileIndexerExpression(const IContextNode* const indexerExpression, StringBuilder& stringBuilder)
     {
-        TranspileLoad(indexerExpression.Operand(), stringBuilder);
-        TranspileLoadArguments(indexerExpression, stringBuilder);
+        TranspileLoad(indexerExpression->GetChild(0), stringBuilder);
+        TranspileLoadArguments(indexerExpression, 1, stringBuilder);
 
-        stringBuilder.PushLine(indexerExpression.Indexer()->SignatureGetString());
+        stringBuilder.PushLine(reinterpret_cast<const IIndexerDefinition*>(indexerExpression->Metadata())->SignatureGetString());
     }
 
-    void TranspileIndexerExpression(const IndexerExpression& indexerExpression, const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileIndexerExpression(const IContextNode* const indexerExpression, const IContextNode* const context, StringBuilder& stringBuilder)
     {
-        TranspileLoad(indexerExpression.Operand(), context, stringBuilder);
-        TranspileLoadArguments(indexerExpression, stringBuilder);
+        TranspileLoad(indexerExpression->GetChild(0), context, stringBuilder);
+        TranspileLoadArguments(indexerExpression, 1, stringBuilder);
 
-        stringBuilder.PushLine(indexerExpression.Indexer()->SignatureGetString());
+        stringBuilder.PushLine(reinterpret_cast<const IIndexerDefinition*>(indexerExpression->Metadata())->SignatureGetString());
     }
 
-    void TranspileLoadDotLHS(const ContextNode* const lhs, const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileLoadDotLHS(const IContextNode* const lhs, const IContextNode* const context, StringBuilder& stringBuilder)
     {
         switch (lhs->MemberType())
         {
             case MemberType::FieldContext:
-                TranspileLoadField(dynamic_cast<const FieldContext*>(lhs), context, stringBuilder, true);
+                TranspileLoadField(lhs, context, stringBuilder, true);
                 break;
             case MemberType::PropertyContext:
-                TranspileLoadProperty(dynamic_cast<const PropertyContext*>(lhs), context, stringBuilder);
+                TranspileLoadProperty(lhs, context, stringBuilder);
                 break;
             case MemberType::FunctionCallContext:
-                TranspileFunctionCall(*dynamic_cast<const FunctionCallContext*>(lhs), context, stringBuilder);
+                TranspileFunctionCall(lhs, context, stringBuilder);
                 break;
             case MemberType::IndexerExpression:
-                TranspileIndexerExpression(*dynamic_cast<const IndexerExpression*>(lhs), context, stringBuilder);
+                TranspileIndexerExpression(lhs, context, stringBuilder);
                 break;
             default:
                 break;
         }
     }
 
-    void TranspileLoadDotLHS(const ContextNode* const lhs, StringBuilder& stringBuilder)
+    void TranspileLoadDotLHS(const IContextNode* const lhs, StringBuilder& stringBuilder)
     {
         switch (lhs->MemberType())
         {
             case MemberType::FieldContext:
-                TranspileLoadField(dynamic_cast<const FieldContext*>(lhs), stringBuilder, true);
+                TranspileLoadField(lhs, stringBuilder, true);
                 break;
             case MemberType::PropertyContext:
-                TranspileLoadProperty(dynamic_cast<const PropertyContext*>(lhs), stringBuilder);
+                TranspileLoadProperty(lhs, stringBuilder);
                 break;
             case MemberType::LocalVariableContext:
                 {
-                    if (const auto localVariableContext = dynamic_cast<const LocalVariableContext*>(lhs); localVariableContext->Variable()->CreationType()->MemberType() == MemberType::Class)
-                        stringBuilder.PushLine("ldloc." + dynamic_cast<const LocalVariableContext*>(lhs)->Index());
-                    else
-                        stringBuilder.PushLine("ldloca." + dynamic_cast<const LocalVariableContext*>(lhs)->Index());
+                    const auto variable = reinterpret_cast<const IVariable*>(lhs->Metadata());
+                    stringBuilder.Push(std::format("ldloc{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
                 }
                 break;
             case MemberType::FunctionParameterContext:
                 {
-                    if (const auto parameterContext = dynamic_cast<const ParameterContext*>(lhs); parameterContext->Variable()->CreationType()->MemberType() == MemberType::Class)
-                        stringBuilder.PushLine("ldarg." + dynamic_cast<const LocalVariableContext*>(lhs)->Index());
-                    else
-                        stringBuilder.PushLine("ldarga." + dynamic_cast<const LocalVariableContext*>(lhs)->Index());
+                    const auto variable = reinterpret_cast<const IVariable*>(lhs->Metadata());
+                    stringBuilder.Push(std::format("ldarg{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
                 }
                 break;
             case MemberType::FunctionCallContext:
-                TranspileFunctionCall(*dynamic_cast<const FunctionCallContext*>(lhs), stringBuilder);
+                TranspileFunctionCall(lhs, stringBuilder);
                 break;
             case MemberType::IndexerExpression:
-                TranspileIndexerExpression(*dynamic_cast<const IndexerExpression*>(lhs), stringBuilder);
+                TranspileIndexerExpression(lhs, stringBuilder);
                 break;
             default:
                 TranspileLoad(lhs, stringBuilder);
         }
     }
 
-    void TranspileLoad(const ContextNode* const current, const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileLoad(const IContextNode* const current, const IContextNode* const context, StringBuilder& stringBuilder)
     {
         switch (current->MemberType())
         {
             case MemberType::DotExpression:
                 {
-                    const auto dotExpression = dynamic_cast<const DotExpression*>(current);
-                    TranspileLoadDotLHS(dotExpression->LHS(), context, stringBuilder);
-                    TranspileLoad(dotExpression->RHS(), dotExpression->LHS(), stringBuilder);
+                    TranspileLoadDotLHS(current->GetChild(static_cast<int>(ChildCode::LHS)), context, stringBuilder);
+                    TranspileLoad(current->GetChild(static_cast<int>(ChildCode::RHS)), current->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
                 }
             case MemberType::FieldContext:
-                TranspileLoadField(dynamic_cast<const FieldContext*>(current), context, stringBuilder, false);
+                TranspileLoadField(current, context, stringBuilder, false);
                 break;
             case MemberType::PropertyContext:
             case MemberType::IndexerExpression:
@@ -339,7 +338,7 @@ namespace Analysis::Creation
         }
     }
 
-    void TranspileListCollection(const IDataType* const listType, const ConstantCollection<ContextNode>* const arguments, StringBuilder& stringBuilder)
+    void TranspileListCollection(const IDataType* const listType, const IContextNode* const arguments, StringBuilder& stringBuilder)
     {
         stringBuilder.PushLine(listType->FindConstructor({ })->FullName());
         if (arguments->ChildCount() == 0)
@@ -347,76 +346,73 @@ namespace Analysis::Creation
 
         const auto addString = listType->FindFunction("Add", { arguments->GetChild(0)->CreationType() })->FullName();
 
-        auto i = 0;
-        for (const auto argument: arguments)
+        for (auto i = 0; i < arguments->ChildCount(); i++)
         {
             if (i++ < arguments->ChildCount() - 1)
                 stringBuilder.PushLine(dup);
 
-            TranspileExpression(argument, stringBuilder);
+            TranspileExpression(arguments->GetChild(i), stringBuilder);
             stringBuilder.PushLine(addString);
         }
     }
 
-    void TranspileArrayCollection(const IDataType* const arrayType, const ConstantCollection<ContextNode>* const arguments, StringBuilder& stringBuilder)
+    void TranspileArrayCollection(const IDataType* const arrayType, const IContextNode* const arguments, StringBuilder& stringBuilder)
     {
         stringBuilder.PushLine("ldc.i4 " + arguments->ChildCount());
         stringBuilder.PushLine(arrayType->FindConstructor({ &Integer::Instance() })->FullName());
 
         const auto indexerString = arrayType->FindIndexer({ &Integer::Instance() })->SignatureSetString();
 
-        auto i = 0;
-        for (const auto argument: *arguments)
+        for (auto i = 0; i < arguments->ChildCount(); i++)
         {
-            if (i < arguments->ChildCount() - 1)
+            if (i++ < arguments->ChildCount() - 1)
                 stringBuilder.PushLine(dup);
 
             stringBuilder.PushLine("ldc.i4 " + i++);
-            TranspileExpression(argument, stringBuilder);
+            TranspileExpression(arguments->GetChild(i), stringBuilder);
             stringBuilder.PushLine(indexerString);
         }
     }
 
-    const ContextNode* TranspileReturnLoad(const ContextNode* const initialContext, StringBuilder& stringBuilder)
+    const IContextNode* TranspileReturnLoad(const IContextNode* const initialContext, StringBuilder& stringBuilder)
     {
         if (initialContext->MemberType() == MemberType::DotExpression)
         {
-            const auto initial = dynamic_cast<const DotExpression*>(initialContext);
-            TranspileLoad(initial->LHS(), stringBuilder);
+            auto context = initialContext->GetChild(static_cast<int>(ChildCode::LHS));
+            auto current = initialContext->GetChild(static_cast<int>(ChildCode::RHS));
 
-            auto context = initial->LHS();
-            auto current = initial->RHS();
+            TranspileLoad(initialContext->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+
             while (true)
             {
                 switch (current->MemberType())
                 {
                     case MemberType::DotExpression:
                         {
-                            const auto dotExpression = dynamic_cast<const DotExpression*>(current);
-                            TranspileLoad(dotExpression->LHS(), context, stringBuilder);
+                            TranspileLoad(current->GetChild(static_cast<int>(ChildCode::LHS)), context, stringBuilder);
 
-                            context = dotExpression->LHS();
-                            current = dotExpression->RHS();
+                            context = current->GetChild(static_cast<int>(ChildCode::LHS));
+                            current = current->GetChild(static_cast<int>(ChildCode::RHS));
                         }
                         continue;
                     case MemberType::IndexerExpression:
-                        TranspileLoad(dynamic_cast<const IndexerExpression*>(current)->Operand(), context, stringBuilder);
+                        TranspileLoad(current->GetChild(0), context, stringBuilder);
                         break;
                     case MemberType::FieldContext:
                         {
-                            if (const auto field = dynamic_cast<const FieldContext*>(current)->Variable(); field->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+                            if (const auto field = reinterpret_cast<const IVariable*>(current->Metadata()); field->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
                                 stringBuilder.PushLine(pop);
                         }
                         break;
                     case MemberType::PropertyContext:
                         {
-                            if (const auto property = dynamic_cast<const PropertyContext*>(current)->Property(); property->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+                            if (const auto property = reinterpret_cast<const PropertyDefinition*>(current->Metadata()); property->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
                                 stringBuilder.PushLine(pop);
                         }
                         break;
                     case MemberType::FunctionCallContext:
                         {
-                            if (const auto function = dynamic_cast<const FunctionCallContext*>(current)->Function(); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+                            if (const auto function = reinterpret_cast<const IFunctionDefinition*>(current->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
                                 stringBuilder.PushLine(pop);
                         }
                     default:
@@ -430,34 +426,33 @@ namespace Analysis::Creation
         return initialContext;
     }
 
-    void TranspileLoad(const ContextNode* const context, StringBuilder& stringBuilder)
+    void TranspileLoad(const IContextNode* const context, StringBuilder& stringBuilder)
     {
         switch (context->MemberType())
         {
             case MemberType::DotExpression:
                 {
-                    const auto dotExpression = dynamic_cast<const DotExpression*>(context);
-                    TranspileLoadDotLHS(dotExpression->LHS(), stringBuilder);
-                    TranspileLoad(dotExpression->RHS(), dotExpression->LHS(), stringBuilder);
+                    TranspileLoadDotLHS(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileLoad(context->GetChild(static_cast<int>(ChildCode::RHS)), context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
                 }
                 break;
             case MemberType::FieldContext:
-                TranspileLoadField(dynamic_cast<const FieldContext*>(context), stringBuilder, false);
+                TranspileLoadField(context, stringBuilder, false);
                 break;
             case MemberType::PropertyContext:
-                TranspileLoadProperty(dynamic_cast<const PropertyContext*>(context), stringBuilder);
+                TranspileLoadProperty(context, stringBuilder);
                 break;
             case MemberType::LocalVariableContext:
-                stringBuilder.PushLine("ldloc." + dynamic_cast<const LocalVariableContext*>(context)->Index());
+                stringBuilder.PushLine("ldloc." + context->CILData());
                 break;
             case MemberType::FunctionParameterContext:
-                stringBuilder.PushLine("ldarg." + dynamic_cast<const ParameterContext*>(context)->Index());
+                stringBuilder.PushLine("ldarg." + context->CILData());
                 break;
             case MemberType::FunctionCallContext:
-                TranspileFunctionCall(*dynamic_cast<const FunctionCallContext*>(context), stringBuilder);
+                TranspileFunctionCall(context, stringBuilder);
                 break;
             case MemberType::IndexerExpression:
-                TranspileIndexerExpression(*dynamic_cast<const IndexerExpression*>(context), stringBuilder);
+                TranspileIndexerExpression(context, stringBuilder);
                 break;
             case MemberType::PrintContext:
             case MemberType::InputContext:
@@ -465,21 +460,22 @@ namespace Analysis::Creation
                 stringBuilder.PushLine(context->CILData());
             case MemberType::FormatContext:
                 {
-                    const auto formatContext = *dynamic_cast<const FormatContext*>(context);
-                    for (const auto argument: formatContext)
+                    for (auto i = 0; i < context->ChildCount(); i++)
                     {
-                        TranspileExpression(argument, stringBuilder);
+                        const auto child = context->GetChild(i);
+                        TranspileExpression(child, stringBuilder);
 
-                        if (argument->MemberType() != MemberType::Class)
-                            stringBuilder.PushLine(std::format("box {}", argument->CreationType()->FullName()));
+                        if (child->MemberType() != MemberType::Class)
+                            stringBuilder.PushLine(std::format("box {}", child->CreationType()->FullName()));
                     }
 
-                    stringBuilder.Push(formatContext.CILData());
+                    stringBuilder.Push(context->CILData());
                 }
                 break;
             case MemberType::FormatSingleContext:
                 {
-                    const auto operand = dynamic_cast<const FormatSingleContext*>(context)->Operand();
+                    const auto operand = context->GetChild(static_cast<int>(ChildCode::Expression));
+
                     TranspileExpression(operand, stringBuilder);
                     if (operand->CreationType()->MemberType() != MemberType::Class)
                         stringBuilder.PushLine(std::format("box {}", operand->CreationType()->FullName()));
@@ -489,8 +485,7 @@ namespace Analysis::Creation
                 break;
             case MemberType::FormatDoubleContext:
                 {
-                    const auto formatContext = *dynamic_cast<const FormatDoubleContext*>(context);
-                    const auto lhs = formatContext.LHS(), rhs = formatContext.RHS();
+                    const auto lhs = context->GetChild(static_cast<int>(ChildCode::LHS)), rhs = context->GetChild(static_cast<int>(ChildCode::RHS));
 
                     TranspileExpression(lhs, stringBuilder);
                     if (lhs->CreationType()->MemberType() != MemberType::Class)
@@ -500,53 +495,46 @@ namespace Analysis::Creation
                     if (rhs->CreationType()->MemberType() != MemberType::Class)
                         stringBuilder.PushLine(std::format("box {}", rhs->CreationType()->FullName()));
 
-                    stringBuilder.Push(formatContext.CILData());
+                    stringBuilder.Push(context->CILData());
                 }
                 break;
             case MemberType::InvokeContext:
                 {
-                    const auto invokeContext = *dynamic_cast<const InvokeContext*>(context);
-                    TranspileLoadArguments(invokeContext, stringBuilder);
-
-                    stringBuilder.PushLine(invokeContext.CILData());
+                    TranspileLoadArguments(context, 0, stringBuilder);
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::FuncRefContext:
                 {
-                    const auto funcRefContext = dynamic_cast<const FuncRefContext*>(context);
-                    if (const auto operand = funcRefContext->Operand(); operand->MemberType() != MemberType::StaticReferenceContext)
+                    if (const auto operand = context->GetChild(static_cast<int>(ChildCode::Expression)); operand->MemberType() != MemberType::StaticReferenceContext)
                         TranspileLoad(operand, stringBuilder);
 
-                    stringBuilder.Push(funcRefContext->CILData());
+                    stringBuilder.Push(context->CILData());
                 }
                 break;
             case MemberType::CollectorConstructorCallContext:
                 {
                     if (context->CreationType()->Type() == TypeKind::List)
-                        return TranspileListCollection(context->CreationType(), dynamic_cast<const CollectionCreationContext*>(context), stringBuilder);
+                        return TranspileListCollection(context->CreationType(), context, stringBuilder);
 
-                    return TranspileArrayCollection(context->CreationType(), dynamic_cast<const CollectionCreationContext*>(context), stringBuilder);
+                    return TranspileArrayCollection(context->CreationType(), context, stringBuilder);
                 }
                 break;
             case MemberType::RefContext:
                 {
-                    const auto refContext = dynamic_cast<const RefContext*>(context);
-
-                    switch (const auto finalContext = TranspileReturnLoad(refContext->Operand(), stringBuilder); finalContext->MemberType())
+                    switch (const auto finalContext = TranspileReturnLoad(context->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder); finalContext->MemberType())
                     {
                         case MemberType::FieldContext:
                             {
-                                if (const auto field = dynamic_cast<const FieldContext*>(finalContext)->Variable(); field->CheckDescriber(Describer::Static))
-                                    stringBuilder.PushLine(std::format("ldsflda {} {}", field->CreationType()->FullName(), field->FullName()));
-                                else
-                                    stringBuilder.PushLine(std::format("ldflda {} {}", field->CreationType()->FullName(), field->FullName()));
+                                const auto field = reinterpret_cast<const IVariable*>(finalContext->Metadata());
+                                stringBuilder.PushLine(std::format("ld{}flda {} {}", field->CheckDescriber(Describer::Static) ? "s" : "", field->CreationType()->FullName(), field->FullName()));
                             }
                             break;
                         case MemberType::LocalVariableContext:
-                            stringBuilder.PushLine("ldloca." + dynamic_cast<const LocalVariableContext*>(finalContext)->Index());
+                            stringBuilder.PushLine("ldloca." + finalContext->CILData());
                             break;
                         case MemberType::FunctionParameterContext:
-                            stringBuilder.PushLine("ldlarga." + dynamic_cast<const ParameterContext*>(finalContext)->Index());
+                            stringBuilder.PushLine("ldlarga." + finalContext->CILData());
                             break;
                         default:
                             break;
@@ -555,8 +543,7 @@ namespace Analysis::Creation
                 break;
             case MemberType::CopyContext:
                 {
-                    const auto copyContext = dynamic_cast<const CopyContext*>(context);
-                    const auto operand = copyContext->Operand();
+                    const auto operand = context->GetChild(static_cast<int>(ChildCode::Expression));
 
                     TranspileExpression(operand, stringBuilder);
                     switch (const auto creationType = operand->CreationType(); creationType->Type())
@@ -601,55 +588,51 @@ namespace Analysis::Creation
             case MemberType::UnaryExpression:
                 {
                     const auto unaryExpression = dynamic_cast<const UnaryContextNode*>(context);
-                    TranspileExpression(unaryExpression->Operand(), stringBuilder);
+                    TranspileExpression(unaryExpression->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder);
                     stringBuilder.PushLine(unaryExpression->CILData());
                 }
                 break;
             case MemberType::BinaryExpression:
                 {
                     const auto binaryExpression = dynamic_cast<const BinaryContextNode*>(context);
-                    TranspileExpression(binaryExpression->LHS(), stringBuilder);
-                    TranspileExpression(binaryExpression->RHS(), stringBuilder);
+                    TranspileExpression(binaryExpression->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileExpression(binaryExpression->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
                     stringBuilder.PushLine(binaryExpression->CILData());
                 }
                 break;
             case MemberType::AssignmentExpression:
                 {
-                    const auto assignmentExpression = dynamic_cast<const BinaryContextNode*>(context);
-                    const auto finalContext = TranspileReturnLoad(assignmentExpression->LHS(), stringBuilder);
+                    const auto finalContext = TranspileReturnLoad(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    const auto rhs = context->GetChild(static_cast<int>(ChildCode::RHS));
 
                     if (finalContext->MemberType() == MemberType::IndexerExpression)
                     {
-                        const auto indexerExpression = *dynamic_cast<const IndexerExpression*>(finalContext);
-                        TranspileLoadArguments(indexerExpression, stringBuilder);
+                        TranspileLoadArguments(finalContext, 1, stringBuilder);
 
-                        TranspileExpression(assignmentExpression->RHS(), stringBuilder);
-                        stringBuilder.PushLine(indexerExpression.Indexer()->SignatureSetString());
+                        TranspileExpression(rhs, stringBuilder);
+                        stringBuilder.PushLine(reinterpret_cast<const IIndexerDefinition*>(finalContext->Metadata())->SignatureSetString());
                         break;
                     }
 
-                    TranspileExpression(assignmentExpression->RHS(), stringBuilder);
-
+                    TranspileExpression(rhs, stringBuilder);
                     stringBuilder.PushLine(dup);
 
                     switch (finalContext->MemberType())
                     {
                         case MemberType::FieldContext:
                             {
-                                if (const auto field = dynamic_cast<const FieldContext*>(finalContext)->Variable(); field->CheckDescriber(Describer::Static))
-                                    stringBuilder.PushLine(std::format("stsfld {} {}", field->CreationType()->FullName(), field->FullName()));
-                                else
-                                    stringBuilder.PushLine(std::format("stfld {} {}", field->CreationType()->FullName(), field->FullName()));
+                                const auto field = reinterpret_cast<const IVariable*>(finalContext->Metadata());
+                                stringBuilder.PushLine(std::format("st{}fld {} {}", field->CheckDescriber(Describer::Static) ? "s" : "", field->CreationType()->FullName(), field->FullName()));
                             }
                             break;
                         case MemberType::PropertyContext:
-                            stringBuilder.PushLine(dynamic_cast<const PropertyContext*>(finalContext)->Property()->SignatureSetString());
+                            stringBuilder.PushLine(reinterpret_cast<const PropertyDefinition*>(finalContext->Metadata())->SignatureSetString());
                             break;
                         case MemberType::LocalVariableContext:
-                            stringBuilder.PushLine("stloc." + dynamic_cast<const LocalVariableContext*>(finalContext)->Index());
+                            stringBuilder.PushLine("stloc." + finalContext->CILData());
                             break;
                         case MemberType::FunctionParameterContext:
-                            stringBuilder.PushLine("starg." + dynamic_cast<const ParameterContext*>(finalContext)->Index());
+                            stringBuilder.PushLine("starg." + finalContext->CILData());
                             break;
                         default:
                             break;

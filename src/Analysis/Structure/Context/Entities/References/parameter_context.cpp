@@ -15,4 +15,6 @@ namespace Analysis::Structure::Context
     MemberType ParameterContext::MemberType() const { return MemberType::FunctionParameterContext; }
 
     int ParameterContext::SlotCount() const { return creationType->SlotCount(); }
+
+    std::string ParameterContext::CILData() const { return std::to_string(index); }
 }

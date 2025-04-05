@@ -2,6 +2,7 @@
 #define FUNCTION_CALL_CONTEXT_H
 
 #include "../../context_node.h"
+
 #include "../../../Creation/Functions/function_definition.h"
 
 namespace Analysis::Structure::Context

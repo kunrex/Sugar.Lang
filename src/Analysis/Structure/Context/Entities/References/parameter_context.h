@@ -15,6 +15,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] std::string CILData() const override;
     };
 }
 

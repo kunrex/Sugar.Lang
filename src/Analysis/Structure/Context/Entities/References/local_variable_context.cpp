@@ -15,4 +15,7 @@ namespace Analysis::Structure::Context
     MemberType LocalVariableContext::MemberType() const { return MemberType::LocalVariableContext; }
 
     int LocalVariableContext::SlotCount() const { return creationType->SlotCount(); }
+
+    std::string LocalVariableContext::CILData() const { return std::to_string(index); }
+
 }
