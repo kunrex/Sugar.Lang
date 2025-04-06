@@ -7,6 +7,7 @@
 #include "long.h"
 #include "./float.h"
 #include "boolean.h"
+#include "built_in_functions.h"
 #include "../Reference/string.h"
 #include "../Generic/referenced.h"
 
@@ -31,17 +32,6 @@ constexpr std::string cil_double = "[System.Runtime]System.Double";
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult ExplicitShort(const CompilationResult& argument) { return  { &Short::Instance(), static_cast<long>(std::get<double>(argument.data)) }; }
-    CompilationResult ExplicitInteger(const CompilationResult& argument) { return  { &Integer::Instance(), static_cast<long>(std::get<double>(argument.data)) }; }
-    CompilationResult ExplicitLong(const CompilationResult& argument) { return  { &Long::Instance(), static_cast<long>(std::get<double>(argument.data)) }; }
-
-    CompilationResult ExplicitFloat(const CompilationResult& argument) { return  { &Float::Instance(), std::get<double>(argument.data) }; }
-
-    CompilationResult ExplicitString(const CompilationResult& argument) { return  { &String::Instance(), std::to_string(std::get<double>(argument.data)) }; }
-
-    CompilationResult Equals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data == arguments[1].data)} ; }
-    CompilationResult NotEquals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data != arguments[1].data)} ; }
-
     CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) + std::get<double>(arguments[1].data)} ; }
     CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) - std::get<double>(arguments[1].data)} ; }
     CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) * std::get<double>(arguments[1].data)} ; }
@@ -49,11 +39,6 @@ namespace Analysis::Structure::Wrappers
 
     CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), arguments[0].data }; }
     CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), -std::get<double>(arguments[0].data) }; }
-
-    CompilationResult GreaterThan(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<double>(arguments[0].data) > std::get<double>(arguments[1].data))} ; }
-    CompilationResult LesserThan(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<double>(arguments[0].data) < std::get<double>(arguments[1].data))} ; }
-    CompilationResult GreaterThanEquals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<double>(arguments[0].data) >= std::get<double>(arguments[1].data))} ; }
-    CompilationResult LesserThanEquals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<double>(arguments[0].data) <= std::get<double>(arguments[1].data))} ; }
 
     Double::Double() : BuiltInValueType(cil_double, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), explicitCasts(), overloads()
     { }
@@ -77,32 +62,32 @@ namespace Analysis::Structure::Wrappers
         tryParse->PushParameterType(&String::Instance());
         tryParse->PushParameterType(Referenced::Instance(&Instance()));
 
-        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ExplicitShort);
+        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ShortCast<double>);
         explicitShort->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Short::Instance(), &Instance() })] = explicitShort;
 
-        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", ExplicitInteger);
+        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", IntCast<double>);
         explicitInteger->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance() })] = explicitInteger;
 
-        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", ExplicitLong);
+        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", LongCast<double>);
         explicitLong->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = explicitLong;
 
-        const auto explicitFloat = new BuiltInCast(&Float::Instance(), "conv.r4", ExplicitFloat);
+        const auto explicitFloat = new BuiltInCast(&Float::Instance(), "conv.r4", FloatCast<double>);
         explicitFloat->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Float::Instance(), &Instance() })] = explicitFloat;
 
-        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()", ExplicitString);
+        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()", StringCast<double>);
         explicitString->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &String::Instance(), &Instance() })] = explicitShort;
 
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "ceq", Equals);
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "ceq", Equals<double>);
         equals->PushParameterType(&Instance());
         equals->PushParameterType(&Instance());
         overloads[SyntaxKind::Equals] = equals;
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals);
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals<double>);
         notEquals->PushParameterType(&Instance());
         notEquals->PushParameterType(&Instance());
         overloads[SyntaxKind::NotEquals] = notEquals;
@@ -145,22 +130,22 @@ namespace Analysis::Structure::Wrappers
         decrement->PushParameterType(&Instance());
         overloads[SyntaxKind::Decrement] = decrement;
 
-        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt", GreaterThan);
+        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt", GreaterThan<double>);
         greater->PushParameterType(&Instance());
         greater->PushParameterType(&Instance());
         overloads[SyntaxKind::GreaterThan] = greater;
 
-        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, &Boolean::Instance(), "clt", LesserThan);
+        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, &Boolean::Instance(), "clt", LesserThan<double>);
         lesser->PushParameterType(&Instance());
         lesser->PushParameterType(&Instance());
         overloads[SyntaxKind::LesserThan] = lesser;
 
-        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, &Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals);
+        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, &Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals<double>);
         greaterEquals->PushParameterType(&Instance());
         greaterEquals->PushParameterType(&Instance());
         overloads[SyntaxKind::GreaterThanEquals] = greaterEquals;
 
-        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, &Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThan);
+        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, &Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThanEquals<double>);
         lesserEquals->PushParameterType(&Instance());
         lesserEquals->PushParameterType(&Instance());
         overloads[SyntaxKind::LesserThanEquals] = lesserEquals;

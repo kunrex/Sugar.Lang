@@ -8,6 +8,8 @@
 #include "../Value/character.h"
 #include "../Generic/array.h"
 
+#include "../Value/built_in_functions.h"
+
 #include "../../Global/BuiltIn/built_in_method.h"
 #include "../../Global/BuiltIn/built_in_indexer.h"
 #include "../../Global/BuiltIn/built_in_operation.h"
@@ -40,7 +42,7 @@ namespace Analysis::Structure::Wrappers
     {
         string result;
         const auto lhs = std::get<string>(arguments[0].data);
-        const auto rhs = std::get<long>(arguments[1].data);
+        const auto rhs = std::get<int>(arguments[1].data);
         for (auto i = 0; i < rhs; i++)
             result += lhs;
 
@@ -127,6 +129,16 @@ namespace Analysis::Structure::Wrappers
         multiplication->PushParameterType(&Instance());
         multiplication->PushParameterType(&Integer::Instance());
         overloads[SyntaxKind::Multiplication] = multiplication;
+
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "[System.Runtime]System.String::Equals(string, string)", Equals<string>);
+        equals->PushParameterType(&Instance());
+        equals->PushParameterType(&Instance());
+        overloads[SyntaxKind::Equals] = equals;
+
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "[System.Runtime]System.String::Equals(string, string) ldc.i4.0 ceq", NotEquals<string>);
+        notEquals->PushParameterType(&Instance());
+        notEquals->PushParameterType(&Instance());
+        overloads[SyntaxKind::NotEquals] = notEquals;
     }
 
     const ICharacteristic* String::FindCharacteristic(const string& name) const

@@ -49,9 +49,9 @@ namespace Analysis::Structure::Compilation
         switch (constant->CreationType()->Type())
         {
         case TypeKind::Short:
-                return CompilationResult(&Short::Instance(), static_cast<long>(*reinterpret_cast<const short*>(constant->Context()->Metadata())));
+                return CompilationResult(&Short::Instance(), *reinterpret_cast<const short*>(constant->Context()->Metadata()));
             case TypeKind::Int:
-                return CompilationResult(&Integer::Instance(), static_cast<long>(*reinterpret_cast<const int*>(constant->Context()->Metadata())));
+                return CompilationResult(&Integer::Instance(), *reinterpret_cast<const int*>(constant->Context()->Metadata()));
             case TypeKind::Long:
                 return CompilationResult(&Long::Instance(), *reinterpret_cast<const long*>(constant->Context()->Metadata()));
             case TypeKind::Float:
@@ -59,9 +59,9 @@ namespace Analysis::Structure::Compilation
             case TypeKind::Double:
                 return CompilationResult(&Double::Instance(), *reinterpret_cast<const double*>(constant->Context()->Metadata()));
             case TypeKind::Boolean:
-                return CompilationResult(&Boolean::Instance(), static_cast<long>(*reinterpret_cast<const bool*>(constant->Context()->Metadata())));
+                return CompilationResult(&Boolean::Instance(), *reinterpret_cast<const bool*>(constant->Context()->Metadata()));
             case TypeKind::Character:
-                return CompilationResult(&Character::Instance(), static_cast<long>(*reinterpret_cast<const char*>(constant->Context()->Metadata())));
+                return CompilationResult(&Character::Instance(), *reinterpret_cast<const char*>(constant->Context()->Metadata()));
             case TypeKind::String:
                 return CompilationResult(&String::Instance(), *reinterpret_cast<const string*>(constant->Context()->Metadata()));
             default:
@@ -117,7 +117,7 @@ namespace Analysis::Structure::Compilation
                             return std::nullopt;
                         }
 
-                        if (auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
+                        if (const auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
                         {
                             const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<string>());
                             if (characteristic == nullptr)
@@ -239,19 +239,19 @@ namespace Analysis::Structure::Compilation
         switch (result->creationType)
         {
             case TypeKind::Short:
-                constant->WithContext(new ShortConstant(static_cast<short>(std::get<long>(result->data))));
+                constant->WithContext(new ShortConstant(std::get<short>(result->data)));
             case TypeKind::Int:
-                constant->WithContext(new IntegerConstant(static_cast<int>(std::get<long>(result->data))));
+                constant->WithContext(new IntegerConstant(std::get<int>(result->data)));
             case TypeKind::Long:
                 constant->WithContext(new LongConstant(std::get<long>(result->data)));
             case TypeKind::Float:
-                constant->WithContext(new FloatConstant(static_cast<float>(std::get<double>(result->data))));
+                constant->WithContext(new FloatConstant(std::get<float>(result->data)));
             case TypeKind::Double:
                 constant->WithContext(new DoubleConstant(std::get<double>(result->data)));
             case TypeKind::Boolean:
-                constant->WithContext(std::get<long>(result->data) == 0 ? new FalseConstant() : new TrueConstant());
+                constant->WithContext(std::get<bool>(result->data) ? new TrueConstant() : new FalseConstant());
             case TypeKind::Character:
-                constant->WithContext(new CharacterConstant(static_cast<char>(std::get<long>(result->data))));
+                constant->WithContext(new CharacterConstant(std::get<char>(result->data)));
             case TypeKind::String:
                 constant->WithContext(new StringConstant(std::get<string>(result->data)));
                 break;

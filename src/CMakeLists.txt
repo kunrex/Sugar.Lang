@@ -574,4 +574,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/DataTypes/i_primitive_type.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_overload.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h
+        Analysis/Structure/Wrappers/Value/built_in_functions.cpp
+        Analysis/Structure/Wrappers/Value/built_in_functions.h
 )

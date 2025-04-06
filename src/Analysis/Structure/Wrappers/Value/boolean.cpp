@@ -1,5 +1,6 @@
 #include "boolean.h"
 
+#include "built_in_functions.h"
 #include "../../DataTypes/data_type_extensions.h"
 
 #include "long.h"
@@ -25,19 +26,10 @@ constexpr std::string cil_boolean = "[System.Runtime]System.Boolean";
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult ExplicitShort(const CompilationResult& argument) { return  { &Short::Instance(), std::get<long>(argument.data) }; }
-    CompilationResult ExplicitInteger(const CompilationResult& argument) { return  { &Integer::Instance(), std::get<long>(argument.data) }; }
-    CompilationResult ExplicitLong(const CompilationResult& argument) { return  { &Long::Instance(), std::get<long>(argument.data) }; }
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), !std::get<bool>(arguments[0].data)} ; }
 
-    CompilationResult ImplicitString(const CompilationResult& argument) { return  { &String::Instance(), std::to_string(static_cast<bool>(std::get<long>(argument.data))) }; }
-
-    CompilationResult Equals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data == arguments[1].data)} ; }
-    CompilationResult NotEquals(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(arguments[0].data != arguments[1].data)} ; }
-
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(!std::get<long>(arguments[0].data))} ; }
-
-    CompilationResult And(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<long>(arguments[0].data) && std::get<long>(arguments[1].data))}; }
-    CompilationResult Or(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), static_cast<long>(std::get<long>(arguments[0].data) || std::get<long>(arguments[1].data))}; }
+    CompilationResult And(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), std::get<bool>(arguments[0].data) && std::get<bool>(arguments[1].data)}; }
+    CompilationResult Or(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), std::get<bool>(arguments[0].data) || std::get<bool>(arguments[1].data)}; }
 
     Boolean::Boolean() : BuiltInValueType(cil_boolean, Enums::Describer::Public), SingletonService(), implicitCasts(), explicitCasts(), overloads()
     { }
@@ -48,28 +40,28 @@ namespace Analysis::Structure::Wrappers
 
     void Boolean::InitializeMembers()
     {
-        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ExplicitShort);
+        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ShortCast<bool>);
         explicitShort->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Short::Instance(), &Instance()})] = explicitShort;
 
-        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", ExplicitInteger);
+        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", IntCast<bool>);
         explicitInteger->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = explicitShort;
 
-        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", ExplicitLong);
+        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", LongCast<bool>);
         explicitLong->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &Long::Instance(), &Instance()})] = explicitShort;
 
-        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Boolean::ToString()", ImplicitString);
+        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Boolean::ToString()", StringCast<bool>);
         explicitString->PushParameterType(&Instance());
         explicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = explicitShort;
 
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Instance(), "ceq", Equals);
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Instance(), "ceq", Equals<bool>);
         equals->PushParameterType(&Instance());
         equals->PushParameterType(&Instance());
         overloads[SyntaxKind::Equals] = equals;
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Instance(), "ceq ldc.i4.0 ceq", NotEquals);
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Instance(), "ceq ldc.i4.0 ceq", NotEquals<bool>);
         notEquals->PushParameterType(&Instance());
         notEquals->PushParameterType(&Instance());
         overloads[SyntaxKind::NotEquals] = notEquals;
