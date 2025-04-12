@@ -11,6 +11,8 @@ namespace ParseNodes::Statements
             explicit ImportStatementNode(const Tokens::Token& path);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

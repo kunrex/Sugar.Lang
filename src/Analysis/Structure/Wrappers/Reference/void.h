@@ -7,12 +7,14 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Void final : public DataTypes::BuiltInClass, public Services::SingletonService<Void>
+    class Void final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
-        protected:
+        private:
             Void();
 
         public:
+            static const Void& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;

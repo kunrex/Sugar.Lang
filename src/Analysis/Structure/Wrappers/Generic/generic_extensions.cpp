@@ -24,7 +24,7 @@ namespace Analysis::Structure::Wrappers
         std::string signature;
         for (int i = 0; i < types.size(); i++)
         {
-            signature += "!" + i;
+            signature += "!" + std::to_string(i);
             if (i < types.size() - 1)
                 signature += ", ";
         }

@@ -13,9 +13,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Integer final : public DataTypes::BuiltInValueType, public Services::SingletonService<Integer>, public virtual Core::Interfaces::IPrimitiveType
+    class Integer final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             Global::BuiltInMethod* tryParse;
@@ -28,6 +28,8 @@ namespace Analysis::Structure::Wrappers
             Integer();
 
         public:
+            static const Integer& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

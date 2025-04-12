@@ -14,9 +14,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Double final : public DataTypes::BuiltInValueType, public Services::SingletonService<Double>, public virtual Core::Interfaces::IPrimitiveType
+    class Double final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             Global::BuiltInMethod* tryParse;
@@ -28,6 +28,8 @@ namespace Analysis::Structure::Wrappers
             Double();
 
         public:
+            static const Double& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

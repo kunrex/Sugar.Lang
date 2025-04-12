@@ -6,7 +6,6 @@
 #include "../../Structure/source_file.h"
 #include "../../Structure/source_directory.h"
 #include "../../Structure/Context/context_node.h"
-#include "../../Structure/Global/Variables/enum_field.h"
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 #include "../../Structure/Global/Variables/global_constant.h"
 
@@ -24,22 +23,23 @@ namespace Analysis::Creation
 
             Services::StringBuilder stringBuilder;
 
-            void CILTranspiler::TranspileDirectory(const Structure::SourceDirectory* directory);
+            void PushTranscription();
 
-            void CILTranspiler::TranspileFile(const Structure::SourceFile* file);
-            void CILTranspiler::TranspileDataType(const Structure::Core::Interfaces::IUserDefinedType* dataType);
+            void TranspileDirectory(const Structure::SourceDirectory* directory);
 
-            void CILTranspiler::TranspileConstant(const Structure::Global::GlobalConstant* constant);
-            void CILTranspiler::TranspileCharacteristic(const Structure::Core::Interfaces::ICharacteristic* characteristic);
+            void TranspileFile(const Structure::SourceFile* file);
+            void TranspileDataType(const Structure::Core::Interfaces::IUserDefinedType* dataType);
 
-            void CILTranspiler::TranspileFunction(const Structure::Core::Interfaces::IScoped* function);
-            void CILTranspiler::TranspileConstructor(const Structure::Core::Interfaces::IScoped* constructor);
+            void TranspileConstant(const Structure::Core::Interfaces::ICharacteristic* constant);
+            void TranspileCharacteristic(const Structure::Core::Interfaces::ICharacteristic* characteristic);
+            void TranspileEnumField(const Structure::Core::Interfaces::ICharacteristic* constant, const std::string& enumType);
 
-            void CILTranspiler::TranspileFunctionBody(const Structure::Core::Interfaces::IScoped* scoped);
+            void TranspileFunction(const Structure::Core::Interfaces::IScoped* function);
+            void TranspileConstructor(const Structure::Core::Interfaces::IScoped* constructor, const std::string& precursor);
 
-            void CILTranspiler::TranspileScope(const Structure::Local::Scope* scope, Services::StringBuilder& stringBuilder, int& maxSlotSize);
+            void TranspileFunctionBody(const Structure::Core::Interfaces::IScoped* scoped, const std::string& precursor);
 
-            void CILTranspiler::TranspileContext(const Structure::Context::ContextNode* context, Services::StringBuilder& stringBuilder);
+            void TranspileScope(const Structure::Local::Scope* scope, Services::StringBuilder& stringBuilder, int& maxSlotSize);
 
         public:
             CILTranspiler(std::string name, std::string directory, const Structure::SourceDirectory* source);

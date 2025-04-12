@@ -28,20 +28,30 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_double = "[System.Runtime]System.Double";
+const string cil_double = "[System.Runtime]System.Double";
+
+namespace
+{
+    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), std::get<double>(arguments[0].data) + std::get<double>(arguments[1].data)} ; }
+    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), std::get<double>(arguments[0].data) - std::get<double>(arguments[1].data)} ; }
+    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), std::get<double>(arguments[0].data) * std::get<double>(arguments[1].data)} ; }
+    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), std::get<double>(arguments[0].data) / std::get<double>(arguments[1].data)} ; }
+
+    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), arguments[0].data }; }
+    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Double::Instance(), -std::get<double>(arguments[0].data) }; }
+}
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) + std::get<double>(arguments[1].data)} ; }
-    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) - std::get<double>(arguments[1].data)} ; }
-    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) * std::get<double>(arguments[1].data)} ; }
-    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), std::get<double>(arguments[0].data) / std::get<double>(arguments[1].data)} ; }
-
-    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), arguments[0].data }; }
-    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Double::Instance(), -std::get<double>(arguments[0].data) }; }
 
     Double::Double() : BuiltInValueType(cil_double, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), explicitCasts(), overloads()
     { }
+
+    const Double& Double::Instance()
+    {
+        static const Double instance;
+        return instance;
+    }
 
     int Double::SlotCount() const { return 2; }
 
@@ -196,9 +206,6 @@ namespace Analysis::Structure::Wrappers
 
     Double::~Double()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         delete tryParse;
 
         for (const auto cast: explicitCasts)

@@ -3,12 +3,12 @@
 
 #include "../../../../Services/singleton_service.h"
 
-#include "../../DataTypes/class.h""
+#include "../../DataTypes/class.h"
 #include "../../Core/Interfaces/DataTypes/i_delegate_type.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Action final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::IDelegateType
+    class Action final : public DataTypes::BuiltInClass, public Services::SingletonService, public virtual Core::Interfaces::IDelegateType
     {
         private:
             mutable std::string genericSignature;

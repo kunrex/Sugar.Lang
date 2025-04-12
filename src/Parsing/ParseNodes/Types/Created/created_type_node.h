@@ -11,6 +11,8 @@ namespace ParseNodes::Types
             explicit CreatedTypeNode(const Values::IdentifierNode* identifier);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

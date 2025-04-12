@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Referenced final : public DataTypes::BuiltInClass, public Services::SingletonCollection
+    class Referenced final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
             const IDataType* referencedType;

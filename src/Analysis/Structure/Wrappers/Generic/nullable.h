@@ -9,7 +9,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Nullable final : public DataTypes::BuiltInValueType, public Services::SingletonCollection
+    class Nullable final : public DataTypes::BuiltInValueType, public Services::SingletonService
     {
         private:
             mutable std::string genericSignature;

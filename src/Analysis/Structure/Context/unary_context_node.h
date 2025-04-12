@@ -7,7 +7,8 @@ namespace Analysis::Structure::Context
 {
     class UnaryContextNode : public FixedContextCollection<1>
     {
-        UnaryContextNode(const Core::Interfaces::IDataType* creationType, const IContextNode* operand);
+        protected:
+            UnaryContextNode(const Core::Interfaces::IDataType* creationType, const IContextNode* operand);
     };
 }
 

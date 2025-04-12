@@ -10,4 +10,9 @@ namespace ParseNodes::Constants
     { }
 
     NodeType ConstantNode::NodeType() const { return NodeType::Constant; }
+
+    void ConstantNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Constant Node" << std::endl;
+    }
 }

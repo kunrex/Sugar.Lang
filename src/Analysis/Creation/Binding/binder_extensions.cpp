@@ -67,7 +67,7 @@ namespace Analysis::Creation::Binding
             PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
-    const IPrimitiveType* BindBuiltInType(const IParseNode* node)
+    const IDataType* BindBuiltInType(const IParseNode* const node)
     {
         switch (node->Token().Kind())
         {

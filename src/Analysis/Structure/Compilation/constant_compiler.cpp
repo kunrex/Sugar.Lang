@@ -44,13 +44,37 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Compilation
 {
+    const IPrimitiveType* BindPrimitiveType(const IParseNode* const node)
+    {
+        switch (node->Token().Kind())
+        {
+        case SyntaxKind::Short:
+            return &Short::Instance();
+        case SyntaxKind::Int:
+            return &Integer::Instance();
+        case SyntaxKind::Long:
+            return &Long::Instance();
+        case SyntaxKind::Float:
+            return &Float::Instance();
+        case SyntaxKind::Double:
+            return &Double::Instance();
+        case SyntaxKind::String:
+            return &String::Instance();
+        case SyntaxKind::Character:
+            return &Character::Instance();
+        default:
+            return &Boolean::Instance();
+        }
+    }
+
     std::optional<CompilationResult> AsCompilationResult(const IConstant* const constant)
     {
         switch (constant->CreationType()->Type())
         {
-        case TypeKind::Short:
+            case TypeKind::Short:
                 return CompilationResult(&Short::Instance(), *reinterpret_cast<const short*>(constant->Context()->Metadata()));
             case TypeKind::Int:
+            case TypeKind::EnumField:
                 return CompilationResult(&Integer::Instance(), *reinterpret_cast<const int*>(constant->Context()->Metadata()));
             case TypeKind::Long:
                 return CompilationResult(&Long::Instance(), *reinterpret_cast<const long*>(constant->Context()->Metadata()));
@@ -73,7 +97,6 @@ namespace Analysis::Structure::Compilation
     {
         switch (const auto characteristic = creationType->FindCharacteristic(*identifierNode->Token().Value<string>()); characteristic->MemberType())
         {
-            case MemberType::EnumField:
             case MemberType::ConstantField:
                 {
                     const auto constField = dynamic_cast<const IConstant*>(characteristic);
@@ -167,7 +190,7 @@ namespace Analysis::Structure::Compilation
                     if (!operand)
                         return std::nullopt;
 
-                    const auto type = BindBuiltInType(parseNode->GetChild(static_cast<int>(ChildCode::RHS)));
+                    const auto type = BindPrimitiveType(parseNode->GetChild(static_cast<int>(ChildCode::RHS)));
 
                     if (const auto cast = operand->creationType->FindBuiltInCast(type, operand->creationType); cast != nullptr)
                         return cast->StaticCompile(*operand);
@@ -226,7 +249,9 @@ namespace Analysis::Structure::Compilation
 
                     return overload->StaticCompile({ *lhs, *rhs });
                 }
-                break;
+            default:
+                //exception
+                return std::nullopt;
         }
     }
 
@@ -236,22 +261,34 @@ namespace Analysis::Structure::Compilation
         if (!result)
             return;
 
-        switch (result->creationType)
+        switch (result->creationType->Type())
         {
             case TypeKind::Short:
                 constant->WithContext(new ShortConstant(std::get<short>(result->data)));
+                break;
             case TypeKind::Int:
                 constant->WithContext(new IntegerConstant(std::get<int>(result->data)));
+                break;
             case TypeKind::Long:
                 constant->WithContext(new LongConstant(std::get<long>(result->data)));
+                break;
             case TypeKind::Float:
                 constant->WithContext(new FloatConstant(std::get<float>(result->data)));
+                break;
             case TypeKind::Double:
                 constant->WithContext(new DoubleConstant(std::get<double>(result->data)));
+                break;
             case TypeKind::Boolean:
-                constant->WithContext(std::get<bool>(result->data) ? new TrueConstant() : new FalseConstant());
+                {
+                    if (std::get<bool>(result->data))
+                        constant->WithContext(new TrueConstant());
+                    else
+                        constant->WithContext(new FalseConstant());
+                }
+                break;
             case TypeKind::Character:
                 constant->WithContext(new CharacterConstant(std::get<char>(result->data)));
+                break;
             case TypeKind::String:
                 constant->WithContext(new StringConstant(std::get<string>(result->data)));
                 break;

@@ -27,5 +27,5 @@ namespace Tokens::Enums
         return result.substr(0, result.size() - 2);
     }
 
-    std::ostream& operator<<(std::ostream& os, const SyntaxKind& dt) { return os << ToString(dt); }
+    std::ostream& operator<<(std::ostream& os, const SeparatorKind& dt) { return os << ToString(dt); }
 }

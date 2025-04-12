@@ -17,12 +17,18 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_math = "[System.Runtime]System.Math";
+const string cil_math = "[System.Runtime]System.Math";
 
 namespace Analysis::Structure::Wrappers
 {
     Math::Math() : BuiltInClass(cil_math, Describer::PublicStatic), SingletonService(), characteristics(), functions()
     { }
+
+    const Math& Math::Instance()
+    {
+        static const Math instance;
+        return instance;
+    }
 
     TypeKind Math::Type() const { return TypeKind::Math; }
 

@@ -8,8 +8,22 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Statements
 {
-    DeclarationNode::DeclarationNode(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier, const Tokens::Token& separator) : FixedNodeCollection(separator), CharacteristicNode(describer, type, identifier)
-    { }
+    DeclarationNode::DeclarationNode(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier, const Tokens::Token& separator) : FixedNodeCollection(separator)
+    {
+        AddChild(ChildCode::Describer, describer);
+        AddChild(ChildCode::Type, type);
+        AddChild(ChildCode::Identifier, identifier);
+    }
 
     NodeType DeclarationNode::NodeType() const { return NodeType::Declaration; }
+
+    void DeclarationNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Declaration Statement Node" << std::endl;
+        const auto next = last ? " " : "| ";
+
+        GetChild(static_cast<int>(ChildCode::Describer))->Print(indent + next, false);
+        GetChild(static_cast<int>(ChildCode::Type))->Print(indent + next, false);
+        GetChild(static_cast<int>(ChildCode::Identifier))->Print(indent + next, true);
+    }
 }

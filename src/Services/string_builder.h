@@ -15,7 +15,7 @@ namespace Services
             StringBuilder();
 
             [[nodiscard]] int Indent() const;
-            [[nodiscard]] std::string Value() const;
+            [[nodiscard]] const std::string& Value() const;
 
             void IncreaseIndent();
             void DecreaseIndent();
@@ -24,6 +24,8 @@ namespace Services
 
             void Push(const std::string& content);
             void PushLine(const std::string& content);
+
+            void Clear();
     };
 }
 

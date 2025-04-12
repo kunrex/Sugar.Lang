@@ -70,9 +70,9 @@ namespace Tokens
     Token Operator::Not(const unsigned long i) { return Unary(i, SyntaxKind::Not, "++", false, 2); }
     Token Operator::Plus(const unsigned long i) { return Unary(i, SyntaxKind::Plus, "++", false, 2); }
     Token Operator::Minus(const unsigned long i) { return Unary(i, SyntaxKind::Minus, "++", false, 2); }
-    Token Operator::BitwiseNot(const unsigned long i) { return Unary(i, SyntaxKind::DecrementPrefix, "~", false, 2); }
+    Token Operator::BitwiseNot(const unsigned long i) { return Unary(i, SyntaxKind::BitwiseNot, "~", false, 2); }
 
-    Token Operator::Assignment(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentAddition, "+="); }
+    Token Operator::Assignment(const unsigned long i) { return Assignment(i, SyntaxKind::Assignment, "+="); }
 
     Token Operator::AssignmentAddition(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentAddition, "+="); }
     Token Operator::AssignmentSubtraction(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentSubtraction, "-="); }
@@ -81,9 +81,9 @@ namespace Tokens
     Token Operator::AssignmentDivision(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentDivision, "/="); }
     Token Operator::AssignmentModulus(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentModulus, "%="); }
 
-    Token Operator::AssignmentBitwiseAnd(const unsigned long i) { return Assignment(i, SyntaxKind::BitwiseAnd, "&="); }
-    Token Operator::AssignmentBitwiseOr(const unsigned long i) { return Assignment(i, SyntaxKind::BitwiseOr, "|="); }
-    Token Operator::AssignmentBitwiseXor(const unsigned long i) { return Assignment(i, SyntaxKind::BitwiseXor, "^="); }
-    Token Operator::AssignmentRightShift(const unsigned long i) { return Assignment(i, SyntaxKind::RightShift, ">>="); }
-    Token Operator::AssignmentLeftShift(const unsigned long i) { return Assignment(i, SyntaxKind::LeftShift, "<<="); }
+    Token Operator::AssignmentBitwiseAnd(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentBitwiseAnd, "&="); }
+    Token Operator::AssignmentBitwiseOr(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentBitwiseOr, "|="); }
+    Token Operator::AssignmentBitwiseXor(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentBitwiseXor, "^="); }
+    Token Operator::AssignmentRightShift(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentBitwiseRightShift, ">>="); }
+    Token Operator::AssignmentLeftShift(const unsigned long i) { return Assignment(i, SyntaxKind::AssignmentBitwiseLeftShift, "<<="); }
 }

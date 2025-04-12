@@ -2,10 +2,10 @@
 
 int main()
 {
-    const auto source = "../source";
+    const auto source = "tests";
 
-    //auto compiler = Compiler(source);
-    //compiler.Compile();
+    const auto compiler = Compiler(source);
+    compiler.Compile();
 
     return 0;
 }

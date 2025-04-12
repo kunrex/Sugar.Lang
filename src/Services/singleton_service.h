@@ -3,33 +3,17 @@
 
 namespace Services
 {
-    template <class TSingleton>
     class SingletonService
     {
         protected:
-            SingletonService();
+            SingletonService() = default;
             virtual ~SingletonService() = default;
 
         public:
-            static TSingleton& Instance();
-
             SingletonService(const SingletonService&) = delete;
             SingletonService& operator=(const SingletonService&) = delete;
             SingletonService(SingletonService&&) = delete;
             SingletonService& operator=(SingletonService&&) = delete;
-    };
-
-    class SingletonCollection
-    {
-        protected:
-            SingletonCollection();
-            virtual ~SingletonCollection() = default;
-
-        public:
-            SingletonCollection(const SingletonCollection&) = delete;
-            SingletonCollection& operator=(const SingletonCollection&) = delete;
-            SingletonCollection(SingletonCollection&&) = delete;
-            SingletonCollection& operator=(SingletonCollection&&) = delete;
     };
 }
 

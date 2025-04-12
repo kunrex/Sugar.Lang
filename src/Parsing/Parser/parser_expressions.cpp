@@ -50,22 +50,23 @@ using namespace ParseNodes::Values;
 using namespace ParseNodes::Constants;
 using namespace ParseNodes::Statements;
 using namespace ParseNodes::Expressions;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Wrappers;
 
 namespace Parsing
 {
-    const ParseNode* Parser::ParseEntity(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseEntity(const SeparatorKind breakSeparator)
     {
         stack<const Token*> tokens;
-        stack<const ParseNode*> output;
+        stack<const IParseNode*> output;
 
         TokenType expected = TokenType::Constant | TokenType::Identifier | TokenType::Keyword;
 
         bool breakOut = false, subtract = false;
         for (; index < source->TokenCount(); index++)
         {
-            auto current = Current();
+            const auto& current = Current();
 
             if (!MatchType(current, expected))
                 breakOut = subtract = true;
@@ -183,17 +184,17 @@ namespace Parsing
         return invalidNode;
     }
 
-    const ParseNode* Parser::ParseExpression(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseExpression(const SeparatorKind breakSeparator)
     {
         stack<const Token*> tokens;
-        stack<const ParseNode*> output;
+        stack<const IParseNode*> output;
 
         TokenType expected = TokenType::Constant | TokenType::Identifier | TokenType::UnaryOperator | TokenType::Keyword | TokenType::Separator;
 
         bool invalid = false, breakOut = false;
         for (; index < source->TokenCount(); index++)
         {
-            const auto current = Current();
+            const auto& current = Current();
 
             if (!MatchType(current, expected))
                 breakOut = invalid = true;
@@ -218,7 +219,7 @@ namespace Parsing
                                     output.push(ParseEntity(SeparatorKind::None));
                                     break;
                                 case SyntaxKind::Input:
-                                    output.push(ParsePrintCall());
+                                    output.push(ParseInputCall());
                                     break;
                                 case SyntaxKind::Format:
                                     output.push(ParseFormatCall());
@@ -270,6 +271,7 @@ namespace Parsing
                             {
                                 case SyntaxKind::OpenBracket:
                                     {
+                                        index++;
                                         output.push(ParseNonEmptyExpression(SeparatorKind::CloseBracket));
                                         expected = TokenType::Separator | TokenType::Operator;
                                     }
@@ -364,7 +366,7 @@ namespace Parsing
                         {
                             while (!tokens.empty())
                             {
-                                const auto top = *tokens.top();
+                                const auto& top = *tokens.top();
                                 const auto topMetadata = Operator::DecodeMetadata(top);
                                 const auto currentMetadata = Operator::DecodeMetadata(current);
 
@@ -397,6 +399,7 @@ namespace Parsing
                 }
 
                 ClearStack(tokens, output);
+                break;
             }
         }
 
@@ -432,7 +435,7 @@ namespace Parsing
         }
     }
 
-    const ParseNode* Parser::ParseNonEmptyExpression(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseNonEmptyExpression(const SeparatorKind breakSeparator)
     {
         const auto expression = ParseExpression(breakSeparator);
 
@@ -447,13 +450,14 @@ namespace Parsing
         return expression;
     }
 
-    void Parser::ClearStack(const Token& top, std::stack<const ParseNode*>& output)
+    void Parser::ClearStack(const Token& top, std::stack<const IParseNode*>& output)
     {
         if (MatchType(top, TokenType::UnaryOperator))
         {
             const auto node = new UnaryNode(top, output.top());
             output.pop();
             output.push(node);
+            return;
         }
 
         const auto rhs = output.top();
@@ -463,16 +467,21 @@ namespace Parsing
 
         if (MatchToken(top, SyntaxKind::Dot))
             output.push(new DotExpressionNode(lhs, rhs, top));
-        if (MatchToken(top, SyntaxKind::As))
+        else if (MatchToken(top, SyntaxKind::As))
             output.push(new CastExpressionNode(lhs, rhs, top));
-
-        output.push(new BinaryNode(top, lhs, rhs));
+        else
+            output.push(new BinaryNode(top, lhs, rhs));
     }
 
-    void Parser::ClearStack(std::stack<const Token*>& stack, std::stack<const ParseNode*>& output)
+    void Parser::ClearStack(std::stack<const Token*>& stack, std::stack<const IParseNode*>& output)
     {
         while (!stack.empty())
-            ClearStack(*stack.top(), output);
+        {
+            const auto& top = *stack.top();
+
+            ClearStack(top, output);
+            stack.pop();
+        }
     }
 
     void Parser::ParseGeneric(DynamicNodeCollection* const generic)
@@ -486,7 +495,7 @@ namespace Parsing
                 generic->AddChild(ParseType());
                 index++;
 
-                if (const auto current = Current(); MatchToken(current, SyntaxKind::Comma, true))
+                if (const auto& current = Current(); MatchToken(current, SyntaxKind::Comma, true))
                     continue;
                 else if (MatchToken(current, SyntaxKind::GreaterThan))
                     return;
@@ -507,7 +516,7 @@ namespace Parsing
             const auto expression = ParseNonEmptyExpression(SeparatorKind::Comma | breakSeparator);
             collection->AddChild(expression);
 
-            const auto current = Current();
+            const auto& current = Current();
             if (MatchToken(current, SyntaxKind::Comma, true))
                 continue;
             if (MatchSeparator(current, breakSeparator))
@@ -521,7 +530,7 @@ namespace Parsing
         TryMatchSeparator(Current(), breakSeparator);
     }
 
-    const IndexerExpressionNode* Parser::ParseIndexerExpression(const ParseNode* const operand)
+    const IndexerExpressionNode* Parser::ParseIndexerExpression(const IParseNode* const operand)
     {
         TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true);
 
@@ -531,9 +540,9 @@ namespace Parsing
         return indexer;
     }
 
-    const ParseNode* Parser::ParseType()
+    const IParseNode* Parser::ParseType()
     {
-        switch (const auto current = Current(); current.Kind())
+        switch (const auto& current = Current(); current.Kind())
         {
             case SyntaxKind::Let:
                 return new AnonymousTypeNode(current);
@@ -545,7 +554,7 @@ namespace Parsing
             case SyntaxKind::String:
             case SyntaxKind::Object:
             case SyntaxKind::Boolean:
-            case SyntaxKind::Character:
+        case SyntaxKind::Character:
                 return new BuiltInTypeNode(current);
             case SyntaxKind::List:
                 {
@@ -630,7 +639,7 @@ namespace Parsing
         }
     }
 
-    const ParseNode* Parser::CheckType(const ParseNode* const parsed) const
+    const IParseNode* Parser::CheckType(const IParseNode* const parsed) const
     {
         switch (parsed->NodeType())
         {
@@ -658,7 +667,7 @@ namespace Parsing
 
     const IdentifierNode* Parser::ParseIdentifier(const bool increment)
     {
-        const auto current = Current();
+        const auto& current = Current();
         const auto identifier = new IdentifierNode(current);
 
         if (TryMatchType(current, TokenType::Identifier))

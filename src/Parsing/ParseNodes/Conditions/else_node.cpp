@@ -12,4 +12,12 @@ namespace ParseNodes::Conditions
     }
 
     NodeType ElseNode::NodeType() const { return NodeType::Else; }
+
+    void ElseNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Else Node" << std::endl;
+        const auto next = last ? " " : "| ";
+
+        GetChild(static_cast<int>(ChildCode::Body))->Print(indent + next, true);
+    }
 }

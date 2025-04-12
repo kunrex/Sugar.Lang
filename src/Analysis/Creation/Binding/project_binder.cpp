@@ -33,12 +33,6 @@ const auto pathRegex = std::regex(R"(^(\.)*(?:[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)
 
 namespace Analysis::Creation::Binding
 {
-    void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
-    {
-        if (!describable->ValidateDescriber(allowed))
-            PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
-    }
-
     void CreateEnum(const IParseNode* const node, SourceFile* const sourceFile)
     {
         const auto index = node->Token().Index();
@@ -116,7 +110,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    void ImportStatement(const ParseNodes::ParseNode* const statement, SourceFile* const sourceFile)
+    void ImportStatement(const IParseNode* const statement, SourceFile* const sourceFile)
     {
         const auto path = *statement->Token().Value<string>();
         const auto index = statement->Token().Index();

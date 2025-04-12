@@ -10,4 +10,9 @@ namespace ParseNodes::Describers
     { }
 
     NodeType DescriberKeywordNode::NodeType() const { return NodeType::Describer; }
+
+    void DescriberKeywordNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Describer Keyword Node: " << ToString(token.Kind()) << std::endl;
+    }
 }

@@ -7,6 +7,12 @@ namespace Exceptions
     ExceptionManager::ExceptionManager() : SingletonService(), ConstantCollection()
     { }
 
+    ExceptionManager& ExceptionManager::Instance()
+    {
+        static ExceptionManager instance;
+        return instance;
+    }
+
     bool ExceptionManager::LogAllExceptions() const
     {
         if (children.empty())

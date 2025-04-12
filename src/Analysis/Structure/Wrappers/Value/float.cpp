@@ -28,20 +28,31 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_float = "[System.Runtime]System.Single";
+const string cil_float = "[System.Runtime]System.Single";
+
+namespace
+{
+    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), std::get<float>(arguments[0].data) + std::get<float>(arguments[1].data)} ; }
+    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), std::get<float>(arguments[0].data) - std::get<float>(arguments[1].data)} ; }
+    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), std::get<float>(arguments[0].data) * std::get<float>(arguments[1].data)} ; }
+    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), std::get<float>(arguments[0].data) / std::get<float>(arguments[1].data)} ; }
+
+    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), arguments[0].data }; }
+    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Float::Instance(), -std::get<float>(arguments[0].data) }; }
+}
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), std::get<float>(arguments[0].data) + std::get<float>(arguments[1].data)} ; }
-    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), std::get<float>(arguments[0].data) - std::get<float>(arguments[1].data)} ; }
-    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), std::get<float>(arguments[0].data) * std::get<float>(arguments[1].data)} ; }
-    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), std::get<float>(arguments[0].data) / std::get<float>(arguments[1].data)} ; }
-
-    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), arguments[0].data }; }
-    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Float::Instance(), -std::get<float>(arguments[0].data) }; }
 
     Float::Float() : BuiltInValueType(cil_float, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
     { }
+
+    const Float& Float::Instance()
+    {
+        static const Float instance;
+        return instance;
+    }
+
 
     int Float::SlotCount() const { return 1; }
 
@@ -200,9 +211,6 @@ namespace Analysis::Structure::Wrappers
 
     Float::~Float()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         delete tryParse;
 
         for (const auto cast: implicitCasts)

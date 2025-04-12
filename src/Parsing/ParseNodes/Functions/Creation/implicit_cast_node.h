@@ -1,16 +1,20 @@
 #ifndef IMPLICIT_CAST_NODE_H
 #define IMPLICIT_CAST_NODE_H
 
-#include "../../Core/function_node.h"
+#include "../../parse_node.h"
+#include "../../Describers/describer_node.h"
+#include "../../Groups/compound_declaration_node.h"
 
 namespace ParseNodes::Functions::Creation
 {
-    class ImplicitCastNode final : public virtual FixedNodeCollection<4>, public Core::FunctionNode<4>
+    class ImplicitCastNode final : public virtual FixedNodeCollection<4>
     {
         public:
-            ImplicitCastNode(const Describers::DescriberNode* describer, const ParseNode* type, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            ImplicitCastNode(const Describers::DescriberNode* describer, const IParseNode* type, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

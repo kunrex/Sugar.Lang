@@ -14,11 +14,11 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_action = "[System.Runtime]System.Action";
+const string cil_action = "[System.Runtime]System.Action";
 
 namespace Analysis::Structure::Wrappers
 {
-    Action::Action() : BuiltInClass(cil_action, Describer::Public), SingletonCollection(), genericSignature(), types()
+    Action::Action() : BuiltInClass(cil_action, Describer::Public), SingletonService(), genericSignature(), types()
     { }
 
     const Action* Action::Instance(const std::vector<const IDataType*>& types)

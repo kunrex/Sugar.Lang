@@ -5,6 +5,7 @@
 
 #include "../Core/DataTypes/data_type.h"
 #include "../Core/Interfaces/DataTypes/i_user_defined_type.h"
+
 #include "../Global/Functions/constructor.h"
 
 namespace Analysis::Structure::DataTypes
@@ -65,13 +66,12 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const override;
 
+            [[nodiscard]] unsigned long ConstructorCount() const override;
+
             void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
 
             void PushFunction(Core::Interfaces::IFunctionDefinition* function) override;
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
-
-            [[nodiscard]] Core::Interfaces::IScoped* StaticConstructor() const override;
-            [[nodiscard]] Core::Interfaces::IScoped* InstanceConstructor() const override;
 
             void PushConstructor(Core::Interfaces::IFunction* constructor) override;
             [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
@@ -89,6 +89,8 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] std::vector<Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
             [[nodiscard]] std::vector<Core::Interfaces::IScoped*> AllScoped() const override;
+
+            void Print(const std::string& indent, bool last) const override;
 
             ~StructSource() override;
     };

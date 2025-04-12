@@ -8,9 +8,11 @@ namespace ParseNodes::Expressions
     class IndexerExpressionNode final : public DynamicNodeCollection
     {
         public:
-            explicit IndexerExpressionNode(const ParseNode* operand);
+            explicit IndexerExpressionNode(const IParseNode* operand);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

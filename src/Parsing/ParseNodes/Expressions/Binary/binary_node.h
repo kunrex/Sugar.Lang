@@ -8,9 +8,11 @@ namespace ParseNodes::Expressions
     class BinaryNode final : public FixedNodeCollection<2>
     {
         public:
-            BinaryNode(const Tokens::Token& base, const ParseNode* lhs, const ParseNode* rhs);
+            BinaryNode(const Tokens::Token& base, const IParseNode* lhs, const IParseNode* rhs);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

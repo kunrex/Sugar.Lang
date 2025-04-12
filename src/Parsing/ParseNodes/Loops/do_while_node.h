@@ -1,16 +1,18 @@
 #ifndef DO_WHILE_NODE_H
 #define DO_WHILE_NODE_H
 
-#include "loop_node.h"
+#include "../parse_node.h"
 
 namespace ParseNodes::Loops
 {
-    class DoWhileNode final : public LoopNode
+    class DoWhileNode final : public virtual FixedNodeCollection<2>
     {
         public:
-            DoWhileNode(const ParseNode* condition, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            DoWhileNode(const IParseNode* condition, const DynamicNodeCollection* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

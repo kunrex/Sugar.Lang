@@ -1,5 +1,5 @@
 #ifndef BRANCH_H
-#define BRANCH_Hv
+#define BRANCH_H
 
 #include "../context_node.h"
 

@@ -77,6 +77,8 @@ namespace Analysis::Structure::DataTypes
 
     const IParseNode* StructSource::Skeleton() const { return skeleton; }
 
+    unsigned long StructSource::ConstructorCount() const { return constructors.size(); }
+
     void StructSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -158,24 +160,32 @@ namespace Analysis::Structure::DataTypes
 
     std::vector<IScoped*> StructSource::AllScoped() const
     {
-        std::vector<IScoped*> all;
+        std::vector<IScoped*> all(functions.size());
 
         for (const auto function: functions)
-            all.push_back(function.second);
+            all.push_back(dynamic_cast<IScoped*>(function.second));
 
         for (const auto constructor: constructors)
-            all.push_back(constructor.second);
+            all.push_back(dynamic_cast<IScoped*>(constructor.second));
 
         for (const auto cast: implicitCasts)
-            all.push_back(cast.second);
+            all.push_back(dynamic_cast<IScoped*>(cast.second));
 
         for (const auto cast: explicitCasts)
-            all.push_back(cast.second);
+        {
+            if (const auto definition = cast.second; definition->MemberType() == MemberType::ExplicitCast)
+                all.push_back(dynamic_cast<IScoped*>(definition));
+        }
 
-        for (const auto& overload: overloads)
-            delete overload.second;
+        for (const auto overload: overloads)
+            all.push_back(dynamic_cast<IScoped*>(overload.second));
 
         return all;
+    }
+
+    void StructSource::Print(const string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Struct: " << name << std::endl;
     }
 
     StructSource::~StructSource()

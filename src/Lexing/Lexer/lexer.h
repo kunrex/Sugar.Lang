@@ -7,7 +7,7 @@
 
 namespace Lexing
 {
-    class Lexer final : public Services::SingletonService<Lexer>
+    class Lexer final : public Services::SingletonService
     {
         private:
             unsigned long index;
@@ -17,14 +17,16 @@ namespace Lexing
 
             void ReadString();
             void ReadNumber();
-            void ReadKeyword();
+            void ReadIdentifier();
             void ReadCharacter();
 
             void ReadMultiLineComment();
             void ReadSingleLineComment();
 
-        public:
             Lexer();
+
+        public:
+            static Lexer& Instance();
 
             void Lex(Analysis::Structure::SourceFile* source);
     };

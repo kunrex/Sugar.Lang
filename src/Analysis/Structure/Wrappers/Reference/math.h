@@ -9,9 +9,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Math final : public DataTypes::BuiltInClass, public Services::SingletonService<Math>
+    class Math final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
@@ -19,6 +19,8 @@ namespace Analysis::Structure::Wrappers
             Math();
 
         public:
+            static const Math& Instance();
+
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             void InitializeMembers() override;

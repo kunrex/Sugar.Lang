@@ -43,6 +43,8 @@ namespace Analysis::Structure::DataTypes
 
     const IParseNode* Enum::Skeleton() const { return skeleton; }
 
+    unsigned long Enum::ConstructorCount() const { return 0; }
+
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -114,6 +116,11 @@ namespace Analysis::Structure::DataTypes
     std::vector<IScoped*> Enum::AllScoped() const
     {
         return { };
+    }
+
+    void Enum::Print(const string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Enum: " << name << std::endl;
     }
 
     Enum::~Enum()

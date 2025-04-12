@@ -9,9 +9,14 @@ namespace Tokens::Enums
         return static_cast<TokenType>(static_cast<short>(lhs) | static_cast<short>(rhs));
     }
 
-    std::string ToString(const TokenType& tokenType)
+    TokenType operator & (const TokenType& lhs, const TokenType& rhs)
     {
-        std::string result;
+        return static_cast<TokenType>(static_cast<short>(lhs) & static_cast<short>(rhs));
+    }
+
+    string ToString(const TokenType& tokenType)
+    {
+        string result;
         const auto shortValue = static_cast<short>(tokenType);
         for (short i = 1; i <= static_cast<short>(TokenType::Invalid); i *= 2)
         {

@@ -10,4 +10,9 @@ namespace ParseNodes::Statements
     { }
 
     NodeType EmptyNode::NodeType() const { return NodeType::Empty; }
+
+    void EmptyNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Empty Statement Node" << std::endl;
+    }
 }

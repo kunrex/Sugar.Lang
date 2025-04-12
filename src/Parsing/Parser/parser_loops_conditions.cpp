@@ -18,7 +18,7 @@ namespace Parsing
         const auto chain = new IfChainNode(Current());
         for (; index < source->TokenCount(); index++)
         {
-            const auto keyword = Current();
+            const auto& keyword = Current();
             index++;
 
             switch (keyword.Kind())
@@ -26,7 +26,11 @@ namespace Parsing
                 case SyntaxKind::If:
                     {
                         if (flag)
+                        {
+                            index -= 2;
+                            flag = false;
                             break;
+                        }
 
                         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
@@ -69,7 +73,7 @@ namespace Parsing
 
     const WhileNode* Parser::ParseWhile()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
@@ -83,7 +87,7 @@ namespace Parsing
 
     const DoWhileNode* Parser::ParseDoWhile()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto body = ParseLazyScope();
@@ -98,7 +102,7 @@ namespace Parsing
 
     const ForLoopNode* Parser::ParseForLoop()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);

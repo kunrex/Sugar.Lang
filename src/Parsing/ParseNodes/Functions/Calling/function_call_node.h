@@ -11,6 +11,8 @@ namespace ParseNodes::Functions::Calling
             explicit FunctionCallNode(const Values::IdentifierNode* identifier);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

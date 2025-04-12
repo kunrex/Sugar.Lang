@@ -12,4 +12,9 @@ namespace ParseNodes::Statements
     { }
 
     NodeType ImportStatementNode::NodeType() const { return NodeType::Import; }
+
+    void ImportStatementNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Import Statement Node: " << *token.Value<string>() << std::endl;
+    }
 }

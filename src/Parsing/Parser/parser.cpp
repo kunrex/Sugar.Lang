@@ -15,14 +15,23 @@ using namespace Tokens::Enums;
 using namespace ParseNodes;
 using namespace ParseNodes::Groups;
 
+using namespace Analysis::Structure;
+
 namespace Parsing
 {
-    const Token& Parser::Current() const { return index < source->TokenCount() ? source->TokenAt(index) : source->TokenAt(source->TokenCount()); }
-    std::optional<std::reference_wrapper<Token>> Parser::LookAhead() const { return index >= source->TokenCount() - 1 ? std::nullopt : source->TokenAt(index + 1); }
+    const Token& Parser::Current() const { return index < source->TokenCount() ? source->TokenAt(index) : source->TokenAt(source->TokenCount() - 1); }
+    std::optional<std::reference_wrapper<Token>> Parser::LookAhead() const
+    {
+        if (index >= source->TokenCount() - 1)
+            return std::nullopt;
+
+        Token token = source->TokenAt(index + 1);
+        return token;
+    }
 
     bool Parser::MatchType(const Token& token, const TokenType tokenType, const bool increment)
     {
-        if (token.Type() == tokenType)
+        if ((token.Type() & tokenType) == token.Type())
         {
             if (increment)
                 index++;
@@ -56,7 +65,7 @@ namespace Parsing
             if (increment)
                 index++;
 
-            return  true;
+            return true;
         }
 
         return false;
@@ -113,13 +122,13 @@ namespace Parsing
 
     InvalidNode* Parser::ParseInvalid(const SeparatorKind breakOut)
     {
-        const auto start = Current();
+        const auto& start = Current();
         const SeparatorKind extra = SeparatorKind::Semicolon | SeparatorKind::FlowerOpenBracket | SeparatorKind::FlowerCloseBracket;
         const SeparatorKind match = breakOut | extra;
 
         for (; index < source->TokenCount(); index++)
         {
-            if (const auto current = Current(); MatchSeparator(current, match))
+            if (const auto& current = Current(); MatchSeparator(current, match))
             {
                 if (MatchSeparator(current, extra) && !MatchSeparator(current, breakOut))
                     index--;
@@ -131,13 +140,24 @@ namespace Parsing
         return new InvalidNode(start);
     }
 
-    void Parser::Parse(Analysis::Structure::SourceFile* const source)
+    Parser& Parser::Instance()
+    {
+        static Parser instance;
+        return instance;
+    }
+
+    void Parser::Parse(SourceFile* const source)
     {
         this->source = source;
 
         const auto sourceNode = new SourceFileNode();
         for (index = 0; index < source->TokenCount(); index++)
-            sourceNode->AddChild(ParseLazyScope());
+        {
+            if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
+                sourceNode->AddChild(ParseScope());
+            else
+                sourceNode->AddChild(ParseStatement());
+        }
 
         this->source->WithSourceNode(sourceNode);
 

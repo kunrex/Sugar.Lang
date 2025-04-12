@@ -5,11 +5,11 @@
 
 namespace Analysis::Creation::Binding
 {
-    void CreateEnum(const ParseNodes::ParseNode* node, Structure::SourceFile* sourceFile);
-    void CreateClass(const ParseNodes::ParseNode* node, Structure::SourceFile* sourceFile);
-    void CreateStruct(const ParseNodes::ParseNode* node, Structure::SourceFile* sourceFile);
+    void CreateEnum(const ParseNodes::Core::Interfaces::IParseNode* node, Structure::SourceFile* sourceFile);
+    void CreateClass(const ParseNodes::Core::Interfaces::IParseNode* node, Structure::SourceFile* sourceFile);
+    void CreateStruct(const ParseNodes::Core::Interfaces::IParseNode* node, Structure::SourceFile* sourceFile);
 
-    void ImportStatement(const ParseNodes::ParseNode* statement, Structure::SourceFile* sourceFile);
+    void ImportStatement(const ParseNodes::Core::Interfaces::IParseNode* statement, Structure::SourceFile* sourceFile);
 }
 
 #endif

@@ -9,7 +9,7 @@ namespace Services
     {
         public:
             virtual void Print() const;
-            virtual void Print(std::string indent, bool last) const;
+            virtual void Print(const std::string& indent, bool last) const;
 
             virtual ~Printable() = default;
     };

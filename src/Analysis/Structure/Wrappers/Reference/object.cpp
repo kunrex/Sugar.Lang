@@ -12,7 +12,7 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_object = "[System.Runtime]System.Object";
+const string cil_object = "[System.Runtime]System.Object";
 
 namespace Analysis::Structure::Wrappers
 {
@@ -21,9 +21,15 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Object::Type() const { return TypeKind::Void; }
 
+    const Object& Object::Instance()
+    {
+        static const Object instance;
+        return instance;
+    }
+
     void Object::InitializeMembers()
     {
-        toString = new BuiltInCast(&String::Instance(), "callvirt instance string class [System.Runtime]System.Object::ToString()");
+        toString = new BuiltInCast(&String::Instance(), "callvirt instance string class [System.Runtime]System.Object::ToString()", nullptr);
         toString->PushParameterType(&Instance());
     }
 

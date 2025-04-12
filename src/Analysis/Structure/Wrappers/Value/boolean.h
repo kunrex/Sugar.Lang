@@ -12,9 +12,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService<Boolean>, public virtual Core::Interfaces::IPrimitiveType
+    class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
             std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
 
@@ -23,6 +23,8 @@ namespace Analysis::Structure::Wrappers
             Boolean();
 
         public:
+            static const Boolean& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

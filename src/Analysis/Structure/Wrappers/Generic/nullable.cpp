@@ -20,19 +20,17 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_nullable = "[System.Runtime]System.Nullable";
+const string cil_nullable = "[System.Runtime]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), genericSignature(), nullableType(nullableType), characteristics(), constructors()
+    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), SingletonService(), genericSignature(), nullableType(nullableType), characteristics(), constructors()
     { }
 
     const Nullable* Nullable::Instance(const IDataType* const dataType)
     {
-        static std::map<unsigned long, const Nullable*> map;
-
-        const std::vector types({ dataType });
-        const auto hash = ArgumentHash(types);
+        static std::map<uintptr_t, const Nullable*> map;
+        const auto hash = reinterpret_cast<uintptr_t>(dataType);
 
         if (map.contains(hash))
             return map.at(hash);
@@ -94,9 +92,6 @@ namespace Analysis::Structure::Wrappers
 
     Nullable::~Nullable()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         for (const auto& constructor: constructors)
             delete constructor.second;
     }

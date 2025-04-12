@@ -1295,23 +1295,15 @@ namespace Analysis::Creation::Binding
 
             for (const auto characteristic: characteristics)
             {
-                switch (characteristic->MemberType())
+                if (characteristic->MemberType() == MemberType::Field)
                 {
-                    case MemberType::EnumField:
-                    case MemberType::ConstantField:
-                        CompileExpression(dynamic_cast<const IConstant*>(characteristic), dataType);
-                        break;
-                    case MemberType::Field:
-                        {
-                            if (characteristic->CheckDescriber(Describer::Static))
-                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &staticScope, staticScope.Scope(), dataType));
-                            else
-                                characteristic->WithContext(BindExpression(characteristic->ParseNode(), &instanceScope, instanceScope.Scope(), dataType));
-                        }
-                        break;
-                    default:
-                        break;
+                    if (characteristic->CheckDescriber(Describer::Static))
+                        characteristic->WithContext(BindExpression(characteristic->ParseNode(), &staticScope, staticScope.Scope(), dataType));
+                    else
+                        characteristic->WithContext(BindExpression(characteristic->ParseNode(), &instanceScope, instanceScope.Scope(), dataType));
                 }
+                else
+                    CompileExpression(dynamic_cast<const IConstant*>(characteristic), dataType);
             }
         }
 
@@ -1321,9 +1313,6 @@ namespace Analysis::Creation::Binding
 
             switch (function->MemberType())
             {
-                case MemberType::Constructor:
-                case MemberType::VoidDefinition:
-                    break;
                 case MemberType::ImplicitCast:
                 case MemberType::ExplicitCast:
                 case MemberType::OperatorOverload:

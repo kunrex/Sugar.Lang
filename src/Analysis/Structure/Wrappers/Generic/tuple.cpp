@@ -20,11 +20,11 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_tuple = "[System.Runtime]System.ValueTuple";
+const string cil_tuple = "[System.Runtime]System.ValueTuple";
 
 namespace Analysis::Structure::Wrappers
 {
-    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonCollection(), genericSignature(), types(), characteristics(), constructor(nullptr)
+    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), characteristics(), constructor(nullptr)
     { }
 
     const Tuple* Tuple::Instance(const std::vector<const IDataType*>& types)
@@ -94,9 +94,6 @@ namespace Analysis::Structure::Wrappers
 
     Tuple::~Tuple()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         delete constructor;
     }
 }

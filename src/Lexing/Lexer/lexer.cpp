@@ -26,11 +26,23 @@ namespace Lexing
     Lexer::Lexer() : index(0), source(nullptr)
     { }
 
+    Lexer& Lexer::Instance()
+    {
+        static Lexer instance;
+        return instance;
+    }
+
     char Lexer::LookAhead() const { return index == source->SourceLength() - 1 ? '\0' : source->SourceAt(index + 1); }
 
     void Lexer::ReadSingleLineComment()
     {
-        while (index < source->SourceLength() && source->SourceAt(index++) != '\n');
+        while (index < source->SourceLength())
+        {
+            if (source->SourceAt(index) == '\n')
+                break;
+
+            index++;
+        }
     }
 
     void Lexer::ReadMultiLineComment()
@@ -222,7 +234,7 @@ namespace Lexing
         ExceptionManager::Instance().AddChild(new CharacterExpectedException('"', index - 1, source));
     }
 
-    void Lexer::ReadKeyword()
+    void Lexer::ReadIdentifier()
     {
         string value;
         const auto start = index;
@@ -256,6 +268,9 @@ namespace Lexing
                 case '~':
                 case '?':
                 case '%':
+                case ' ':
+                case '\n':
+                case '\t':
                     breakOut = true;
                     break;
                 case '"':
@@ -323,7 +338,7 @@ namespace Lexing
                         if (lookAhead == '=')
                             source->PushBackToken(Operator::Equals(index++));
                         else
-                            source->PushBackToken(Operator::Assignment(index++));
+                            source->PushBackToken(Operator::Assignment(index));
                     }
                     break;
                 case '!':
@@ -331,7 +346,7 @@ namespace Lexing
                         if (lookAhead == '=')
                             source->PushBackToken(Operator::NotEquals(index++));
                         else
-                            source->PushBackToken(Operator::Not(index++));
+                            source->PushBackToken(Operator::Not(index));
                     }
                     break;
                 case '>':
@@ -348,7 +363,7 @@ namespace Lexing
                         else if (lookAhead == '=')
                             source->PushBackToken(Operator::GreaterThanEquals(index++));
                         else
-                            source->PushBackToken(Operator::GreaterThan(index++));
+                            source->PushBackToken(Operator::GreaterThan(index));
                     }
                     break;
                 case '<':
@@ -365,7 +380,7 @@ namespace Lexing
                         else if (lookAhead == '=')
                             source->PushBackToken(Operator::LesserThanEquals(index++));
                         else
-                            source->PushBackToken(Operator::LesserThan(index++));
+                            source->PushBackToken(Operator::LesserThan(index));
                     }
                     break;
                 case '&':
@@ -375,7 +390,7 @@ namespace Lexing
                         else if (lookAhead == '=')
                             source->PushBackToken(Operator::AssignmentBitwiseAnd(index++));
                         else
-                            source->PushBackToken(Operator::BitwiseAnd(index++));
+                            source->PushBackToken(Operator::BitwiseAnd(index));
                     }
                     break;
                 case '|':
@@ -385,7 +400,7 @@ namespace Lexing
                         else if (lookAhead == '=')
                             source->PushBackToken(Operator::AssignmentBitwiseOr(index++));
                         else
-                            source->PushBackToken(Operator::BitwiseOr(index++));
+                            source->PushBackToken(Operator::BitwiseOr(index));
                     }
                     break;
                 case '^':
@@ -393,11 +408,11 @@ namespace Lexing
                         if (lookAhead == '=')
                             source->PushBackToken(Operator::AssignmentBitwiseXor(index++));
                         else
-                            source->PushBackToken(Operator::BitwiseXor(index++));
+                            source->PushBackToken(Operator::BitwiseXor(index));
                     }
                     break;
                 case '~':
-                    source->PushBackToken(Operator::BitwiseNot(index++));
+                    source->PushBackToken(Operator::BitwiseNot(index));
                     break;
                 case '+':
                     {
@@ -407,7 +422,7 @@ namespace Lexing
                             source->PushBackToken(Operator::AssignmentAddition(index++));
                         else
                         {
-                            const auto prev = index == 0 ? std::nullopt : std::optional(source->TokenAt(source->TokenCount() - 1));
+                            const auto prev = source->TokenCount() == 0 ? std::nullopt : std::make_optional(source->TokenAt(source->TokenCount() - 1));
 
                             if (isdigit(lookAhead))
                             {
@@ -425,7 +440,7 @@ namespace Lexing
                                         break;
                                     case TokenType::Separator:
                                         {
-                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::OpenBracket)
+                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::BoxCloseBracket)
                                                 source->PushBackToken(Operator::Addition(index));
                                             else
                                             {
@@ -444,6 +459,7 @@ namespace Lexing
                             }
                             else
                             {
+                                std::cout << !prev << std::endl;
                                 if (!prev || lookAhead == '-')
                                 {
                                     source->PushBackToken(Operator::Plus(index));
@@ -458,7 +474,7 @@ namespace Lexing
                                         break;
                                     case TokenType::Separator:
                                         {
-                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::OpenBracket)
+                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::BoxCloseBracket)
                                                 source->PushBackToken(Operator::Addition(index));
                                             else
                                                 source->PushBackToken(Operator::Plus(index));
@@ -471,166 +487,162 @@ namespace Lexing
                             }
                         }
                     }
-                        break;
+                    break;
                 case '-':
+                    {
+                        if (lookAhead == '-')
+                            source->PushBackToken(Operator::Decrement(index++));
+                        else if (lookAhead == '=')
+                            source->PushBackToken(Operator::AssignmentSubtraction(index++));
+                        else
                         {
-                            if (lookAhead == '+')
-                                source->PushBackToken(Operator::Decrement(index++));
-                            else if (lookAhead == '=')
-                                source->PushBackToken(Operator::AssignmentSubtraction(index++));
+                            const auto prev = source->TokenCount() == 0 ? std::nullopt : std::make_optional(source->TokenAt(source->TokenCount() - 1));
+
+                            if (isdigit(lookAhead))
+                            {
+                                if (!prev)
+                                {
+                                    ReadNumber();
+                                    break;
+                                }
+
+                                switch (prev->Type())
+                                {
+                                    case TokenType::Constant:
+                                    case TokenType::Identifier:
+                                        source->PushBackToken(Operator::Subtraction(index));
+                                        break;
+                                    case TokenType::Separator:
+                                        {
+                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::BoxCloseBracket)
+                                                source->PushBackToken(Operator::Subtraction(index));
+                                            else
+                                                ReadNumber();
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            index++;
+                                            ReadNumber();
+                                        }
+                                    break;
+                                }
+                            }
                             else
                             {
-                                const auto prev = index == 0 ? std::nullopt : std::optional(source->TokenAt(source->TokenCount() - 1));
-
-                                if (isdigit(lookAhead))
+                                if (!prev || lookAhead == '-')
                                 {
-                                    if (!prev)
-                                    {
-                                        ReadNumber();
-                                        break;
-                                    }
-
-                                    switch (prev->Type())
-                                    {
-                                        case TokenType::Constant:
-                                        case TokenType::Identifier:
-                                            source->PushBackToken(Operator::Subtraction(index));
-                                            break;
-                                        case TokenType::Separator:
-                                            {
-                                                if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::OpenBracket)
-                                                    source->PushBackToken(Operator::Subtraction(index));
-                                                else
-                                                {
-                                                    index++;
-                                                    ReadKeyword();
-                                                }
-                                            }
-                                            break;
-                                        default:
-                                            {
-                                                index++;
-                                                ReadNumber();
-                                            }
-                                            break;
-                                    }
+                                    source->PushBackToken(Operator::Minus(index));
+                                    break;
                                 }
-                                else
-                                {
-                                    if (!prev || lookAhead == '-')
-                                    {
-                                        source->PushBackToken(Operator::Minus(index));
-                                        break;
-                                    }
 
-                                    switch (prev->Type())
-                                    {
-                                        case TokenType::Constant:
-                                        case TokenType::Identifier:
-                                            source->PushBackToken(Operator::Subtraction(index));
-                                            break;
-                                        case TokenType::Separator:
-                                            {
-                                                if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::OpenBracket)
-                                                    source->PushBackToken(Operator::Subtraction(index));
-                                                else
-                                                    source->PushBackToken(Operator::Minus(index));
-                                            }
-                                            break;
-                                        default:
-                                            source->PushBackToken(Operator::Minus(index));
-                                            break;
-                                    }
+                                switch (prev->Type())
+                                {
+                                    case TokenType::Constant:
+                                    case TokenType::Identifier:
+                                        source->PushBackToken(Operator::Subtraction(index));
+                                        break;
+                                    case TokenType::Separator:
+                                        {
+                                            if (prev->Kind() == SyntaxKind::CloseBracket || prev->Kind() == SyntaxKind::BoxCloseBracket)
+                                                source->PushBackToken(Operator::Subtraction(index));
+                                            else
+                                                source->PushBackToken(Operator::Minus(index));
+                                        }
+                                        break;
+                                    default:
+                                        source->PushBackToken(Operator::Minus(index));
+                                    break;
                                 }
                             }
                         }
-                        break;
-                    case '*':
-                        {
-                            if (lookAhead == '=')
-                                source->PushBackToken(Operator::AssignmentMultiplication(index));
-                            else
-                                source->PushBackToken(Operator::Multiplication(index));
-                        }
-                        break;
-                    case '/':
-                        {
-                            if (lookAhead == '=')
-                                source->PushBackToken(Operator::AssignmentDivision(index));
-                            else if (lookAhead == '/')
-                                ReadSingleLineComment();
-                            else if (lookAhead == '*')
-                                ReadMultiLineComment();
-                            else
-                                source->PushBackToken(Operator::Division(index));
-                        }
-                        break;
-                    case '%':
-                        {
-                            if (lookAhead == '=')
-                                source->PushBackToken(Operator::AssignmentModulus(index));
-                            else
-                                source->PushBackToken(Operator::Modulus(index));
-                        }
-                        break;
+                    }
+                    break;
+                case '*':
+                    {
+                        if (lookAhead == '=')
+                            source->PushBackToken(Operator::AssignmentMultiplication(index++));
+                        else
+                            source->PushBackToken(Operator::Multiplication(index));
+                    }
+                    break;
+                case '/':
+                    {
+                        if (lookAhead == '=')
+                            source->PushBackToken(Operator::AssignmentDivision(index++));
+                        else if (lookAhead == '/')
+                            ReadSingleLineComment();
+                        else if (lookAhead == '*')
+                            ReadMultiLineComment();
+                        else
+                            source->PushBackToken(Operator::Division(index));
+                    }
+                    break;
+                case '%':
+                    {
+                        if (lookAhead == '=')
+                            source->PushBackToken(Operator::AssignmentModulus(index++));
+                        else
+                            source->PushBackToken(Operator::Modulus(index));
+                    }
+                    break;
+                case ':':
+                    source->PushBackToken(Separator::Colon(index));
+                    break;
+                case ';':
+                    source->PushBackToken(Separator::Semicolon(index));
+                    break;
+                case '.':
+                    source->PushBackToken(Separator::Dot(index));
+                    break;
+                case ',':
+                    source->PushBackToken(Separator::Comma(index));
+                    break;
+                case '(':
+                    source->PushBackToken(Separator::OpenBracket(index));
+                    break;
+                case ')':
+                    source->PushBackToken(Separator::CloseBracket(index));
+                    break;
+                case '[':
+                    source->PushBackToken(Separator::BoxOpenBracket(index));
+                    break;
+                case ']':
+                    source->PushBackToken(Separator::BoxCloseBracket(index));
+                    break;
+                case '{':
+                    source->PushBackToken(Separator::FlowerOpenBracket(index));
+                    break;
+                case '}':
+                    source->PushBackToken(Separator::FlowerCloseBracket(index));
+                    break;
+                case '?':
+                    source->PushBackToken(Separator::QuestionMark(index));
+                    break;
 
-                    case ':':
-                        source->PushBackToken(Separator::Colon(index));
-                        break;
-                    case ';':
-                        source->PushBackToken(Separator::Semicolon(index));
-                        break;
-                    case '.':
-                        source->PushBackToken(Separator::Dot(index));
-                        break;
-                    case ',':
-                        source->PushBackToken(Separator::Comma(index));
-                        break;
-                    case '(':
-                        source->PushBackToken(Separator::OpenBracket(index));
-                        break;
-                    case ')':
-                        source->PushBackToken(Separator::CloseBracket(index));
-                        break;
-                    case '[':
-                        source->PushBackToken(Separator::BoxOpenBracket(index));
-                        break;
-                    case ']':
-                        source->PushBackToken(Separator::BoxCloseBracket(index));
-                        break;
-                    case '{':
-                        source->PushBackToken(Separator::FlowerOpenBracket(index));
-                        break;
-                    case '}':
-                        source->PushBackToken(Separator::FlowerCloseBracket(index));
-                        break;
-                    case '?':
-                        source->PushBackToken(Separator::QuestionMark(index));
-                        break;
+                case '"':
+                    ReadString();
+                    break;
+                case '\'':
+                    ReadCharacter();
+                    break;
 
-                    case '"':
-                        ReadString();
-                        break;
-                    case '\'':
-                        ReadCharacter();
-                        break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    ReadNumber();
+                    break;
 
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                        ReadNumber();
-                        break;
-
-                    default:
-                        ReadKeyword();
-                        break;
+                default:
+                    ReadIdentifier();
+                    break;
             }
         }
     }

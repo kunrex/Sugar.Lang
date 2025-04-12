@@ -5,16 +5,16 @@
 
 #include "../../../source_file.h"
 
-#include "../../Creation/characteristic.h"
-
 #include "../Scoped/i_scoped.h"
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IUserDefinedType : public Services::Child<SourceFile>, public virtual IDataType
+    class IUserDefinedType : public Services::Child<SourceFile>, public virtual IDataType, public Services::Printable
     {
         public:
             [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const = 0;
+
+            [[nodiscard]] virtual unsigned long ConstructorCount() const = 0;
 
             virtual void PushCharacteristic(ICharacteristic* characteristic) = 0;
 
@@ -30,7 +30,7 @@ namespace Analysis::Structure::Core::Interfaces
             virtual void PushOverload(IOperatorOverload* overload) = 0;
 
             [[nodiscard]] virtual std::vector<ICharacteristic*> AllCharacteristics() const = 0;
-            [[nodiscard]] virtual std::vector<IScoped*> AllScoped() const = 0 ;
+            [[nodiscard]] virtual std::vector<IScoped*> AllScoped() const = 0;
     };
 }
 

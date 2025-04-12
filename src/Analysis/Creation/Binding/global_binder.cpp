@@ -4,7 +4,6 @@
 
 #include "binder_extensions.h"
 
-#include "../../../Exceptions/exception_manager.h"
 #include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/static_binding_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/variable_definition_exception.h"
@@ -15,18 +14,7 @@
 
 #include "../../../Lexing/Tokens/Factories/operator.h"
 
-#include "../../../Parsing/ParseNodes/DataTypes/data_type_node.h"
-#include "../../../Parsing/ParseNodes/Statements/declaration_node.h"
-#include "../../../Parsing/ParseNodes/Properties/base_indexer_node.h"
 #include "../../../Parsing/ParseNodes/Properties/base_property_node.h"
-#include "../../../Parsing/ParseNodes/Statements/initialisation_node.h"
-#include "../../../Parsing/ParseNodes/Expressions/Binary/binary_node.h"
-#include "../../../Parsing/ParseNodes/Properties/assigned_property_node.h"
-#include "../../../Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h"
-#include "../../../Parsing/ParseNodes/Functions/Creation/implicit_cast_node.h"
-#include "../../../Parsing/ParseNodes/Functions/Creation/function_creation_node.h"
-#include "../../../Parsing/ParseNodes/Functions/Creation/operator_overload_node.h"
-#include "../../../Parsing/ParseNodes/Functions/Creation/constructor_creation_node.h"
 
 #include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/DataTypes/class.h"
@@ -48,6 +36,7 @@
 #include "../../Structure/Global/Functions/operator_overload.h"
 
 #include "../../Structure/Local/Variables/function_parameter.h"
+#include "../../Structure/Wrappers/Generic/enum_field.h"
 
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Value/integer.h"
@@ -105,6 +94,8 @@ namespace Analysis::Creation::Binding
 
     void BindEnumExpression(const IParseNode* const expression, IUserDefinedType* const dataType)
     {
+        const auto type = EnumField::Instance(dataType);
+
         switch (expression->NodeType())
         {
             case NodeType::Identifier:
@@ -118,7 +109,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), nullptr));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, nullptr));
                 }
                 break;
             case NodeType::Binary:
@@ -146,7 +137,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, &Integer::Instance(), expression->GetChild(static_cast<int>(ChildCode::RHS))));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, expression->GetChild(static_cast<int>(ChildCode::RHS))));
                 }
                 break;
             default:
@@ -589,7 +580,7 @@ namespace Analysis::Creation::Binding
         if (creationType != dataType)
             PushException(new LogException(std::format("Expected return type: {}.", dataType->FullName()), base.Index(), source));
 
-        const auto declarationNode = operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters))();
+        const auto declarationNode = operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
@@ -650,8 +641,6 @@ namespace Analysis::Creation::Binding
                     break;
             }
         }
-
-        enumSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string valuetype {}::ToString()", enumSource->FullName())));
     }
 
     void BindClass(IUserDefinedType* const classSource)
@@ -703,9 +692,9 @@ namespace Analysis::Creation::Binding
             return;
 
         if (const auto explicitString = classSource->FindExplicitCast(&String::Instance(), classSource); explicitString == nullptr)
-            classSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName())));
+            classSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName()), nullptr));
 
-        if (const auto defaultConstructor = classSource->FindConstructor({ }); defaultConstructor == nullptr)
+        if (!classSource->ConstructorCount())
             classSource->PushConstructor(new DefaultConstructor(classSource));
     }
 
@@ -758,9 +747,9 @@ namespace Analysis::Creation::Binding
             return;
 
         if (const auto explicitString = structSource->FindExplicitCast(&String::Instance(), structSource); explicitString == nullptr)
-            structSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName())));
+            structSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName()), nullptr));
 
-        if (const auto defaultConstructor = structSource->FindConstructor({ }); defaultConstructor == nullptr)
+        if (!structSource->ConstructorCount())
             structSource->PushConstructor(new DefaultConstructor(structSource));
     }
 

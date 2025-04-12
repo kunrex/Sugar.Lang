@@ -19,7 +19,7 @@ namespace Services
 
     int StringBuilder::Indent() const { return indent; }
 
-    string StringBuilder::Value() const { return value; }
+    const string& StringBuilder::Value() const { return value; }
 
     void StringBuilder::IncreaseIndent() { indent++; }
 
@@ -35,5 +35,10 @@ namespace Services
     void StringBuilder::PushLine(const std::string& content)
     {
         value += std::format("{}{}\n", string(indent, '\t'), content);
+    }
+
+    void StringBuilder::Clear()
+    {
+        value.clear();
     }
 }

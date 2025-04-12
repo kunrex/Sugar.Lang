@@ -21,6 +21,7 @@ namespace Tokens::Enums
     };
 
     TokenType operator | (const TokenType& lhs, const TokenType& rhs);
+    TokenType operator & (const TokenType& lhs, const TokenType& rhs);
 
     std::string ToString(const TokenType& tokenType);
     std::ostream& operator << (std::ostream& os, const TokenType& dt);

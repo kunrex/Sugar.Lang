@@ -12,7 +12,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Dictionary final : public DataTypes::BuiltInClass, public Services::SingletonCollection,
+    class Dictionary final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
             mutable std::string genericSignature;

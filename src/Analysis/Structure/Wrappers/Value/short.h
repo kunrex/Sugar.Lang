@@ -13,9 +13,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Short final : public DataTypes::BuiltInValueType, public Services::SingletonService<Short>, public virtual Core::Interfaces::IPrimitiveType
+    class Short final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             Global::BuiltInMethod* tryParse;
@@ -28,6 +28,8 @@ namespace Analysis::Structure::Wrappers
             Short();
 
         public:
+            static const Short& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

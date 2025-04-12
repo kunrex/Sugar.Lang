@@ -6,86 +6,77 @@ namespace Tokens
 {
     Keyword::Keyword() = default;
 
-    void Keyword::KeywordInit()
-    {
-        keywordMap["print"] = { SyntaxKind::Print, KeywordType::General };
-        keywordMap["println"] = { SyntaxKind::Println, KeywordType::General };
-        keywordMap["input"] = { SyntaxKind::Input, KeywordType::General };
-        keywordMap["format"] = { SyntaxKind::Format, KeywordType::General };
-        keywordMap["tostring"] = { SyntaxKind::ToString, KeywordType::General };
-
-        keywordMap["let"] = { SyntaxKind::Let, KeywordType::General };
-
-        keywordMap["this"] = { SyntaxKind::This, KeywordType::General };
-
-        keywordMap["get"] = { SyntaxKind::Get, KeywordType::General };
-        keywordMap["set"] = { SyntaxKind::Set, KeywordType::General };
-
-        keywordMap["create"] = { SyntaxKind::Create, KeywordType::General };
-
-        keywordMap["throw"] = { SyntaxKind::Throw, KeywordType::General };
-
-        keywordMap["invoke"] = { SyntaxKind::Invoke, KeywordType::General };
-        keywordMap["funcref"] = { SyntaxKind::FuncRef, KeywordType::General };
-
-        keywordMap["as"] = { SyntaxKind::As, KeywordType::General };
-
-        keywordMap["import"] = { SyntaxKind::Import, KeywordType::General };
-
-        keywordMap["enum"] = { SyntaxKind::Enum, KeywordType::DataType };
-        keywordMap["class"] = { SyntaxKind::Class, KeywordType::DataType };
-        keywordMap["struct"] = { SyntaxKind::Struct, KeywordType::DataType };
-
-        keywordMap["short"] = { SyntaxKind::Short, KeywordType::Type };
-        keywordMap["int"] = { SyntaxKind::Int, KeywordType::Type };
-        keywordMap["long"] = { SyntaxKind::Long, KeywordType::Type };
-        keywordMap["float"] = { SyntaxKind::Float, KeywordType::Type };
-        keywordMap["double"] = { SyntaxKind::Double, KeywordType::Type };
-        keywordMap["bool"] = { SyntaxKind::Boolean, KeywordType::Type };
-        keywordMap["char"] = { SyntaxKind::Character, KeywordType::Type };
-        keywordMap["func"] = { SyntaxKind::Func, KeywordType::Type };
-        keywordMap["action"] = { SyntaxKind::Action, KeywordType::Type };
-        keywordMap["array"] = { SyntaxKind::Array, KeywordType::Type };
-        keywordMap["list"] = { SyntaxKind::List, KeywordType::Type };
-        keywordMap["tuple"] = { SyntaxKind::Tuple, KeywordType::Type };
-        keywordMap["dictionary"] = { SyntaxKind::Dictionary, KeywordType::Type };
-        keywordMap["math"] = { SyntaxKind::Math, KeywordType::Type };
-        keywordMap["string"] = { SyntaxKind::String, KeywordType::Type };
-        keywordMap["exception"] = { SyntaxKind::Exception, KeywordType::Type };
-        keywordMap["nullable"] = { SyntaxKind::Nullable, KeywordType::Type };
-        keywordMap["object"] = { SyntaxKind::Object, KeywordType::Type };
-
-        keywordMap["void"] = { SyntaxKind::Void, KeywordType::Function };
-        keywordMap["indexer"] = { SyntaxKind::Indexer, KeywordType::Function };
-        keywordMap["operator"] = { SyntaxKind::Operator, KeywordType::Function };
-        keywordMap["explicit"] = { SyntaxKind::Explicit, KeywordType::Function };
-        keywordMap["implicit"] = { SyntaxKind::Implicit, KeywordType::Function };
-        keywordMap["constructor"] = { SyntaxKind::Static, KeywordType::Function };
-
-        keywordMap["ref"] = { SyntaxKind::Ref, KeywordType::Describer };
-        keywordMap["const"] = { SyntaxKind::Const, KeywordType::Describer };
-        keywordMap["static"] = { SyntaxKind::Static, KeywordType::Describer };
-        keywordMap["public"] = { SyntaxKind::Public, KeywordType::Describer };
-        keywordMap["private"] = { SyntaxKind::Private, KeywordType::Describer };
-        keywordMap["constexpr"] = { SyntaxKind::Constexpr, KeywordType::Describer };
-
-        keywordMap["copy"] = { SyntaxKind::Copy, KeywordType::General };
-
-        keywordMap["do"] = { SyntaxKind::Do, KeywordType::Loop };
-        keywordMap["for"] = { SyntaxKind::For, KeywordType::Loop };
-        keywordMap["while"] = { SyntaxKind::While, KeywordType::Loop };
-
-        keywordMap["if"] = { SyntaxKind::If, KeywordType::Condition };
-        keywordMap["elif"] = { SyntaxKind::Elif, KeywordType::Condition };
-        keywordMap["else"] = { SyntaxKind::Else, KeywordType::Condition };
-
-        keywordMap["break"] = { SyntaxKind::Break, KeywordType::Control };
-        keywordMap["return"] = { SyntaxKind::Return, KeywordType::Control };
-        keywordMap["continue"] = { SyntaxKind::Continue, KeywordType::Control };
-    }
-
     std::optional<Token> Keyword::TryMatchKeyword(const std::string& value, const unsigned long i)
     {
+        static const std::unordered_map<std::string, std::tuple<SyntaxKind, KeywordType>> keywordMap = {
+            { "print",       { SyntaxKind::Print,       KeywordType::General } },
+            { "println",     { SyntaxKind::Println,     KeywordType::General } },
+            { "input",       { SyntaxKind::Input,       KeywordType::General } },
+            { "format",      { SyntaxKind::Format,      KeywordType::General } },
+            { "tostring",    { SyntaxKind::ToString,    KeywordType::General } },
+            { "let",         { SyntaxKind::Let,         KeywordType::General } },
+            { "this",        { SyntaxKind::This,        KeywordType::General } },
+            { "get",         { SyntaxKind::Get,         KeywordType::General } },
+            { "set",         { SyntaxKind::Set,         KeywordType::General } },
+            { "create",      { SyntaxKind::Create,      KeywordType::General } },
+            { "throw",       { SyntaxKind::Throw,       KeywordType::General } },
+            { "invoke",      { SyntaxKind::Invoke,      KeywordType::General } },
+            { "funcref",     { SyntaxKind::FuncRef,     KeywordType::General } },
+            { "as",          { SyntaxKind::As,          KeywordType::General } },
+            { "import",      { SyntaxKind::Import,      KeywordType::General } },
+
+            { "enum",        { SyntaxKind::Enum,        KeywordType::DataType } },
+            { "class",       { SyntaxKind::Class,       KeywordType::DataType } },
+            { "struct",      { SyntaxKind::Struct,      KeywordType::DataType } },
+
+            { "short",       { SyntaxKind::Short,       KeywordType::Type } },
+            { "int",         { SyntaxKind::Int,         KeywordType::Type } },
+            { "long",        { SyntaxKind::Long,        KeywordType::Type } },
+            { "float",       { SyntaxKind::Float,       KeywordType::Type } },
+            { "double",      { SyntaxKind::Double,      KeywordType::Type } },
+            { "bool",        { SyntaxKind::Boolean,     KeywordType::Type } },
+            { "char",        { SyntaxKind::Character,   KeywordType::Type } },
+            { "func",        { SyntaxKind::Func,        KeywordType::Type } },
+            { "action",      { SyntaxKind::Action,      KeywordType::Type } },
+            { "array",       { SyntaxKind::Array,       KeywordType::Type } },
+            { "list",        { SyntaxKind::List,        KeywordType::Type } },
+            { "tuple",       { SyntaxKind::Tuple,       KeywordType::Type } },
+            { "dictionary",  { SyntaxKind::Dictionary,  KeywordType::Type } },
+            { "math",        { SyntaxKind::Math,        KeywordType::Type } },
+            { "string",      { SyntaxKind::String,      KeywordType::Type } },
+            { "exception",   { SyntaxKind::Exception,   KeywordType::Type } },
+            { "nullable",    { SyntaxKind::Nullable,    KeywordType::Type } },
+            { "object",      { SyntaxKind::Object,      KeywordType::Type } },
+
+            { "void",        { SyntaxKind::Void,        KeywordType::Function } },
+            { "indexer",     { SyntaxKind::Indexer,     KeywordType::Function } },
+            { "operator",    { SyntaxKind::Operator,    KeywordType::Function } },
+            { "explicit",    { SyntaxKind::Explicit,    KeywordType::Function } },
+            { "implicit",    { SyntaxKind::Implicit,    KeywordType::Function } },
+            { "constructor", { SyntaxKind::Constructor,      KeywordType::Function } },
+
+            { "ref",         { SyntaxKind::Ref,         KeywordType::Describer } },
+            { "const",       { SyntaxKind::Const,       KeywordType::Describer } },
+            { "static",      { SyntaxKind::Static,      KeywordType::Describer } },
+            { "public",      { SyntaxKind::Public,      KeywordType::Describer } },
+            { "private",     { SyntaxKind::Private,     KeywordType::Describer } },
+            { "constexpr",   { SyntaxKind::Constexpr,   KeywordType::Describer } },
+
+            { "copy",        { SyntaxKind::Copy,        KeywordType::General } },
+
+            { "do",          { SyntaxKind::Do,          KeywordType::Loop } },
+            { "for",         { SyntaxKind::For,         KeywordType::Loop } },
+            { "while",       { SyntaxKind::While,       KeywordType::Loop } },
+
+            { "if",          { SyntaxKind::If,          KeywordType::Condition } },
+            { "elif",        { SyntaxKind::Elif,        KeywordType::Condition } },
+            { "else",        { SyntaxKind::Else,        KeywordType::Condition } },
+
+            { "break",       { SyntaxKind::Break,       KeywordType::Control } },
+            { "return",      { SyntaxKind::Return,      KeywordType::Control } },
+            { "continue",    { SyntaxKind::Continue,    KeywordType::Control } },
+        };
+
         if (const auto result = keywordMap.find(value); result != keywordMap.end()) {
             return std::make_optional(Token(i, TokenType::Keyword, std::get<0>(result->second), static_cast<short>(std::get<1>(result->second)), result->first));
         }

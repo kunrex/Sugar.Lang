@@ -12,9 +12,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService<Character>, public virtual Core::Interfaces::IPrimitiveType
+    class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
@@ -27,6 +27,8 @@ namespace Analysis::Structure::Wrappers
             Character();
 
         public:
+            static const Character& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

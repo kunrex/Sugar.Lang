@@ -8,4 +8,9 @@ namespace ParseNodes::Types
     { }
 
     NodeType AnonymousTypeNode::NodeType() const { return NodeType::AnonymousType; }
+
+    void AnonymousTypeNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Anonymous Type Node" << std::endl;
+    }
 }

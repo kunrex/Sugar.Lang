@@ -12,4 +12,9 @@ namespace ParseNodes::Values
     { }
 
     NodeType IdentifierNode::NodeType() const { return NodeType::Identifier; }
+
+    void IdentifierNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Identifier Node: " << *token.Value<string>() << std::endl;
+    }
 }

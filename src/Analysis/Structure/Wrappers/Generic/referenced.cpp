@@ -15,15 +15,14 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Referenced::Referenced(const IDataType* const referencedType) : BuiltInClass(std::format("{}&", referencedType->Name()), Describer::Public), referencedType(referencedType)
+    Referenced::Referenced(const IDataType* const referencedType) : BuiltInClass(std::format("{}&", referencedType->Name()), Describer::Public), SingletonService(), referencedType(referencedType)
     { }
 
     const Referenced* Referenced::Instance(const IDataType* const dataType)
     {
-        static std::map<unsigned long, const Referenced*> map;
+        static std::map<uintptr_t, const Referenced*> map;
 
-        const std::vector types({ dataType });
-        const auto hash = ArgumentHash(types);
+        const auto hash = reinterpret_cast<uintptr_t>(dataType);
 
         if (map.contains(hash))
             return map.at(hash);

@@ -12,7 +12,6 @@ add_library(Sugar STATIC
         Services/dictionary.h
         Services/string_builder.cpp
         Services/string_builder.h
-        Services/singleton_service.cpp
         Services/singleton_service.h
 
         Lexing/Tokens/token.cpp
@@ -127,8 +126,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.cpp
         Parsing/ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.cpp
-        Parsing/ParseNodes/Functions/Calling/BaseFunctions/base_function_call_node.h
 
         Parsing/ParseNodes/Functions/Creation/explicit_cast_node.cpp
         Parsing/ParseNodes/Functions/Creation/explicit_cast_node.h
@@ -141,29 +138,18 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Functions/Creation/constructor_creation_node.cpp
         Parsing/ParseNodes/Functions/Creation/constructor_creation_node.h
 
-        Parsing/ParseNodes/Core/body_node.cpp
-        Parsing/ParseNodes/Core/body_node.h
-        Parsing/ParseNodes/Core/entity_node.cpp
-        Parsing/ParseNodes/Core/entity_node.h
-        Parsing/ParseNodes/Core/function_node.cpp
-        Parsing/ParseNodes/Core/function_node.h
-
         Parsing/ParseNodes/DataTypes/class_node.cpp
         Parsing/ParseNodes/DataTypes/class_node.h
         Parsing/ParseNodes/DataTypes/struct_node.cpp
         Parsing/ParseNodes/DataTypes/struct_node.h
         Parsing/ParseNodes/DataTypes/enum_node.cpp
         Parsing/ParseNodes/DataTypes/enum_node.h
-        Parsing/ParseNodes/DataTypes/data_type_node.cpp
-        Parsing/ParseNodes/DataTypes/data_type_node.h
 
         Parsing/ParseNodes/Conditions/if_node.cpp
         Parsing/ParseNodes/Conditions/if_node.h
         Parsing/ParseNodes/Conditions/else_node.cpp
         Parsing/ParseNodes/Conditions/else_node.h
 
-        Parsing/ParseNodes/Loops/loop_node.cpp
-        Parsing/ParseNodes/Loops/loop_node.h
         Parsing/ParseNodes/Loops/while_node.cpp
         Parsing/ParseNodes/Loops/while_node.h
         Parsing/ParseNodes/Loops/for_loop_node.cpp
@@ -179,8 +165,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Properties/Accessors/set_node.h
         Parsing/ParseNodes/Properties/base_property_node.cpp
         Parsing/ParseNodes/Properties/base_property_node.h
-        Parsing/ParseNodes/Properties/Accessors/accessor_node.cpp
-        Parsing/ParseNodes/Properties/Accessors/accessor_node.h
 
         Parsing/Parser/parser.cpp
         Parsing/Parser/parser.h
@@ -546,8 +530,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/DataTypes/i_delegate_type.h
         Analysis/Structure/Context/Control/throw.cpp
         Analysis/Structure/Context/Control/throw.h
-        Analysis/Structure/Global/Variables/enum_field.cpp
-        Analysis/Structure/Global/Variables/enum_field.h
         Analysis/Structure/Core/Interfaces/Creation/i_constant.h
         Analysis/Structure/Context/Expressions/ternary_expression.cpp
         Analysis/Structure/Context/Expressions/ternary_expression.h
@@ -556,14 +538,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/DataTypes/i_collection_type.h
         Parsing/ParseNodes/Core/Interfaces/i_parse_node.h
         Parsing/ParseNodes/Enums/child_code.h
-        Parsing/ParseNodes/Core/describable_node.cpp
-        Parsing/ParseNodes/Core/describable_node.h
-        Parsing/ParseNodes/Core/nameable_node.cpp
-        Parsing/ParseNodes/Core/nameable_node.h
-        Parsing/ParseNodes/Core/characteristic_node.cpp
-        Parsing/ParseNodes/Core/characteristic_node.h
-        Parsing/ParseNodes/Core/property_node.cpp
-        Parsing/ParseNodes/Core/property_node.h
         Parsing/ParseNodes/Expressions/indexer_expression_node.cpp
         Parsing/ParseNodes/Describers/describer_keyword_node.cpp
         Parsing/ParseNodes/Describers/describer_keyword_node.h
@@ -576,4 +550,7 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h
         Analysis/Structure/Wrappers/Value/built_in_functions.cpp
         Analysis/Structure/Wrappers/Value/built_in_functions.h
+        Analysis/Structure/Wrappers/Generic/enum_field.cpp
+        Analysis/Structure/Wrappers/Generic/enum_field.h
+        Lexing/Tokens/Enums/type_kind.cpp
 )

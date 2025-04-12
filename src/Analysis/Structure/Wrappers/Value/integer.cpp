@@ -28,28 +28,38 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_integer = "[System.Runtime]System.Int32";
+const string cil_integer = "[System.Runtime]System.Int32";
+
+namespace
+{
+    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) + std::get<int>(arguments[1].data)} ; }
+    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) - std::get<int>(arguments[1].data)} ; }
+    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) * std::get<int>(arguments[1].data)} ; }
+    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) / std::get<int>(arguments[1].data)} ; }
+    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) % std::get<int>(arguments[1].data)} ; }
+
+    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), arguments[0].data }; }
+    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), -std::get<int>(arguments[0].data) }; }
+
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
+    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
+    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
+    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
+}
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) + std::get<int>(arguments[1].data)} ; }
-    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) - std::get<int>(arguments[1].data)} ; }
-    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) * std::get<int>(arguments[1].data)} ; }
-    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) / std::get<int>(arguments[1].data)} ; }
-    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) % std::get<int>(arguments[1].data)} ; }
-
-    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), arguments[0].data }; }
-    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), -std::get<int>(arguments[0].data) }; }
-
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
-    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
-    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
-    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
-
     Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
     { }
+
+    const Integer& Integer::Instance()
+    {
+        static const Integer instance;
+        return instance;
+    }
+
 
     int Integer::SlotCount() const { return 1; }
 
@@ -237,9 +247,6 @@ namespace Analysis::Structure::Wrappers
 
     Integer::~Integer()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         delete tryParse;
 
         for (const auto cast: implicitCasts)

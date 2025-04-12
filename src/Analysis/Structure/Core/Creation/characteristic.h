@@ -16,7 +16,7 @@ namespace Analysis::Structure::Core
 
             const ParseNodes::Core::Interfaces::IParseNode* parseNode;
 
-            const Interfaces::IContextNode* context;
+            mutable const Interfaces::IContextNode* context;
 
             Characteristic(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 

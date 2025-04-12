@@ -13,9 +13,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class String final : public DataTypes::BuiltInClass, public Services::SingletonService<String>, public virtual Core::Interfaces::IPrimitiveType
+    class String final : public DataTypes::BuiltInClass, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
@@ -27,6 +27,8 @@ namespace Analysis::Structure::Wrappers
             String();
 
         public:
+            static const String& Instance();
+
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             void InitializeMembers() override;

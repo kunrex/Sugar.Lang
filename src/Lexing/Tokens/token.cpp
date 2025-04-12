@@ -39,7 +39,7 @@ namespace Tokens
     template <typename TType>
     optional<TType> Token::Value() const
     {
-        if (const TType* v = std::get_if<TType>(&value)) {
+        if (const auto v = std::get_if<TType>(&value)) {
             return *v;
         }
 
@@ -52,4 +52,8 @@ namespace Tokens
         std::visit([](auto&& arg) { cout << arg << endl; }, value);
         cout << "]" << endl;
     }
+
+    template optional<long> Token::Value() const;
+    template optional<double> Token::Value() const;
+    template optional<string> Token::Value() const;
 }

@@ -4,6 +4,7 @@
 #include <format>
 
 #include "generic_extensions.h"
+
 #include "../../DataTypes/data_type_extensions.h"
 
 using namespace std;
@@ -14,11 +15,11 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_func = "[System.Runtime]System.Func";
+const string cil_func = "[System.Runtime]System.Func";
 
 namespace Analysis::Structure::Wrappers
 {
-    Func::Func() : BuiltInClass(cil_func, Describer::Public), SingletonCollection(), genericSignature(), types()
+    Func::Func() : BuiltInClass(cil_func, Describer::Public), SingletonService(), genericSignature(), types()
     { }
 
     const Func* Func::Instance(const std::vector<const IDataType*>& types)

@@ -45,7 +45,7 @@
 
 namespace Parsing
 {
-    class Parser final : public Services::SingletonService<Parser>
+    class Parser final : public Services::SingletonService
     {
         private:
             unsigned long index = 0;
@@ -68,20 +68,20 @@ namespace Parsing
 
             [[nodiscard]] ParseNodes::InvalidNode* ParseInvalid(Tokens::Enums::SeparatorKind breakOut);
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseEntity(Tokens::Enums::SeparatorKind breakSeparator);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseExpression(Tokens::Enums::SeparatorKind breakSeparator);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseNonEmptyExpression(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseEntity(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseExpression(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNonEmptyExpression(Tokens::Enums::SeparatorKind breakSeparator);
 
-            void ClearStack(const Tokens::Token& top, std::stack<const ParseNodes::ParseNode*>& output);
-            void ClearStack(std::stack<const Tokens::Token*>& stack, std::stack<const ParseNodes::ParseNode*>& output);
+            void ClearStack(const Tokens::Token& top, std::stack<const ParseNodes::Core::Interfaces::IParseNode*>& output);
+            void ClearStack(std::stack<const Tokens::Token*>& stack, std::stack<const ParseNodes::Core::Interfaces::IParseNode*>& output);
 
             void ParseExpressionCollection(ParseNodes::DynamicNodeCollection* collection, Tokens::Enums::SeparatorKind breakSeparator);
 
             void ParseGeneric(ParseNodes::DynamicNodeCollection* generic);
-            [[nodiscard]] const ParseNodes::Expressions::IndexerExpressionNode* ParseIndexerExpression(const ParseNodes::ParseNode* operand);
+            [[nodiscard]] const ParseNodes::Expressions::IndexerExpressionNode* ParseIndexerExpression(const ParseNodes::Core::Interfaces::IParseNode* operand);
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseType();
-            [[nodiscard]] const ParseNodes::ParseNode* CheckType(const ParseNodes::ParseNode* parsed) const;
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseType();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* CheckType(const ParseNodes::Core::Interfaces::IParseNode* parsed) const;
 
             [[nodiscard]] const ParseNodes::Values::IdentifierNode* ParseIdentifier(bool increment = false);
 
@@ -98,18 +98,19 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Functions::Calling::FuncRefNode* ParseFuncRefCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::ToStringNode* ParseToStringCall();
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseConstructorCall();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseConstructorCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FunctionCallNode* ParseFunctionCall(const ParseNodes::Values::IdentifierNode* identifier);
 
-            [[nodiscard]] const ParseNodes::Properties::BasePropertyNode* ParseProperty(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::ParseNode* type, const ParseNodes::Values::IdentifierNode* identifier);
-            [[nodiscard]] const ParseNodes::Properties::BaseIndexerNode* ParseIndexer(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] std::tuple<const ParseNodes::Properties::GetNode*, const ParseNodes::Properties::SetNode*> ParseAccessors();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseProperty(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::Core::Interfaces::IParseNode* type, const ParseNodes::Values::IdentifierNode* identifier);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseIndexer(const ParseNodes::Describers::DescriberNode* describer);
 
-            [[nodiscard]] const ParseNodes::Functions::Creation::ConstructorCreationNode* ParseConstructor(const ParseNodes::Describers::DescriberNode* describer);
-            [[nodiscard]] const ParseNodes::Functions::Creation::FunctionCreationNode* ParseFunction(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::ParseNode* type);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseConstructor(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseFunction(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::Core::Interfaces::IParseNode* type);
 
-            [[nodiscard]] const ParseNodes::Functions::Creation::ExplicitCastNode* ParseExplicitCast(const ParseNodes::Describers::DescriberNode* describer);
-            [[nodiscard]] const ParseNodes::Functions::Creation::ImplicitCastNode* ParseImplicitCast(const ParseNodes::Describers::DescriberNode* describer);
-            [[nodiscard]] const ParseNodes::Functions::Creation::OperatorOverloadNode* ParseOperatorOverload(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseExplicitCast(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseImplicitCast(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseOperatorOverload(const ParseNodes::Describers::DescriberNode* describer);
 
             [[nodiscard]] const ParseNodes::Groups::IfChainNode* ParseIf();
 
@@ -117,25 +118,27 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Loops::DoWhileNode* ParseDoWhile();
             [[nodiscard]] const ParseNodes::Loops::ForLoopNode* ParseForLoop();
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseImportStatement();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseImportStatement();
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseEnumDefinition(const ParseNodes::Describers::DescriberNode* describer);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseClassDefinition(const ParseNodes::Describers::DescriberNode* describer);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseStructDefinition(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseEnumDefinition(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseClassDefinition(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseStructDefinition(const ParseNodes::Describers::DescriberNode* describer);
 
             [[nodiscard]] const ParseNodes::Describers::DescriberNode* ParseDescriber();
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseVariableDeclaration(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::ParseNode* type, Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseVariableDeclaration(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::Core::Interfaces::IParseNode* type, Tokens::Enums::SeparatorKind breakSeparator);
 
-            [[nodiscard]] const ParseNodes::ParseNode* ParseKeywordStatement(Tokens::Enums::SeparatorKind breakSeparator);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseDescriberStatement(Tokens::Enums::SeparatorKind breakSeparator);
-            [[nodiscard]] const ParseNodes::ParseNode* ParseIdentifierStatement(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseKeywordStatement(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseDescriberStatement(Tokens::Enums::SeparatorKind breakSeparator);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseIdentifierStatement(Tokens::Enums::SeparatorKind breakSeparator);
 
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseLazyScope();
             [[nodiscard]] const ParseNodes::Groups::ScopeNode* ParseScope();
-            [[nodiscard]] const ParseNodes::ParseNode* ParseStatement();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseStatement();
 
         public:
+            static Parser& Instance();
+
             void Parse(Analysis::Structure::SourceFile* source);
     };
 }

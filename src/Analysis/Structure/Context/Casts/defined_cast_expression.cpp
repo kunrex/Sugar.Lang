@@ -21,5 +21,5 @@ namespace Analysis::Structure::Context
     bool DefinedCastExpression::Readable() const { return true; }
     bool DefinedCastExpression::Writable() const { return false; }
 
-    string DefinedCastExpression::CILData() const { return definition->MemberType() == MemberType::BuiltInCast ? definition->FullName : std::format("call {}", definition->FullName()); }
+    string DefinedCastExpression::CILData() const { return definition->MemberType() == MemberType::BuiltInCast ? definition->FullName() : std::format("call {}", definition->FullName()); }
 }

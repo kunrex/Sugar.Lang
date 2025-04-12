@@ -21,6 +21,12 @@ namespace Analysis::Structure::Wrappers
     void Void::InitializeMembers()
     { }
 
+    const Void& Void::Instance()
+    {
+        static const Void instance;
+        return instance;
+    }
+
     const ICharacteristic* Void::FindCharacteristic(const string& name) const
     { return nullptr; }
 

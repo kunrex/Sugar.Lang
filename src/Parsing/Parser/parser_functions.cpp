@@ -24,60 +24,31 @@ using namespace ParseNodes::Values;
 using namespace ParseNodes::Statements;
 using namespace ParseNodes::Describers;
 using namespace ParseNodes::Properties;
+using namespace ParseNodes::Core::Interfaces;
 using namespace ParseNodes::Functions::Calling;
 using namespace ParseNodes::Functions::Creation;
 
 namespace Parsing
 {
-    const BasePropertyNode* Parser::ParseProperty(const DescriberNode* const describer, const ParseNode* const type, const IdentifierNode* const identifier)
+    const IParseNode* Parser::ParseProperty(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier)
     {
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
 
-        const GetNode* get = nullptr;
-        const SetNode* set = nullptr;
-
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
-        if (MatchToken(Current(), SyntaxKind::Get))
-        {
-            const auto current = Current();
-            index++;
-
-            const auto body = ParseScope();
-            index++;
-
-            get = new GetNode(desc, body, current);
-            index++;
-        }
-
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
-        if (MatchToken(Current(), SyntaxKind::Set))
-        {
-            const auto current = Current();
-            index++;
-
-            const auto body = ParseScope();
-            index++;
-
-            set = new SetNode(desc, body, current);
-            index++;
-        }
-
-        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket, true);
-        if (get == nullptr && set == nullptr)
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Get, Current(), source));
+        const auto result = ParseAccessors();
+        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
 
         if (MatchToken(Current(), SyntaxKind::Equals, true))
         {
             const auto value = ParseNonEmptyExpression(SeparatorKind::Semicolon);
-            return new AssignedPropertyNode(describer, type, identifier, get, set, value);;
+            return new AssignedPropertyNode(describer, type, identifier, std::get<0>(result), std::get<1>(result), value);;
         }
 
-        return new BasePropertyNode(describer, type, identifier, get, set);
+        return new BasePropertyNode(describer, type, identifier, std::get<0>(result), std::get<1>(result));
     }
 
-    const BaseIndexerNode* Parser::ParseIndexer(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseIndexer(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto type = ParseType();
@@ -88,47 +59,61 @@ namespace Parsing
 
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
 
+        const auto result = ParseAccessors();
+
+        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
+        return new BaseIndexerNode(describer, type, parameters, std::get<0>(result), std::get<1>(result), keyword);
+    }
+
+    std::tuple<const GetNode*, const SetNode*> Parser::ParseAccessors()
+    {
         const GetNode* get = nullptr;
         const SetNode* set = nullptr;
 
         auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Get))
         {
-            const auto current = Current();
+            const auto& current = Current();
             index++;
 
             const auto body = ParseScope();
             index++;
 
             get = new GetNode(desc, body, current);
-            index++;
+            desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         }
 
-        desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
         if (MatchToken(Current(), SyntaxKind::Set))
         {
-            const auto current = Current();
+            const auto& current = Current();
             index++;
 
             const auto body = ParseScope();
             index++;
 
             set = new SetNode(desc, body, current);
-            index++;
+        }
+        else if (desc != nullptr)
+        {
+            ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Set, Current(), source));
+            delete desc;
         }
 
-        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
-        if (get == nullptr && set == nullptr)
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Get, Current(), source));
-
-        return new BaseIndexerNode(describer, type, parameters, get, set, keyword);
+        return { get, set };
     }
 
     const CompoundDeclarationNode* Parser::ParseFunctionParameters()
     {
-        TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
+        const auto parameters = new CompoundDeclarationNode(source->TokenAt(index));
+        if (!TryMatchToken(Current(), SyntaxKind::OpenBracket, true))
+        {
+            const auto invalid = ParseInvalid(SeparatorKind::CloseBracket | SeparatorKind::FlowerOpenBracket);
+            parameters->AddChild(invalid);
+            return parameters;
+        }
 
-        const auto parameters = new CompoundDeclarationNode(source->TokenAt(index - 1));
+        if (TryMatchToken(Current(), SyntaxKind::CloseBracket))
+            return parameters;
 
         while (index < source->TokenCount())
         {
@@ -149,7 +134,7 @@ namespace Parsing
             const auto identifier = ParseIdentifier();
             index++;
 
-            const auto current = Current();
+            const auto& current = Current();
             parameters->AddChild(new DeclarationNode(describer, type, identifier, current));
             if (MatchToken(current, SyntaxKind::Comma, true))
                 continue;
@@ -172,9 +157,9 @@ namespace Parsing
         ParseExpressionCollection(function, SeparatorKind::CloseBracket);
     }
 
-    const ParseNode* Parser::ParseConstructorCall()
+    const IParseNode* Parser::ParseConstructorCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto type = ParseType();
@@ -211,7 +196,7 @@ namespace Parsing
         return functionCall;
     }
 
-    const FunctionCreationNode* Parser::ParseFunction(const DescriberNode* const describer, const ParseNode* const type)
+    const IParseNode* Parser::ParseFunction(const DescriberNode* const describer, const IParseNode* const type)
     {
         const auto identifier = ParseIdentifier(true);
 
@@ -222,9 +207,9 @@ namespace Parsing
         return new FunctionCreationNode(describer, type, identifier, parameters, body);
     }
 
-    const ConstructorCreationNode* Parser::ParseConstructor(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseConstructor(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto parameters = ParseFunctionParameters();
@@ -234,12 +219,14 @@ namespace Parsing
         return new ConstructorCreationNode(describer, parameters, body, keyword);
     }
 
-    const ExplicitCastNode* Parser::ParseExplicitCast(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseExplicitCast(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto type = ParseType();
+        index++;
+
         const auto parameters = ParseFunctionParameters();
         index++;
 
@@ -247,9 +234,9 @@ namespace Parsing
         return new ExplicitCastNode(describer, type, parameters, body, keyword);
     }
 
-    const ImplicitCastNode* Parser::ParseImplicitCast(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseImplicitCast(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto type = ParseType();
@@ -262,7 +249,7 @@ namespace Parsing
         return new ImplicitCastNode(describer, type, parameters, body, keyword);
     }
 
-    const OperatorOverloadNode* Parser::ParseOperatorOverload(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseOperatorOverload(const DescriberNode* const describer)
     {
         index++;
 
@@ -270,7 +257,7 @@ namespace Parsing
         index++;
 
         TryMatchType(Current(), TokenType::Operator);
-        const auto baseOperator = Current();
+        const auto& baseOperator = Current();
         index++;
 
         const auto parameters = ParseFunctionParameters();
@@ -282,7 +269,7 @@ namespace Parsing
 
     const PrintNode* Parser::ParsePrintCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto print = new PrintNode(keyword);;
         index++;
 
@@ -290,12 +277,13 @@ namespace Parsing
         if (print->ChildCount() != 1)
             ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
 
+        index++;
         return print;
     }
 
     const PrintlnNode* Parser::ParsePrintlnCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto print = new PrintlnNode(keyword);;
         index++;
 
@@ -308,7 +296,7 @@ namespace Parsing
 
     const InputNode* Parser::ParseInputCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto input = new InputNode(Current());;
         index++;
 
@@ -321,7 +309,7 @@ namespace Parsing
 
     const FormatNode* Parser::ParseFormatCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto format = new FormatNode(Current());;
         index++;
 
@@ -334,7 +322,7 @@ namespace Parsing
 
     const InvokeNode* Parser::ParseInvokeCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto invoke = new InvokeNode(Current());;
         index++;
 
@@ -347,7 +335,7 @@ namespace Parsing
 
     const FuncRefNode* Parser::ParseFuncRefCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto funcRef = new FuncRefNode(keyword);
         index++;
 
@@ -364,7 +352,7 @@ namespace Parsing
 
     const ToStringNode* Parser::ParseToStringCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto toString = new ToStringNode(Current());;
         index++;
 
@@ -377,7 +365,7 @@ namespace Parsing
 
     const RefCallNode* Parser::ParseRefCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto ref = new RefCallNode(keyword);;
         index++;
 
@@ -390,7 +378,7 @@ namespace Parsing
 
     const CopyCallNode* Parser::ParseCopyCall()
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         const auto copy = new CopyCallNode(keyword);;
         index++;
 

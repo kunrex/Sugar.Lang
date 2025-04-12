@@ -28,28 +28,38 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_long = "[System.Runtime]System.Int64";
+const string cil_long = "[System.Runtime]System.Int64";
+
+namespace
+{
+    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) + std::get<long>(arguments[1].data)} ; }
+    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) - std::get<long>(arguments[1].data)} ; }
+    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) * std::get<long>(arguments[1].data)} ; }
+    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) / std::get<long>(arguments[1].data)} ; }
+    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) % std::get<long>(arguments[1].data)} ; }
+
+    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), arguments[0].data }; }
+    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), -std::get<long>(arguments[0].data) }; }
+
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), static_cast<long>(!std::get<long>(arguments[0].data))} ; }
+    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) & std::get<long>(arguments[1].data)} ; }
+    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) | std::get<long>(arguments[1].data)} ; }
+    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) >> std::get<long>(arguments[1].data)} ; }
+    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) << std::get<long>(arguments[1].data)} ; }
+    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) ^ std::get<long>(arguments[1].data)} ; }
+}
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) + std::get<long>(arguments[1].data)} ; }
-    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) - std::get<long>(arguments[1].data)} ; }
-    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) * std::get<long>(arguments[1].data)} ; }
-    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) / std::get<long>(arguments[1].data)} ; }
-    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) % std::get<long>(arguments[1].data)} ; }
-
-    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), arguments[0].data }; }
-    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), -std::get<long>(arguments[0].data) }; }
-
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), static_cast<long>(!std::get<long>(arguments[0].data))} ; }
-    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) & std::get<long>(arguments[1].data)} ; }
-    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) | std::get<long>(arguments[1].data)} ; }
-    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) >> std::get<long>(arguments[1].data)} ; }
-    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) << std::get<long>(arguments[1].data)} ; }
-    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Long::Instance(), std::get<long>(arguments[0].data) ^ std::get<long>(arguments[1].data)} ; }
-
     Long::Long() : BuiltInValueType(cil_long, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), explicitCasts(), overloads()
     { }
+
+    const Long& Long::Instance()
+    {
+        static const Long instance;
+        return instance;
+    }
+
 
     int Long::SlotCount() const { return 2; }
 
@@ -231,9 +241,6 @@ namespace Analysis::Structure::Wrappers
 
     Long::~Long()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
-
         delete tryParse;
 
         for (const auto cast: explicitCasts)

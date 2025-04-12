@@ -10,5 +10,10 @@ namespace ParseNodes::Statements
     { }
 
     NodeType ContinueNode::NodeType() const { return NodeType::Continue; }
+
+    void ContinueNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Continue Statement Node" << std::endl;
+    }
 }
 

@@ -12,7 +12,6 @@ namespace Analysis::Creation::Binding
 
     void ValidateDescriber(const Structure::Core::Describable* describable, Structure::Enums::Describer allowed, unsigned long index, const Structure::SourceFile* source);
 
-    const Structure::Core::Interfaces::IPrimitiveType* BindBuiltInType(const ParseNodes::Core::Interfaces::IParseNode* node);
     const Structure::Core::Interfaces::IDataType* BindDataType(const ParseNodes::Core::Interfaces::IParseNode* node, const Structure::SourceFile* source);
 }
 

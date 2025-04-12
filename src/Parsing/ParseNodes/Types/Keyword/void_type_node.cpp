@@ -8,4 +8,9 @@ namespace ParseNodes::Types
     { }
 
     NodeType VoidTypeNode::NodeType() const { return NodeType::VoidType; }
+
+    void VoidTypeNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Void Node" << std::endl;
+    }
 }

@@ -10,4 +10,10 @@ namespace ParseNodes::Values
     { }
 
     NodeType ThisNode::NodeType() const { return NodeType::This; }
+
+    void ThisNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "This Node" << std::endl;
+    }
+
 }

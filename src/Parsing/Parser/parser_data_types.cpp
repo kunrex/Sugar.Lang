@@ -18,26 +18,28 @@ using namespace ParseNodes::Groups;
 using namespace ParseNodes::DataTypes;
 using namespace ParseNodes::Describers;
 using namespace ParseNodes::Statements;
+using namespace ParseNodes::Core::Interfaces;
 
 namespace Parsing
 {
-    const ParseNode* Parser::ParseImportStatement()
+    const IParseNode* Parser::ParseImportStatement()
     {
-        const auto keyword = Current();
         index++;
 
-        const auto path = Current();
+        const auto& path = Current();
         if (TryMatchToken(path, SyntaxKind::Constant))
             if (const auto kind = static_cast<TypeKind>(path.Metadata()); kind != TypeKind::String)
                 ExceptionManager::Instance().AddChild(new ParsingException("Local path expected (as a string).", path, source));
+            else
+                index++;
 
         TryMatchToken(Current(), SyntaxKind::Semicolon);
         return new ImportStatementNode(path);
     }
 
-    const ParseNode* Parser::ParseEnumDefinition(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseEnumDefinition(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto identifier = ParseIdentifier(true);
@@ -50,9 +52,9 @@ namespace Parsing
         return new EnumNode(describer, identifier, body, keyword);
     }
 
-    const ParseNode* Parser::ParseClassDefinition(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseClassDefinition(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto identifier = ParseIdentifier(true);
@@ -61,9 +63,9 @@ namespace Parsing
         return new ClassNode(describer, identifier, body, keyword);
     }
 
-    const ParseNode* Parser::ParseStructDefinition(const DescriberNode* const describer)
+    const IParseNode* Parser::ParseStructDefinition(const DescriberNode* const describer)
     {
-        const auto keyword = Current();
+        const auto& keyword = Current();
         index++;
 
         const auto identifier = ParseIdentifier(true);

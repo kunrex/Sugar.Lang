@@ -8,10 +8,12 @@
 
 namespace Exceptions
 {
-    class ExceptionManager final : public Services::SingletonService<ExceptionManager>, public Services::ConstantCollection<CompileException>
+    class ExceptionManager final : public Services::SingletonService, public Services::ConstantCollection<CompileException>
     {
         public:
             ExceptionManager();
+
+            static ExceptionManager& Instance();
 
             [[nodiscard]] bool LogAllExceptions() const;
     };

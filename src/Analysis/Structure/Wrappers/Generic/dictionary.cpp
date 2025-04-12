@@ -24,11 +24,11 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_dictionary = "[System.Collections.Generic]System.Collections.Generic.Dictionary";
+const string cil_dictionary = "[System.Collections.Generic]System.Collections.Generic.Dictionary";
 
 namespace Analysis::Structure::Wrappers
 {
-    Dictionary::Dictionary(const IDataType* const keyType, const IDataType* const valueType) : BuiltInClass(cil_dictionary, Describer::Public), SingletonCollection(), genericSignature(), keyType(keyType), valueType(valueType), count(nullptr), functions(), constructor(nullptr), indexer(nullptr)
+    Dictionary::Dictionary(const IDataType* const keyType, const IDataType* const valueType) : BuiltInClass(cil_dictionary, Describer::Public), SingletonService(), genericSignature(), keyType(keyType), valueType(valueType), count(nullptr), functions(), constructor(nullptr), indexer(nullptr)
     { }
 
     const Dictionary* Dictionary::Instance(const IDataType* const keyType, const IDataType* const valueType)

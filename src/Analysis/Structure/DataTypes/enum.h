@@ -31,6 +31,8 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const override;
 
+            [[nodiscard]] unsigned long ConstructorCount() const override;
+
             void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
@@ -53,6 +55,8 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] std::vector<Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
             [[nodiscard]] std::vector<Core::Interfaces::IScoped*> AllScoped() const override;
+
+            void Print(const std::string& indent, bool last) const override;
 
             ~Enum() override;
     };

@@ -15,6 +15,8 @@ namespace Analysis::Structure
             [[nodiscard]] Enums::SourceType SourceType() const override;
 
             bool AddChild(std::string key, SourceObject* value) override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

@@ -23,19 +23,18 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_list = "[System.Collections.Generic]System.Collections.Generic.List";
+const string cil_list = "[System.Collections.Generic]System.Collections.Generic.List";
 
 namespace Analysis::Structure::Wrappers
 {
-    List::List(const IDataType* const listType) : BuiltInClass(cil_list, Describer::Public), SingletonCollection(), genericSignature(), listType(listType), characteristics(), functions(), constructors(), indexer(nullptr)
+    List::List(const IDataType* const listType) : BuiltInClass(cil_list, Describer::Public), SingletonService(), genericSignature(), listType(listType), characteristics(), functions(), constructors(), indexer(nullptr)
     { }
 
     const List* List::Instance(const IDataType* const dataType)
     {
-        static std::map<unsigned long, const List*> map;
+        static std::map<uintptr_t, const List*> map;
 
-        const std::vector types({ dataType });
-        const auto hash = ArgumentHash(types);
+        const auto hash = reinterpret_cast<uintptr_t>(dataType);
 
         if (map.contains(hash))
             return map.at(hash);

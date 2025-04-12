@@ -27,7 +27,7 @@ namespace Analysis::Structure::Context
     class FixedContextCollection : public Core::Created, public virtual Core::Interfaces::IContextNode
     {
         protected:
-            std::array<std::tuple<int, const ContextNode*>, childCount> children;
+            std::array<std::tuple<int, const IContextNode*>, childCount> children;
 
             void AddChild(ParseNodes::Enums::ChildCode code, const IContextNode* context);
 

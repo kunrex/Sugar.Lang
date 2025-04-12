@@ -45,7 +45,7 @@ namespace ParseNodes
         for (auto i = 0; i < childCount; i++)
             if (std::get<1>(children.at(i)) == nullptr)
             {
-                children[0] = std::tuple(code, child);
+                children[i] = std::tuple(static_cast<int>(code), child);
                 break;
             }
     }
@@ -77,4 +77,11 @@ namespace ParseNodes
         for (const auto child: children)
             delete child;
     }
+
+    template class FixedNodeCollection<1>;
+    template class FixedNodeCollection<2>;
+    template class FixedNodeCollection<3>;
+    template class FixedNodeCollection<4>;
+    template class FixedNodeCollection<5>;
+    template class FixedNodeCollection<6>;
 }

@@ -10,9 +10,11 @@ namespace ParseNodes::Functions::Calling
     class ConstructorCallNode final : public DynamicNodeCollection
     {
         public:
-            ConstructorCallNode(const ParseNode* type, const Tokens::Token& keyword);
+            ConstructorCallNode(const IParseNode* type, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

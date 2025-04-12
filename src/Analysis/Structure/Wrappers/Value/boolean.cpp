@@ -22,17 +22,26 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_boolean = "[System.Runtime]System.Boolean";
+const string cil_boolean = "[System.Runtime]System.Boolean";
+
+namespace
+{
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Boolean::Instance(), !std::get<bool>(arguments[0].data)} ; }
+
+    CompilationResult And(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Boolean::Instance(), std::get<bool>(arguments[0].data) && std::get<bool>(arguments[1].data)}; }
+    CompilationResult Or(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Boolean::Instance(), std::get<bool>(arguments[0].data) || std::get<bool>(arguments[1].data)}; }
+}
 
 namespace Analysis::Structure::Wrappers
 {
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), !std::get<bool>(arguments[0].data)} ; }
-
-    CompilationResult And(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), std::get<bool>(arguments[0].data) && std::get<bool>(arguments[1].data)}; }
-    CompilationResult Or(const std::vector<CompilationResult>& arguments) { return { &Boolean::Instance(), std::get<bool>(arguments[0].data) || std::get<bool>(arguments[1].data)}; }
-
     Boolean::Boolean() : BuiltInValueType(cil_boolean, Enums::Describer::Public), SingletonService(), implicitCasts(), explicitCasts(), overloads()
     { }
+
+    const Boolean& Boolean::Instance()
+    {
+        static const Boolean instance;
+        return instance;
+    }
 
     int Boolean::SlotCount() const { return 1; }
 

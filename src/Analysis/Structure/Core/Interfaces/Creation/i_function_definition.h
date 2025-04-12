@@ -1,6 +1,7 @@
 #ifndef I_FUNCTION_DEFINITION_H
 #define I_FUNCTION_DEFINITION_H
 
+#include "../i_nameable.h"
 #include "i_function.h"
 
 namespace Analysis::Structure::Core::Interfaces

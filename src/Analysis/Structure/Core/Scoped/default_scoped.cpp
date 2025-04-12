@@ -2,6 +2,8 @@
 
 #include "../../Wrappers/Reference/void.h"
 
+using namespace std;
+
 using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Enums;
@@ -9,7 +11,7 @@ using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string default_scoped_name = "default_scoped";
+const string default_scoped_name = "default_scoped";
 
 namespace Analysis::Structure::Core
 {
@@ -22,8 +24,8 @@ namespace Analysis::Structure::Core
 
     MemberType DefaultScoped::MemberType() const { return MemberType::Scope; }
 
-    const std::string& DefaultScoped::Name() const { return default_scoped_name; }
-    const std::string& DefaultScoped::FullName() const { return default_scoped_name; }
+    const string& DefaultScoped::Name() const { return default_scoped_name; }
+    const string& DefaultScoped::FullName() const { return default_scoped_name; }
 
     const IDataType* DefaultScoped::CreationType() const { return &Void::Instance(); }
 

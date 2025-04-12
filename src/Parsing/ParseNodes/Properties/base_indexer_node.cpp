@@ -8,13 +8,29 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-
-    BaseIndexerNode::BaseIndexerNode(const DescriberNode* const describer, const ParseNode* const type, const CompoundDeclarationNode* const parameters, const GetNode* const get, const SetNode* const set, const Tokens::Token& keyword) : EntityNode(describer, type, keyword)
+    BaseIndexerNode::BaseIndexerNode(const DescriberNode* const describer, const IParseNode* const type, const CompoundDeclarationNode* const parameters, const GetNode* const get, const SetNode* const set, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
-        children.push_back(parameters);
-        children.push_back(get);
-        children.push_back(set);
+        AddChild(ChildCode::Describer, describer);
+        AddChild(ChildCode::Type, type);
+        AddChild(ChildCode::Parameters, parameters);
+        AddChild(ChildCode::Get, get);
+        AddChild(ChildCode::Set, set);
     }
 
     NodeType BaseIndexerNode::NodeType() const { return NodeType::IndexerDeclaration; }
+
+    void BaseIndexerNode::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Indexer Node" << std::endl;
+        const auto next = last ? " " : "| ";
+
+        GetChild(static_cast<int>(ChildCode::Describer))->Print(indent + next, false);
+        GetChild(static_cast<int>(ChildCode::Type))->Print(indent + next, false);
+        GetChild(static_cast<int>(ChildCode::Parameters))->Print(indent + next, false);
+        if (const auto get = GetChild(static_cast<int>(ChildCode::Get)); get != nullptr)
+            get->Print(indent + next, false);
+
+        if (const auto set = GetChild(static_cast<int>(ChildCode::Set)); set != nullptr)
+            set->Print(indent + next, true);
+    }
 }

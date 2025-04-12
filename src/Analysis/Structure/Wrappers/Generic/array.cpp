@@ -23,7 +23,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Array::Array(const IDataType* const arrayType) : BuiltInClass(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonCollection(), genericSignature(), arrayType(arrayType), length(nullptr), constructor(nullptr), indexer(nullptr)
+    Array::Array(const IDataType* const arrayType) : BuiltInClass(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonService(), genericSignature(), arrayType(arrayType), length(nullptr), constructor(nullptr), indexer(nullptr)
     { }
 
     const Array* Array::Instance(const IDataType* const dataType)

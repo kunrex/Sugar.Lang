@@ -1,16 +1,20 @@
 #ifndef DECLARATION_NODE_H
 #define DECLARATION_NODE_H
 
-#include "../Core/characteristic_node.h"
+#include "../parse_node.h"
+#include "../Values/identifier_node.h"
+#include "../Describers/describer_node.h"
 
 namespace ParseNodes::Statements
 {
-    class DeclarationNode : public virtual FixedNodeCollection<3>, public Core::CharacteristicNode<3>
+    class DeclarationNode final: public virtual FixedNodeCollection<3>
     {
         public:
-            DeclarationNode(const Describers::DescriberNode* describer, const ParseNode* type, const Values::IdentifierNode* identifier, const Tokens::Token& separator);
+            DeclarationNode(const Describers::DescriberNode* describer, const IParseNode* type, const Values::IdentifierNode* identifier, const Tokens::Token& separator);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

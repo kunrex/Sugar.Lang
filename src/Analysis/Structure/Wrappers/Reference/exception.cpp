@@ -15,12 +15,18 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_exception = "[System.Runtime]System.Exception";
+const string cil_exception = "[System.Runtime]System.Exception";
 
 namespace Analysis::Structure::Wrappers
 {
     Exception::Exception() : BuiltInClass(cil_exception, Describer::Public), SingletonService(), constructor(nullptr)
     { }
+
+    const Exception& Exception::Instance()
+    {
+        static const Exception instance;
+        return instance;
+    }
 
     TypeKind Exception::Type() const { return TypeKind::Exception; }
 

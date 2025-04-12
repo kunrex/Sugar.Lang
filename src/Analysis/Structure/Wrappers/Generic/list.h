@@ -11,7 +11,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class List final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::ICollectionType
+    class List final : public DataTypes::BuiltInClass, public Services::SingletonService, public virtual Core::Interfaces::ICollectionType
     {
         private:
             mutable std::string genericSignature;

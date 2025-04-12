@@ -48,10 +48,21 @@ namespace Analysis::Structure
 
     void SourceFile::WithSourceNode(SourceFileNode* const source)
     {
-        if (sourceNode != nullptr)
+        if (sourceNode == nullptr)
             sourceNode = source;
     }
     const SourceFileNode* SourceFile::SourceNode() const { return sourceNode; }
+
+    void SourceFile::Print(const string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Sugar File: " << name << std::endl;
+        const auto next = indent + (last ? " " : "| ");
+
+        auto i = 0;
+        const auto childCount = map.size();
+        for (const auto& child: map)
+            child.second->Print(next, ++i == childCount);
+    }
 
     SourceFile::~SourceFile()
     {

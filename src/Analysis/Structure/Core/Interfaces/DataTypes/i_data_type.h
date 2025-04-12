@@ -11,8 +11,6 @@
 #include "../Creation/i_indexer_definition.h"
 #include "../Creation/i_function_definition.h"
 
-
-
 namespace Analysis::Structure::Core::Interfaces
 {
     class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotCount, public virtual IReadWrite

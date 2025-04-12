@@ -8,14 +8,16 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Object final : public DataTypes::BuiltInClass, public Services::SingletonService<Object>
+    class Object final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
-        protected:
+        private:
             Global::BuiltInCast* toString;
 
             Object();
 
         public:
+            static const Object& Instance();
+
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;
 
             void InitializeMembers() override;

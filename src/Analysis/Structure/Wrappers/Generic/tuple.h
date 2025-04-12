@@ -11,7 +11,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Tuple final : public DataTypes::BuiltInValueType, public Services::SingletonCollection
+    class Tuple final : public DataTypes::BuiltInValueType, public Services::SingletonService
     {
         private:
             mutable std::string genericSignature;

@@ -26,7 +26,7 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_character = "[System.Runtime]System.Char";
+const string cil_character = "[System.Runtime]System.Char";
 
 namespace Analysis::Structure::Wrappers
 {
@@ -36,6 +36,12 @@ namespace Analysis::Structure::Wrappers
     int Character::SlotCount() const { return 1; }
 
     TypeKind Character::Type() const { return TypeKind::Character; }
+
+    const Character& Character::Instance()
+    {
+        static const Character instance;
+        return instance;
+    }
 
     void Character::InitializeMembers()
     {
@@ -143,9 +149,6 @@ namespace Analysis::Structure::Wrappers
 
     Character::~Character()
     {
-        for (const auto characteristic: characteristics)
-            delete characteristic.second;
-
         for (const auto function: functions)
             delete function.second;
 

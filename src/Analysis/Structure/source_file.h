@@ -49,6 +49,8 @@ namespace Analysis::Structure
             void WithSourceNode(ParseNodes::Groups::SourceFileNode* source);
             [[nodiscard]] const ParseNodes::Groups::SourceFileNode* SourceNode() const;
 
+            void Print(const std::string& indent, bool last) const override;
+
             ~SourceFile() override;
     };
 }

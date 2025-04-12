@@ -11,6 +11,8 @@ namespace ParseNodes::Describers
             explicit DescriberNode(const Tokens::Token& openBracket);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

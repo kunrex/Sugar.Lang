@@ -5,7 +5,6 @@
 #include "../Lexing/Tokens/token.h"
 
 #include "../Parsing/ParseNodes/parse_node.h"
-#include "../Parsing/ParseNodes/Conditions/condition_node.h"
 #include "../Parsing/ParseNodes/Statements/declaration_node.h"
 
 #include "../Analysis/Structure/source_object.h"
@@ -20,13 +19,13 @@ using namespace Exceptions;
 using namespace Tokens;
 
 using namespace ParseNodes;
-using namespace ParseNodes::Conditions;
 using namespace ParseNodes::Statements;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Context;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Services
 {
@@ -77,29 +76,13 @@ namespace Services
     ConstantCollection<TChild>::ConstantCollection() : Collection<const TChild>()
     { }
 
-    template class ICollection<ContextNode>;
-    template class ICollection<SourceObject>;
-    template class ICollection<const Token>;
-    template class ICollection<const ParseNode>;
-    template class ICollection<const ConditionNode>;
-    template class ICollection<const LocalVariable>;
-    template class ICollection<const DeclarationNode>;
-    template class ICollection<const CompileException>;
-
-    template class Collection<ContextNode>;
     template class Collection<SourceObject>;
 
-    template class Collection<const Token>;
-    template class Collection<const ParseNode>;
-    template class Collection<const ConditionNode>;
+    template class Collection<const IContextNode>;
     template class Collection<const LocalVariable>;
-    template class Collection<const DeclarationNode>;
     template class Collection<const CompileException>;
 
-    template class ConstantCollection<Token>;
-    template class ConstantCollection<ParseNode>;
-    template class ConstantCollection<ConditionNode>;
+    template class ConstantCollection<IContextNode>;
     template class ConstantCollection<LocalVariable>;
-    template class ConstantCollection<DeclarationNode>;
     template class ConstantCollection<CompileException>;
 }

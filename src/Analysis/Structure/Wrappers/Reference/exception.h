@@ -8,14 +8,16 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Exception final : public DataTypes::BuiltInClass, public Services::SingletonService<Exception>
+    class Exception final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
-        protected:
+        private:
             Global::BuiltInConstructor* constructor;
 
             Exception();
 
         public:
+            static const Exception& Instance();
+
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             void InitializeMembers() override;

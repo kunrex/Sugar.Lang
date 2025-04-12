@@ -15,7 +15,7 @@ namespace Analysis::Structure::Context
     const IContextNode* ContextNode::GetChild(const int index) const { return nullptr; }
 
     template <int childCount>
-    FixedContextCollection<childCount>::FixedContextCollection(const IDataType* const creationType) : Created(creationType), children(childCount)
+    FixedContextCollection<childCount>::FixedContextCollection(const IDataType* const creationType) : Created(creationType), children()
     { }
 
     template <int childCount>
@@ -37,10 +37,10 @@ namespace Analysis::Structure::Context
     template <int childCount>
     void FixedContextCollection<childCount>::AddChild(const ChildCode code, const IContextNode* const context)
     {
-        for (const auto child: children)
-            if (std::get<1>(child) == nullptr)
+        for (auto i = 0; i < childCount; i++)
+            if (std::get<1>(children.at(i)) == nullptr)
             {
-                children[0] = { static_cast<int>(code), child };
+                children[i] = std::tuple(static_cast<int>(code), context);
                 break;
             }
     }
@@ -70,4 +70,8 @@ namespace Analysis::Structure::Context
         for (const auto child: children)
             delete child;
     }
+
+    template class FixedContextCollection<1>;
+    template class FixedContextCollection<2>;
+    template class FixedContextCollection<3>;
 }

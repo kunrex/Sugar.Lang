@@ -43,6 +43,8 @@ namespace Analysis::Structure::DataTypes
 
     const IParseNode* ClassSource::Skeleton() const { return skeleton; }
 
+    unsigned long ClassSource::ConstructorCount() const { return constructors.size(); }
+
     void ClassSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -66,8 +68,6 @@ namespace Analysis::Structure::DataTypes
 
     void ClassSource::PushConstructor(IFunction* const constructor)
     {
-        IFunction* s = constructor;
-
         constructors[ArgumentHash(constructor)] = constructor;
     }
 
@@ -132,24 +132,32 @@ namespace Analysis::Structure::DataTypes
 
     std::vector<IScoped*> ClassSource::AllScoped() const
     {
-        std::vector<IScoped*> all;
+        std::vector<IScoped*> all(functions.size());
 
         for (const auto function: functions)
-            all.push_back(function.second);
+            all.push_back(dynamic_cast<IScoped*>(function.second));
 
         for (const auto constructor: constructors)
-            all.push_back(constructor.second);
+            all.push_back(dynamic_cast<IScoped*>(constructor.second));
 
         for (const auto cast: implicitCasts)
-            all.push_back(cast.second);
+            all.push_back(dynamic_cast<IScoped*>(cast.second));
 
         for (const auto cast: explicitCasts)
-            all.push_back(cast.second);
+        {
+            if (const auto definition = cast.second; definition->MemberType() == MemberType::ExplicitCast)
+                all.push_back(dynamic_cast<IScoped*>(definition));
+        }
 
-        for (const auto& overload: overloads)
-            delete overload.second;
+        for (const auto overload: overloads)
+            all.push_back(dynamic_cast<IScoped*>(overload.second));
 
         return all;
+    }
+
+    void ClassSource::Print(const string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Class: " << name << std::endl;
     }
 
     ClassSource::~ClassSource()
@@ -172,7 +180,7 @@ namespace Analysis::Structure::DataTypes
         for (const auto cast: explicitCasts)
             delete cast.second;
 
-        for (const auto& overload: overloads)
+        for (const auto overload: overloads)
             delete overload.second;
     }
 }

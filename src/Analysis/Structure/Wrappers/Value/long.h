@@ -13,9 +13,9 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Long final : public DataTypes::BuiltInValueType, public Services::SingletonService<Long>, public virtual Core::Interfaces::IPrimitiveType
+    class Long final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
-        protected:
+        private:
             std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
 
             Global::BuiltInMethod* tryParse;
@@ -27,6 +27,8 @@ namespace Analysis::Structure::Wrappers
             Long();
 
         public:
+            static const Long& Instance();
+
             [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;

@@ -11,6 +11,8 @@ namespace ParseNodes
             explicit InvalidNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

@@ -1,6 +1,8 @@
 #ifndef TYPE_KIND_H
 #define TYPE_KIND_H
 
+#include "string"
+
 namespace Tokens::Enums
 {
     enum class TypeKind : short
@@ -33,8 +35,11 @@ namespace Tokens::Enums
 
         Void = -1,
         Custom = -2,
-        Referenced = -3
+        EnumField = -3,
+        Referenced = -4,
     };
+
+    std::string ToString(const TypeKind& kind);
 }
 
 #endif

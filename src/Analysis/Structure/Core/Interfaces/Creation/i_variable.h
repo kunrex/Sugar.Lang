@@ -1,6 +1,7 @@
 #ifndef I_VARIABLE_H
 #define I_VARIABLE_H
 
+#include "../i_node.h"
 #include "../i_created.h"
 #include "../i_nameable.h"
 #include "../i_read_write.h"

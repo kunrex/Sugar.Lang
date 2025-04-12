@@ -16,53 +16,63 @@
 #include "../ParseNodes/Statements/throw_statement_node.h"
 #include "../ParseNodes/Statements/Control/continue_node.h"
 #include "../ParseNodes/Statements/expression_statement_node.h"
+#include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
 
 using namespace Tokens::Enums;
 
 using namespace ParseNodes;
 using namespace ParseNodes::Enums;
+using namespace ParseNodes::Types;
 using namespace ParseNodes::Values;
 using namespace ParseNodes::Groups;
 using namespace ParseNodes::Describers;
 using namespace ParseNodes::Statements;
 using namespace ParseNodes::Expressions;
+using namespace ParseNodes::Core::Interfaces;
 using namespace ParseNodes::Functions::Calling;
 
 namespace Parsing
 {
-    const ParseNode* Parser::ParseVariableDeclaration(const DescriberNode* const describer, const ParseNode* const type, const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseVariableDeclaration(const DescriberNode* const describer, const IParseNode* const type, const SeparatorKind breakSeparator)
     {
         const auto identifier = ParseIdentifier(true);
 
-        const auto current = Current();
+        const auto& current = Current();
         if (MatchToken(current, SyntaxKind::FlowerOpenBracket))
             return ParseProperty(describer, type, identifier);
         if (MatchSeparator(current, breakSeparator))
-            return new DeclarationNode(describer, type, identifier, current);;
+            return new DeclarationNode(describer, type, identifier, current);
 
         const auto declarations = new CompoundDeclarationNode(current);
-        if (MatchToken(current, SyntaxKind::Equals, true))
+
+        if (MatchToken(current, SyntaxKind::Assignment, true))
         {
             const auto initialise = new InitialisationNode(describer, type, identifier, ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma), Current());
+
             if (MatchSeparator(Current(), breakSeparator))
             {
                 delete declarations;
                 return initialise;
             }
+
+            declarations->AddChild(initialise);
         }
+        else
+            declarations->AddChild(new DeclarationNode(describer, type, identifier, current));
 
         if (MatchToken(Current(), SyntaxKind::Comma, true))
         {
+            std::cout << *Current().Value<std::string>() << std::endl;
             while (index < source->TokenCount())
             {
                 const auto identify = ParseIdentifier(true);
 
-                if (const auto cur = Current(); MatchToken(cur, SyntaxKind::Comma, true))
+                if (const auto& cur = Current(); MatchToken(cur, SyntaxKind::Comma, true))
                 {
                     declarations->AddChild(new DeclarationNode(describer, type, identify, cur));
                     continue;
                 }
-                else if (MatchToken(cur, SyntaxKind::Equals, true))
+                else if (MatchToken(cur, SyntaxKind::Assignment, true))
                 {
                     declarations->AddChild(new InitialisationNode(describer, type, identifier, ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma), Current()));
                     if (MatchToken(Current(), SyntaxKind::Comma, true))
@@ -90,7 +100,7 @@ namespace Parsing
         const auto describer = new DescriberNode(source->TokenAt(index - 1));
         while (index < source->TokenCount())
         {
-            const auto current = Current();
+            const auto& current = Current();
             if (!MatchType(current, TokenType::Keyword))
             {
                 Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
@@ -109,10 +119,10 @@ namespace Parsing
                 continue;
             if (MatchLookAhead(SeparatorKind::BoxCloseBracket, true))
             {
+                index++;
                 if (TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true))
                     continue;
 
-                index--;
                 return describer;
             }
 
@@ -126,7 +136,7 @@ namespace Parsing
         return describer;
     }
 
-    const ParseNode* Parser::ParseIdentifierStatement(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseIdentifierStatement(const SeparatorKind breakSeparator)
     {
         if (MatchLookAhead(SyntaxKind::Colon))
         {
@@ -135,68 +145,20 @@ namespace Parsing
 
             return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
         }
-
-        const auto entity = ParseEntity(breakSeparator);
-
-        if (const auto lookAhead = LookAhead(); lookAhead)
+        if (MatchLookAhead(TokenType::Identifier))
         {
-            switch (lookAhead->get().Type())
-            {
-                case TokenType::UnaryOperator:
-                    {
-                        const auto unary = new UnaryNode(*lookAhead, entity);
-                        index += 2;
+            const auto type = ParseType();
+            index += 2;
 
-                        if (const auto cur = Current(); MatchType(cur, TokenType::BinaryOperator | TokenType::AssignmentOperator))
-                        {
-                            const auto expression = ParseNonEmptyExpression(SeparatorKind::Semicolon);
-                            const auto binary = new BinaryNode(cur, unary, expression);
-
-                            TryMatchToken(Current(), SyntaxKind::Semicolon);
-                            return new ExpressionStatementNode(binary, Current());
-                        }
-                        else if (MatchSeparator(cur, SeparatorKind::Semicolon))
-                            return new ExpressionStatementNode(unary, cur);
-
-                        break;
-                    }
-                case TokenType::BinaryOperator:
-                case TokenType::AssignmentOperator:
-                    {
-                        index += 2;
-
-                        const auto expression = ParseNonEmptyExpression(breakSeparator);
-                        const auto binary = new BinaryNode(*lookAhead, entity, expression);
-
-                        TryMatchSeparator(Current(), breakSeparator);
-                        return new ExpressionStatementNode(binary, Current());
-                    }
-                case TokenType::Identifier:
-                    {
-                        const auto type = CheckType(entity);
-                        index++;
-
-                        return ParseFunction(new DescriberNode(Current()), type);
-                    }
-                case TokenType::Separator:
-                    {
-                        if (TryMatchSeparator(*lookAhead, breakSeparator))
-                            return entity;
-                    }
-                    break;
-                default:
-                    break;
-            }
+            return ParseFunction(new DescriberNode(Current()), type);
         }
 
-        const auto invalid = ParseInvalid(breakSeparator);
-        TryMatchSeparator(Current(), breakSeparator);
-        return invalid;
+        return new ExpressionStatementNode(ParseExpression(SeparatorKind::Semicolon), Current());
     }
 
-    const ParseNode* Parser::ParseKeywordStatement(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseKeywordStatement(const SeparatorKind breakSeparator)
     {
-        switch (const auto current = Current(); current.Kind())
+        switch (const auto& current = Current(); current.Kind())
         {
             case SyntaxKind::Print:
                 return ParsePrintCall();
@@ -223,7 +185,7 @@ namespace Parsing
                 return ParseForLoop();
             case SyntaxKind::Break:
                 {
-                    const auto keyword = Current();
+                    const auto& keyword = Current();
                     index++;
 
                     TryMatchSeparator(Current(), SeparatorKind::Semicolon);
@@ -231,11 +193,9 @@ namespace Parsing
                 }
             case SyntaxKind::Return:
                 {
-                    if (MatchLookAhead(breakSeparator))
-                    {
-                        index++;
+                    index++;
+                    if (MatchSeparator(Current(), breakSeparator))
                         return new ReturnNode(Current());
-                    }
 
                     return new ReturnNode(ParseNonEmptyExpression(breakSeparator), Current());
                 }
@@ -253,6 +213,22 @@ namespace Parsing
                 return ParseClassDefinition(new DescriberNode(Current()));
             case SyntaxKind::Struct:
                 return ParseStructDefinition(new DescriberNode(Current()));
+            case SyntaxKind::Let:
+                {
+                    index++;
+                    TryMatchToken(Current(), SyntaxKind::Colon, true);
+                    return ParseVariableDeclaration(new DescriberNode(Current()), new AnonymousTypeNode(current), breakSeparator);
+                }
+            case SyntaxKind::Indexer:
+                return ParseIndexer(new DescriberNode(Current()));
+            case SyntaxKind::Constructor:
+                return ParseConstructor(new DescriberNode(Current()));
+            case SyntaxKind::Explicit:
+                return ParseExplicitCast(new DescriberNode(Current()));
+            case SyntaxKind::Implicit:
+                return ParseImplicitCast(new DescriberNode(Current()));
+            case SyntaxKind::Operator:
+                return ParseOperatorOverload(new DescriberNode(Current()));
             default:
                 {
                     if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
@@ -260,7 +236,7 @@ namespace Parsing
                         const auto type = ParseType();
                         index++;
 
-                        const auto cur = Current();
+                        const auto& cur = Current();
                         if (MatchToken(cur, SyntaxKind::Colon, true))
                             return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
                         if (MatchType(cur, TokenType::Identifier))
@@ -275,12 +251,11 @@ namespace Parsing
         return invalid;
     }
 
-    const ParseNode* Parser::ParseDescriberStatement(const SeparatorKind breakSeparator)
+    const IParseNode* Parser::ParseDescriberStatement(const SeparatorKind breakSeparator)
     {
         const auto describer = ParseDescriber();
-        index++;
 
-        switch (const auto current = Current(); current.Type())
+        switch (const auto& current = Current(); current.Type())
         {
             case TokenType::Identifier:
                 {
@@ -308,7 +283,7 @@ namespace Parsing
                         const auto type = ParseType();
                         index++;
 
-                        const auto cur = Current();
+                        const auto& cur = Current();
                         if (MatchToken(cur, SyntaxKind::Colon, true))
                             return ParseVariableDeclaration(describer, type, breakSeparator);
                         if (MatchType(cur, TokenType::Identifier))
@@ -326,12 +301,21 @@ namespace Parsing
                                 return ParseStructDefinition(describer);
                             case SyntaxKind::Indexer:
                                 return ParseIndexer(describer);
+                            case SyntaxKind::Constructor:
+                                return ParseConstructor(describer);
                             case SyntaxKind::Explicit:
                                 return ParseExplicitCast(describer);
                             case SyntaxKind::Implicit:
                                 return ParseImplicitCast(describer);
                             case SyntaxKind::Operator:
                                 return ParseOperatorOverload(describer);
+                            case SyntaxKind::Let:
+                                {
+                                    index++;
+                                    TryMatchToken(Current(), SyntaxKind::Colon, true);
+                                    return ParseVariableDeclaration(describer, new AnonymousTypeNode(current), breakSeparator);
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -370,16 +354,21 @@ namespace Parsing
             if (MatchToken(Current(), SyntaxKind::FlowerCloseBracket))
                 return scope;
 
-            scope->AddChild(ParseLazyScope());
+            if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
+                scope->AddChild(ParseScope());
+
+            scope->AddChild(ParseStatement());
         }
 
         TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
         return scope;
     }
 
-    const ParseNode* Parser::ParseStatement()
+    const IParseNode* Parser::ParseStatement()
     {
-        const auto current = Current();
+        const auto& current = Current();
+        if (MatchToken(current, SyntaxKind::BoxOpenBracket))
+            return ParseDescriberStatement(SeparatorKind::Semicolon);
         if (MatchType(current, TokenType::Keyword))
             return ParseKeywordStatement(SeparatorKind::Semicolon);
         if (MatchType(current, TokenType::Identifier))

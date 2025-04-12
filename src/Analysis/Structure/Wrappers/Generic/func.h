@@ -8,7 +8,7 @@
 
 namespace Analysis::Structure::Wrappers
 {
-    class Func final : public DataTypes::BuiltInClass, public Services::SingletonCollection, public virtual Core::Interfaces::IDelegateType
+    class Func final : public DataTypes::BuiltInClass, public Services::SingletonService, public virtual Core::Interfaces::IDelegateType
     {
         private:
             mutable std::string genericSignature;

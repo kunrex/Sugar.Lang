@@ -25,7 +25,7 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-constexpr std::string cil_string = "[System.Runtime]System.String";
+const string cil_string = "[System.Runtime]System.String";
 
 namespace Analysis::Structure::Wrappers
 {
@@ -51,6 +51,12 @@ namespace Analysis::Structure::Wrappers
 
     String::String() : BuiltInClass(cil_string, Describer::Public), SingletonService(), characteristics(), functions(), indexer(nullptr), overloads()
     { }
+
+    const String& String::Instance()
+    {
+        static const String instance;
+        return instance;
+    }
 
     TypeKind String::Type() const { return TypeKind::String; }
 
@@ -159,6 +165,8 @@ namespace Analysis::Structure::Wrappers
     {
         if (ArgumentHash(argumentList) == ArgumentHash(indexer))
             return indexer;
+
+        return nullptr;
     }
 
     const IFunction* String::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const

@@ -22,4 +22,6 @@ namespace Analysis::Structure::Context
 
     bool TernaryExpression::Readable() const { return true; }
     bool TernaryExpression::Writable() const { return false; }
+
+    std::string TernaryExpression::CILData() const { return ""; }
 }

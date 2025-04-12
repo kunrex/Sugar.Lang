@@ -10,7 +10,6 @@ namespace Analysis::Structure::Enums
         ValueType,
 
         Field,
-        EnumField,
         ConstantField,
 
         Property,

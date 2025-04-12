@@ -76,15 +76,15 @@ void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
     }
 }
 
-void LexParse(SourceObject* const directory)
+void LexParse(const SourceDirectory* const directory)
 {
-    for (const auto child: *directory)
+    for (const auto& child: *directory)
     {
-        if (child->SourceType() == SourceType::Directory)
-            LexParse(child);
+        if (const auto sourceObject = child.second; sourceObject->SourceType() == SourceType::Directory)
+            LexParse(dynamic_cast<SourceDirectory*>(sourceObject));
         else
         {
-            const auto casted = static_cast<SourceFile* const>(child);
+            const auto casted = dynamic_cast<SourceFile*>(sourceObject);
             const auto previous = ExceptionManager::Instance().ChildCount();
             Lexer::Instance().Lex(casted);
 
@@ -96,6 +96,7 @@ void LexParse(SourceObject* const directory)
 
 void StructureDataTypes(const SourceDirectory* const directory)
 {
+    std::cout << directory->Name() << std::endl;
     for (const auto child: directory->values())
     {
         if (child->SourceType() == SourceType::Directory)
@@ -105,9 +106,13 @@ void StructureDataTypes(const SourceDirectory* const directory)
         }
 
         const auto file = dynamic_cast<SourceFile*>(child);
-        for (const auto source = file->SourceNode(); const auto node: *source)
+        std::cout << file->Name() << std::endl;
+        const auto source = file->SourceNode();
+
+        const auto childCount = source->ChildCount();
+        for (auto i = 0; i < childCount; i++)
         {
-            switch (node->NodeType())
+            switch (const auto node = source->GetChild(i); node->NodeType())
             {
                 case NodeType::Enum:
                     CreateEnum(node, file);
@@ -136,9 +141,12 @@ void ManageImportStatements(const SourceDirectory* const directory)
         }
 
         const auto file = dynamic_cast<SourceFile*>(child);
-        for (const auto sourceNode = file->SourceNode(); const auto node: *sourceNode)
+        const auto source = file->SourceNode();
+
+        const auto childCount = source->ChildCount();
+        for (auto i = 0; i < childCount; i++)
         {
-            switch (node->NodeType())
+            switch (const auto node = source->GetChild(i); node->NodeType())
             {
                 case NodeType::Enum:
                 case NodeType::Class:
@@ -148,7 +156,7 @@ void ManageImportStatements(const SourceDirectory* const directory)
                     ImportStatement(node, file);
                     break;
                 default:
-                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Index(), file));
+                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), file));
                     break;
             }
         }
@@ -202,8 +210,12 @@ Compiler::Compiler(const std::string& sourcePath) : sourcePath(sourcePath)
 void Compiler::Compile() const
 {
     if (ExceptionManager::Instance().ChildCount() > 0)
+    {
+        std::cout << "Failed to initalise source system" << std::endl;
         return;
+    }
 
+    /*
     Lexer::Instance();
     Parser::Instance();
     LexParse(source);
@@ -225,11 +237,21 @@ void Compiler::Compile() const
         }
     }
 
+    /*
     CILTranspiler transpiler(name, sourcePath, source);
     transpiler.Transpile();
 
     if (!ExceptionManager::Instance().LogAllExceptions())
         cout << "Compiled successfully at " << transpiler.OutputFile() << endl;
+    */
+
+    try
+    {
+        LexParse(source);
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
 
     delete source;
 }
