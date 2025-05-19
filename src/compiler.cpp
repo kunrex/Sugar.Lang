@@ -20,6 +20,15 @@
 
 #include "Analysis/Creation/Transpiling/cil_transpiler.h"
 
+#include "Analysis/Structure/Wrappers/Value/short.h"
+#include "Analysis/Structure/Wrappers/Value/integer.h"
+#include "Analysis/Structure/Wrappers/Value/long.h"
+#include "Analysis/Structure/Wrappers/Value/float.h"
+#include "Analysis/Structure/Wrappers/Value/double.h"
+#include "Analysis/Structure/Wrappers/Value/boolean.h"
+#include "Analysis/Structure/Wrappers/Value/character.h"
+#include "Analysis/Structure/Wrappers/Reference/string.h"
+
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -37,10 +46,11 @@ using namespace Analysis::Creation::Binding;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Wrappers;
 
 constexpr string_view source_extension = ".sugar";
 
-void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
+void PushStructure(const std::string& strPath, SourceDirectory* const directory)
 {
     const auto path = fs::path(strPath);
 
@@ -57,10 +67,10 @@ void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
 
         if (is_directory(entry))
         {
-            const auto child = new SourceDirectory(name);
-            directory->AddChild(name, child);
+            const auto child = new SourceDirectory(name, false);
 
-            PushDirectory(childPath.string(), child);
+            directory->AddChild(name, child);
+            PushStructure(childPath.string(), child);
         }
         else if (is_regular_file(entry) && childPath.extension() == source_extension)
         {
@@ -71,123 +81,9 @@ void PushDirectory(const std::string& strPath, SourceDirectory* const directory)
                 return;
             }
 
-            directory->AddChild(name, new SourceFile(name, string((std::istreambuf_iterator(file)), std::istreambuf_iterator<char>())));
+            const auto clippedName = name.substr(0, name.find_last_of('.'));
+            directory->AddChild(clippedName, new SourceFile(clippedName, string((std::istreambuf_iterator(file)), std::istreambuf_iterator<char>())));
         }
-    }
-}
-
-void LexParse(const SourceDirectory* const directory)
-{
-    for (const auto& child: *directory)
-    {
-        if (const auto sourceObject = child.second; sourceObject->SourceType() == SourceType::Directory)
-            LexParse(dynamic_cast<SourceDirectory*>(sourceObject));
-        else
-        {
-            const auto casted = dynamic_cast<SourceFile*>(sourceObject);
-            const auto previous = ExceptionManager::Instance().ChildCount();
-            Lexer::Instance().Lex(casted);
-
-            if (ExceptionManager::Instance().ChildCount() == previous)
-                Parser::Instance().Parse(casted);
-        }
-    }
-}
-
-void StructureDataTypes(const SourceDirectory* const directory)
-{
-    std::cout << directory->Name() << std::endl;
-    for (const auto child: directory->values())
-    {
-        if (child->SourceType() == SourceType::Directory)
-        {
-            StructureDataTypes(dynamic_cast<SourceDirectory*>(child));
-            continue;
-        }
-
-        const auto file = dynamic_cast<SourceFile*>(child);
-        std::cout << file->Name() << std::endl;
-        const auto source = file->SourceNode();
-
-        const auto childCount = source->ChildCount();
-        for (auto i = 0; i < childCount; i++)
-        {
-            switch (const auto node = source->GetChild(i); node->NodeType())
-            {
-                case NodeType::Enum:
-                    CreateEnum(node, file);
-                    break;
-                case NodeType::Class:
-                    CreateClass(node, file);
-                    break;
-                case NodeType::Struct:
-                    CreateStruct(node, file);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-}
-
-void ManageImportStatements(const SourceDirectory* const directory)
-{
-    for (const auto child: directory->values())
-    {
-        if (child->SourceType() == SourceType::Directory)
-        {
-            ManageImportStatements(dynamic_cast<SourceDirectory*>(child));
-            continue;
-        }
-
-        const auto file = dynamic_cast<SourceFile*>(child);
-        const auto source = file->SourceNode();
-
-        const auto childCount = source->ChildCount();
-        for (auto i = 0; i < childCount; i++)
-        {
-            switch (const auto node = source->GetChild(i); node->NodeType())
-            {
-                case NodeType::Enum:
-                case NodeType::Class:
-                case NodeType::Struct:
-                    break;
-                case NodeType::Import:
-                    ImportStatement(node, file);
-                    break;
-                default:
-                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), file));
-                    break;
-            }
-        }
-    }
-}
-
-void BindGlobal(const SourceDirectory* directory)
-{
-    for (const auto child: directory->values())
-    {
-        if (child->SourceType() == SourceType::Directory)
-        {
-            BindGlobal(dynamic_cast<SourceDirectory*>(child));
-            continue;
-        }
-
-        GlobalBindSourceFile(dynamic_cast<SourceFile*>(child));
-    }
-}
-
-void BindLocal(const SourceDirectory* directory)
-{
-    for (const auto child: directory->values())
-    {
-        if (child->SourceType() == SourceType::Directory)
-        {
-            BindLocal(dynamic_cast<SourceDirectory*>(child));
-            continue;
-        }
-
-        LocalBindSourceFile(dynamic_cast<SourceFile*>(child));
     }
 }
 
@@ -201,40 +97,56 @@ Compiler::Compiler(const std::string& sourcePath) : sourcePath(sourcePath)
     }
 
     const auto name = path.filename().string();
-    source = new SourceDirectory(name);
+    source = new SourceDirectory(name, true);
 
     ExceptionManager::Instance();
-    PushDirectory(sourcePath, source);
+    PushStructure(sourcePath, source);
 }
 
 void Compiler::Compile() const
 {
     if (ExceptionManager::Instance().ChildCount() > 0)
     {
-        std::cout << "Failed to initalise source system" << std::endl;
+        std::cout << "Failed to initialise source system." << std::endl;
         return;
     }
 
-    /*
     Lexer::Instance();
     Parser::Instance();
-    LexParse(source);
 
-    std::vector<void (*)(const SourceDirectory*)> steps;
-    steps.push_back(StructureDataTypes);
-    steps.push_back(ManageImportStatements);
-    steps.push_back(BindGlobal);
-    steps.push_back(BindLocal);
+    Short::Instance();
+    Integer::Instance();
+    Long::Instance();
+    Float::Instance();
+    Double::Instance();
+    Boolean::Instance();
+    Character::Instance();
+    String::Instance();
 
-    for (const auto func : steps)
+    std::vector<void(SourceObject::*)()> steps;
+    steps.push_back(&SourceObject::LexParse);
+    steps.push_back(&SourceObject::InitDataTypes);
+    steps.push_back(&SourceObject::ManageImports);
+    steps.push_back(&SourceObject::BindGlobal);
+    //steps.push_back(&SourceObject::BindLocal);
+
+    try
     {
-        func(source);
-
-        if (ExceptionManager::Instance().LogAllExceptions())
+        for (const auto func: steps)
         {
-            delete source;
-            return;
+            (source->*func)();
+
+            if (ExceptionManager::Instance().LogAllExceptions())
+            {
+                delete source;
+                return;
+            }
         }
+
+        source->Print("", true);;
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
 
     /*
@@ -244,14 +156,6 @@ void Compiler::Compile() const
     if (!ExceptionManager::Instance().LogAllExceptions())
         cout << "Compiled successfully at " << transpiler.OutputFile() << endl;
     */
-
-    try
-    {
-        LexParse(source);
-    }
-    catch (const std::exception& e) {
-        std::cout << e.what() << std::endl;
-    }
 
     delete source;
 }

@@ -20,6 +20,13 @@ namespace Analysis::Structure
             [[nodiscard]] virtual Enums::SourceType SourceType() const = 0;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            virtual void LexParse() = 0;
+            virtual void InitDataTypes() = 0;
+            virtual void ManageImports() = 0;
+
+            virtual void BindGlobal() = 0;
+            virtual void BindLocal() = 0;
     };
 }
 

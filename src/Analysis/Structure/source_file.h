@@ -49,6 +49,13 @@ namespace Analysis::Structure
             void WithSourceNode(ParseNodes::Groups::SourceFileNode* source);
             [[nodiscard]] const ParseNodes::Groups::SourceFileNode* SourceNode() const;
 
+            void LexParse() override;
+            void InitDataTypes() override;
+            void ManageImports() override;
+
+            void BindGlobal() override;
+            void BindLocal() override;
+
             void Print(const std::string& indent, bool last) const override;
 
             ~SourceFile() override;
