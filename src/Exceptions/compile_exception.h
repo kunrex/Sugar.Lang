@@ -9,7 +9,7 @@ namespace Exceptions
     class CompileException : public std::exception
     {
         private:
-            const char* c_str;
+            const std::string message;
 
         public:
             explicit CompileException(const std::string& message);
