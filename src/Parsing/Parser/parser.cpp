@@ -159,8 +159,6 @@ namespace Parsing
                 sourceNode->AddChild(ParseStatement());
         }
 
-        this->source->WithSourceNode(sourceNode);
-
         index = 0;
         this->source = nullptr;
 
