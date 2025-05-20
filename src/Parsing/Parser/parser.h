@@ -139,7 +139,7 @@ namespace Parsing
         public:
             static Parser& Instance();
 
-            void Parse(Analysis::Structure::SourceFile* source);
+            [[nodiscard]] ParseNodes::Groups::SourceFileNode* Parse(const Analysis::Structure::SourceFile* source);
     };
 }
 
