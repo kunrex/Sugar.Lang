@@ -67,13 +67,8 @@ namespace Analysis::Structure
     }
 
     unsigned long SourceFile::TokenCount() const { return tokens.size(); }
-    const Tokens::Token& SourceFile::TokenAt(const unsigned long i) { return tokens.at(i); }
+    const Tokens::Token& SourceFile::TokenAt(const unsigned long i) const { return tokens.at(i); }
 
-    void SourceFile::WithSourceNode(SourceFileNode* const source)
-    {
-        if (sourceNode == nullptr)
-            sourceNode = source;
-    }
     const SourceFileNode* SourceFile::SourceNode() const { return sourceNode; }
 
     void SourceFile::LexParse()
