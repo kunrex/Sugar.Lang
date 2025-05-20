@@ -7,9 +7,14 @@
 
 #include "../ParseNodes/Statements/initialisation_node.h"
 
+#include "../ParseNodes/Properties/base_indexer_node.h"
 #include "../ParseNodes/Properties/assigned_property_node.h"
 
+#include "../ParseNodes/Functions/Creation/explicit_cast_node.h"
+#include "../ParseNodes/Functions/Creation/implicit_cast_node.h"
 #include "../ParseNodes/Functions/Calling/constructor_call_node.h"
+#include "../ParseNodes/Functions/Creation/function_creation_node.h"
+#include "../ParseNodes/Functions/Creation/operator_overload_node.h"
 #include "../ParseNodes/Functions/Calling/collection_construction_call_node.h"
 
 using namespace Exceptions;
@@ -112,7 +117,7 @@ namespace Parsing
             return parameters;
         }
 
-        if (TryMatchToken(Current(), SyntaxKind::CloseBracket))
+        if (MatchToken(Current(), SyntaxKind::CloseBracket))
             return parameters;
 
         while (index < source->TokenCount())
@@ -256,9 +261,7 @@ namespace Parsing
         const auto type = ParseType();
         index++;
 
-        TryMatchType(Current(), TokenType::Operator);
-        const auto& baseOperator = Current();
-        index++;
+        const auto& baseOperator =  TryMatchType(Current(), TokenType::Operator, true) ? source->TokenAt(index - 1) : Current();
 
         const auto parameters = ParseFunctionParameters();
         index++;
