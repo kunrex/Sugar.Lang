@@ -21,7 +21,7 @@ namespace Exceptions
         for (const auto exception: children)
         {
             std::cerr << exception->what() << std::endl;
-            std::cout<< std::endl;
+            std::cout << std::endl;
         }
 
         return true;
