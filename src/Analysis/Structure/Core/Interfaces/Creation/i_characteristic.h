@@ -2,11 +2,13 @@
 #define I_CHARACTERISTIC_H
 
 #include "i_variable.h"
+#include "../i_bindable.h"
+
 #include "../../../Context/context_node.h"
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class ICharacteristic : public virtual IVariable
+    class ICharacteristic : public virtual IVariable, public virtual IBindable
     {
         public:
             [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const = 0;

@@ -28,9 +28,6 @@ namespace Analysis::Structure::Core::Interfaces
             virtual void PushExplicitCast(IFunction* cast) = 0;
 
             virtual void PushOverload(IOperatorOverload* overload) = 0;
-
-            [[nodiscard]] virtual std::vector<ICharacteristic*> AllCharacteristics() const = 0;
-            [[nodiscard]] virtual std::vector<IScoped*> AllScoped() const = 0;
     };
 }
 

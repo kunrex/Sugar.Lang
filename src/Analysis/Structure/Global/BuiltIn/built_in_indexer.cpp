@@ -4,6 +4,7 @@ using namespace std;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
@@ -13,14 +14,27 @@ namespace Analysis::Structure::Global
         this->setInstruction = setInstruction;
     }
 
-    const std::string& BuiltInIndexer::FullName() const { return creationType->Name(); }
-
     MemberType BuiltInIndexer::MemberType() const { return MemberType::BuiltInIndexer; }
 
     bool BuiltInIndexer::Readable() const { return readable; }
     bool BuiltInIndexer::Writable() const { return writable; }
 
     const std::string& BuiltInIndexer::SignatureGetString() const { return getInstruction; }
-    const std::string& BuiltInIndexer::SignatureSetString() const { return setInstruction; }
+    const std::string& BuiltInIndexer::SignatureSetString() const
+    {
+        return setInstruction;
+    }
+
+    unsigned long BuiltInIndexer::ParameterCount() const { return parameters.size(); }
+
+    const IDataType* BuiltInIndexer::ParameterAt(const unsigned long index) const
+    {
+        return parameters.at(index);
+    }
+
+    void BuiltInIndexer::PushParameterType(const IDataType* type)
+    {
+        parameters.push_back(type);
+    }
 }
 

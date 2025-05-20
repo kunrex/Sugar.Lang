@@ -21,4 +21,7 @@ namespace Analysis::Structure::Global
     const string& BuiltInCast::FullName() const { return fullName; }
 
     CompilationResult BuiltInCast::StaticCompile(const CompilationResult& argument) const { return castDelegate(argument); }
+
+    void BuiltInCast::Bind()
+    { }
 }

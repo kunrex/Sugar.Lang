@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInVoid final : public Creation::VoidDefinition, public Core::Interfaces::BuiltInFunction
+    class BuiltInVoid final : public Creation::VoidDefinition, public Core::BuiltInFunction
     {
         public:
             BuiltInVoid(const std::string& name, Enums::Describer describer, const std::string& instruction);
@@ -14,6 +14,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            void Bind() override;
     };
 }
 

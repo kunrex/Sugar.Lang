@@ -6,6 +6,8 @@
 
 #include "../../Core/DataTypes/data_type.h"
 
+#include "../../../Creation/Binding/local_binder.h"
+
 using namespace std;
 
 using namespace ParseNodes::Core::Interfaces;
@@ -13,6 +15,7 @@ using namespace ParseNodes::Core::Interfaces;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Creation::Binding;
 
 namespace Analysis::Structure::Global
 {
@@ -27,6 +30,11 @@ namespace Analysis::Structure::Global
             fullName = std::format("{} void {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
+    }
+
+    void VoidFunction::Bind()
+    {
+        BindScoped(this);
     }
 }
 

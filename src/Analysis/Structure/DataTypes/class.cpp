@@ -27,9 +27,11 @@ namespace Analysis::Structure::DataTypes
 
     const string& BuiltInClass::FullName() const { return name; }
 
-    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
+    void BuiltInClass::Bind()
     { }
 
+    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
+    { }
 
     TypeKind ClassSource::Type() const { return TypeKind::Custom; }
 
@@ -52,7 +54,7 @@ namespace Analysis::Structure::DataTypes
 
     const ICharacteristic* ClassSource::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     void ClassSource::PushFunction(IFunctionDefinition* const function)
@@ -63,7 +65,7 @@ namespace Analysis::Structure::DataTypes
     const IFunctionDefinition* ClassSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
-        return functions.contains(hash) ? nullptr : functions.at(hash);
+        return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
     void ClassSource::PushConstructor(IFunction* const constructor)
@@ -74,7 +76,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* ClassSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return constructors.contains(hash) ? nullptr : constructors.at(hash);
+        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
     }
 
     void ClassSource::PushIndexer(IIndexerDefinition* indexer)
@@ -85,7 +87,7 @@ namespace Analysis::Structure::DataTypes
     const IIndexerDefinition* ClassSource::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return indexers.contains(hash) ? nullptr : indexers.at(hash);
+        return indexers.contains(hash) ? indexers.at(hash) : nullptr;
     }
 
     void ClassSource::PushImplicitCast(IFunction* cast)
@@ -96,7 +98,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* ClassSource::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
     void ClassSource::PushExplicitCast(IFunction* cast)
@@ -107,7 +109,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* ClassSource::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     void ClassSource::PushOverload(IOperatorOverload* overload)
@@ -120,39 +122,25 @@ namespace Analysis::Structure::DataTypes
         return overloads.at(base);
     }
 
-    std::vector<ICharacteristic*> ClassSource::AllCharacteristics() const
+    void ClassSource::Bind()
     {
-        std::vector<ICharacteristic*> all;
-
         for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
-
-        return all;
-    }
-
-    std::vector<IScoped*> ClassSource::AllScoped() const
-    {
-        std::vector<IScoped*> all(functions.size());
+            characteristic.second->Bind();
 
         for (const auto function: functions)
-            all.push_back(dynamic_cast<IScoped*>(function.second));
+            function.second->Bind();
 
         for (const auto constructor: constructors)
-            all.push_back(dynamic_cast<IScoped*>(constructor.second));
+            constructor.second->Bind();
 
         for (const auto cast: implicitCasts)
-            all.push_back(dynamic_cast<IScoped*>(cast.second));
+            cast.second->Bind();
 
         for (const auto cast: explicitCasts)
-        {
-            if (const auto definition = cast.second; definition->MemberType() == MemberType::ExplicitCast)
-                all.push_back(dynamic_cast<IScoped*>(definition));
-        }
+            cast.second->Bind();
 
         for (const auto overload: overloads)
-            all.push_back(dynamic_cast<IScoped*>(overload.second));
-
-        return all;
+            overload.second->Bind();
     }
 
     void ClassSource::Print(const string& indent, const bool last) const

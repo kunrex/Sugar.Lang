@@ -14,11 +14,8 @@
 
 #include "../../../Lexing/Tokens/Factories/operator.h"
 
-#include "../../../Parsing/ParseNodes/Properties/base_property_node.h"
-
 #include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/DataTypes/class.h"
-#include "../../Structure/DataTypes/value_type.h"
 
 #include "../../Structure/Global/BuiltIn/built_in_cast.h"
 
@@ -688,11 +685,16 @@ namespace Analysis::Creation::Binding
             }
         }
 
+
         if (classSource->CheckDescriber(Describer::Static))
             return;
 
         if (const auto explicitString = classSource->FindExplicitCast(&String::Instance(), classSource); explicitString == nullptr)
-            classSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName()), nullptr));
+        {
+            const auto cast = new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName()), nullptr);
+            cast->PushParameterType(classSource);
+            classSource->PushExplicitCast(cast);;
+        }
 
         if (!classSource->ConstructorCount())
             classSource->PushConstructor(new DefaultConstructor(classSource));
@@ -747,7 +749,11 @@ namespace Analysis::Creation::Binding
             return;
 
         if (const auto explicitString = structSource->FindExplicitCast(&String::Instance(), structSource); explicitString == nullptr)
-            structSource->PushExplicitCast(new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName()), nullptr));
+        {
+            const auto cast = new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName()), nullptr);
+            cast->PushParameterType(structSource);
+            structSource->PushExplicitCast(cast);
+        }
 
         if (!structSource->ConstructorCount())
             structSource->PushConstructor(new DefaultConstructor(structSource));

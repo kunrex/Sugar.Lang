@@ -3,29 +3,34 @@
 
 #include <vector>
 
-#include "../../Core/built_in_function.h"
 #include "../../Creation/Properties/indexer_definition.h"
+#include "../../Core/Interfaces/Creation/i_built_in_parametrized.h"
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInIndexer final : public Creation::IndexerDefinition, public Core::Interfaces::BuiltInFunction
+    class BuiltInIndexer final : public Creation::IndexerDefinition, public virtual Core::Interfaces::IBuiltInParametrized
     {
-        protected:
+        private:
             const bool readable;
             const bool writable;
+
+            std::vector<const Core::Interfaces::IDataType*> parameters;
 
         public:
             BuiltInIndexer(const Core::Interfaces::IDataType* creationType, bool readable, const std::string& getInstruction, bool writable, const std::string& setInstruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
-            [[nodiscard]] const std::string& FullName() const override;
-
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] const std::string& SignatureGetString() const override;
             [[nodiscard]] const std::string& SignatureSetString() const override;
+
+            [[nodiscard]] unsigned long ParameterCount() const override;
+            [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
+
+            void PushParameterType(const Core::Interfaces::IDataType* type) override;
     };
 }
 

@@ -52,7 +52,7 @@ namespace Analysis::Structure::DataTypes
 
     const ICharacteristic* Enum::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     void Enum::PushFunction(IFunctionDefinition* const function)
@@ -93,7 +93,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* Enum::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     void Enum::PushOverload(IOperatorOverload* overload)
@@ -104,18 +104,13 @@ namespace Analysis::Structure::DataTypes
         return nullptr;
     }
 
-    std::vector<ICharacteristic*> Enum::AllCharacteristics() const
+    void Enum::Bind()
     {
-        std::vector<ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
+            characteristic.second->Bind();
 
-        return all;
-    }
-
-    std::vector<IScoped*> Enum::AllScoped() const
-    {
-        return { };
+        for (const auto& cast: explicitCasts)
+            cast.second->Bind();
     }
 
     void Enum::Print(const string& indent, const bool last) const

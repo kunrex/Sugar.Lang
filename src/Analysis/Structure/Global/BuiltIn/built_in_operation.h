@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInOperation final : public Creation::OverloadDefinition, public Core::Interfaces::BuiltInFunction, public virtual Core::Interfaces::IBuiltInOverload
+    class BuiltInOperation final : public Creation::OverloadDefinition, public Core::BuiltInFunction, public virtual Core::Interfaces::IBuiltInOverload
     {
         private:
             const Core::Interfaces::OverloadFunction overloadDelegate;
@@ -20,6 +20,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& FullName() const override;
 
             [[nodiscard]] Compilation::CompilationResult StaticCompile(const std::vector<Compilation::CompilationResult>& arguments) const override;
+
+            void Bind() override;
     };
 }
 

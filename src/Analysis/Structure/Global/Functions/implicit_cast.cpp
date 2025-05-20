@@ -6,6 +6,8 @@
 
 #include "../../Core/DataTypes/data_type.h"
 
+#include "../../../Creation/Binding/local_binder.h"
+
 using namespace std;
 
 using namespace ParseNodes;
@@ -13,6 +15,7 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Creation::Binding;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
@@ -28,5 +31,10 @@ namespace Analysis::Structure::Global
             fullName = std::format("call {} {} {}::{}{}", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
 
         return fullName;
+    }
+
+    void ImplicitCast::Bind()
+    {
+        BindScoped(this);
     }
 }

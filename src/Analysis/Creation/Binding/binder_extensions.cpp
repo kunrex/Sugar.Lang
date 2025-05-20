@@ -5,16 +5,7 @@
 #include "../../../Exceptions/Compilation/Analysis/type_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 
-#include "../../../Parsing/ParseNodes/Types/Created/created_type_node.h"
 #include "../../../Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/func_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/list_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/array_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/tuple_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/action_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/nullable_type_node.h"
-#include "../../../Parsing/ParseNodes/Types/Keyword/Generic/dictionary_type_node.h"
-#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
 
 #include "../../Structure/Wrappers/Value/long.h"
 #include "../../Structure/Wrappers/Value/short.h"
@@ -155,7 +146,11 @@ namespace Analysis::Creation::Binding
             case NodeType::BuiltInType:
                 return BindBuiltInType(node);
             case NodeType::CreatedType:
-                return source->GetReference(*node->Token().Value<string>());
+                {
+                    if (const auto type = source->GetReference(*node->Token().Value<string>()); type != nullptr)
+                        return type;
+                }
+                break;
             case NodeType::FuncType:
                 return BindFunc(node, source);
             case NodeType::ListType:
@@ -171,8 +166,10 @@ namespace Analysis::Creation::Binding
             case NodeType::DictionaryType:
                 return BindDictionary(node, source);
             default:
-                ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Token().Index(), source));
-                return &Object::Instance();
+               break;
         }
+
+        ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Token().Index(), source));
+        return &Object::Instance();
     }
 }

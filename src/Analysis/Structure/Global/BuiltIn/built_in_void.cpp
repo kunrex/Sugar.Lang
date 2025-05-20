@@ -19,4 +19,7 @@ namespace Analysis::Structure::Global
     MemberType BuiltInVoid::MemberType() const { return MemberType::BuiltInDefinition; }
 
     const string& BuiltInVoid::FullName() const { return fullName; }
+
+    void BuiltInVoid::Bind()
+    { }
 }

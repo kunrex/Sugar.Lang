@@ -1,5 +1,7 @@
 #include "built_in_constructor.h"
 
+#include "built_in_operation.h"
+
 using namespace std;
 
 using namespace Tokens::Enums;
@@ -18,5 +20,8 @@ namespace Analysis::Structure::Global
     MemberType BuiltInConstructor::MemberType() const { return MemberType::BuiltInConstructor; }
 
     const string& BuiltInConstructor::FullName() const { return fullName; }
+
+    void BuiltInOperation::Bind()
+    { }
 }
 

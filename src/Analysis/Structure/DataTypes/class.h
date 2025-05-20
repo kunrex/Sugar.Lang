@@ -24,8 +24,6 @@ namespace Analysis::Structure::DataTypes
         protected:
             BuiltInClass(const std::string& name, Enums::Describer describer);
 
-            virtual void InitializeMembers() = 0;
-
         public:
             [[nodiscard]] const std::string& FullName() const override;
     };
@@ -81,8 +79,7 @@ namespace Analysis::Structure::DataTypes
             void PushOverload(Core::Interfaces::IOperatorOverload* overload) override;
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
 
-            [[nodiscard]] std::vector<Core::Interfaces::ICharacteristic*> AllCharacteristics() const override;
-            [[nodiscard]] std::vector<Core::Interfaces::IScoped*> AllScoped() const override;
+            void Bind() override;
 
             void Print(const std::string& indent, bool last) const override;
 

@@ -14,6 +14,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            void Bind() override;
     };
 }
 

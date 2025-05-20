@@ -10,7 +10,6 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr int word_size = 8;
@@ -48,7 +47,7 @@ namespace Analysis::Structure::DataTypes
 
     const ICharacteristic* ValueType::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     ValueType::~ValueType()
@@ -92,7 +91,7 @@ namespace Analysis::Structure::DataTypes
     const IFunctionDefinition* StructSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
-        return functions.contains(hash) ? nullptr : functions.at(hash);
+        return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
     void StructSource::PushConstructor(IFunction* constructor)
@@ -103,7 +102,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* StructSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return constructors.contains(hash) ? nullptr : constructors.at(hash);
+        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
     }
 
     void StructSource::PushIndexer(IIndexerDefinition* indexer)
@@ -114,7 +113,7 @@ namespace Analysis::Structure::DataTypes
     const IIndexerDefinition* StructSource::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return indexers.contains(hash) ? nullptr : indexers.at(hash);
+        return indexers.contains(hash) ? indexers.at(hash) : nullptr;
     }
 
     void StructSource::PushImplicitCast(IFunction* cast)
@@ -125,7 +124,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* StructSource::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
     void StructSource::PushExplicitCast(IFunction* cast)
@@ -136,7 +135,7 @@ namespace Analysis::Structure::DataTypes
     const IFunction* StructSource::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     void StructSource::PushOverload(IOperatorOverload* overload)
@@ -149,38 +148,25 @@ namespace Analysis::Structure::DataTypes
         return overloads.at(base);
     }
 
-    std::vector<ICharacteristic*> StructSource::AllCharacteristics() const
+    void StructSource::Bind()
     {
-        std::vector<ICharacteristic*> all;
         for (const auto& characteristic : characteristics)
-            all.push_back(characteristic.second);
-
-        return all;
-    }
-
-    std::vector<IScoped*> StructSource::AllScoped() const
-    {
-        std::vector<IScoped*> all(functions.size());
+            characteristic.second->Bind();
 
         for (const auto function: functions)
-            all.push_back(dynamic_cast<IScoped*>(function.second));
+            function.second->Bind();
 
         for (const auto constructor: constructors)
-            all.push_back(dynamic_cast<IScoped*>(constructor.second));
+            constructor.second->Bind();
 
         for (const auto cast: implicitCasts)
-            all.push_back(dynamic_cast<IScoped*>(cast.second));
+            cast.second->Bind();
 
         for (const auto cast: explicitCasts)
-        {
-            if (const auto definition = cast.second; definition->MemberType() == MemberType::ExplicitCast)
-                all.push_back(dynamic_cast<IScoped*>(definition));
-        }
+            cast.second->Bind();
 
         for (const auto overload: overloads)
-            all.push_back(dynamic_cast<IScoped*>(overload.second));
-
-        return all;
+            overload.second->Bind();
     }
 
     void StructSource::Print(const string& indent, const bool last) const

@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInCast final : public Creation::CastDefinition, public Core::Interfaces::BuiltInFunction, public virtual Core::Interfaces::IBuiltInCast
+    class BuiltInCast final : public Creation::CastDefinition, public Core::BuiltInFunction, public virtual Core::Interfaces::IBuiltInCast
     {
         private:
             const Core::Interfaces::CastFunction castDelegate;
@@ -20,6 +20,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& FullName() const override;
 
             [[nodiscard]] Compilation::CompilationResult StaticCompile(const Compilation::CompilationResult& argument) const override;
+
+            void Bind() override;
     };
 }
 

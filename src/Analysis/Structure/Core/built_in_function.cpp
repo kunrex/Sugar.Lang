@@ -1,10 +1,12 @@
 #include "built_in_function.h"
 
-namespace Analysis::Structure::Core::Interfaces
+using namespace Analysis::Structure::Core::Interfaces;
+
+namespace Analysis::Structure::Core
 {
     unsigned long BuiltInFunction::ParameterCount() const { return parameters.size(); }
 
-    const IDataType* BuiltInFunction::ParameterAt(unsigned long index) const
+    const IDataType* BuiltInFunction::ParameterAt(const unsigned long index) const
     {
         return parameters.at(index);
     }

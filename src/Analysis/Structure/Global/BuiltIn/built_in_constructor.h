@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInConstructor final : public Creation::ConstructorDefinition, public Core::Interfaces::BuiltInFunction
+    class BuiltInConstructor final : public Creation::ConstructorDefinition, public Core::BuiltInFunction
     {
         public:
             BuiltInConstructor(const Core::Interfaces::IDataType* creationType, const std::string& instruction);
@@ -14,6 +14,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            void Bind() override;
     };
 }
 

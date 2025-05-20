@@ -19,4 +19,7 @@ namespace Analysis::Structure::Global
     MemberType BuiltInMethod::MemberType() const { return MemberType::BuiltInDefinition; }
 
     const string& BuiltInMethod::FullName() const { return fullName; }
+
+    void BuiltInMethod::Bind()
+    { }
 }

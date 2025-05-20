@@ -1287,50 +1287,23 @@ namespace Analysis::Creation::Binding
         return result;
     }
 
-    void LocalBindDataType(const IUserDefinedType* const dataType)
+    void BindScoped(IScoped* const scoped, const IUserDefinedType* const dataType)
     {
-        if (const auto characteristics = dataType->AllCharacteristics(); !characteristics.empty())
-        {
-            auto staticScope = DefaultScoped(Describer::Static), instanceScope = DefaultScoped(Describer::Private);
+        BindScope(scoped->ParseNode(), scoped->Scope(), scoped, dataType);
 
-            for (const auto characteristic: characteristics)
-            {
-                if (characteristic->MemberType() == MemberType::Field)
+        switch (scoped->MemberType())
+        {
+            case MemberType::ImplicitCast:
+            case MemberType::ExplicitCast:
+            case MemberType::OperatorOverload:
+            case MemberType::MethodDefinition:
                 {
-                    if (characteristic->CheckDescriber(Describer::Static))
-                        characteristic->WithContext(BindExpression(characteristic->ParseNode(), &staticScope, staticScope.Scope(), dataType));
-                    else
-                        characteristic->WithContext(BindExpression(characteristic->ParseNode(), &instanceScope, instanceScope.Scope(), dataType));
+                    if (const auto scope = scoped->Scope(); !CheckCodePaths(scope, scoped->CreationType(), scoped->ParseNode()->Token().Index(), dataType))
+                        PushException(new LogException("Not all code paths return a value", scoped->ParseNode()->Token().Index(), dataType->Parent()));
                 }
-                else
-                    CompileExpression(dynamic_cast<const IConstant*>(characteristic), dataType);
-            }
+                break;
+            default:
+                break;
         }
-
-        for (const auto function: dataType->AllScoped())
-        {
-            BindScope(function->ParseNode(), function->Scope(), function, dataType);
-
-            switch (function->MemberType())
-            {
-                case MemberType::ImplicitCast:
-                case MemberType::ExplicitCast:
-                case MemberType::OperatorOverload:
-                case MemberType::MethodDefinition:
-                    {
-                        if (const auto scope = function->Scope(); !CheckCodePaths(scope, function->CreationType(), function->ParseNode()->Token().Index(), dataType))
-                            PushException(new LogException("Not all code paths return a value", function->ParseNode()->Token().Index(), dataType->Parent()));
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    void LocalBindSourceFile(const SourceFile* source)
-    {
-        for (const auto type: source->values())
-            LocalBindDataType(type);
     }
 }

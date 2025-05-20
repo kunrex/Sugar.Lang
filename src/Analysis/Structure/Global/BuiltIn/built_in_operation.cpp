@@ -23,4 +23,7 @@ namespace Analysis::Structure::Global
     const string& BuiltInOperation::FullName() const { return fullName; }
 
     CompilationResult BuiltInOperation::StaticCompile(const std::vector<CompilationResult>& arguments) const { return overloadDelegate(arguments); }
+
+    void BuiltInOperation::Bind()
+    { }
 }
