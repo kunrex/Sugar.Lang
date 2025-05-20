@@ -24,7 +24,7 @@ namespace Services
     template <typename TParent>
     void Child<TParent>::SetParent(TParent* parent)
     {
-        if (parent == nullptr)
+        if (this->parent == nullptr)
             this->parent = parent;
     }
 
