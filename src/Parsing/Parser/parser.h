@@ -23,7 +23,6 @@
 
 #include "../ParseNodes/Values/identifier_node.h"
 
-#include "../ParseNodes/Properties/base_indexer_node.h"
 #include "../ParseNodes/Properties/base_property_node.h"
 
 #include "../ParseNodes/Expressions/indexer_expression_node.h"
