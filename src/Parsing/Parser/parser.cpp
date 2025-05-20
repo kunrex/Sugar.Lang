@@ -146,7 +146,7 @@ namespace Parsing
         return instance;
     }
 
-    void Parser::Parse(SourceFile* const source)
+    SourceFileNode* Parser::Parse(const SourceFile* const source)
     {
         this->source = source;
 
