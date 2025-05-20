@@ -12,7 +12,7 @@ namespace Exceptions
             const std::string message;
 
         public:
-            explicit CompileException(const std::string& message);
+            explicit CompileException(std::string message);
 
             [[nodiscard]] const char* what() const noexcept override;
     };
