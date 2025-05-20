@@ -44,7 +44,7 @@ namespace Analysis::Structure
 
             void PushBackToken(Tokens::Token token);
             [[nodiscard]] unsigned long TokenCount() const;
-            [[nodiscard]] const Tokens::Token& TokenAt(unsigned long i);
+            [[nodiscard]] const Tokens::Token& TokenAt(unsigned long i) const;
 
             void WithSourceNode(ParseNodes::Groups::SourceFileNode* source);
             [[nodiscard]] const ParseNodes::Groups::SourceFileNode* SourceNode() const;
