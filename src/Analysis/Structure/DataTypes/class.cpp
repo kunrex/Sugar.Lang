@@ -27,9 +27,6 @@ namespace Analysis::Structure::DataTypes
 
     const string& BuiltInClass::FullName() const { return name; }
 
-    void BuiltInClass::Bind()
-    { }
-
     ClassSource::ClassSource(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
     { }
 
