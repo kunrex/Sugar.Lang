@@ -49,7 +49,7 @@ namespace Parsing
     {
         private:
             unsigned long index = 0;
-            Analysis::Structure::SourceFile* source = nullptr;
+            const Analysis::Structure::SourceFile* source = nullptr;
 
             [[nodiscard]] const Tokens::Token& Current() const;
             [[nodiscard]] std::optional<std::reference_wrapper<Tokens::Token>> LookAhead() const;
