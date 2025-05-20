@@ -163,5 +163,7 @@ namespace Parsing
 
         index = 0;
         this->source = nullptr;
+
+        return sourceNode;
     }
 }
