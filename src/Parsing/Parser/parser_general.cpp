@@ -120,7 +120,7 @@ namespace Parsing
             if (MatchLookAhead(SeparatorKind::BoxCloseBracket, true))
             {
                 index++;
-                if (TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true))
+                if (MatchToken(Current(), SyntaxKind::BoxOpenBracket, true))
                     continue;
 
                 return describer;
