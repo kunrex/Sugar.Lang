@@ -45,7 +45,7 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
-        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Public : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, enumSource);
@@ -63,7 +63,7 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
-        const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto classSource = new ClassSource(identifier, describer == Describer::None ? Describer::Public : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(classSource, Describer::Static | Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, classSource);
@@ -81,7 +81,7 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
-        const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Private : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto structSource = new StructSource(identifier, describer == Describer::None ? Describer::Public : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
         ValidateDescriber(structSource, Describer::AccessModifiers, index, sourceFile);
         sourceFile->AddChild(identifier, structSource);
@@ -139,7 +139,10 @@ namespace Analysis::Creation::Binding
         for (; i < parsed.size(); i++)
         {
             if (const auto& name = parsed.at(i); name.empty())
+            {
                 current = current->Parent();
+                continue;
+            }
             else if (current->SourceType() == SourceType::Directory)
             {
                 const auto casted = dynamic_cast<const SourceDirectory*>(current);
@@ -151,7 +154,6 @@ namespace Analysis::Creation::Binding
 
             break;
         }
-
 
         if (current == nullptr || i < parsed.size() - 2)
         {
