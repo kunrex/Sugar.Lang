@@ -2,7 +2,7 @@
 
 namespace Exceptions
 {
-    CompileException::CompileException(const std::string& message) : c_str(message.c_str())
+    CompileException::CompileException(std::string message) : message(std::move(message))
     { }
 
     const char* CompileException::what() const noexcept { return c_str; }
