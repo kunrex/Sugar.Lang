@@ -4,10 +4,10 @@
 #include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
 
 #include "../../Lexing/Tokens/Enums/keyword_type.h"
+
 #include "../ParseNodes/Describers/describer_keyword_node.h"
 
-#include "../ParseNodes/Expressions/Unary/unary_node.h"
-#include "../ParseNodes/Expressions/Binary/binary_node.h"
+#include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
 
 #include "../ParseNodes/Statements/empty_node.h"
 #include "../ParseNodes/Statements/Control/break_node.h"
@@ -16,7 +16,6 @@
 #include "../ParseNodes/Statements/throw_statement_node.h"
 #include "../ParseNodes/Statements/Control/continue_node.h"
 #include "../ParseNodes/Statements/expression_statement_node.h"
-#include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
 
 using namespace Tokens::Enums;
 
@@ -116,7 +115,10 @@ namespace Parsing
             describer->AddChild(new DescriberKeywordNode(current));
 
             if (MatchLookAhead(SeparatorKind::Comma, true))
+            {
+                index++;
                 continue;
+            }
             if (MatchLookAhead(SeparatorKind::BoxCloseBracket, true))
             {
                 index++;
@@ -241,6 +243,11 @@ namespace Parsing
                             return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
                         if (MatchType(cur, TokenType::Identifier))
                             return ParseFunction(new DescriberNode(Current()), type);
+
+                        const auto invalid = ParseInvalid(breakSeparator);
+                        TryMatchSeparator(Current(), breakSeparator);
+                        invalid->AddChild(type);
+                        return invalid;
                     }
                 }
                 break;
@@ -288,37 +295,39 @@ namespace Parsing
                             return ParseVariableDeclaration(describer, type, breakSeparator);
                         if (MatchType(cur, TokenType::Identifier))
                             return ParseFunction(describer, type);
+
+                        const auto invalid = ParseInvalid(breakSeparator);
+                        TryMatchSeparator(Current(), breakSeparator);
+                        invalid->AddChild(type);
+                        return invalid;
                     }
-                    else
+
+                    switch (current.Kind())
                     {
-                        switch (current.Kind())
-                        {
-                            case SyntaxKind::Enum:
-                                return ParseEnumDefinition(describer);
-                            case SyntaxKind::Class:
-                                return ParseClassDefinition(describer);
-                            case SyntaxKind::Struct:
-                                return ParseStructDefinition(describer);
-                            case SyntaxKind::Indexer:
-                                return ParseIndexer(describer);
-                            case SyntaxKind::Constructor:
-                                return ParseConstructor(describer);
-                            case SyntaxKind::Explicit:
-                                return ParseExplicitCast(describer);
-                            case SyntaxKind::Implicit:
-                                return ParseImplicitCast(describer);
-                            case SyntaxKind::Operator:
-                                return ParseOperatorOverload(describer);
-                            case SyntaxKind::Let:
-                                {
-                                    index++;
-                                    TryMatchToken(Current(), SyntaxKind::Colon, true);
-                                    return ParseVariableDeclaration(describer, new AnonymousTypeNode(current), breakSeparator);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
+                        case SyntaxKind::Enum:
+                            return ParseEnumDefinition(describer);
+                        case SyntaxKind::Class:
+                            return ParseClassDefinition(describer);
+                        case SyntaxKind::Struct:
+                            return ParseStructDefinition(describer);
+                        case SyntaxKind::Indexer:
+                            return ParseIndexer(describer);
+                        case SyntaxKind::Constructor:
+                            return ParseConstructor(describer);
+                        case SyntaxKind::Explicit:
+                            return ParseExplicitCast(describer);
+                        case SyntaxKind::Implicit:
+                            return ParseImplicitCast(describer);
+                        case SyntaxKind::Operator:
+                            return ParseOperatorOverload(describer);
+                        case SyntaxKind::Let:
+                            {
+                                index++;
+                                TryMatchToken(Current(), SyntaxKind::Colon, true);
+                                return ParseVariableDeclaration(describer, new AnonymousTypeNode(current), breakSeparator);
+                            }
+                        default:
+                            break;
                     }
                 }
                 break;
