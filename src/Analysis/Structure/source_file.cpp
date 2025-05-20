@@ -112,7 +112,8 @@ namespace Analysis::Structure
 
     void SourceFile::BindLocal()
     {
-        LocalBindSourceFile(this);
+        for (const auto type: values())
+            type->Bind();
     }
 
     void SourceFile::ManageImports()
