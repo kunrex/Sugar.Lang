@@ -4,10 +4,10 @@
 
 #include "data_type_extensions.h"
 
-#include "../Global/BuiltIn/built_in_method.h"
-#include "../Global/Functions/method_function.h"
+#include "../../Creation/Binding/global_binder.h"
+#include "../../Creation/Binding/binder_extensions.h"
 
-#include "../Wrappers/Generic/array.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
 
 using namespace std;
 
@@ -15,11 +15,10 @@ using namespace Tokens::Enums;
 
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
+
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Global;
-using namespace Analysis::Structure::Creation;
-using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
@@ -41,10 +40,6 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    const IParseNode* Enum::Skeleton() const { return skeleton; }
-
-    unsigned long Enum::ConstructorCount() const { return 0; }
-
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
@@ -64,12 +59,12 @@ namespace Analysis::Structure::DataTypes
     void Enum::PushConstructor(IFunction* constructor)
     { }
 
-    const IFunction* Enum::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Enum::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     {
         return nullptr;
     }
 
-    void Enum::PushIndexer(IIndexerDefinition* indexer)
+    void Enum::PushIndexer(IIndexerDefinition* const indexer)
     { }
 
     const IIndexerDefinition* Enum::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -77,7 +72,7 @@ namespace Analysis::Structure::DataTypes
         return nullptr;
     }
 
-    void Enum::PushImplicitCast(IFunction* cast)
+    void Enum::PushImplicitCast(IFunction* const cast)
     { }
 
     const IFunction* Enum::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -85,7 +80,7 @@ namespace Analysis::Structure::DataTypes
         return nullptr;
     }
 
-    void Enum::PushExplicitCast(IFunction* cast)
+    void Enum::PushExplicitCast(IFunction* const cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
@@ -96,7 +91,7 @@ namespace Analysis::Structure::DataTypes
         return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
-    void Enum::PushOverload(IOperatorOverload* overload)
+    void Enum::PushOverload(IOperatorOverload* const overload)
     { }
 
     const IOperatorOverload* Enum::FindOverload(const SyntaxKind base) const
@@ -104,13 +99,30 @@ namespace Analysis::Structure::DataTypes
         return nullptr;
     }
 
-    void Enum::Bind()
+    void Enum::BindGlobal()
+    {
+        const auto count = skeleton->ChildCount();
+        for (auto i = 0; i < count; i++)
+        {
+            switch (const auto child = skeleton->GetChild(i); child->NodeType())
+            {
+                case ParseNodes::Enums::NodeType::Expression:
+                    BindEnumConstant(child, this);
+                    break;
+                default:
+                    PushException(new Exceptions::InvalidGlobalStatementException(child->Token().Index(), parent));
+                    break;
+            }
+        }
+    }
+
+    void Enum::BindLocal()
     {
         for (const auto& characteristic : characteristics)
-            characteristic.second->Bind();
+            characteristic.second->BindLocal();
 
         for (const auto& cast: explicitCasts)
-            cast.second->Bind();
+            cast.second->BindLocal();
     }
 
     void Enum::Print(const string& indent, const bool last) const

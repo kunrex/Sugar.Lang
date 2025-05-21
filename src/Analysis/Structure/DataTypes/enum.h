@@ -29,10 +29,6 @@ namespace Analysis::Structure::DataTypes
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* Skeleton() const override;
-
-            [[nodiscard]] unsigned long ConstructorCount() const override;
-
             void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
@@ -40,7 +36,7 @@ namespace Analysis::Structure::DataTypes
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
             void PushConstructor(Core::Interfaces::IFunction* constructor) override;
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(bool isStatic, const std::vector<const IDataType*>& argumentList) const override;
 
             void PushIndexer(Core::Interfaces::IIndexerDefinition* indexer) override;
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
@@ -53,7 +49,8 @@ namespace Analysis::Structure::DataTypes
             void PushOverload(Core::Interfaces::IOperatorOverload* overload) override;
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
 
-            void Bind() override;
+            void BindGlobal() override;
+            void BindLocal() override;
 
             void Print(const std::string& indent, bool last) const override;
 

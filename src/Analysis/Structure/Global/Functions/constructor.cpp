@@ -38,7 +38,7 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    void Constructor::Bind()
+    void Constructor::BindLocal()
     {
         BindScoped(this);
     }

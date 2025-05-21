@@ -4,12 +4,14 @@
 #include "../../Services/child.h"
 #include "../../Services/printable.h"
 
-#include "Core/nameable.h"
 #include "Enums/source_type.h"
+
+#include "Core/nameable.h"
+#include "Core/Interfaces/i_bindable.h"
 
 namespace Analysis::Structure
 {
-    class SourceObject : public Core::Nameable, public Services::Child<SourceObject>, public Services::Printable
+    class SourceObject : public Core::Nameable, public Services::Child<SourceObject>, public Services::Printable, public virtual Core::Interfaces::IGloballyBindable, public virtual Core::Interfaces::ILocallyBindable
     {
         protected:
             mutable std::string fullName;
@@ -24,9 +26,6 @@ namespace Analysis::Structure
             virtual void LexParse() = 0;
             virtual void InitDataTypes() = 0;
             virtual void ManageImports() = 0;
-
-            virtual void BindGlobal() = 0;
-            virtual void BindLocal() = 0;
     };
 }
 

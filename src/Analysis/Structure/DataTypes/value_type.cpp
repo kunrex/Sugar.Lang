@@ -2,11 +2,21 @@
 
 #include "data_type_extensions.h"
 
+#include "../../Creation/Binding/global_binder.h"
+#include "../../Creation/Binding/binder_extensions.h"
+
+#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
+
 using namespace std;
+
+using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
+using namespace ParseNodes::Enums;
 using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Creation::Binding;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -61,6 +71,9 @@ namespace Analysis::Structure::DataTypes
 
     const string& BuiltInValueType::FullName() const { return name; }
 
+    void BuiltInValueType::BindLocal()
+    { }
+
     StructSource::StructSource(const string& name, const Enums::Describer describer, const IParseNode* const skeleton) : ValueType(name, describer), skeleton(skeleton), fullName()
     { }
 
@@ -74,16 +87,12 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
-    const IParseNode* StructSource::Skeleton() const { return skeleton; }
-
-    unsigned long StructSource::ConstructorCount() const { return constructors.size(); }
-
     void StructSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
         characteristics[characteristic->Name()] = characteristic;
     }
 
-    void StructSource::PushFunction(IFunctionDefinition* function)
+    void StructSource::PushFunction(IFunctionDefinition* const function)
     {
         functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
     }
@@ -94,18 +103,18 @@ namespace Analysis::Structure::DataTypes
         return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    void StructSource::PushConstructor(IFunction* constructor)
+    void StructSource::PushConstructor(IFunction* const constructor)
     {
-        constructors[ArgumentHash(constructor)] = constructor;
+        constructors[ArgumentHash(constructor) >> 1 | constructor->CheckDescriber(Describer::Static)] = constructor;
     }
 
-    const IFunction* StructSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* StructSource::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     {
-        const auto hash = ArgumentHash(argumentList);
+        const auto hash = ArgumentHash(argumentList) >> 1 | isStatic;
         return constructors.contains(hash) ? constructors.at(hash) : nullptr;
     }
 
-    void StructSource::PushIndexer(IIndexerDefinition* indexer)
+    void StructSource::PushIndexer(IIndexerDefinition* const indexer)
     {
         indexers[ArgumentHash(indexer)] = indexer;
     }
@@ -116,7 +125,7 @@ namespace Analysis::Structure::DataTypes
         return indexers.contains(hash) ? indexers.at(hash) : nullptr;
     }
 
-    void StructSource::PushImplicitCast(IFunction* cast)
+    void StructSource::PushImplicitCast(IFunction* const cast)
     {
         implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
@@ -127,7 +136,7 @@ namespace Analysis::Structure::DataTypes
         return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
-    void StructSource::PushExplicitCast(IFunction* cast)
+    void StructSource::PushExplicitCast(IFunction* const cast)
     {
         explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
     }
@@ -138,7 +147,7 @@ namespace Analysis::Structure::DataTypes
         return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
-    void StructSource::PushOverload(IOperatorOverload* overload)
+    void StructSource::PushOverload(IOperatorOverload* const overload)
     {
         overloads[overload->Operator()] = overload;
     }
@@ -148,25 +157,77 @@ namespace Analysis::Structure::DataTypes
         return overloads.at(base);
     }
 
-    void StructSource::Bind()
+    void StructSource::BindGlobal()
+    {
+        const auto count = skeleton->ChildCount();
+        for (auto i = 0; i < count; i++)
+        {
+            switch (const auto child = skeleton->GetChild(i); child->NodeType())
+            {
+            case NodeType::Declaration:
+                DeclareGlobalVariable(child, this);
+                break;
+            case NodeType::Initialisation:
+                InitialiseGlobalVariable(child, this);
+                break;
+            case NodeType::Property:
+                CreateProperty(child, this);
+                break;
+            case NodeType::PropertyInitialisation:
+                InitialiseProperty(child, this);
+                break;
+            case NodeType::Indexer:
+                CreateIndexer(child, this);
+                break;
+            case NodeType::FunctionDeclaration:
+                CreateFunction(child, this);
+                break;
+            case NodeType::ConstructorDeclaration:
+                CreateConstructor(child, this);
+                break;
+            case NodeType::ImplicitDeclaration:
+                CreateImplicit(child, this);
+                break;
+            case NodeType::ExplicitDeclaration:
+                CreateExplict(child, this);
+                break;
+            case NodeType::OperatorOverload:
+                CreateOperatorOverload(child, this);
+                break;
+            default:
+                PushException(new InvalidGlobalStatementException(child->Token().Index(), parent));
+                break;
+            }
+        }
+
+        TryDeclareStaticConstructor(this);
+
+        if (CheckDescriber(Describer::Static))
+            return;
+
+        TryDeclareExplicitString(this);
+        TryDeclareDefaultConstructor(this);
+    }
+
+    void StructSource::BindLocal()
     {
         for (const auto& characteristic : characteristics)
-            characteristic.second->Bind();
+            characteristic.second->BindLocal();
 
         for (const auto function: functions)
-            function.second->Bind();
+            function.second->BindLocal();
 
         for (const auto constructor: constructors)
-            constructor.second->Bind();
+            constructor.second->BindLocal();
 
         for (const auto cast: implicitCasts)
-            cast.second->Bind();
+            cast.second->BindLocal();
 
         for (const auto cast: explicitCasts)
-            cast.second->Bind();
+            cast.second->BindLocal();
 
         for (const auto overload: overloads)
-            overload.second->Bind();
+            overload.second->BindLocal();
     }
 
     void StructSource::Print(const string& indent, const bool last) const

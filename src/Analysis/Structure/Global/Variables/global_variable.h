@@ -17,6 +17,8 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
+
+            void BindLocal() override;
     };
 }
 

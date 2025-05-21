@@ -107,13 +107,14 @@ namespace Analysis::Structure
 
     void SourceFile::BindGlobal()
     {
-        GlobalBindSourceFile(this);
+        for (const auto type: values())
+            type->BindGlobal();
     }
 
     void SourceFile::BindLocal()
     {
         for (const auto type: values())
-            type->Bind();
+            type->BindLocal();
     }
 
     void SourceFile::ManageImports()

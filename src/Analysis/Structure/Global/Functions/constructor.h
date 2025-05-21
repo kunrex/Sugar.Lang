@@ -15,13 +15,13 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            void Bind() override;
+            void BindLocal() override;
     };
 
     class DefaultConstructor final : public Constructor
     {
         public:
-            explicit DefaultConstructor(const Core::Interfaces::IDataType* creationType);
+            DefaultConstructor(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
 
             ~DefaultConstructor() override;
     };

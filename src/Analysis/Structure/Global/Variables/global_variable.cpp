@@ -28,4 +28,10 @@ namespace Analysis::Structure::Global
 
     bool GlobalVariable::Readable() const { return true; }
     bool GlobalVariable::Writable() const { return true; }
+
+    void GlobalVariable::BindLocal()
+    {
+        const auto parameterLessConstructor = parent->FindConstructor({ });
+
+    }
 }
