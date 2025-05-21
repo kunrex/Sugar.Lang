@@ -3,12 +3,20 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IBindable
+    class ILocallyBindable
     {
         public:
-            virtual void Bind() = 0;
+            virtual void BindLocal() = 0;
 
-            virtual ~IBindable() = default;
+            virtual ~ILocallyBindable() = default;
+    };
+
+    class IGloballyBindable
+    {
+        public:
+            virtual void BindGlobal() = 0;
+
+            virtual ~IGloballyBindable() = default;
     };
 }
 
