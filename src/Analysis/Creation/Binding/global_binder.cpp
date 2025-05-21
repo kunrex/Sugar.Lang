@@ -18,6 +18,7 @@
 #include "../../Structure/DataTypes/class.h"
 
 #include "../../Structure/Global/BuiltIn/built_in_cast.h"
+#include "../../Structure/Global/BuiltIn/built_in_constructor.h"
 
 #include "../../Structure/Global/Properties/indexer.h"
 #include "../../Structure/Global/Properties/property.h"
@@ -89,15 +90,15 @@ namespace Analysis::Creation::Binding
             PushException(new ReturnAccessibilityException(index, dataType->Parent()));
     }
 
-    void BindEnumExpression(const IParseNode* const expression, IUserDefinedType* const dataType)
+    void BindEnumConstant(const IParseNode* const expressionNode, IUserDefinedType* const dataType)
     {
         const auto type = EnumField::Instance(dataType);
 
-        switch (expression->NodeType())
+        switch (expressionNode->NodeType())
         {
             case NodeType::Identifier:
                 {
-                    const auto identifier = expression->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+                    const auto identifier = expressionNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
                     const auto value = *identifier.Value<string>();
 
                     if (dataType->FindCharacteristic(value) != nullptr)
@@ -111,7 +112,7 @@ namespace Analysis::Creation::Binding
                 break;
             case NodeType::Binary:
                 {
-                    const auto operation = expression->Token();
+                    const auto operation = expressionNode->Token();
 
                     if (operation.Kind() != SyntaxKind::Assignment)
                     {
@@ -119,7 +120,7 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    const auto lhs = expression->GetChild(static_cast<int>(ChildCode::LHS));
+                    const auto lhs = expressionNode->GetChild(static_cast<int>(ChildCode::LHS));
                     if (lhs->NodeType() != NodeType::Identifier)
                     {
                         PushException(new InvalidGlobalStatementException(lhs->Token().Index(), dataType->Parent()));
@@ -134,11 +135,11 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, expression->GetChild(static_cast<int>(ChildCode::RHS))));
+                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, expressionNode->GetChild(static_cast<int>(ChildCode::RHS))));
                 }
                 break;
             default:
-                PushException(new InvalidGlobalStatementException(expression->Token().Index(), dataType->Parent()));
+                PushException(new InvalidGlobalStatementException(expressionNode->Token().Index(), dataType->Parent()));
                 break;
         }
     }
@@ -621,162 +622,29 @@ namespace Analysis::Creation::Binding
         dataType->PushOverload(operatorOverload);
     }
 
-    void BindEnum(IUserDefinedType* const enumSource)
+    void TryDeclareExplicitString(IUserDefinedType* const dataType)
     {
-        const auto skeleton = enumSource->Skeleton();
-
-        const auto count = skeleton->ChildCount();
-        for (auto i = 0; i < count; i++)
-        {
-            switch (const auto child = skeleton->GetChild(i); child->NodeType())
-            {
-                case NodeType::Expression:
-                    BindEnumExpression(child, enumSource);
-                    break;
-                default:
-                    PushException(new InvalidGlobalStatementException(child->Token().Index(), enumSource->Parent()));
-                    break;
-            }
-        }
-    }
-
-    void BindClass(IUserDefinedType* const classSource)
-    {
-        const auto skeleton = classSource->Skeleton();
-
-        const auto count = skeleton->ChildCount();
-        for (auto i = 0; i < count; i++)
-        {
-            switch (const auto child = skeleton->GetChild(i); child->NodeType())
-            {
-                case NodeType::Declaration:
-                    DeclareGlobalVariable(child, classSource);
-                    break;
-                case NodeType::Initialisation:
-                    InitialiseGlobalVariable(child, classSource);
-                    break;
-                case NodeType::Property:
-                    CreateProperty(child, classSource);
-                    break;
-                case NodeType::PropertyInitialisation:
-                    InitialiseProperty(child, classSource);
-                    break;
-                case NodeType::Indexer:
-                    CreateIndexer(child, classSource);
-                    break;
-                case NodeType::FunctionDeclaration:
-                    CreateFunction(child, classSource);
-                    break;
-                case NodeType::ConstructorDeclaration:
-                    CreateConstructor(child, classSource);
-                    break;
-                case NodeType::ImplicitDeclaration:
-                    CreateImplicit(child, classSource);
-                    break;
-                case NodeType::ExplicitDeclaration:
-                    CreateExplict(child, classSource);
-                    break;
-                case NodeType::OperatorOverload:
-                    CreateOperatorOverload(child, classSource);
-                    break;
-                default:
-                    PushException(new InvalidGlobalStatementException(child->Token().Index(), classSource->Parent()));
-                    break;
-            }
-        }
-
-
-        if (classSource->CheckDescriber(Describer::Static))
+        if (dataType->FindExplicitCast(&String::Instance(), dataType) != nullptr)
             return;
 
-        if (const auto explicitString = classSource->FindExplicitCast(&String::Instance(), classSource); explicitString == nullptr)
-        {
-            const auto cast = new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", classSource->FullName()), nullptr);
-            cast->PushParameterType(classSource);
-            classSource->PushExplicitCast(cast);;
-        }
-
-        if (!classSource->ConstructorCount())
-            classSource->PushConstructor(new DefaultConstructor(classSource));
+        const auto cast = new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", dataType->FullName()), nullptr);
+        cast->PushParameterType(dataType);
+        dataType->PushExplicitCast(cast);
     }
 
-    void BindStruct(IUserDefinedType* const structSource)
+    void TryDeclareStaticConstructor(IUserDefinedType* const dataType)
     {
-        const auto skeleton = structSource->Skeleton();
-
-        const auto count = skeleton->ChildCount();
-        for (auto i = 0; i < count; i++)
-        {
-            switch (const auto child = skeleton->GetChild(i); child->NodeType())
-            {
-                case NodeType::Declaration:
-                    DeclareGlobalVariable(child, structSource);
-                    break;
-                case NodeType::Initialisation:
-                    InitialiseGlobalVariable(child, structSource);
-                    break;
-                case NodeType::Property:
-                    CreateProperty(child, structSource);
-                    break;
-                case NodeType::PropertyInitialisation:
-                    InitialiseProperty(child, structSource);
-                    break;
-                case NodeType::Indexer:
-                    CreateIndexer(child, structSource);
-                    break;
-                case NodeType::FunctionDeclaration:
-                    CreateFunction(child, structSource);
-                    break;
-                case NodeType::ConstructorDeclaration:
-                    CreateConstructor(child, structSource);
-                    break;
-                case NodeType::ImplicitDeclaration:
-                    CreateImplicit(child, structSource);
-                    break;
-                case NodeType::ExplicitDeclaration:
-                    CreateExplict(child, structSource);
-                    break;
-                case NodeType::OperatorOverload:
-                    CreateOperatorOverload(child, structSource);
-                    break;
-                default:
-                    PushException(new InvalidGlobalStatementException(child->Token().Index(), structSource->Parent()));
-                    break;
-            }
-        }
-
-        if (structSource->CheckDescriber(Describer::Static))
+        if (dataType->FindConstructor(true, { }) != nullptr)
             return;
 
-        if (const auto explicitString = structSource->FindExplicitCast(&String::Instance(), structSource); explicitString == nullptr)
-        {
-            const auto cast = new BuiltInCast(&String::Instance(), std::format("callvirt instance string class {}::ToString()", structSource->FullName()), nullptr);
-            cast->PushParameterType(structSource);
-            structSource->PushExplicitCast(cast);
-        }
-
-        if (!structSource->ConstructorCount())
-            structSource->PushConstructor(new DefaultConstructor(structSource));
+        dataType->PushConstructor(new DefaultConstructor(Describer::Static, dataType));
     }
 
-    void GlobalBindSourceFile(const SourceFile* const source)
+    void TryDeclareDefaultConstructor(IUserDefinedType* const dataType)
     {
-        for (const auto type: source->values())
-        {
-            switch (type->MemberType())
-            {
-                case MemberType::Enum:
-                    BindEnum(type);
-                    break;
-                case MemberType::Class:
-                    BindClass(type);
-                    break;
-                case MemberType::ValueType:
-                    BindStruct(type);
-                    break;
-                default:
-                    break;
-            }
-        }
+        if (dataType->FindConstructor(false, { }) != nullptr)
+            return;
+
+        dataType->PushConstructor(new DefaultConstructor(Describer::None, dataType));
     }
 }
