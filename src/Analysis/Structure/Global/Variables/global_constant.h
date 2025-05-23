@@ -28,6 +28,8 @@ namespace Analysis::Structure::Global
 
             void PushDependency(const IConstant* constant) const override;
             [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
+
+            void BindLocal() override;
     };
 }
 

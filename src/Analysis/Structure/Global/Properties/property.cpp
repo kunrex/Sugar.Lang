@@ -2,11 +2,15 @@
 
 #include <format>
 
+#include "../../../Creation/Binding/local_binder.h"
 #include "../../Core/DataTypes/data_type.h"
+#include "../../Core/Scoped/default_scoped.h"
 
 using namespace std;
 
 using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Creation::Binding;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -60,4 +64,10 @@ namespace Analysis::Structure::Global
 
     const std::string& Property::SignatureGetString() const { return getInstruction; }
     const std::string& Property::SignatureSetString() const { return setInstruction; }
+
+    void Property::BindLocal()
+    {
+        auto scoped = DefaultScoped();
+        context = BindExpression(parseNode, &scoped, scoped.Scope(), parent);
+    }
 }

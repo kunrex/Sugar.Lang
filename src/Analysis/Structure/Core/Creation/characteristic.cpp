@@ -13,12 +13,6 @@ namespace Analysis::Structure::Core
 
     const IParseNode* Characteristic::ParseNode() const { return parseNode; }
 
-    void Characteristic::WithContext(const IContextNode* const context) const
-    {
-        if (this->context == nullptr)
-            this->context = context;
-    }
-
     const IContextNode* Characteristic::Context() const { return context; }
 
     Characteristic::~Characteristic()

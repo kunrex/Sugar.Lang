@@ -32,9 +32,9 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    void VoidFunction::Bind()
+    void VoidFunction::BindLocal()
     {
-        BindScoped(this);
+        BindScope(parseNode, scope, this, parent);
     }
 }
 

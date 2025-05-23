@@ -23,6 +23,8 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] const std::string& SignatureGetString() const override;
             [[nodiscard]] const std::string& SignatureSetString() const override;
+
+            void BindLocal() override;
     };
 }
 

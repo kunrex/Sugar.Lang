@@ -40,15 +40,7 @@ namespace Analysis::Structure::Global
 
     void Constructor::BindLocal()
     {
-        BindScoped(this);
-    }
-
-    DefaultConstructor::DefaultConstructor(const IDataType* const creationType) : Constructor(Describer::Public, creationType, new ScopeNode(defaultConstructor))
-    { }
-
-    DefaultConstructor::~DefaultConstructor()
-    {
-        delete parseNode;
+        BindScope(parseNode, scope, this, parent);
     }
 }
 

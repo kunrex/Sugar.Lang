@@ -2,10 +2,13 @@
 #define GLOBAL_VARIABLE_H
 
 #include "../../Core/Creation/characteristic.h"
+#include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
+
+#include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class GlobalVariable : public Core::Characteristic
+    class GlobalVariable : public Core::Characteristic, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             GlobalVariable(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);

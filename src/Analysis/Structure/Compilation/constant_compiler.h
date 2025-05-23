@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Compilation
 {
-    void CompileExpression(const Core::Interfaces::IConstant* constant, const Core::Interfaces::IUserDefinedType* dataType);
+    const Core::Interfaces::IContextNode* CompileExpression(const Core::Interfaces::IConstant* constant, const Core::Interfaces::IUserDefinedType* dataType);
 }
 
 #endif

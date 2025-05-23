@@ -203,8 +203,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/created.h
         Analysis/Structure/Core/Creation/function.cpp
         Analysis/Structure/Core/Creation/function.h
-        Analysis/Structure/Local/local_node.cpp
-        Analysis/Structure/Local/local_node.h
         Analysis/Structure/Core/Scoped/scoped.cpp
         Analysis/Structure/Core/Scoped/scoped.h
         Analysis/Structure/Creation/Functions/void_definition.cpp
@@ -239,8 +237,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Global/Functions/constructor.h
         Analysis/Structure/Global/Variables/global_variable.cpp
         Analysis/Structure/Global/Variables/global_variable.h
-        Analysis/Structure/Global/global_node.cpp
-        Analysis/Structure/Global/global_node.h
         Analysis/Creation/Transpiling/cil_transpiler.cpp
         Analysis/Creation/Transpiling/cil_transpiler.h
         Analysis/Structure/Context/context_node.h
@@ -553,4 +549,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Wrappers/Generic/enum_field.cpp
         Analysis/Structure/Wrappers/Generic/enum_field.h
         Lexing/Tokens/Enums/type_kind.cpp
+        Analysis/Structure/Core/Interfaces/i_bindable.h
+        Analysis/Structure/Core/Interfaces/Creation/i_built_in_parametrized.h
 )

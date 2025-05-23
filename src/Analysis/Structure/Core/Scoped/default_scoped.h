@@ -10,12 +10,10 @@ namespace Analysis::Structure::Core
     class DefaultScoped final : public Describable, public virtual Interfaces::IScoped
     {
         private:
-            mutable Local::Scope scope;
+            Local::Scope* const scope;
 
         public:
-            explicit DefaultScoped(Enums::Describer describer);
-
-            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
+            DefaultScoped();
 
             [[nodiscard]] Local::Scope* Scope() const override;
 
@@ -36,6 +34,10 @@ namespace Analysis::Structure::Core
             void AddLocalVariable(const Local::LocalVariable* variable) override;
 
             [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const override;
+
+            void BindLocal() override;
+
+            ~DefaultScoped() override;
     };
 }
 

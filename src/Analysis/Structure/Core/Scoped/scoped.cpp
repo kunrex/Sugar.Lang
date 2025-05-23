@@ -12,8 +12,6 @@ namespace Analysis::Structure::Core
     Scoped::Scoped(const IParseNode* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0), scope(new Local::Scope(ScopeType::Scope, "", this))
     { }
 
-    const IParseNode* Scoped::ParseNode() const { return parseNode; }
-
     Scope* Scoped::Scope() const { return scope; }
 
     unsigned long Scoped::ParameterCount() const { return parameterCount; }
@@ -48,5 +46,10 @@ namespace Analysis::Structure::Core
                 return i;
 
         return std::nullopt;
+    }
+
+    Scoped::~Scoped()
+    {
+        delete scope;
     }
 }

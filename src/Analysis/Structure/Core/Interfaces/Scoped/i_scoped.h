@@ -16,8 +16,6 @@ namespace Analysis::Structure::Core::Interfaces
     class IScoped : public virtual IFunction, public virtual INameable
     {
         public:
-            [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const = 0;
-
             [[nodiscard]] virtual Local::Scope* Scope() const = 0;
 
             [[nodiscard]] virtual unsigned long VariableCount() const = 0;

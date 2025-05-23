@@ -20,10 +20,10 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] bool Compiled() const override;
 
-            void WithContext(const Core::Interfaces::IContextNode* context) const override;
-
             void PushDependency(const IConstant* constant) const override;
             [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
+
+            void BindLocal() override;
     };
 }
 

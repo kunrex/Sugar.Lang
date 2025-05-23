@@ -26,7 +26,6 @@ namespace Analysis::Creation::Binding
     void CreateOperatorOverload(const ParseNodes::Core::Interfaces::IParseNode* operatorOverloadNode, Structure::Core::Interfaces::IUserDefinedType* dataType);
 
     void TryDeclareExplicitString(Structure::Core::Interfaces::IUserDefinedType* dataType);
-    void TryDeclareStaticConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
     void TryDeclareDefaultConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
 }
 

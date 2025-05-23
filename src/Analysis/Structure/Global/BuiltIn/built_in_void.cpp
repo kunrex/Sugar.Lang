@@ -20,6 +20,6 @@ namespace Analysis::Structure::Global
 
     const string& BuiltInVoid::FullName() const { return fullName; }
 
-    void BuiltInVoid::Bind()
+    void BuiltInVoid::BindLocal()
     { }
 }

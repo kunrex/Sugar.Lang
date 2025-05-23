@@ -255,45 +255,37 @@ namespace Analysis::Structure::Compilation
         }
     }
 
-    void CompileExpression(const IConstant* const constant, const IUserDefinedType* const dataType)
+    const IContextNode* CompileExpression(const IConstant* const constant, const IUserDefinedType* const dataType)
     {
         const auto result = CompileExpression(constant->ParseNode(), constant, dataType);
         if (!result)
-            return;
+            return nullptr;
 
         switch (result->creationType->Type())
         {
             case TypeKind::Short:
-                constant->WithContext(new ShortConstant(std::get<short>(result->data)));
-                break;
+                return new ShortConstant(std::get<short>(result->data));
             case TypeKind::Int:
-                constant->WithContext(new IntegerConstant(std::get<int>(result->data)));
-                break;
+                return new IntegerConstant(std::get<int>(result->data));
             case TypeKind::Long:
-                constant->WithContext(new LongConstant(std::get<long>(result->data)));
-                break;
+                return new LongConstant(std::get<long>(result->data));
             case TypeKind::Float:
-                constant->WithContext(new FloatConstant(std::get<float>(result->data)));
-                break;
+                return new FloatConstant(std::get<float>(result->data));
             case TypeKind::Double:
-                constant->WithContext(new DoubleConstant(std::get<double>(result->data)));
-                break;
+                return new DoubleConstant(std::get<double>(result->data));
             case TypeKind::Boolean:
                 {
                     if (std::get<bool>(result->data))
-                        constant->WithContext(new TrueConstant());
-                    else
-                        constant->WithContext(new FalseConstant());
+                        return new TrueConstant();
+
+                    return new FalseConstant();
                 }
-                break;
             case TypeKind::Character:
-                constant->WithContext(new CharacterConstant(std::get<char>(result->data)));
-                break;
+                return new CharacterConstant(std::get<char>(result->data));
             case TypeKind::String:
-                constant->WithContext(new StringConstant(std::get<string>(result->data)));
-                break;
+                return new StringConstant(std::get<string>(result->data));
             default:
-                break;
+                return nullptr;
         }
     }
 }

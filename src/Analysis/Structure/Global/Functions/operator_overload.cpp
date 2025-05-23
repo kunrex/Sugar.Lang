@@ -34,8 +34,8 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    void OperatorOverload::Bind()
+    void OperatorOverload::BindLocal()
     {
-        BindScoped(this);
+        BindScope(parseNode, scope, this, parent);
     }
 }

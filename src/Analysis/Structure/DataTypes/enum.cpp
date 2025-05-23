@@ -59,7 +59,7 @@ namespace Analysis::Structure::DataTypes
     void Enum::PushConstructor(IFunction* constructor)
     { }
 
-    const IFunction* Enum::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Enum::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return nullptr;
     }

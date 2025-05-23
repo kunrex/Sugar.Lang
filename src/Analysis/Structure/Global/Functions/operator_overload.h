@@ -3,10 +3,13 @@
 
 #include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/overload_definition.h"
+#include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
+
+#include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class OperatorOverload final : public Core::Nameable, public Creation::OverloadDefinition, public Core::Scoped
+    class OperatorOverload final : public Core::Nameable, public Creation::OverloadDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             OperatorOverload(Tokens::Enums::SyntaxKind baseOperator, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
@@ -15,7 +18,7 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            void Bind() override;
+            void BindLocal() override;
     };
 }
 

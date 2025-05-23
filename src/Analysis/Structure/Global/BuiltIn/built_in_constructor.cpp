@@ -21,7 +21,7 @@ namespace Analysis::Structure::Global
 
     const string& BuiltInConstructor::FullName() const { return fullName; }
 
-    void BuiltInOperation::Bind()
+    void BuiltInConstructor::BindLocal()
     { }
 }
 

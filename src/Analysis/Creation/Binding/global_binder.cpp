@@ -107,14 +107,15 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, nullptr));
+                    const auto constant = new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, nullptr);
+
+                    constant->SetParent(dataType);
+                    dataType->PushCharacteristic(constant);
                 }
                 break;
             case NodeType::Binary:
                 {
-                    const auto operation = expressionNode->Token();
-
-                    if (operation.Kind() != SyntaxKind::Assignment)
+                    if (const auto& operation = expressionNode->Token(); operation.Kind() != SyntaxKind::Assignment)
                     {
                         PushException(new InvalidGlobalStatementException(operation.Index(), dataType->Parent()));
                         return;
@@ -135,7 +136,10 @@ namespace Analysis::Creation::Binding
                         return;
                     }
 
-                    dataType->PushCharacteristic(new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, expressionNode->GetChild(static_cast<int>(ChildCode::RHS))));
+                    const auto constant = new GlobalConstant(value, Describer::Public | Describer::Constexpr, type, expressionNode->GetChild(static_cast<int>(ChildCode::RHS)))
+
+                    constant->SetParent(dataType);
+                    dataType->PushCharacteristic(constant);
                 }
                 break;
             default:
@@ -160,6 +164,13 @@ namespace Analysis::Creation::Binding
         }
 
         const auto describer = FromNode(declarationNode->GetChild(static_cast<int>(ChildCode::Describer)));
+
+        if ((describer & Describer::Constexpr) == Describer::Constexpr)
+        {
+            PushException(new LogException("Constants must be initialised", declarationNode->Token().Index()));
+            return;
+        }
+
         const auto globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType);
 
         MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
@@ -167,6 +178,7 @@ namespace Analysis::Creation::Binding
         ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
         ValidateDescriber(globalVariable, Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
+        globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);
     }
 
@@ -189,7 +201,7 @@ namespace Analysis::Creation::Binding
 
         GlobalVariable* globalVariable;
         if ((describer & Describer::Constexpr) == Describer::Constexpr)
-            globalVariable = new GlobalConstant(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
+            globalVariable = new GlobalConstant(value, describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
         else
             globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
 
@@ -198,6 +210,7 @@ namespace Analysis::Creation::Binding
         ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
         ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
+        globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);
     }
 
@@ -260,6 +273,7 @@ namespace Analysis::Creation::Binding
         ValidateStaticBinding(property, identifier.Index(), dataType);
         ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
 
+        property->SetParent(dataType);
         dataType->PushCharacteristic(property);
     }
 
@@ -289,6 +303,7 @@ namespace Analysis::Creation::Binding
         ValidateStaticBinding(property, identifier.Index(), dataType);
         ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
 
+        property->SetParent(dataType);
         dataType->PushCharacteristic(property);
     }
 
@@ -416,6 +431,7 @@ namespace Analysis::Creation::Binding
             const auto voidDefinition = new VoidFunction(value, describer, functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(voidDefinition, parameters, declarationNode, source);
 
+            voidDefinition->SetParent(dataType);
             function = voidDefinition;
         }
         else
@@ -423,6 +439,7 @@ namespace Analysis::Creation::Binding
             const auto methodDefinition = new MethodFunction(value, describer, BindDataType(typeNode, source), functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
             BindFunctionParameters(methodDefinition, parameters, declarationNode, source);
 
+            methodDefinition->SetParent(dataType);
             function = methodDefinition;
         }
 
@@ -464,6 +481,7 @@ namespace Analysis::Creation::Binding
 
         ValidateDescriber(constructor, Describer::AccessModifiers, index, source);
 
+        constructor->SetParent(dataType);
         dataType->PushConstructor(constructor);
     }
 
@@ -512,6 +530,7 @@ namespace Analysis::Creation::Binding
         if (!explicitCast->MatchDescriber(Describer::PublicStatic))
             PushException(new ExpectedDescriberException(Describer::PublicStatic, index, source));
 
+        explicitCast->SetParent(dataType);
         dataType->PushExplicitCast(explicitCast);
     }
 
@@ -560,6 +579,7 @@ namespace Analysis::Creation::Binding
         if (!implicitCast->MatchDescriber(Describer::PublicStatic))
             PushException(new ExpectedDescriberException(Describer::PublicStatic, index, source));
 
+        implicitCast->SetParent(dataType);
         dataType->PushImplicitCast(implicitCast);
     }
 
@@ -619,6 +639,7 @@ namespace Analysis::Creation::Binding
         if (!operatorOverload->MatchDescriber(Describer::PublicStatic))
             PushException(new ExpectedDescriberException(Describer::PublicStatic, base.Index(), source));
 
+        operatorOverload->SetParent(dataType);
         dataType->PushOverload(operatorOverload);
     }
 
@@ -632,19 +653,12 @@ namespace Analysis::Creation::Binding
         dataType->PushExplicitCast(cast);
     }
 
-    void TryDeclareStaticConstructor(IUserDefinedType* const dataType)
-    {
-        if (dataType->FindConstructor(true, { }) != nullptr)
-            return;
-
-        dataType->PushConstructor(new DefaultConstructor(Describer::Static, dataType));
-    }
-
     void TryDeclareDefaultConstructor(IUserDefinedType* const dataType)
     {
-        if (dataType->FindConstructor(false, { }) != nullptr)
+        if (dataType->FindConstructor({ }) != nullptr)
             return;
 
-        dataType->PushConstructor(new DefaultConstructor(Describer::None, dataType));
+        const auto constructor = new BuiltInConstructor(dataType, std::format("{} instance void {} {}::.ctor()", dataType->MemberType() == MemberType::Class ? "newobj" : "call", dataType->MemberType() == MemberType::Class ? "class" : "valuetype", dataType->FullName()));
+        dataType->PushConstructor(constructor);
     }
 }

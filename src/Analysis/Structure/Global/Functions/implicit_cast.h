@@ -3,11 +3,13 @@
 
 #include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/cast_definition.h"
+#include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
+#include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class ImplicitCast final : public Core::Nameable, public Creation::CastDefinition, public Core::Scoped
+    class ImplicitCast final : public Core::Nameable, public Creation::CastDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             ImplicitCast(Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
@@ -16,7 +18,7 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            void Bind() override;
+            void BindLocal() override;
     };
 }
 

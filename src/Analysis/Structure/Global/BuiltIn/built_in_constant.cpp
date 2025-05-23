@@ -21,10 +21,10 @@ namespace Analysis::Structure::Global
 
     const std::string& BuiltInConstant::FullName() const { return fullName; }
 
-    void BuiltInConstant::WithContext(const IContextNode* const context) const
-    { }
-
     bool BuiltInConstant::IsDependent(const IConstant* constant) const { return false; }
     void BuiltInConstant::PushDependency(const IConstant* constant) const
+    { }
+
+    void BuiltInConstant::BindLocal()
     { }
 }

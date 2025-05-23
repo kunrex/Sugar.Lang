@@ -105,12 +105,12 @@ namespace Analysis::Structure::DataTypes
 
     void StructSource::PushConstructor(IFunction* const constructor)
     {
-        constructors[ArgumentHash(constructor) >> 1 | constructor->CheckDescriber(Describer::Static)] = constructor;
+        constructors[ArgumentHash(constructor)] = constructor;
     }
 
-    const IFunction* StructSource::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* StructSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
-        const auto hash = ArgumentHash(argumentList) >> 1 | isStatic;
+        const auto hash = ArgumentHash(argumentList);
         return constructors.contains(hash) ? constructors.at(hash) : nullptr;
     }
 

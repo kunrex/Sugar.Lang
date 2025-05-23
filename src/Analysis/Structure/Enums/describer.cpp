@@ -71,7 +71,7 @@ namespace Analysis::Structure::Enums
             result += "Static, ";
 
         if (!result.empty())
-            result.erase(result.size() - 3);
+            result.erase(result.size() - 2);
 
         return result;
     }

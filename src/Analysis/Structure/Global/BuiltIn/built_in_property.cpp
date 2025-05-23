@@ -22,4 +22,7 @@ namespace Analysis::Structure::Global
 
     const std::string& BuiltInProperty::SignatureGetString() const { return getInstruction; }
     const std::string& BuiltInProperty::SignatureSetString() const { return setInstruction; }
+
+    void BuiltInProperty::BindLocal()
+    { }
 }

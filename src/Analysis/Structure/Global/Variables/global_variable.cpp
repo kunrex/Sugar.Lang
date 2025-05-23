@@ -1,8 +1,13 @@
 #include "global_variable.h"
 
+#include "../../../Creation/Binding/local_binder.h"
+#include "../../Core/Scoped/default_scoped.h"
+
 using namespace std;
 
 using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Creation::Binding;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -31,7 +36,7 @@ namespace Analysis::Structure::Global
 
     void GlobalVariable::BindLocal()
     {
-        const auto parameterLessConstructor = parent->FindConstructor({ });
-
+        auto scoped = DefaultScoped();
+        context = BindExpression(parseNode, &scoped, scoped.Scope(), parent);
     }
 }

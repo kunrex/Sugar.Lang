@@ -5,18 +5,17 @@
 #include <optional>
 #include <unordered_map>
 
-#include "../../../../Services/collection.h"
-
-#include "../local_node.h"
 #include "../Variables/local_variable.h"
 
 #include "../../Enums/scope_type.h"
 #include "../../Context/context_node.h"
 #include "../../Core/Interfaces/Scoped/i_scoped.h"
 
+#include "../../../../Services/collection.h"
+
 namespace Analysis::Structure::Local
 {
-    class Scope final : public LocalNode, public Core::Nameable, Services::ConstantChild<Scope>, public Services::ConstantCollection<Core::Interfaces::IContextNode>
+    class Scope final : public Core::Nameable, Services::ConstantChild<Scope>, public Services::ConstantCollection<Core::Interfaces::IContextNode>, public virtual Core::Interfaces::INode
     {
         private:
             const Enums::ScopeType type;

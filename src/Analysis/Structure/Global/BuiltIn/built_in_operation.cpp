@@ -24,6 +24,6 @@ namespace Analysis::Structure::Global
 
     CompilationResult BuiltInOperation::StaticCompile(const std::vector<CompilationResult>& arguments) const { return overloadDelegate(arguments); }
 
-    void BuiltInOperation::Bind()
+    void BuiltInOperation::BindLocal()
     { }
 }

@@ -8,12 +8,11 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class ICharacteristic : public virtual IVariable, public virtual IBindable
+    class ICharacteristic : public virtual IVariable, public virtual ILocallyBindable
     {
         public:
             [[nodiscard]] virtual const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const = 0;
 
-            virtual void WithContext(const IContextNode* context) const = 0;
             [[nodiscard]] virtual const IContextNode* Context() const = 0;
     };
 }

@@ -11,21 +11,19 @@ using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string default_scoped_name = "default_scoped";
+const string default_name = "default";
 
 namespace Analysis::Structure::Core
 {
-    DefaultScoped::DefaultScoped(const Enums::Describer describer) : Describable(describer), scope(ScopeType::Scope, default_scoped_name, this)
+    DefaultScoped::DefaultScoped() : scope(new Local::Scope(ScopeType::Scope, default_name, this))
     { }
 
-    const IParseNode* DefaultScoped::ParseNode() const { return nullptr; }
-
-    Scope* DefaultScoped::Scope() const { return &scope; }
+    Scope* DefaultScoped::Scope() const { return scope; }
 
     MemberType DefaultScoped::MemberType() const { return MemberType::Scope; }
 
-    const string& DefaultScoped::Name() const { return default_scoped_name; }
-    const string& DefaultScoped::FullName() const { return default_scoped_name; }
+    const string& DefaultScoped::Name() const { return default_name; }
+    const string& DefaultScoped::FullName() const { return default_name; }
 
     const IDataType* DefaultScoped::CreationType() const { return &Void::Instance(); }
 
@@ -42,4 +40,12 @@ namespace Analysis::Structure::Core
 
     void DefaultScoped::AddLocalVariable(const LocalVariable* const variable)
     { }
+
+    void DefaultScoped::BindLocal()
+    { }
+
+    DefaultScoped::~DefaultScoped()
+    {
+        delete scope;
+    }
 }

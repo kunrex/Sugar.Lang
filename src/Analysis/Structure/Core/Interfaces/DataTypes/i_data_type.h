@@ -4,7 +4,6 @@
 #include "../i_node.h"
 #include "../i_nameable.h"
 #include "../i_slot_size.h"
-#include "../i_bindable.h"
 #include "../i_describable.h"
 #include "../Creation/i_function.h"
 #include "../Creation/i_characteristic.h"
@@ -14,7 +13,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotCount, public virtual IReadWrite, public virtual IBindable
+    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotCount, public virtual IReadWrite, public virtual IGloballyBindable, public virtual ILocallyBindable
     {
         public:
             [[nodiscard]] virtual Tokens::Enums::TypeKind Type() const = 0;

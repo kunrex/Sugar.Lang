@@ -44,7 +44,7 @@ namespace Analysis::Structure::Wrappers
             return map.at(hash);
 
         const auto enumField = new EnumField(enumType);
-        enumField->InitializeMembers();
+        enumField->BindGlobal();
 
         map[hash] = enumField;
         return enumField;
@@ -56,11 +56,11 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& EnumField::FullName() const { return enumType->FullName(); }
 
-    void EnumField::InitializeMembers()
+    void EnumField::BindGlobal()
     {
         const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", nullptr);
         explicitInteger->PushParameterType(this);
-        explicitCasts[DataTypes::ArgumentHash(explicitInteger)] = explicitInteger;
+        explicitCasts[ArgumentHash(explicitInteger)] = explicitInteger;
 
         const auto explicitString = new BuiltInCast(&Integer::Instance(), std::format("box {} call instance string [mscorlib]System.Boolean::ToString()", enumType->FullName()), nullptr);
         explicitString->PushParameterType(this);
@@ -98,7 +98,7 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* EnumField::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* EnumField::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -116,12 +116,12 @@ namespace Analysis::Structure::Wrappers
     const IFunction* EnumField::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* EnumField::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     EnumField::~EnumField()

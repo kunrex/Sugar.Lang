@@ -1110,11 +1110,16 @@ namespace Analysis::Creation::Binding
                         {
                             const auto expression = BindExpression(value, scoped, current, dataType);
                             current->AddChild(new Return(expression->CreationType()));
+
+                            if (scoped->CreationType() != expression->CreationType())
+                                PushException(new LogException(std::format("Return type does not match expected type: `{}`", scoped->CreationType()->FullName()), child->Token().Index(), dataType->Parent()));
                         }
 
                         current->AddChild(new Return());
-                        return;
+                        if (scoped->CreationType() != &Void::Instance())
+                            PushException(new LogException("Unexpected return argument", child->Token().Index(), dataType->Parent()));
                     }
+                    return;
                 case NodeType::IfChain:
                     {
                         const auto name = current->FullName();
@@ -1242,7 +1247,7 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    bool CheckCodePaths(const Scope* const scope, const IDataType* const expected, const unsigned long index, const IUserDefinedType* const dataType)
+    bool IsReturnComplete(const Scope* const scope, const IDataType* const expected)
     {
         for (const auto context: *scope)
         {
@@ -1251,7 +1256,7 @@ namespace Analysis::Creation::Binding
                 if (context->CreationType() == expected)
                     return true;
 
-                PushException(new LogException("Returned value does not match expected value", index, dataType->Parent()));
+                return false;
             }
         }
 
@@ -1263,7 +1268,7 @@ namespace Analysis::Creation::Binding
                 const auto type = current->Type();
                 if (type == ScopeType::Scope)
                 {
-                    if (CheckCodePaths(current, expected, index, dataType))
+                    if (IsReturnComplete(current, expected))
                     {
                         result = true;
                         break;;
@@ -1272,7 +1277,7 @@ namespace Analysis::Creation::Binding
 
                 if (type == ScopeType::Condition)
                 {
-                    if (CheckCodePaths(current, expected, index, dataType))
+                    if (IsReturnComplete(current, expected))
                     {
                         if (const auto last = current->NestedAt(current->NestedCount() - 1); last->GetChild(0)->MemberType() != MemberType::BranchJump)
                             return true;
@@ -1280,30 +1285,10 @@ namespace Analysis::Creation::Binding
                 }
 
                 if (type == ScopeType::ConditionScope)
-                    result = CheckCodePaths(current, expected, index, dataType);
+                    result = IsReturnComplete(current, expected);
             }
         }
 
         return result;
-    }
-
-    void BindScoped(IScoped* const scoped, const IUserDefinedType* const dataType)
-    {
-        BindScope(scoped->ParseNode(), scoped->Scope(), scoped, dataType);
-
-        switch (scoped->MemberType())
-        {
-            case MemberType::ImplicitCast:
-            case MemberType::ExplicitCast:
-            case MemberType::OperatorOverload:
-            case MemberType::MethodDefinition:
-                {
-                    if (const auto scope = scoped->Scope(); !CheckCodePaths(scope, scoped->CreationType(), scoped->ParseNode()->Token().Index(), dataType))
-                        PushException(new LogException("Not all code paths return a value", scoped->ParseNode()->Token().Index(), dataType->Parent()));
-                }
-                break;
-            default:
-                break;
-        }
     }
 }

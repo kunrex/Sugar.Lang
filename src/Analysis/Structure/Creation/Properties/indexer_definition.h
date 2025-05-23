@@ -9,7 +9,7 @@
 
 namespace Analysis::Structure::Creation
 {
-    class IndexerDefinition : public Global::GlobalNode, public Core::Describable, public Core::Created, public virtual Core::PropertySignature, public virtual Core::Interfaces::IIndexerDefinition
+    class IndexerDefinition : public Core::Describable, public Core::Created, public virtual Core::PropertySignature, public virtual Core::Interfaces::IIndexerDefinition
     {
         protected:
             IndexerDefinition(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);

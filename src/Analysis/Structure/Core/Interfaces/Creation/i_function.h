@@ -11,7 +11,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IFunction : public virtual INode, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual IBindable
+    class IFunction : public virtual INode, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual ILocallyBindable
     {
 
     };

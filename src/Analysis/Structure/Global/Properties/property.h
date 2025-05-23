@@ -4,10 +4,13 @@
 #include "../../Creation/Functions/void_definition.h"
 #include "../../Creation/Functions/method_definition.h"
 #include "../../Creation/Properties/property_definition.h"
+#include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
+
+#include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class Property final : public Creation::PropertyDefinition
+    class Property final : public Creation::PropertyDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             mutable bool readable;
@@ -28,7 +31,9 @@ namespace Analysis::Structure::Global
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] const std::string& SignatureGetString() const override;
-            [[nodiscard]] const std::string& SignatureSetString() const override;;
+            [[nodiscard]] const std::string& SignatureSetString() const override;
+
+            void BindLocal() override;
     };
 }
 

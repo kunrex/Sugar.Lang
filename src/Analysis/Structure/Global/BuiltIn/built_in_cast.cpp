@@ -22,6 +22,6 @@ namespace Analysis::Structure::Global
 
     CompilationResult BuiltInCast::StaticCompile(const CompilationResult& argument) const { return castDelegate(argument); }
 
-    void BuiltInCast::Bind()
+    void BuiltInCast::BindLocal()
     { }
 }

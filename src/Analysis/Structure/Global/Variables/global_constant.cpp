@@ -1,5 +1,7 @@
 #include "global_constant.h"
 
+#include "../../Compilation/constant_compiler.h"
+
 using namespace std;
 
 using namespace Tokens::Enums;
@@ -8,6 +10,7 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
@@ -36,6 +39,14 @@ namespace Analysis::Structure::Global
                 return true;
 
         return false;
+    }
+
+    void GlobalConstant::BindLocal()
+    {
+        if (context != nullptr)
+            return;
+
+        context = CompileExpression(this, parent);
     }
 }
 

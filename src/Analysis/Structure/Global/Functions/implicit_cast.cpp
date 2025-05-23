@@ -33,8 +33,8 @@ namespace Analysis::Structure::Global
         return fullName;
     }
 
-    void ImplicitCast::Bind()
+    void ImplicitCast::BindLocal()
     {
-        BindScoped(this);
+        BindScope(parseNode, scope, this, parent);
     }
 }

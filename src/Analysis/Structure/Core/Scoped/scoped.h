@@ -14,14 +14,12 @@ namespace Analysis::Structure::Core
         protected:
             const ParseNodes::Core::Interfaces::IParseNode* parseNode;
 
-            mutable unsigned long parameterCount;
-            mutable Local::Scope* scope;
+            int parameterCount;
+            Local::Scope* const scope;
 
             explicit Scoped(const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
         public:
-            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseNode() const override;
-
             [[nodiscard]] Local::Scope* Scope() const override;
 
             [[nodiscard]] unsigned long ParameterCount() const override;
@@ -34,6 +32,8 @@ namespace Analysis::Structure::Core
             void AddLocalVariable(const Local::LocalVariable* variable) override;
 
             [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const override;
+
+            ~Scoped() override;
     };
 }
 
