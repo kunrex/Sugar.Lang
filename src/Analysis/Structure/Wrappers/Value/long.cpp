@@ -65,7 +65,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Long::Type() const { return TypeKind::Long; }
 
-    void Long::InitializeMembers()
+    void Long::BindGlobal()
     {
         characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.i8 9223372036854775807", false, "");
         characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i8 -9223372036854775807", false, "");
@@ -199,7 +199,7 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Long::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* Long::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -210,7 +210,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Long::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Long::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Long::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -227,16 +227,16 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Long::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* Long::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
     const IBuiltInOverload* Long::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     Long::~Long()

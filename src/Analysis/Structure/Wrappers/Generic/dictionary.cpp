@@ -45,7 +45,7 @@ namespace Analysis::Structure::Wrappers
         const auto action = new Dictionary(keyType, valueType);
         action->genericSignature = std::format("{}`{}<{}>", cil_dictionary, types.size(), MapGenericSignature(types));
 
-        action->InitializeMembers();
+        action->BindGlobal();
 
         map[hash] = action;
         return action;
@@ -55,7 +55,7 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Dictionary::FullName() const { return genericSignature; }
 
-    void Dictionary::InitializeMembers()
+    void Dictionary::BindGlobal()
     {
         const auto getCount = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
         count = new BuiltInProperty(Describer::Public, "Count", &Integer::Instance(), true, getCount, false, "");

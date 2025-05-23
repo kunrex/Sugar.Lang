@@ -12,10 +12,11 @@
 #include "../Generic/referenced.h"
 
 #include "../../Compilation/compilation_result.h"
+#include "../../Context/Constants/integer_constant.h"
 
 #include "../../Global/BuiltIn/built_in_cast.h"
 #include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_constant.h"
 #include "../../Global/BuiltIn/built_in_operation.h"
 
 using namespace std;
@@ -24,6 +25,7 @@ using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -64,10 +66,10 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Short::Type() const { return TypeKind::Short; }
 
-    void Short::InitializeMembers()
+    void Short::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.i2 32767", false, "");
-        characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i2 -32767", false, "");
+        characteristics["Max"] = new BuiltInConstant(Describer::Public | Describer::Constexpr, "Max", &Instance(), new ShortConstant(32767));
+        characteristics["Min"] = new BuiltInConstant(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i2 -32767", false, "");
 
         tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Int16::TryParse(string, int16&)");
         tryParse->PushParameterType(&String::Instance());
@@ -202,7 +204,7 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Short::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* Short::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -222,7 +224,7 @@ namespace Analysis::Structure::Wrappers
     const IFunction* Short::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
     const IFunction* Short::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -233,17 +235,17 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Short::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* Short::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     const IBuiltInOverload* Short::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     Short::~Short()

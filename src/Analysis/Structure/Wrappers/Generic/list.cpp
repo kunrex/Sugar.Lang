@@ -42,7 +42,7 @@ namespace Analysis::Structure::Wrappers
         const auto list = new List(dataType);
         list->genericSignature = std::format("{}`1<{}>", cil_list, dataType->FullName());
 
-        list->InitializeMembers();
+        list->BindGlobal();
 
         map[hash] = list;
         return list;
@@ -54,7 +54,7 @@ namespace Analysis::Structure::Wrappers
 
     const IDataType* List::GenericType() const { return listType; }
 
-    void List::InitializeMembers()
+    void List::BindGlobal()
     {
         const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
         characteristics["Count"] = new BuiltInProperty(Describer::Public, "Count", &Integer::Instance(), true, count, false, "");

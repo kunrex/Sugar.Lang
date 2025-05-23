@@ -43,7 +43,7 @@ namespace Analysis::Structure::Wrappers
 
     const IDataType* Referenced::ReferencedType() const { return referencedType; }
 
-    void Referenced::InitializeMembers()
+    void Referenced::BindGlobal()
     { }
 
     const ICharacteristic* Referenced::FindCharacteristic(const std::string& name) const

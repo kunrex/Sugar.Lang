@@ -2,7 +2,7 @@
 
 int main()
 {
-    const auto source = "tests";
+    const auto source = "/Users/kunalkashyap/Projects/C++/Sugar/Sugar.Lang/tests";
 
     const auto compiler = Compiler(source);
     compiler.Compile();

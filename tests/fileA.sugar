@@ -1,1 +1,8 @@
-int: x = 10;
+class Hello
+{
+    [public, static]
+    explicit int(Hello: x)
+    {
+        return x;
+    }
+}

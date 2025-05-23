@@ -32,7 +32,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Math::Type() const { return TypeKind::Math; }
 
-    void Math::InitializeMembers()
+    void Math::BindGlobal()
     {
         characteristics["PI"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "PI", &Double::Instance(), true, "ldc.r8 3.14159265358979", false, "");
         characteristics["E"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "E", &Double::Instance(), true, "ldc.r8 2.71828182845904", false, "");
@@ -135,10 +135,10 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Math::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) & ArgumentHash(argumentList);
-        return functions.contains(hash) ? nullptr : functions.at(hash);
+        return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    const IFunction* Math::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Math::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Math::FindIndexer(const std::vector<const IDataType*>& argumentList) const

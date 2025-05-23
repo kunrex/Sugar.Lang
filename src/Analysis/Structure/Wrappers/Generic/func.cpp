@@ -37,7 +37,7 @@ namespace Analysis::Structure::Wrappers
 
         func->genericSignature = std::format("{}`{}<{}>", cil_func, types.size(), MapGenericSignature(types));
 
-        func->InitializeMembers();
+        func->BindGlobal();
 
         map[hash] = func;
         return func;
@@ -53,7 +53,7 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Func::DelegateSignature() const { return genericSignature; }
 
-    void Func::InitializeMembers()
+    void Func::BindGlobal()
     { }
 
     const ICharacteristic* Func::FindCharacteristic(const std::string& name) const

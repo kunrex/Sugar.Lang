@@ -4,10 +4,13 @@
 #include "../../Creation/Functions/void_definition.h"
 #include "../../Creation/Functions/method_definition.h"
 #include "../../Creation/Properties/indexer_definition.h"
+#include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
+
+#include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class Indexer final : public Creation::IndexerDefinition
+    class Indexer final : public Creation::IndexerDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             const Creation::MethodDefinition* get;

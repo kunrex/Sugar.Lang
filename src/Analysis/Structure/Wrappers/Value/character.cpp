@@ -43,7 +43,7 @@ namespace Analysis::Structure::Wrappers
         return instance;
     }
 
-    void Character::InitializeMembers()
+    void Character::BindGlobal()
     {
         characteristics["MinValue"] = new BuiltInProperty(Describer::PublicStatic, "MinValue", &Instance(), true, "ldsfld char System.Char::MinValue", false, "");
         characteristics["MaxValue"] = new BuiltInProperty(Describer::PublicStatic, "MaxValue", &Instance(), true, "ldsfld char System.Char::MaxValue", false, "");
@@ -105,16 +105,16 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Character::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* Character::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) & ArgumentHash(argumentList);
-        return functions.contains(hash) ? nullptr : functions.at(hash);
+        return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    const IFunction* Character::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Character::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Character::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -123,7 +123,7 @@ namespace Analysis::Structure::Wrappers
     const IFunction* Character::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
     const IFunction* Character::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -134,17 +134,17 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Character::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* Character::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     const IBuiltInOverload* Character::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     Character::~Character()

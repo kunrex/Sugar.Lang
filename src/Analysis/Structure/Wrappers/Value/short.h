@@ -34,7 +34,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
-            void InitializeMembers() override;
+            void BindGlobal() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 

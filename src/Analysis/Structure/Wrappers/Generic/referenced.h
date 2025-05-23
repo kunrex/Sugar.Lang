@@ -27,7 +27,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const IDataType* ReferencedType() const;
 
-            void InitializeMembers() override;
+            void BindGlobal() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 

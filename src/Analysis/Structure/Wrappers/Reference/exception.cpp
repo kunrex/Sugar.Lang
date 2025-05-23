@@ -30,7 +30,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Exception::Type() const { return TypeKind::Exception; }
 
-    void Exception::InitializeMembers()
+    void Exception::BindGlobal()
     {
         constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
         constructor->PushParameterType(&String::Instance());
@@ -42,12 +42,9 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Exception::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Exception::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Exception::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     {
-        if (ArgumentHash(constructor) == ArgumentHash(argumentList))
-            return constructor;
-
-        return nullptr;
+        return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
     }
 
     const IIndexerDefinition* Exception::FindIndexer(const std::vector<const IDataType*>& argumentList) const

@@ -37,7 +37,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            void InitializeMembers() override;
+            void BindGlobal() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 

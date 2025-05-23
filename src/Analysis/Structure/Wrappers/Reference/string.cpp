@@ -60,7 +60,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind String::Type() const { return TypeKind::String; }
 
-    void String::InitializeMembers()
+    void String::BindGlobal()
     {
         characteristics["Length"] = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "callvirt instance int32 class [System.Runtime]System.String::get_Length()", false, "");
         characteristics["Empty"] = new BuiltInProperty(Describer::PublicStatic, "Empty", &Instance(), true, "ldsfld string [System.Runtime]System.String::Empty", false, "");
@@ -155,18 +155,15 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* String::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) & ArgumentHash(argumentList);
-        return functions.contains(hash) ? nullptr : functions.at(hash);
+        return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    const IFunction* String::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* String::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* String::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
-        if (ArgumentHash(argumentList) == ArgumentHash(indexer))
-            return indexer;
-
-        return nullptr;
+        return ArgumentHash(argumentList) == ArgumentHash(indexer) ? indexer : nullptr;
     }
 
     const IFunction* String::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const

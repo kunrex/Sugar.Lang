@@ -39,7 +39,7 @@ namespace Analysis::Structure::Wrappers
         else
             action->genericSignature = std::format("{}`{}<{}>", cil_action, types.size(), MapGenericSignature(types));
 
-        action->InitializeMembers();
+        action->BindGlobal();
 
         map[hash] = action;
         return action;
@@ -55,7 +55,7 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Action::DelegateSignature() const { return genericSignature; }
 
-    void Action::InitializeMembers()
+    void Action::BindGlobal()
     { }
 
     const ICharacteristic* Action::FindCharacteristic(const std::string& name) const

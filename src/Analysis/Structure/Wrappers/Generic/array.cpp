@@ -39,7 +39,7 @@ namespace Analysis::Structure::Wrappers
         const auto array = new Array(dataType);
         array->genericSignature = std::format("{} {}[]", dataType->MemberType() == MemberType::Class ? "class" : "valuetype", dataType->FullName());
 
-        array->InitializeMembers();
+        array->BindGlobal();
 
         map[hash] = array;
         return array;
@@ -51,7 +51,7 @@ namespace Analysis::Structure::Wrappers
 
     const IDataType* Array::GenericType() const { return arrayType; }
 
-    void Array::InitializeMembers()
+    void Array::BindGlobal()
     {
         length = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "ldlen", false, "");
 

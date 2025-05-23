@@ -57,7 +57,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Double::Type() const { return TypeKind::Double; }
 
-    void Double::InitializeMembers()
+    void Double::BindGlobal()
     {
         characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.r8 1.7976931348623157E+308", false, "");
         characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.r8 -1.7976931348623157E+308", false, "");
@@ -163,7 +163,7 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Double::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* Double::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -174,7 +174,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Double::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Double::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Double::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -191,17 +191,17 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Double::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* Double::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     const IBuiltInOverload* Double::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     Double::~Double()

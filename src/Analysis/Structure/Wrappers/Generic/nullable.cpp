@@ -38,7 +38,7 @@ namespace Analysis::Structure::Wrappers
         const auto nullable = new Nullable(dataType);
         nullable->genericSignature = std::format("{}`1<{}>", cil_nullable, dataType->FullName());
 
-        nullable->InitializeMembers();
+        nullable->BindGlobal();
 
         map[hash] = nullable;
         return nullable;
@@ -48,7 +48,7 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Nullable::FullName() const { return genericSignature; }
 
-    void Nullable::InitializeMembers()
+    void Nullable::BindGlobal()
     {
         const auto isNull = std::format("call instance bool valuetype {}::get_HasValue()", genericSignature);
         characteristics["IsNull"] = new BuiltInProperty(Describer::Public, "IsNull", &Boolean::Instance(), true, isNull, false, "");

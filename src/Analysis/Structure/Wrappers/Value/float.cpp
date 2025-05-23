@@ -58,7 +58,7 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Float::Type() const { return TypeKind::Float; }
 
-    void Float::InitializeMembers()
+    void Float::BindGlobal()
     {
         characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.r4 3.4028235E+38", false, "");
         characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.r4 -3.4028235E+38", false, "");
@@ -165,7 +165,7 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Float::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? nullptr : characteristics.at(name);
+        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
     }
 
     const IFunctionDefinition* Float::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -176,7 +176,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Float::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Float::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Float::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -185,7 +185,7 @@ namespace Analysis::Structure::Wrappers
     const IFunction* Float::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return implicitCasts.contains(hash) ? nullptr : implicitCasts.at(hash);
+        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
     }
 
     const IFunction* Float::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -196,17 +196,17 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Float::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? nullptr : explicitCasts.at(hash);
+        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
     }
 
     const IOperatorOverload* Float::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     const IBuiltInOverload* Float::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? nullptr : overloads.at(base);
+        return overloads.contains(base) ? overloads.at(base) : nullptr;
     }
 
     Float::~Float()

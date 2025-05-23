@@ -41,7 +41,7 @@ namespace Analysis::Structure::Wrappers
             tuple->types.push_back(type);
 
         tuple->genericSignature = std::format("{}`{}<{}>", cil_tuple, types.size(), MapGenericSignature(types));
-        tuple->InitializeMembers();
+        tuple->BindGlobal();
 
         map[hash] = tuple;
         return tuple;
@@ -51,7 +51,7 @@ namespace Analysis::Structure::Wrappers
 
     const std::string& Tuple::FullName() const { return genericSignature; }
 
-    void Tuple::InitializeMembers()
+    void Tuple::BindGlobal()
     {
         constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor({})", genericSignature, MapGenericCallSignature(types)));
 
