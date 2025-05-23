@@ -58,7 +58,7 @@ namespace Analysis::Structure::Wrappers
     void Dictionary::BindGlobal()
     {
         const auto getCount = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
-        count = new BuiltInProperty(Describer::Public, "Count", &Integer::Instance(), true, getCount, false, "");
+        count = new BuiltInProperty("Count", Describer::Public, &Integer::Instance(), true, getCount, false, "");
 
         const auto get = std::format("callvirt instance !1 class {}::get_Item(!0)", genericSignature);
         const auto set = std::format("callvirt instance void class {}::set_Item(!0, !1)", genericSignature);

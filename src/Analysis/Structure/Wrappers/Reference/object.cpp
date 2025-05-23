@@ -39,7 +39,7 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Object::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Object::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Object::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Object::FindIndexer(const std::vector<const IDataType*>& argumentList) const

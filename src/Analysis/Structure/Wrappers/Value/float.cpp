@@ -12,9 +12,11 @@
 #include "../Generic/referenced.h"
 
 #include "../../Compilation/compilation_result.h"
+#include "../../Context/Constants/float_constant.h"
 
 #include "../../Global/BuiltIn/built_in_cast.h"
 #include "../../Global/BuiltIn/built_in_method.h"
+#include "../../Global/BuiltIn/built_in_constant.h"
 #include "../../Global/BuiltIn/built_in_property.h"
 #include "../../Global/BuiltIn/built_in_operation.h"
 
@@ -24,6 +26,7 @@ using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -60,14 +63,14 @@ namespace Analysis::Structure::Wrappers
 
     void Float::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.r4 3.4028235E+38", false, "");
-        characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.r4 -3.4028235E+38", false, "");
+        characteristics["Max"] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, &Instance(), new FloatConstant(3.4028235E+38));
+        characteristics["Min"] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, &Instance(), new FloatConstant(-3.4028235E+38));
 
-        characteristics["NaN"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "NaN", &Instance(), true, "ldc.r4 NaN", false, "");
-        characteristics["PositiveInfinity"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "PositiveInfinity", &Instance(), true, "ldc.r4 Infinity", false, "");
-        characteristics["NegativeInfinity"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "NegativeInfinity", &Instance(), true, "ldc.r4 -Infinity", false, "");
+        characteristics["NaN"] = new BuiltInProperty("NaN", Describer::PublicStatic | Describer::Const, &Instance(), true, "ldc.r4 NaN", false, "");
+        characteristics["PositiveInfinity"] = new BuiltInProperty("PositiveInfinity", Describer::PublicStatic | Describer::Const, &Instance(), true, "ldc.r4 Infinity", false, "");
+        characteristics["NegativeInfinity"] = new BuiltInProperty("NegativeInfinity", Describer::PublicStatic | Describer::Const, &Instance(), true, "ldc.r4 -Infinity", false, "");
 
-        characteristics["Epsilon"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Epsilon", &Instance(), true, "ldc.r4 1.401298E-45", false, "");
+        characteristics["Epsilon"] = new BuiltInConstant("Epsilon", Describer::Public | Describer::Constexpr, &Instance(), new FloatConstant(1.401298E-45));
 
         tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Single::TryParse(string, float32&)");
         tryParse->PushParameterType(&String::Instance());
@@ -176,7 +179,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Float::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Float::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Float::FindIndexer(const std::vector<const IDataType*>& argumentList) const

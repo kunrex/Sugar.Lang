@@ -45,8 +45,8 @@ namespace Analysis::Structure::Wrappers
 
     void Character::BindGlobal()
     {
-        characteristics["MinValue"] = new BuiltInProperty(Describer::PublicStatic, "MinValue", &Instance(), true, "ldsfld char System.Char::MinValue", false, "");
-        characteristics["MaxValue"] = new BuiltInProperty(Describer::PublicStatic, "MaxValue", &Instance(), true, "ldsfld char System.Char::MaxValue", false, "");
+        characteristics["MinValue"] = new BuiltInProperty("MinValue", Describer::PublicStatic, &Instance(), true, "ldsfld char System.Char::MinValue", false, "");
+        characteristics["MaxValue"] = new BuiltInProperty("MaxValue", Describer::PublicStatic, &Instance(), true, "ldsfld char System.Char::MaxValue", false, "");
 
         const auto isDigit = new BuiltInMethod("IsDigit", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsDigit(char)");
         isDigit->PushParameterType(&Boolean::Instance());
@@ -114,7 +114,7 @@ namespace Analysis::Structure::Wrappers
         return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    const IFunction* Character::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Character::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Character::FindIndexer(const std::vector<const IDataType*>& argumentList) const

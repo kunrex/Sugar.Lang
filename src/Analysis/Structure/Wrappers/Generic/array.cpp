@@ -53,7 +53,7 @@ namespace Analysis::Structure::Wrappers
 
     void Array::BindGlobal()
     {
-        length = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "ldlen", false, "");
+        length = new BuiltInProperty("Length", Describer::Public, &Integer::Instance(), true, "ldlen", false, "");
 
         constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
         constructor->PushParameterType(&Integer::Instance());

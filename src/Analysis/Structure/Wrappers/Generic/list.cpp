@@ -57,10 +57,10 @@ namespace Analysis::Structure::Wrappers
     void List::BindGlobal()
     {
         const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
-        characteristics["Count"] = new BuiltInProperty(Describer::Public, "Count", &Integer::Instance(), true, count, false, "");
+        characteristics["Count"] = new BuiltInProperty("Count", Describer::Public, &Integer::Instance(), true, count, false, "");
 
         const auto capacity = std::format("callvirt instance int32 class {}::get_Capacity()", genericSignature);
-        characteristics["Capacity"] = new BuiltInProperty(Describer::Public, "Capacity", &Integer::Instance(), true, capacity, false, "");
+        characteristics["Capacity"] = new BuiltInProperty("Capacity", Describer::Public, &Integer::Instance(), true, capacity, false, "");
 
         const auto get = std::format("callvirt instance !0 class {}::get_Item(int32)", genericSignature);
         const auto set = std::format("callvirt instance void class {}::set_Item(int32, !0)", genericSignature);

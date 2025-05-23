@@ -61,7 +61,7 @@ namespace Analysis::Structure::Wrappers
             const auto getInstruction = std::format("call instance {} class {}::get_Item{}()", type->FullName(), genericSignature, i);
 
             const auto name = std::format("Element{}", i++);
-            characteristics[name] = new BuiltInProperty(Describer::Public, name, type, true, getInstruction, false, "");
+            characteristics[name] = new BuiltInProperty(name, Describer::Public, type, true, getInstruction, false, "");
 
             constructor->PushParameterType(type);
         }

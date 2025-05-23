@@ -62,8 +62,8 @@ namespace Analysis::Structure::Wrappers
 
     void String::BindGlobal()
     {
-        characteristics["Length"] = new BuiltInProperty(Describer::Public, "Length", &Integer::Instance(), true, "callvirt instance int32 class [System.Runtime]System.String::get_Length()", false, "");
-        characteristics["Empty"] = new BuiltInProperty(Describer::PublicStatic, "Empty", &Instance(), true, "ldsfld string [System.Runtime]System.String::Empty", false, "");
+        characteristics["Length"] = new BuiltInProperty("Length", Describer::Public, &Integer::Instance(), true, "callvirt instance int32 class [System.Runtime]System.String::get_Length()", false, "");
+        characteristics["Empty"] = new BuiltInProperty("Empty", Describer::PublicStatic | Describer::Const, &Instance(), true, "ldsfld string [System.Runtime]System.String::Empty", false, "");
 
         const auto clone = new BuiltInMethod("Clone", Describer::Public, &Instance(), "call instance string class [System.Runtime]System.String::Clone()");
         functions[std::hash<string>()("Clone") ^ ArgumentHash(clone)] = clone;
@@ -158,7 +158,7 @@ namespace Analysis::Structure::Wrappers
         return functions.contains(hash) ? functions.at(hash) : nullptr;
     }
 
-    const IFunction* String::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* String::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* String::FindIndexer(const std::vector<const IDataType*>& argumentList) const

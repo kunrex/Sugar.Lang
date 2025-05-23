@@ -12,10 +12,11 @@
 #include "../Generic/referenced.h"
 
 #include "../../Compilation/compilation_result.h"
+#include "../../Context/Constants/integer_constant.h"
 
 #include "../../Global/BuiltIn/built_in_cast.h"
 #include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_constant.h"
 #include "../../Global/BuiltIn/built_in_operation.h"
 
 using namespace std;
@@ -24,6 +25,7 @@ using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -67,8 +69,8 @@ namespace Analysis::Structure::Wrappers
 
     void Integer::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.i4 2147483647", false, "");
-        characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i4 -2147483647", false, "");
+        characteristics["Max"] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, &Instance(), new IntegerConstant(2147483647));
+        characteristics["Min"] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, &Instance(), new IntegerConstant(-2147483648));
 
         tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Int32::TryParse(string, int32&)");
         tryParse->PushParameterType(&String::Instance());
@@ -212,7 +214,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Integer::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Integer::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Integer::FindIndexer(const std::vector<const IDataType*>& argumentList) const

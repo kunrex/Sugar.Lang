@@ -12,10 +12,11 @@
 #include "../Generic/referenced.h"
 
 #include "../../Compilation/compilation_result.h"
+#include "../../Context/Constants/integer_constant.h"
 
 #include "../../Global/BuiltIn/built_in_cast.h"
 #include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_constant.h"
 #include "../../Global/BuiltIn/built_in_operation.h"
 
 using namespace std;
@@ -24,6 +25,7 @@ using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -67,8 +69,8 @@ namespace Analysis::Structure::Wrappers
 
     void Long::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Max", &Instance(), true, "ldc.i8 9223372036854775807", false, "");
-        characteristics["Min"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i8 -9223372036854775807", false, "");
+        characteristics["Max"] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, &Instance(), new LongConstant(9223372036854775807));
+        characteristics["Min"] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, &Instance(), new LongConstant(-9223372036854775807));
 
         tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Int64::TryParse(string, int64&)");
         tryParse->PushParameterType(&String::Instance());
@@ -210,7 +212,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Long::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Long::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Long::FindIndexer(const std::vector<const IDataType*>& argumentList) const

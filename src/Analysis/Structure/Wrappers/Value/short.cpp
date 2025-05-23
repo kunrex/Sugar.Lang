@@ -68,8 +68,8 @@ namespace Analysis::Structure::Wrappers
 
     void Short::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInConstant(Describer::Public | Describer::Constexpr, "Max", &Instance(), new ShortConstant(32767));
-        characteristics["Min"] = new BuiltInConstant(Describer::Public | Describer::Constexpr, "Min", &Instance(), true, "ldc.i2 -32767", false, "");
+        characteristics["Max"] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, &Instance(), new ShortConstant(32767));
+        characteristics["Min"] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, &Instance(), new ShortConstant(-32767));
 
         tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Int16::TryParse(string, int16&)");
         tryParse->PushParameterType(&String::Instance());

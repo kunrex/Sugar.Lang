@@ -42,7 +42,7 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Exception::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Exception::FindConstructor(const bool isStatic, const std::vector<const IDataType*>& argumentList) const
+    const IFunction* Exception::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
     }

@@ -51,10 +51,10 @@ namespace Analysis::Structure::Wrappers
     void Nullable::BindGlobal()
     {
         const auto isNull = std::format("call instance bool valuetype {}::get_HasValue()", genericSignature);
-        characteristics["IsNull"] = new BuiltInProperty(Describer::Public, "IsNull", &Boolean::Instance(), true, isNull, false, "");
+        characteristics["IsNull"] = new BuiltInProperty("IsNull"", Describer::Public, &Boolean::Instance(), true, isNull, false, "");
 
         const auto value = std::format("call instance !0 valuetype {}::get_Value()", genericSignature);
-        characteristics["Value"] = new BuiltInProperty(Describer::Public, "Value", nullableType, true, value, false, "");
+        characteristics["Value"] = new BuiltInProperty("Value", Describer::Public, nullableType, true, value, false, "");
 
         const auto constructor = new BuiltInConstructor(this, std::format("call instance void valuetype {}::.ctor(!0)", genericSignature));
         constructor->PushParameterType(nullableType);

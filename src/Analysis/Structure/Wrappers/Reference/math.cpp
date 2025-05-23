@@ -1,12 +1,13 @@
 #include "./math.h"
 
+#include "../../Context/Constants/float_constant.h"
 #include "../../DataTypes/data_type_extensions.h"
 
 #include "../Value/double.h"
 #include "../Value/integer.h"
 
 #include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/BuiltIn/built_in_constant.h"
 
 using namespace std;
 
@@ -14,6 +15,7 @@ using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -34,8 +36,8 @@ namespace Analysis::Structure::Wrappers
 
     void Math::BindGlobal()
     {
-        characteristics["PI"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "PI", &Double::Instance(), true, "ldc.r8 3.14159265358979", false, "");
-        characteristics["E"] = new BuiltInProperty(Describer::Public | Describer::Constexpr, "E", &Double::Instance(), true, "ldc.r8 2.71828182845904", false, "");
+        characteristics["PI"] = new BuiltInConstant("PI", Describer::Public | Describer::Constexpr, &Double::Instance(), new DoubleConstant(M_PI));
+        characteristics["E"] = new BuiltInConstant("E", Describer::Public | Describer::Constexpr, &Double::Instance(), new DoubleConstant(M_E));
 
         const auto abs = new BuiltInMethod("Abs", Describer::PublicStatic, &Double::Instance(), "call float64 class [System.Runtime]System.Math::Abs(float64)");
         abs->PushParameterType(&Double::Instance());
