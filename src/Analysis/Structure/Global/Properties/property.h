@@ -34,6 +34,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& SignatureSetString() const override;
 
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
     };
 }
 
