@@ -314,30 +314,53 @@ print(a); //prints 10
 References will inherit functions, fields and indexers defined by their base class. They do not however inherit any operator or cast overloads, to use them `copy` must be called to explicitly dereference and create a value.
 
 ## Properties
-Sugar lets you customise member fields using properties. A rather basic implementation:
+Properties in Sugar are a simpler version of their counterpart in C#. They serve to simplify code patterns.
+
+##### Auto Implemented Properties
+
 ```cs
 [public] int: x { get; [private] set; }
 ```
-- A public get, private set property. It can be accessed anywhere but changed only in the implementation of the structure it's defined in
+
+This declares a public getter and private setter for a compiler generated backing field. These properties may be inline initialised too.
+
 ```cs
-[private] int: x { [public] get; [public] set; }  // a private get set property
+[public] int: code { get; [private] set; } = 200;
 ```
-- In case of conflicts like above, the describer on the field definition is given preference.
+
+##### Accessor Bodies
+
+The accessors may optionally define bodies. 
+
 ```cs
-list<int> values = create list<int>();
-[public] int: Count { get { return values.Count; } }
+int: Property 
+{ 
+    get 
+    {
+        //custom definition
+    } 
+    set
+    {
+        //custom definition
+    }   
+}
 ```
-- Accessors can define bodies. the `set` accessor implicitly define the `value` parameter to represent the value assigned.
-#### Special Cases
-The absence of a body in get only and set only properties can lead to special cases.
+
+In these cases no backing field is generated and all accessors must define a body if any of them does.
+
+If a property defines only one accessor, it's expected to define a body since no backing field is generated.
+
 ```cs
-[public] int: x { get; }
+int: GetOnlyProperty 
+{ 
+    get 
+    {
+        //custom definition
+    } 
+}
 ```
-- Creates a runtime constant that can only be initialised.
-```cs
-[public] int: x { set; }
-```
-- A set only property. This is essentially the same thing as a function.
+
+Properties may be `static`. They cannot be `const` or `constexpr`.
 
 ## Special Functions
 Sugar features functions for cast overloading, operator overloading, indexers and constructors.
