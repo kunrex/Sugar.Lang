@@ -265,8 +265,10 @@ Describers can contain the following keywords:
 4. `const`: A runtime constant.
 5. `constexpr`: A compile time constant.
 
-
 6. `ref`: Allows reference like behaviour with structs.
+
+
+7. `entrypoint`: Defines the entrypoint for execution.
 
 ### `const` and `constexpr`
 
@@ -424,6 +426,24 @@ let: x = create Class(param1, param2);
 ```
 Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 
+## The Entry Point, Executables vs Libraries
+
+Here's how `Hello World` looks in Sugar:
+
+```cs
+class MyFirstProgram
+{
+    [entrypoint]
+    void HelloWorld() 
+    {
+        print("Hello World");
+    }
+}
+```
+
+`entrypoint` in the describer defines that execution will begin from the `HelloWorld` function. By default, this function is also public and static. Naturally only one function can contain this describer. 
+
+When an entrypoint is defined, the compiler generates an executable (.exe). If no entrypoint is provided, the compiler instead produces a class library (.dll). A class library contains usable structures such as classes and functions, but it does not define a standalone path of execution.
 ## Questions ?!
 So yes there a few things here. No try-catch-finally blocks, no switch statements, no generics and no destructors.
 
