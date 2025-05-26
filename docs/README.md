@@ -4,9 +4,11 @@
 
 # Sugar.Lang
 
-Sugar is a compiled (transpiled) programming language I started working on a couple of years back. It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
+Sugar is a compiled (transpiled) programming language I started working on a couple of years back. I lost inspiration in between and its been in active development (or my closest version of that) for 4 months. 
 
-I aimed to create something simple but useful. Syntactically, sugar inspired by C# but a sweeter version maybe? Personally, I think C# is a wonderful language and while sugar doesn't come close to it in regard of features, I've tried my best at implementing those aspects which I think are fundamental.
+It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
+
+I aimed to create something simple but useful. Sugar inspired by C#, C++, and Python mainly but C# gets most of the credit. Personally, I think C# is a wonderful language and while sugar doesn't come close to it in regard of features, I've tried my best at implementing those aspects which I think are fundamental.
 
 ## The Basics
 
