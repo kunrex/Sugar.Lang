@@ -1,8 +1,13 @@
 #include "src/compiler.h"
 
-int main()
+#include <string>
+#include <filesystem>
+
+namespace  fs = std::filesystem;
+
+int main(std::string args[])
 {
-    const auto source = "/Users/kunalkashyap/Projects/C++/Sugar/Sugar.Lang/tests";
+    const auto source = args->empty() ? std::string(fs::current_path()) : args[0];
 
     const auto compiler = Compiler(source);
     compiler.Compile();
