@@ -1057,16 +1057,16 @@ namespace Analysis::Creation::Binding
 
     void TryDeclareStaticConstructor(IUserDefinedType* const dataType)
     {
-        if (dataType->InstanceConstructor() != nullptr)
+        if (dataType->StaticConstructor() != nullptr)
             return;
 
         const auto constructor = new StaticImplicitConstructor(dataType);
         dataType->PushConstructor(constructor);
     }
 
-    void TryDeclareDefaultConstructor(IUserDefinedType* const dataType)
+    void TryDeclareInstanceConstructor(IUserDefinedType* const dataType)
     {
-        if (dataType->StaticConstructor() != nullptr)
+        if (dataType->InstanceConstructor() != nullptr)
             return;
 
         const auto constructor = new ImplicitConstructor(Describer::Public, dataType);

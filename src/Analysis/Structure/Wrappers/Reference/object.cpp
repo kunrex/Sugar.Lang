@@ -17,17 +17,24 @@ const string cil_object = "[System.Runtime]System.Object";
 namespace Analysis::Structure::Wrappers
 {
     Object::Object() : BuiltInClass(cil_object, Describer::Public), toString(nullptr)
+    { }
+
+    Object Object::instance;
+
+    const Object* Object::Instance() { return &instance; }
+
+    void Object::BindGlobalInstance()
     {
-        BindGlobal();
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     TypeKind Object::Type() const { return TypeKind::Void; }
-
-    const Object* Object::Instance()
-    {
-        static const Object instance;
-        return &instance;
-    }
 
     void Object::BindGlobal()
     {

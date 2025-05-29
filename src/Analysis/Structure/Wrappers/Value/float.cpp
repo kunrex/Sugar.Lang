@@ -46,16 +46,22 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-
     Float::Float() : BuiltInValueType(cil_float, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Float* Float::Instance()
+    Float Float::instance;
+
+    const Float* Float::Instance() { return &instance; }
+
+    void Float::BindGlobalInstance()
     {
-        static const Float instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     int Float::SlotCount() const { return 1; }
@@ -92,7 +98,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitDouble = new BuiltInCast(Double::Instance(), "conv.r8", DoubleCast<float>);
         implicitDouble->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
-        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
+        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), new BuiltInCast(*implicitDouble));
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Single::ToString()", StringCast<float>);
         explicitString->PushParameterType(this);

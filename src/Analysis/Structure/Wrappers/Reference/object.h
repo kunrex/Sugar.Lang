@@ -11,12 +11,15 @@ namespace Analysis::Structure::Wrappers
     class Object final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
+            static Object instance;
+
             Global::BuiltInCast* toString;
 
             Object();
 
         public:
             static const Object* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;
 

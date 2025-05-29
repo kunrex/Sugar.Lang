@@ -31,19 +31,26 @@ const string cil_character = "[System.Runtime]System.Char";
 namespace Analysis::Structure::Wrappers
 {
     Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), functions(), implicitCasts(), explicitCasts(), overloads()
+    { }
+
+    Character Character::instance;
+
+    const Character* Character::Instance() { return &instance; }
+
+    void Character::BindGlobalInstance()
     {
-        BindGlobal();
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     int Character::SlotCount() const { return 1; }
 
     TypeKind Character::Type() const { return TypeKind::Character; }
-
-    const Character* Character::Instance()
-    {
-        static const Character instance;
-        return &instance;
-    }
 
     void Character::BindGlobal()
     {
@@ -79,20 +86,20 @@ namespace Analysis::Structure::Wrappers
         const auto implicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<char>);
         implicitInteger->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInteger);
-        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInteger);
+        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), new BuiltInCast(*implicitInteger));
 
         const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<char>);
-        explicitShort->PushParameterType(Instance());
+        explicitShort->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash({ Short::Instance(), this }), explicitShort);
 
         const auto explicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<char>);
-        explicitLong->PushParameterType(Instance());
+        explicitLong->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), explicitLong);
 
         const auto implicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()", StringCast<char>);
         implicitString->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), implicitString);
-        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), implicitString);
+        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), new BuiltInCast(*implicitString));
 
         const auto equals = new BuiltInOperation(SyntaxKind::Equals, this, "ceq", Equals<char>);
         equals->PushParameterType(this);

@@ -10,10 +10,13 @@ namespace Analysis::Structure::Wrappers
     class Void final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
+            static Void instance;
+
             Void();
 
         public:
             static const Void* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

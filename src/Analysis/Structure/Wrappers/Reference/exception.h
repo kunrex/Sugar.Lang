@@ -11,12 +11,15 @@ namespace Analysis::Structure::Wrappers
     class Exception final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
+            static Exception instance;
+
             Global::BuiltInConstructor* constructor;
 
             Exception();
 
         public:
             static const Exception* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 

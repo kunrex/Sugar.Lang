@@ -11,6 +11,21 @@ namespace Analysis::Structure::Wrappers
     Void::Void() : BuiltInClass("void", Enums::Describer::Public)
     { }
 
+    Void Void::instance;
+
+    const Void* Void::Instance() { return &instance; }
+
+    void Void::BindGlobalInstance()
+    {
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
+    }
+
     int Void::SlotCount() const { return 0; }
 
     TypeKind Void::Type() const { return TypeKind::Void; }
@@ -20,12 +35,6 @@ namespace Analysis::Structure::Wrappers
 
     void Void::BindGlobal()
     { }
-
-    const Void* Void::Instance()
-    {
-        static const Void instance;
-        return &instance;
-    }
 
     const ICharacteristic* Void::FindCharacteristic(const string& name) const
     { return nullptr; }

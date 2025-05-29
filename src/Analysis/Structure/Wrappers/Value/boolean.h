@@ -16,6 +16,8 @@ namespace Analysis::Structure::Wrappers
     class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Boolean instance;
+
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
 
@@ -25,6 +27,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Boolean* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

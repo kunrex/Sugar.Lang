@@ -54,14 +54,21 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Short::Short() : BuiltInValueType(cil_short, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Short* Short::Instance()
+    Short Short::instance;
+
+    const Short* Short::Instance() { return &instance; }
+
+    void Short::BindGlobalInstance()
     {
-        static const Short instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     int Short::SlotCount() const { return 1; }
@@ -80,22 +87,22 @@ namespace Analysis::Structure::Wrappers
         const auto implicitInt = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<short>);
         implicitInt->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInt);
-        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInt);
+        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), new BuiltInCast(*implicitInt));
 
         const auto implicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<short>);
         implicitLong->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
-        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
+        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), new BuiltInCast(*implicitLong));
 
         const auto implicitFloat = new BuiltInCast(Float::Instance(), "conv.r4", FloatCast<short>);
         implicitFloat->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), implicitFloat);
-        explicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), implicitFloat);
+        explicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), new BuiltInCast(*implicitFloat));
 
         const auto implicitDouble = new BuiltInCast(Double::Instance(), "conv.r8", DoubleCast<short>);
         implicitDouble->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
-        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
+        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), new BuiltInCast(*implicitDouble));
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int16::ToString()", StringCast<short>);
         explicitString->PushParameterType(this);

@@ -18,6 +18,8 @@ namespace Analysis::Structure::Wrappers
     class Double final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Double instance;
+
             Global::BuiltInMethod* tryParse;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
@@ -28,6 +30,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Double* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

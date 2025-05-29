@@ -121,22 +121,17 @@ namespace Analysis::Structure::DataTypes
     {
         if (constructor->CheckDescriber(Describer::Static))
             constructors.insert(constructors.begin(), { ArgumentHash(constructor), constructor });
-        else if (constructor->ParameterCount() == 0)
-            constructors.insert(constructors.begin() + 1, { ArgumentHash(constructor), constructor });
         else
             constructors.emplace_back(ArgumentHash(constructor), constructor);
     }
 
     const IConstructor* StructSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
-        if (argumentList.empty())
-            return std::get<1>(constructors[1]);
-
         const auto hash= ArgumentHash(argumentList);
-        for (auto i = 2; i < constructors.size(); i++)
+        for (int i = StaticConstructor() != nullptr; i < constructors.size(); i++)
         {
-            if (std::get<0>(constructors[i]) == hash)
-                return std::get<1>(constructors[i]);
+            if (const auto current = constructors[i]; std::get<0>(current) == hash)
+                return std::get<1>(current);
         }
 
         return nullptr;
@@ -144,14 +139,22 @@ namespace Analysis::Structure::DataTypes
 
     IConstructor* StructSource::StaticConstructor() const
     {
+        if (constructors.empty())
+            return nullptr;
+
         const auto constructor = std::get<1>(constructors[0]);
         return constructor->CheckDescriber(Describer::Static) ? constructor : nullptr;
     }
 
     IConstructor* StructSource::InstanceConstructor() const
     {
-        const auto constructor = std::get<1>(constructors[0]);
-        return !constructor->ParameterCount() ? constructor : nullptr;
+        for (int i = StaticConstructor() != nullptr; i < constructors.size(); i++)
+        {
+            if (const auto current = std::get<1>(constructors[i]); !current->ParameterCount())
+                return current;
+        }
+
+        return nullptr;
     }
 
     void StructSource::PushIndexer(IIndexerDefinition* const indexer)
@@ -265,7 +268,7 @@ namespace Analysis::Structure::DataTypes
             return;
 
         TryDeclareExplicitString(this);
-        TryDeclareDefaultConstructor(this);
+        TryDeclareInstanceConstructor(this);
     }
 
     void StructSource::BindLocal()

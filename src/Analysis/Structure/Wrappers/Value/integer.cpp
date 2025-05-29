@@ -54,16 +54,22 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Integer* Integer::Instance()
-    {
-        static const Integer instance;
-        return &instance;
-    }
+    Integer Integer::instance;
 
+    const Integer* Integer::Instance() { return &instance; }
+
+    void Integer::BindGlobalInstance()
+    {
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
+    }
 
     int Integer::SlotCount() const { return 1; }
 
@@ -85,7 +91,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<int>);
         implicitLong->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
-        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
+        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), new BuiltInCast(*implicitLong));
 
         const auto explicitFloat = new BuiltInCast(Float::Instance(), "conv.r4", FloatCast<int>);
         explicitFloat->PushParameterType(this);
@@ -94,7 +100,7 @@ namespace Analysis::Structure::Wrappers
         const auto implicitDouble = new BuiltInCast(Double::Instance(), "conv.r8", DoubleCast<int>);
         implicitDouble->PushParameterType(this);
         implicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
-        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this}), implicitDouble);
+        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this}), new BuiltInCast(*implicitDouble));
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int32::ToString()", StringCast<int>);
         explicitString->PushParameterType(this);

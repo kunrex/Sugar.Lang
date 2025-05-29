@@ -20,14 +20,21 @@ const string cil_exception = "[System.Runtime]System.Exception";
 namespace Analysis::Structure::Wrappers
 {
     Exception::Exception() : BuiltInClass(cil_exception, Describer::Public), SingletonService(), constructor(nullptr)
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Exception* Exception::Instance()
+    Exception Exception::instance;
+
+    const Exception* Exception::Instance() { return &instance; }
+
+    void Exception::BindGlobalInstance()
     {
-        static const Exception instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     TypeKind Exception::Type() const { return TypeKind::Exception; }

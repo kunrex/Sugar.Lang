@@ -17,6 +17,8 @@ namespace Analysis::Structure::Wrappers
     class Float final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Float instance;
+
             Global::BuiltInMethod* tryParse;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
@@ -28,6 +30,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Float* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

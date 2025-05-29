@@ -16,6 +16,8 @@ namespace Analysis::Structure::Wrappers
     class String final : public DataTypes::BuiltInClass, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static String instance;
+
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
@@ -28,6 +30,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const String* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 

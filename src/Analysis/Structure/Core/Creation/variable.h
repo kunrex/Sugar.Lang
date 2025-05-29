@@ -8,7 +8,7 @@
 
 namespace Analysis::Structure::Core
 {
-    class Variable : public Nameable, public Describable, public Created, public virtual Interfaces::IVariable
+    class Variable : public Nameable, public Describable, public Created, public Services::Printable, public virtual Interfaces::IVariable
     {
         protected:
             Variable(const std::string& name, Enums::Describer describer, const Interfaces::IDataType* creationType);

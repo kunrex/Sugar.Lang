@@ -50,14 +50,21 @@ namespace Analysis::Structure::Wrappers
     }
 
     String::String() : BuiltInClass(cil_string, Describer::Public), SingletonService(), characteristics(), functions(), indexer(nullptr), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const String* String::Instance()
+    String String::instance;
+
+    const String* String::Instance() { return &instance; }
+
+    void String::BindGlobalInstance()
     {
-        static const String instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     TypeKind String::Type() const { return TypeKind::String; }

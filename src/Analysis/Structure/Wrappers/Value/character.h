@@ -16,6 +16,8 @@ namespace Analysis::Structure::Wrappers
     class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Character instance;
+
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
@@ -27,6 +29,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Character* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

@@ -54,16 +54,22 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Long::Long() : BuiltInValueType(cil_long, Describer::Public), SingletonService(), tryParse(nullptr), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Long* Long::Instance()
-    {
-        static const Long instance;
-        return &instance;
-    }
+    Long Long::instance;
 
+    const Long* Long::Instance() { return &instance; }
+
+    void Long::BindGlobalInstance()
+    {
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
+    }
 
     int Long::SlotCount() const { return 2; }
 

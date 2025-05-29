@@ -8,7 +8,7 @@
 
 namespace Analysis::Structure::Creation
 {
-    class IndexerDefinition : public Core::Describable, public Core::Created, public virtual Core::Interfaces::IIndexerDefinition
+    class IndexerDefinition : public Core::Describable, public Core::Created, public Services::Printable, public virtual Core::Interfaces::IIndexerDefinition
     {
         protected:
             IndexerDefinition(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);

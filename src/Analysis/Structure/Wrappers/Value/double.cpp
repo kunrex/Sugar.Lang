@@ -47,14 +47,21 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Double::Double() : BuiltInValueType(cil_double, Describer::Public), SingletonService(), tryParse(nullptr), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Double* Double::Instance()
+    Double Double::instance;
+
+    const Double* Double::Instance() { return &instance; }
+
+    void Double::BindGlobalInstance()
     {
-        static const Double instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     int Double::SlotCount() const { return 2; }
@@ -94,7 +101,7 @@ namespace Analysis::Structure::Wrappers
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()", StringCast<double>);
         explicitString->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitShort);
+        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitString);
 
         const auto equals = new BuiltInOperation(SyntaxKind::Equals, Boolean::Instance(), "ceq", Equals<double>);
         equals->PushParameterType(this);

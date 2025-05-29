@@ -17,6 +17,8 @@ namespace Analysis::Structure::Wrappers
     class Integer final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Integer instance;
+
             Global::BuiltInMethod* tryParse;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
@@ -28,6 +30,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Integer* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

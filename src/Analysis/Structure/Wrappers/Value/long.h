@@ -17,6 +17,8 @@ namespace Analysis::Structure::Wrappers
     class Long final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
+            static Long instance;
+
             Global::BuiltInMethod* tryParse;
 
             std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
@@ -27,6 +29,7 @@ namespace Analysis::Structure::Wrappers
 
         public:
             static const Long* Instance();
+            static void BindGlobalInstance();
 
             [[nodiscard]] int SlotCount() const override;
 

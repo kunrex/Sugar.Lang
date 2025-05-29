@@ -22,6 +22,9 @@
 #include "Analysis/Creation/Transpiling/cil_transpiler.h"
 #include "Analysis/Structure/Global/Functions/void_function.h"
 #include "Analysis/Structure/Wrappers/Generic/array.h"
+#include "Analysis/Structure/Wrappers/Reference/exception.h"
+#include "Analysis/Structure/Wrappers/Reference/math.h"
+#include "Analysis/Structure/Wrappers/Reference/object.h"
 
 #include "Analysis/Structure/Wrappers/Value/short.h"
 #include "Analysis/Structure/Wrappers/Value/integer.h"
@@ -31,6 +34,7 @@
 #include "Analysis/Structure/Wrappers/Value/boolean.h"
 #include "Analysis/Structure/Wrappers/Value/character.h"
 #include "Analysis/Structure/Wrappers/Reference/string.h"
+#include "Analysis/Structure/Wrappers/Reference/void.h"
 #include "Exceptions/Compilation/transpile_file_exception.h"
 
 using namespace std;
@@ -159,21 +163,10 @@ void Compiler::Compile() const
     Lexer::Instance();
     Parser::Instance();
 
-    Short::Instance();
-    Integer::Instance();
-    Long::Instance();
-    Float::Instance();
-    Double::Instance();
-    Boolean::Instance();
-    Character::Instance();
-    String::Instance();
-
     std::vector<void(SourceObject::*)()> steps;
     steps.push_back(&SourceObject::LexParse);
     steps.push_back(&SourceObject::InitDataTypes);
     steps.push_back(&SourceObject::ManageImports);
-    //steps.push_back(&SourceObject::BindGlobal);
-    //steps.push_back(&SourceObject::BindLocal);
 
     try
     {
@@ -187,6 +180,33 @@ void Compiler::Compile() const
                 return;
             }
         }
+
+        Short::BindGlobalInstance();
+        Integer::BindGlobalInstance();
+        Long::BindGlobalInstance();
+        Float::BindGlobalInstance();
+        Double::BindGlobalInstance();
+        Boolean::BindGlobalInstance();
+        Character::BindGlobalInstance();
+        String::BindGlobalInstance();
+        Exception::BindGlobalInstance();
+        Void::BindGlobalInstance();
+        Object::BindGlobalInstance();
+        Math::BindGlobalInstance();
+
+        source->BindGlobal();
+        if (ExceptionManager::Instance().LogAllExceptions())
+        {
+            delete source;
+            return;
+        }
+
+        /*source->BindLocal();
+        if (ExceptionManager::Instance().LogAllExceptions())
+        {
+            delete source;
+            return;
+        }*/
 
         source->Print("", true);
 

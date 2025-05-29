@@ -35,14 +35,21 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Boolean::Boolean() : BuiltInValueType(cil_boolean, Enums::Describer::Public), SingletonService(), implicitCasts(), explicitCasts(), overloads()
-    {
-        BindGlobal();
-    }
+    { }
 
-    const Boolean* Boolean::Instance()
+    Boolean Boolean::instance;
+
+    const Boolean* Boolean::Instance() { return &instance; }
+
+    void Boolean::BindGlobalInstance()
     {
-        static const Boolean instance;
-        return &instance;
+        static bool bound;
+
+        if (!bound)
+        {
+            instance.BindGlobal();
+            bound = true;
+        }
     }
 
     int Boolean::SlotCount() const { return 1; }
@@ -57,15 +64,15 @@ namespace Analysis::Structure::Wrappers
 
         const auto explicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<bool>);
         explicitInteger->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), explicitShort);
+        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), explicitInteger);
 
         const auto explicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<bool>);
         explicitLong->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), explicitShort);
+        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), explicitLong);
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Boolean::ToString()", StringCast<bool>);
         explicitString->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitShort);
+        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitString);
 
         const auto equals = new BuiltInOperation(SyntaxKind::Equals, this, "ceq", Equals<bool>);
         equals->PushParameterType(this);

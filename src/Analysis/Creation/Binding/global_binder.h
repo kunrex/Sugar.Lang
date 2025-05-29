@@ -29,7 +29,7 @@ namespace Analysis::Creation::Binding
 
     void TryDeclareExplicitString(Structure::Core::Interfaces::IUserDefinedType* dataType);
     void TryDeclareStaticConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
-    void TryDeclareDefaultConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
+    void TryDeclareInstanceConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
 }
 
 #endif
