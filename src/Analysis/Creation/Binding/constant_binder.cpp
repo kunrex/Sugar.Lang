@@ -97,12 +97,17 @@ namespace Analysis::Creation::Binding
                         return AsCompilationResult(characteristic);
 
                     if (characteristic->HasDependant(constant))
+                        return std::nullopt;
+
+                    if (constant->HasDependant(characteristic))
                     {
                         PushException(new LogException(std::format("Cyclic dependency between: {} and: {}", constant->FullName(), characteristic->FullName()), identifierNode->Token().Index(), dataType->Parent()));
                         constant->IncrementDependencyCount();
+
+                        return std::nullopt;
                     }
-                    else
-                         characteristic->PushDependant(constant);
+
+                    characteristic->PushDependant(constant);
                 }
                 break;
             default:
