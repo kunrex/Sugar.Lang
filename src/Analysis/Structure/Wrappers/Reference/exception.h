@@ -16,7 +16,7 @@ namespace Analysis::Structure::Wrappers
             Exception();
 
         public:
-            static const Exception& Instance();
+            static const Exception* Instance();
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 

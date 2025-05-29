@@ -11,7 +11,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    Branch::Branch(const string& name) : ContextNode(&Object::Instance()), cilInstruction(std::format("br {}", name))
+    Branch::Branch(const string& name) : ContextNode(Object::Instance()), cilInstruction(std::format("br {}", name))
     { }
 
     MemberType Branch::MemberType() const { return MemberType::BranchJump; }

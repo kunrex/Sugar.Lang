@@ -54,7 +54,9 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Long::Long() : BuiltInValueType(cil_long, Describer::Public), SingletonService(), tryParse(nullptr), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Long* Long::Instance()
     {

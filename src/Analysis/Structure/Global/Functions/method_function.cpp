@@ -100,7 +100,7 @@ namespace Analysis::Structure::Global
 
         builder.PushLine(".maxstack 1");
         builder.PushLine(load_this);
-        builder.PushLine(std::format("ld{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType()->FullName(), parent->FindCharacteristic(name)->FullName()));
+        builder.PushLine(std::format("ld{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(name)->FullName()));
         builder.PushLine("ret");
 
         builder.DecreaseIndent();

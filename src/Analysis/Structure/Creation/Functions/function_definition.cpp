@@ -4,10 +4,13 @@
 
 #include "../../Global/Functions/function_extensions.h"
 
+#include "../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Creation
@@ -17,8 +20,8 @@ namespace Analysis::Structure::Creation
 
     const std::string& FunctionDefinition::Signature() const
     {
-        if (signature.empty() && parent != nullptr)
-            signature = std::format("{} {}::{}{}", creationType->FullName(), parent->FullName(), name, ParameterString(this));
+        if (signature.empty())
+            signature = std::format("{} {}{}", creationType->FullName(), name, ParameterString(this));
 
         return signature;
     }

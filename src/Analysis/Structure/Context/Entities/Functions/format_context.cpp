@@ -13,7 +13,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    FormatContext::FormatContext() : DynamicContextCollection(&String::Instance()), slotCount(-1)
+    FormatContext::FormatContext() : DynamicContextCollection(String::Instance()), slotCount(-1)
     { }
 
     int FormatContext::SlotCount() const
@@ -31,7 +31,7 @@ namespace Analysis::Structure::Context
 
     string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
 
-    FormatSingleContext::FormatSingleContext(const IContextNode* const operand) : UnaryContextNode(&String::Instance(), operand), slotCount(std::max(String::Instance().SlotCount(), operand->SlotCount()))
+    FormatSingleContext::FormatSingleContext(const IContextNode* const operand) : UnaryContextNode(String::Instance(), operand), slotCount(std::max(String::Instance()->SlotCount(), operand->SlotCount()))
     { }
 
     int FormatSingleContext::SlotCount() const { return slotCount; }
@@ -43,7 +43,7 @@ namespace Analysis::Structure::Context
 
     string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
 
-    FormatDoubleContext::FormatDoubleContext(const IContextNode* const arg1, const IContextNode* const arg2) : BinaryContextNode(&String::Instance(), arg1, arg2), slotCount(-1)
+    FormatDoubleContext::FormatDoubleContext(const IContextNode* const arg1, const IContextNode* const arg2) : BinaryContextNode(String::Instance(), arg1, arg2), slotCount(-1)
     { }
 
     int FormatDoubleContext::SlotCount() const

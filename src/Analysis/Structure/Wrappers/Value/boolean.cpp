@@ -35,7 +35,9 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Boolean::Boolean() : BuiltInValueType(cil_boolean, Enums::Describer::Public), SingletonService(), implicitCasts(), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Boolean* Boolean::Instance()
     {

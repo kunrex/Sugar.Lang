@@ -7,7 +7,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    InvalidContext::InvalidContext() : ContextNode(&Object::Instance())
+    InvalidContext::InvalidContext() : ContextNode(Object::Instance())
     { }
 
     MemberType InvalidContext::MemberType() const { return MemberType::Invalid; }

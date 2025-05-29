@@ -15,7 +15,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    ShortConstant::ShortConstant(const short value) : ContextNode(&Short::Instance()), value(value)
+    ShortConstant::ShortConstant(const short value) : ContextNode(Short::Instance()), value(value)
     { }
 
     MemberType ShortConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -28,7 +28,7 @@ namespace Analysis::Structure::Context
     uintptr_t ShortConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string ShortConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
-    IntegerConstant::IntegerConstant(const int value) : ContextNode(&Integer::Instance()), value(value)
+    IntegerConstant::IntegerConstant(const int value) : ContextNode(Integer::Instance()), value(value)
     { }
 
     MemberType IntegerConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -41,7 +41,7 @@ namespace Analysis::Structure::Context
     uintptr_t IntegerConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string IntegerConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
-    LongConstant::LongConstant(const long value) : ContextNode(&Long::Instance()), value(value)
+    LongConstant::LongConstant(const long value) : ContextNode(Long::Instance()), value(value)
     { }
 
     MemberType LongConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -54,7 +54,7 @@ namespace Analysis::Structure::Context
     uintptr_t LongConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string LongConstant::CILData() const { return std::format("ldc.i8 {}", value); }
 
-    CharacterConstant::CharacterConstant(const char value) : ContextNode(&Character::Instance()), value(value)
+    CharacterConstant::CharacterConstant(const char value) : ContextNode(Character::Instance()), value(value)
     { }
 
     MemberType CharacterConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -67,7 +67,7 @@ namespace Analysis::Structure::Context
     uintptr_t CharacterConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string CharacterConstant::CILData() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
 
-    BoolConstant::BoolConstant(const bool value) : ContextNode(&Boolean::Instance()), value(value)
+    BoolConstant::BoolConstant(const bool value) : ContextNode(Boolean::Instance()), value(value)
     { }
 
     uintptr_t BoolConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }

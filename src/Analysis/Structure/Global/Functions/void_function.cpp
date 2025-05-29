@@ -70,6 +70,8 @@ namespace Analysis::Structure::Global
     Entrypoint::Entrypoint(const std::string& name, const Enums::Describer describer, const IParseNode* const body) : VoidFunction(name, describer, body)
     { }
 
+    Entrypoint* Entrypoint::instance = nullptr;
+
     const Entrypoint* Entrypoint::Instance() { return instance; }
 
     Entrypoint* Entrypoint::InitInstance(const std::string& name, const Enums::Describer describer, const IParseNode* const body)
@@ -133,7 +135,7 @@ namespace Analysis::Structure::Global
     void GeneratedSetFunction::Transpile(StringBuilder& builder) const
     {
         builder.PushLine("");
-        builder.PushLine(std::format(".method {} final {} void {}({} value) cil managed", AccessModifierString(this), StaticModifierString(this), name, creationType()->FullName()));
+        builder.PushLine(std::format(".method {} final {} void {}({} value) cil managed", AccessModifierString(this), StaticModifierString(this), name, creationType->FullName()));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
@@ -141,7 +143,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(".maxstack 2");
         builder.PushLine(load_this);
         builder.PushLine("ldarg.1");
-        builder.PushLine(std::format("st{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType()->FullName(), parent->FindCharacteristic(name)->FullName()));
+        builder.PushLine(std::format("st{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(name)->FullName()));
         builder.PushLine("ret");
 
         builder.DecreaseIndent();

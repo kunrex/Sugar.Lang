@@ -63,27 +63,27 @@ namespace Analysis::Creation::Binding
         switch (node->Token().Kind())
         {
             case SyntaxKind::Short:
-                return &Short::Instance();
+                return Short::Instance();
             case SyntaxKind::Int:
-                return &Integer::Instance();
+                return Integer::Instance();
             case SyntaxKind::Long:
-                return &Long::Instance();
+                return Long::Instance();
             case SyntaxKind::Float:
-                return &Float::Instance();
+                return Float::Instance();
             case SyntaxKind::Double:
-                return &Double::Instance();
+                return Double::Instance();
             case SyntaxKind::String:
-                return &String::Instance();
+                return String::Instance();
             case SyntaxKind::Character:
-                return &Character::Instance();
+                return Character::Instance();
             case SyntaxKind::Boolean:
-                return &Boolean::Instance();
+                return Boolean::Instance();
             case SyntaxKind::Exception:
-                return &Exception::Instance();
+                return Exception::Instance();
             case SyntaxKind::Math:
-                return &Math::Instance();
+                return Math::Instance();
             default:
-                return &Object::Instance();
+                return Object::Instance();
         }
     }
 
@@ -170,6 +170,6 @@ namespace Analysis::Creation::Binding
         }
 
         ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Token().Index(), source));
-        return &Object::Instance();
+        return Object::Instance();
     }
 }

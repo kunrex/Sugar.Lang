@@ -1,7 +1,6 @@
 #ifndef BUILT_IN_FUNCTIONS_H
 #define BUILT_IN_FUNCTIONS_H
 
-
 #include "../../Compilation/compilation_result.h"
 
 using namespace Analysis::Structure::Compilation;

@@ -48,7 +48,9 @@ namespace Analysis::Structure::Wrappers
 {
 
     Float::Float() : BuiltInValueType(cil_float, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Float* Float::Instance()
     {

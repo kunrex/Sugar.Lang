@@ -42,13 +42,13 @@ namespace Analysis::Structure::Wrappers
         if (map.contains(hash))
             return map.at(hash);
 
-        const auto action = new Dictionary(keyType, valueType);
-        action->genericSignature = std::format("{}`{}<{}>", cil_dictionary, types.size(), MapGenericSignature(types));
+        const auto dictionary = new Dictionary(keyType, valueType);
+        dictionary->genericSignature = std::format("{}`{}<{}>", cil_dictionary, types.size(), MapGenericSignature(types));
 
-        action->BindGlobal();
+        dictionary->BindGlobal();
 
-        map[hash] = action;
-        return action;
+        map[hash] = dictionary;
+        return dictionary;
     }
 
     TypeKind Dictionary::Type() const { return TypeKind::Dictionary; }

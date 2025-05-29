@@ -5,11 +5,11 @@
 
 namespace fs = std::filesystem;
 
-int main(std::string args[])
+int main(const int argc, char* argv[])
 {
-    const auto source = args->empty() ? std::string(fs::current_path()) : args[0];
+    const auto source = (argc > 1) ? std::string(argv[1]) : std::string(fs::current_path());
 
-    const auto compiler = Compiler(source);
+    const Compiler compiler(source);
     compiler.Compile();
 
     return 0;

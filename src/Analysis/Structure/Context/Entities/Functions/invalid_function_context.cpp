@@ -9,7 +9,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    InvalidFunctionContext::InvalidFunctionContext() : DynamicContextCollection(&Object::Instance())
+    InvalidFunctionContext::InvalidFunctionContext() : DynamicContextCollection(Object::Instance())
     { }
 
     MemberType InvalidFunctionContext::MemberType() const { return MemberType::Invalid; }

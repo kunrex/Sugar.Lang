@@ -21,10 +21,6 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] unsigned long ParameterCount() const override;
-
-            void BindLocal() override;
-
-            void Transpile(Services::StringBuilder& builder) const override;
     };
 
     class GetIndexer final : public Indexer

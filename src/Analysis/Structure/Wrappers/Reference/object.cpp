@@ -17,7 +17,9 @@ const string cil_object = "[System.Runtime]System.Object";
 namespace Analysis::Structure::Wrappers
 {
     Object::Object() : BuiltInClass(cil_object, Describer::Public), toString(nullptr)
-    { }
+    {
+        BindGlobal();
+    }
 
     TypeKind Object::Type() const { return TypeKind::Void; }
 

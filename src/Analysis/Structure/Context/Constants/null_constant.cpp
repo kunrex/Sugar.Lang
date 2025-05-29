@@ -9,7 +9,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    NullConstant::NullConstant() : ContextNode(&Object::Instance())
+    NullConstant::NullConstant() : ContextNode(Object::Instance())
     { }
 
     MemberType NullConstant::MemberType() const { return MemberType::ConstantContext; }

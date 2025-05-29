@@ -19,7 +19,7 @@ namespace Analysis::Structure::Wrappers
             Math();
 
         public:
-            static const Math& Instance();
+            static const Math* Instance();
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 

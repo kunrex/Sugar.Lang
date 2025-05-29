@@ -12,7 +12,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    FloatConstant::FloatConstant(const float value) : ContextNode(&Float::Instance()), value(value)
+    FloatConstant::FloatConstant(const float value) : ContextNode(Float::Instance()), value(value)
     { }
 
     MemberType FloatConstant::MemberType() const { return MemberType::ConstantContext; }
@@ -25,7 +25,7 @@ namespace Analysis::Structure::Context
     uintptr_t FloatConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string FloatConstant::CILData() const { return std::format("ldc.r4 {}", value); }
 
-    DoubleConstant::DoubleConstant(const double value) : ContextNode(&Double::Instance()), value(value)
+    DoubleConstant::DoubleConstant(const double value) : ContextNode(Double::Instance()), value(value)
     { }
 
     MemberType DoubleConstant::MemberType() const { return MemberType::ConstantContext; }

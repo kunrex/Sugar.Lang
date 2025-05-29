@@ -10,7 +10,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    Return::Return() : ContextNode(&Void::Instance())
+    Return::Return() : ContextNode(Void::Instance())
     { }
 
     Return::Return(const IDataType* const dataType) : ContextNode(dataType)

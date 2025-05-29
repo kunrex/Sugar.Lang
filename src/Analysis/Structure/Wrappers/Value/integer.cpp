@@ -54,7 +54,9 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Integer* Integer::Instance()
     {

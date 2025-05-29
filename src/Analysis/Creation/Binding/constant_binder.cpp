@@ -43,21 +43,21 @@ namespace Analysis::Creation::Binding
         switch (node->Token().Kind())
         {
             case SyntaxKind::Short:
-                return &Short::Instance();
+                return Short::Instance();
             case SyntaxKind::Int:
-                return &Integer::Instance();
+                return Integer::Instance();
             case SyntaxKind::Long:
-                return &Long::Instance();
+                return Long::Instance();
             case SyntaxKind::Float:
-                return &Float::Instance();
+                return Float::Instance();
             case SyntaxKind::Double:
-                return &Double::Instance();
+                return Double::Instance();
             case SyntaxKind::String:
-                return &String::Instance();
+                return String::Instance();
             case SyntaxKind::Character:
-                return &Character::Instance();
+                return Character::Instance();
             default:
-                return &Boolean::Instance();
+                return Boolean::Instance();
         }
     }
 
@@ -66,22 +66,22 @@ namespace Analysis::Creation::Binding
         switch (constant->CreationType()->Type())
         {
             case TypeKind::Short:
-                return CompilationResult(&Short::Instance(), *reinterpret_cast<const short*>(constant->Context()->Metadata()));
+                return CompilationResult(Short::Instance(), *reinterpret_cast<const short*>(constant->Context()->Metadata()));
             case TypeKind::Int:
             case TypeKind::EnumField:
-                return CompilationResult(&Integer::Instance(), *reinterpret_cast<const int*>(constant->Context()->Metadata()));
+                return CompilationResult(Integer::Instance(), *reinterpret_cast<const int*>(constant->Context()->Metadata()));
             case TypeKind::Long:
-                return CompilationResult(&Long::Instance(), *reinterpret_cast<const long*>(constant->Context()->Metadata()));
+                return CompilationResult(Long::Instance(), *reinterpret_cast<const long*>(constant->Context()->Metadata()));
             case TypeKind::Float:
-                return CompilationResult(&Float::Instance(), *reinterpret_cast<const float*>(constant->Context()->Metadata()));
+                return CompilationResult(Float::Instance(), *reinterpret_cast<const float*>(constant->Context()->Metadata()));
             case TypeKind::Double:
-                return CompilationResult(&Double::Instance(), *reinterpret_cast<const double*>(constant->Context()->Metadata()));
+                return CompilationResult(Double::Instance(), *reinterpret_cast<const double*>(constant->Context()->Metadata()));
             case TypeKind::Boolean:
-                return CompilationResult(&Boolean::Instance(), *reinterpret_cast<const bool*>(constant->Context()->Metadata()));
+                return CompilationResult(Boolean::Instance(), *reinterpret_cast<const bool*>(constant->Context()->Metadata()));
             case TypeKind::Character:
-                return CompilationResult(&Character::Instance(), *reinterpret_cast<const char*>(constant->Context()->Metadata()));
+                return CompilationResult(Character::Instance(), *reinterpret_cast<const char*>(constant->Context()->Metadata()));
             case TypeKind::String:
-                return CompilationResult(&String::Instance(), *reinterpret_cast<const std::string*>(constant->Context()->Metadata()));
+                return CompilationResult(String::Instance(), *reinterpret_cast<const std::string*>(constant->Context()->Metadata()));
             default:
                 return std::nullopt;
         }
@@ -160,21 +160,21 @@ namespace Analysis::Creation::Binding
                     switch (const auto& token = parseNode->Token(); token.Kind())
                     {
                         case SyntaxKind::Short:
-                                return CompilationResult(&Short::Instance(), *token.Value<long>());
+                                return CompilationResult(Short::Instance(), *token.Value<long>());
                             case SyntaxKind::Int:
-                                return CompilationResult(&Integer::Instance(), *token.Value<long>());
+                                return CompilationResult(Integer::Instance(), *token.Value<long>());
                             case SyntaxKind::Long:
-                                return CompilationResult(&Long::Instance(), *token.Value<long>());
+                                return CompilationResult(Long::Instance(), *token.Value<long>());
                             case SyntaxKind::Character:
-                                return CompilationResult(&Character::Instance(), *token.Value<long>());
+                                return CompilationResult(Character::Instance(), *token.Value<long>());
                             case SyntaxKind::Boolean:
-                                return CompilationResult(&Boolean::Instance(), *token.Value<long>());
+                                return CompilationResult(Boolean::Instance(), *token.Value<long>());
                             case SyntaxKind::Float:
-                                return CompilationResult(&Float::Instance(), *token.Value<long>());
+                                return CompilationResult(Float::Instance(), *token.Value<long>());
                             case SyntaxKind::Double:
-                                return CompilationResult(&Double::Instance(), *token.Value<long>());
+                                return CompilationResult(Double::Instance(), *token.Value<long>());
                             case SyntaxKind::String:
-                                return CompilationResult(&String::Instance(), *token.Value<long>());
+                                return CompilationResult(String::Instance(), *token.Value<long>());
                             default:
                                 PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                                 return std::nullopt;

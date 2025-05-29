@@ -28,6 +28,6 @@ namespace Analysis::Structure::Global
     void BuiltInOperation::BindLocal()
     { }
 
-    void BuiltInProperty::Transpile(Services::StringBuilder& builder) const
+    void BuiltInOperation::Transpile(Services::StringBuilder& builder) const
     { }
 }

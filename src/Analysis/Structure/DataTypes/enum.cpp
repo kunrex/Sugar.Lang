@@ -34,12 +34,12 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace
 {
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
-    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
-    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
-    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
+    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
+    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
+    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
 }
 
 namespace Analysis::Structure::DataTypes
@@ -160,11 +160,11 @@ namespace Analysis::Structure::DataTypes
             }
         }
 
-        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", nullptr);
+        const auto explicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", nullptr);
         explicitInteger->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash(explicitInteger), explicitInteger);
 
-        const auto explicitString = new BuiltInCast(&Integer::Instance(), std::format("box {} callvirt instance string [System.Runtime]System.Enum::ToString()", fullName), nullptr);
+        const auto explicitString = new BuiltInCast(Integer::Instance(), std::format("box {} callvirt instance string [System.Runtime]System.Enum::ToString()", fullName), nullptr);
         explicitString->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash(explicitString), explicitString);
 
@@ -184,17 +184,17 @@ namespace Analysis::Structure::DataTypes
 
         const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor, this, "xor", BitwiseXor);
         bitwiseXor->PushParameterType(this);
-        bitwiseXor->PushParameterType(&Integer::Instance());
+        bitwiseXor->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
 
         const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, this, "shr", RightShift);
         rightShift->PushParameterType(this);
-        rightShift->PushParameterType(&Integer::Instance());
+        rightShift->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::RightShift, rightShift);
 
         const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, this, "shl", LeftShift);
         leftShift->PushParameterType(this);
-        leftShift->PushParameterType(&Integer::Instance());
+        leftShift->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
     }
 

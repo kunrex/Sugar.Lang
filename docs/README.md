@@ -428,9 +428,9 @@ struct Complex
 }
 ```
 
-Cast and operator overloads must be public and static. Indexers and constructors, however, cannot be static. 
+Cast and operator overloads must be public and static. Indexers cannot be static. The static constructor can be overridden and must be private and parameterless.   
 
-All structures implicitly define an explicit default string conversion and parameterless constructor. The constructor will initialise all fields to their default (or inlined) values. These structures can be overridden. 
+All structures implicitly define an explicit string conversion and parameterless constructor. The constructor will initialise all fields to their default (or inlined) values. These structures can be overridden.
 
 ## Import Statements
 

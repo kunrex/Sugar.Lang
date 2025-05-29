@@ -24,12 +24,14 @@ const string cil_math = "[System.Runtime]System.Math";
 namespace Analysis::Structure::Wrappers
 {
     Math::Math() : BuiltInClass(cil_math, Describer::PublicStatic), SingletonService(), characteristics(), functions()
-    { }
+    {
+        BindGlobal();
+    }
 
-    const Math& Math::Instance()
+    const Math* Math::Instance()
     {
         static const Math instance;
-        return instance;
+        return &instance;
     }
 
     TypeKind Math::Type() const { return TypeKind::Math; }

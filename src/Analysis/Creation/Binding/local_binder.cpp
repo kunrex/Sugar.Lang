@@ -13,7 +13,6 @@
 #include "../../../Exceptions/Compilation/Analysis/Local/non_static_reference_exception.h"
 
 #include "../../../Lexing/Tokens/Factories/operator.h"
-#include "../../Structure/Compilation/constant_compiler.h"
 
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 
@@ -241,7 +240,7 @@ namespace Analysis::Creation::Binding
 
                     if (const auto valueType = value->CreationType(); valueType != type)
                     {
-                        if (type == &Object::Instance())
+                        if (type == Object::Instance())
                         {
                             if (valueType->MemberType() == MemberType::ValueType)
                                 scope->AddChild(new BoxCastExpression(value));
@@ -592,21 +591,21 @@ namespace Analysis::Creation::Binding
 
     const IContextNode* BindPrint(const IContextNode* const operand, const bool ln)
     {
-        if (operand->CreationType() == &Short::Instance())
+        if (operand->CreationType() == Short::Instance())
             return new PrintShortContext(operand, ln);
-        if (operand->CreationType() == &Integer::Instance())
+        if (operand->CreationType() == Integer::Instance())
             return new PrintIntContext(operand, ln);
-        if (operand->CreationType() == &Long::Instance())
+        if (operand->CreationType() == Long::Instance())
             return new PrintLongContext(operand, ln);
-        if (operand->CreationType() == &Float::Instance())
+        if (operand->CreationType() == Float::Instance())
             return new PrintFloatContext(operand, ln);
-        if (operand->CreationType() == &Double::Instance())
+        if (operand->CreationType() == Double::Instance())
             return new PrintDoubleContext(operand, ln);
-        if (operand->CreationType() == &Character::Instance())
+        if (operand->CreationType() == Character::Instance())
             return new PrintCharContext(operand, ln);
-        if (operand->CreationType() == &Boolean::Instance())
+        if (operand->CreationType() == Boolean::Instance())
             return new PrintBoolContext(operand, ln);
-        if (operand->CreationType() == &String::Instance())
+        if (operand->CreationType() == String::Instance())
             return new PrintStringContext(operand, ln);
 
         return new PrintObjectContext(operand, ln);
@@ -715,7 +714,7 @@ namespace Analysis::Creation::Binding
                                 }
 
                                 if (!invalid)
-                                    return BindInvoke(delegate->CreationType()->Type() == TypeKind::Action ? &Void::Instance() : delegateType->TypeAt(typeCount - 1), delegateType, arguments);
+                                    return BindInvoke(delegate->CreationType()->Type() == TypeKind::Action ? Void::Instance() : delegateType->TypeAt(typeCount - 1), delegateType, arguments);
                             }
                             break;
                         default:
@@ -723,7 +722,7 @@ namespace Analysis::Creation::Binding
                     }
 
                     PushException(new LogException("Arguments do not match delegate signature", entity->Token().Index(), dataType->Parent()));
-                    return new InvokeContext(&Object::Instance(), Action::Instance({ }));
+                    return new InvokeContext(Object::Instance(), Action::Instance({ }));
                 }
             case NodeType::FuncRef:
                 {
@@ -983,14 +982,14 @@ namespace Analysis::Creation::Binding
                     const auto operand = BindExpression(expression->GetChild(static_cast<int>(ChildCode::LHS)), scoped, scope, dataType);
                     const auto type = BindDataType(expression->GetChild(static_cast<int>(ChildCode::RHS)), dataType->Parent());
 
-                    if (type == &Object::Instance())
+                    if (type == Object::Instance())
                     {
                         if (operand->CreationType()->MemberType() == MemberType::ValueType)
                             return new BoxCastExpression(operand);
 
                         return operand;
                     }
-                    if (operand->CreationType() == &Object::Instance())
+                    if (operand->CreationType() == Object::Instance())
                     {
                         if (operand->CreationType()->MemberType() == MemberType::Class)
                             return new CastClassExpression(type, operand);
@@ -1116,7 +1115,7 @@ namespace Analysis::Creation::Binding
                         }
 
                         current->AddChild(new Return());
-                        if (scoped->CreationType() != &Void::Instance())
+                        if (scoped->CreationType() != Void::Instance())
                             PushException(new LogException("Unexpected return argument", child->Token().Index(), dataType->Parent()));
                     }
                     return;

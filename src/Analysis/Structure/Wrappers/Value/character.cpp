@@ -31,7 +31,9 @@ const string cil_character = "[System.Runtime]System.Char";
 namespace Analysis::Structure::Wrappers
 {
     Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), functions(), implicitCasts(), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     int Character::SlotCount() const { return 1; }
 

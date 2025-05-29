@@ -11,7 +11,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    BranchTrue::BranchTrue(const string& name) : ContextNode(&Object::Instance()), cilInstruction(std::format("brtrue {}", name))
+    BranchTrue::BranchTrue(const string& name) : ContextNode(Object::Instance()), cilInstruction(std::format("brtrue {}", name))
     { }
 
     MemberType BranchTrue::MemberType() const { return MemberType::BranchJump; }
@@ -23,7 +23,7 @@ namespace Analysis::Structure::Context
 
     string BranchTrue::CILData() const { return cilInstruction; }
 
-    BranchFalse::BranchFalse(const string& name) : ContextNode(&Object::Instance()), cilInstruction(std::format("brfalse {}", name))
+    BranchFalse::BranchFalse(const string& name) : ContextNode(Object::Instance()), cilInstruction(std::format("brfalse {}", name))
     { }
 
     MemberType BranchFalse::MemberType() const { return MemberType::BranchJump; }

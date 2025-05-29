@@ -46,9 +46,10 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-
     Double::Double() : BuiltInValueType(cil_double, Describer::Public), SingletonService(), tryParse(nullptr), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Double* Double::Instance()
     {
@@ -88,7 +89,7 @@ namespace Analysis::Structure::Wrappers
         explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), explicitLong);
 
         const auto explicitFloat = new BuiltInCast(Float::Instance(), "conv.r4", FloatCast<double>);
-        explicitFloat->PushParameterType(Instance());
+        explicitFloat->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), explicitFloat);
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()", StringCast<double>);

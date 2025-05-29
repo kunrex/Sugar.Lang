@@ -14,10 +14,10 @@ constexpr std::string_view cil_write_line = "call void [System.Runtime]System.Co
 
 namespace Analysis::Structure::Context
 {
-    PrintContext::PrintContext(const bool ln) : UnaryContextNode(&Object::Instance(), nullptr), ln(ln), slotCount(0)
+    PrintContext::PrintContext(const bool ln) : UnaryContextNode(Object::Instance(), nullptr), ln(ln), slotCount(0)
     { }
 
-    PrintContext::PrintContext(const IContextNode* const operand, const bool ln) : UnaryContextNode(&Object::Instance(), operand), ln(ln), slotCount(operand->SlotCount())
+    PrintContext::PrintContext(const IContextNode* const operand, const bool ln) : UnaryContextNode(Object::Instance(), operand), ln(ln), slotCount(operand->SlotCount())
     { }
 
     MemberType PrintContext::MemberType() const { return MemberType::PrintContext; }

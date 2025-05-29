@@ -18,12 +18,6 @@ namespace Analysis::Structure::Global
 
     unsigned long Indexer::ParameterCount() const { return parameterCount; }
 
-    void Indexer::BindLocal()
-    { }
-
-    void Indexer::Transpile(StringBuilder& builder) const
-    { }
-
     GetIndexer::GetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get) : Indexer(describer, creationType, get->ParameterCount()), getInstruction("call " + get->FullName()), get(get)
     { }
 

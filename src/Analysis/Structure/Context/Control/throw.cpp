@@ -10,7 +10,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    Throw::Throw() : ContextNode(&Object::Instance())
+    Throw::Throw() : ContextNode(Object::Instance())
     { }
 
     MemberType Throw::MemberType() const { return MemberType::Throw; }

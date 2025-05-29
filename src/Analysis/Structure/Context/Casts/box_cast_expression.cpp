@@ -14,7 +14,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    BoxCastExpression::BoxCastExpression(const IContextNode* const operand) : UnaryContextNode(&Object::Instance(), operand), slotCount(std::max(Object::Instance().SlotCount(), operand->SlotCount()))
+    BoxCastExpression::BoxCastExpression(const IContextNode* const operand) : UnaryContextNode(Object::Instance(), operand), slotCount(std::max(Object::Instance()->SlotCount(), operand->SlotCount()))
     { }
 
     MemberType BoxCastExpression::MemberType() const { return MemberType::CastExpression; }

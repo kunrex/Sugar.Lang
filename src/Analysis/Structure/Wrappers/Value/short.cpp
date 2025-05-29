@@ -54,7 +54,9 @@ namespace
 namespace Analysis::Structure::Wrappers
 {
     Short::Short() : BuiltInValueType(cil_short, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
-    { }
+    {
+        BindGlobal();
+    }
 
     const Short* Short::Instance()
     {

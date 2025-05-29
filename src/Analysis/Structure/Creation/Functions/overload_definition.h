@@ -2,6 +2,7 @@
 #define OVERLOAD_DEFINITION_H
 
 #include "../../Core/Creation/function.h"
+#include "../../Core/Interfaces/Creation/i_operator_overload.h"
 
 namespace Analysis::Structure::Creation
 {

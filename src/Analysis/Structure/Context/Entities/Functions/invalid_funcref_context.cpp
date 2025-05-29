@@ -9,7 +9,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    InvalidFuncRefContext::InvalidFuncRefContext(const IContextNode* objectContext) : UnaryContextNode(&Object::Instance(), objectContext)
+    InvalidFuncRefContext::InvalidFuncRefContext(const IContextNode* objectContext) : UnaryContextNode(Object::Instance(), objectContext)
     { }
 
     MemberType InvalidFuncRefContext::MemberType() const { return MemberType::Invalid; }

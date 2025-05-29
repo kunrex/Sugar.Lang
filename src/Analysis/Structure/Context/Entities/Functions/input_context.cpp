@@ -9,12 +9,12 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    InputContext::InputContext() : ContextNode(&String::Instance())
+    InputContext::InputContext() : ContextNode(String::Instance())
     { }
 
     MemberType InputContext::MemberType() const { return MemberType::InputContext; }
 
-    int InputContext::SlotCount() const { return String::Instance().SlotCount(); }
+    int InputContext::SlotCount() const { return String::Instance()->SlotCount(); }
 
     bool InputContext::Readable() const { return true; }
     bool InputContext::Writable() const { return false; }

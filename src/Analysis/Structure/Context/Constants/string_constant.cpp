@@ -11,7 +11,7 @@ using namespace Analysis::Structure::Wrappers;
 
 namespace Analysis::Structure::Context
 {
-    StringConstant::StringConstant(string value) : ContextNode(&String::Instance()), value(std::move(value))
+    StringConstant::StringConstant(string value) : ContextNode(String::Instance()), value(std::move(value))
     { }
 
     int StringConstant::SlotCount() const { return 1; }

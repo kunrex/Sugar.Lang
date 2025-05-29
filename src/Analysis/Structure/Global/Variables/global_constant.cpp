@@ -4,7 +4,6 @@
 
 #include "../../../Creation/Binding/constant_binder.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
-#include "../../Compilation/constant_compiler.h"
 #include "../../Context/Constants/integer_constant.h"
 
 using namespace std;
@@ -19,7 +18,6 @@ using namespace Analysis::Creation::Transpiling;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Context;
-using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
@@ -46,7 +44,7 @@ namespace Analysis::Structure::Global
     void GlobalConstant::Transpile(Services::StringBuilder& builder) const
     {
         builder.PushLine("");
-        builder.PushLine(std::format(".field literal {} {} = {}", creationType()->FullName(), name, ConstantString(this)));
+        builder.PushLine(std::format(".field literal {} {} = {}", creationType->FullName(), name, ConstantString(this)));
     }
 
     void GlobalConstant::IncrementDependencyCount() { dependencyCount++; }

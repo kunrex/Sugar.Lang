@@ -772,7 +772,7 @@ namespace Analysis::Creation::Binding
 
                 if (parameters.size() > 1)
                     PushException(new LogException("Entrypoint can define no parameters or one parameter of array<string>", identifier.Index(), source));
-                else if (parameters.size() == 1 && parameters[0] != Array::Instance(&String::Instance()))
+                else if (parameters.size() == 1 && parameters[0] != Array::Instance(String::Instance()))
                     PushException(new LogException("Expected type of array<string>", identifier.Index(), source));
             }
 
@@ -1047,10 +1047,10 @@ namespace Analysis::Creation::Binding
 
     void TryDeclareExplicitString(IUserDefinedType* const dataType)
     {
-        if (dataType->FindExplicitCast(&String::Instance(), dataType) != nullptr)
+        if (dataType->FindExplicitCast(String::Instance(), dataType) != nullptr)
             return;
 
-        const auto cast = new BuiltInCast(&String::Instance(), std::format("call instance string class {}::ToString()", dataType->FullName()), nullptr);
+        const auto cast = new BuiltInCast(String::Instance(), std::format("call instance string class {}::ToString()", dataType->FullName()), nullptr);
         cast->PushParameterType(dataType);
         dataType->PushExplicitCast(cast);
     }

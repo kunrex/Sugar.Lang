@@ -28,10 +28,12 @@ namespace Parsing
 
         const auto& path = Current();
         if (TryMatchToken(path, SyntaxKind::Constant))
+        {
             if (const auto kind = static_cast<TypeKind>(path.Metadata()); kind != TypeKind::String)
                 ExceptionManager::Instance().AddChild(new ParsingException("Local path expected (as a string).", path, source));
             else
                 index++;
+        }
 
         TryMatchToken(Current(), SyntaxKind::Semicolon);
         return new ImportStatementNode(path);

@@ -312,9 +312,9 @@ namespace Analysis::Creation::Transpiling
     void TranspileArrayCollection(const IDataType* const arrayType, const IContextNode* const arguments, StringBuilder& stringBuilder)
     {
         stringBuilder.PushLine("ldc.i4 " + std::to_string(arguments->ChildCount()));
-        stringBuilder.PushLine(arrayType->FindConstructor({ &Integer::Instance() })->FullName());
+        stringBuilder.PushLine(arrayType->FindConstructor({ Integer::Instance() })->FullName());
 
-        const auto indexerString = arrayType->FindIndexer({ &Integer::Instance() })->SignatureSetString();
+        const auto indexerString = arrayType->FindIndexer({ Integer::Instance() })->SignatureSetString();
 
         for (auto i = 0; i < arguments->ChildCount(); i++)
         {
@@ -614,6 +614,36 @@ namespace Analysis::Creation::Transpiling
                         stringBuilder.PushLine(pop);
                 }
                 break;
+        }
+    }
+
+    void TranspileScope(const Scope* const scope, StringBuilder& stringBuilder, int& maxSlotSize)
+    {
+        const auto flag = scope->Type() != ScopeType::Scope;
+        if (flag)
+        {
+            stringBuilder.PushLine(std::format("{}:", scope->FullName()));
+            stringBuilder.IncreaseIndent();
+        }
+
+        const auto contextCount = scope->ChildCount();
+        for (auto i = 0; i < contextCount; i++)
+        {
+            const auto current = scope->GetChild(i);
+
+            TranspileContext(current, stringBuilder);
+            if (const auto size = current->SlotCount(); size > maxSlotSize)
+                maxSlotSize = size;
+        }
+
+        if (flag)
+            stringBuilder.DecreaseIndent();
+
+        const auto nestedCount = scope->NestedCount();
+        for (auto i = 0; i < nestedCount; i++)
+        {
+            const auto nested = scope->NestedAt(i);
+            TranspileScope(nested, stringBuilder, maxSlotSize);
         }
     }
 }
