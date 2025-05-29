@@ -23,5 +23,11 @@ namespace Analysis::Structure::Global
 
     void BuiltInConstructor::BindLocal()
     { }
+
+    void BuiltInConstructor::Transpile(Services::StringBuilder& builder) const
+    { }
+
+    void BuiltInConstructor::PushTranspilation(const ICharacteristic* const characteristic)
+    { }
 }
 

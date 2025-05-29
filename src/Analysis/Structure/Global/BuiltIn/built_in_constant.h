@@ -2,11 +2,10 @@
 #define BUILT_IN_CONSTANT_H
 
 #include "../../Core/Creation/characteristic.h"
-#include "../../Core/Interfaces/Creation/i_constant.h"
 
 namespace Analysis::Structure::Global
 {
-    class BuiltInConstant final : public Core::Characteristic, public virtual Core::Interfaces::IConstant
+    class BuiltInConstant final : public Core::Characteristic
     {
         public:
             BuiltInConstant(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IContextNode* context);
@@ -18,12 +17,13 @@ namespace Analysis::Structure::Global
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] bool Compiled() const override;
-
-            void PushDependency(const IConstant* constant) const override;
-            [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
-
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
+
+            void IncrementDependencyCount() override;
+            void PushDependant(ICharacteristic* characteristic) const override;
+            [[nodiscard]] bool HasDependant(const ICharacteristic* characteristic) const override;
     };
 }
 

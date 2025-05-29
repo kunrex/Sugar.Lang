@@ -4,6 +4,8 @@
 #include "../../Core/nameable.h"
 #include "../../Core/Creation/function.h"
 
+#include "../../Core/Interfaces/Creation/i_function_definition.h"
+
 namespace Analysis::Structure::Creation
 {
     class FunctionDefinition : public Core::Nameable, public Core::Function, public virtual Core::Interfaces::IFunctionDefinition

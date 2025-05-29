@@ -8,6 +8,13 @@
 #include "../../Creation/Binding/binder_extensions.h"
 
 #include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
+#include "../../Creation/Transpiling/cil_transpiler.h"
+#include "../Global/BuiltIn/built_in_cast.h"
+#include "../Global/BuiltIn/built_in_operation.h"
+#include "../Wrappers/Generic/action.h"
+#include "../Wrappers/Value/integer.h"
+
+#include "../Compilation/compilation_result.h"
 
 using namespace std;
 
@@ -16,10 +23,24 @@ using namespace Tokens::Enums;
 using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Creation::Binding;
+using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
+
+namespace
+{
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
+    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
+    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
+    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
+}
 
 namespace Analysis::Structure::DataTypes
 {
@@ -40,14 +61,26 @@ namespace Analysis::Structure::DataTypes
         return fullName;
     }
 
+    const ICharacteristic* Enum::LastCharacteristic() const
+    {
+        if (characteristics.empty())
+            return nullptr;
+
+        return characteristics[characteristics.size() - 1];
+    }
+
     void Enum::PushCharacteristic(ICharacteristic* const characteristic)
     {
-        characteristics[characteristic->Name()] = characteristic;
+        characteristics.push_back(characteristic);
     }
 
     const ICharacteristic* Enum::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
     void Enum::PushFunction(IFunctionDefinition* const function)
@@ -56,13 +89,16 @@ namespace Analysis::Structure::DataTypes
     const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr;}
 
-    void Enum::PushConstructor(IFunction* constructor)
+    void Enum::PushConstructor(IConstructor* constructor)
     { }
 
-    const IFunction* Enum::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Enum::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return nullptr;
     }
+
+    IConstructor* Enum::StaticConstructor() const { return nullptr; }
+    IConstructor* Enum::InstanceConstructor() const { return nullptr; }
 
     void Enum::PushIndexer(IIndexerDefinition* const indexer)
     { }
@@ -82,13 +118,18 @@ namespace Analysis::Structure::DataTypes
 
     void Enum::PushExplicitCast(IFunction* const cast)
     {
-        explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
+        explicitCasts.emplace_back(ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)})), cast);
     }
 
     const IFunction* Enum::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
+
+        for (const auto cast : explicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     void Enum::PushOverload(IOperatorOverload* const overload)
@@ -96,6 +137,10 @@ namespace Analysis::Structure::DataTypes
 
     const IOperatorOverload* Enum::FindOverload(const SyntaxKind base) const
     {
+        for (const auto overload : overloads)
+            if (std::get<0>(overload) == base)
+                return std::get<1>(overload);
+
         return nullptr;
     }
 
@@ -114,15 +159,66 @@ namespace Analysis::Structure::DataTypes
                     break;
             }
         }
+
+        const auto explicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", nullptr);
+        explicitInteger->PushParameterType(this);
+        explicitCasts.emplace_back(ArgumentHash(explicitInteger), explicitInteger);
+
+        const auto explicitString = new BuiltInCast(&Integer::Instance(), std::format("box {} callvirt instance string [System.Runtime]System.Enum::ToString()", fullName), nullptr);
+        explicitString->PushParameterType(this);
+        explicitCasts.emplace_back(ArgumentHash(explicitString), explicitString);
+
+        const auto bitwiseNot = new BuiltInOperation(SyntaxKind::BitwiseNot, this, "not", Not);
+        bitwiseNot->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseNot, bitwiseNot);
+
+        const auto bitwiseAnd = new BuiltInOperation(SyntaxKind::BitwiseAnd, this, "and", BitwiseAnd);
+        bitwiseAnd->PushParameterType(this);
+        bitwiseAnd->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseAnd, bitwiseAnd);
+
+        const auto bitwiseOr = new BuiltInOperation(SyntaxKind::BitwiseOr, this, "or", BitwiseOr);
+        bitwiseOr->PushParameterType(this);
+        bitwiseOr->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseOr, bitwiseOr);
+
+        const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor, this, "xor", BitwiseXor);
+        bitwiseXor->PushParameterType(this);
+        bitwiseXor->PushParameterType(&Integer::Instance());
+        overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
+
+        const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, this, "shr", RightShift);
+        rightShift->PushParameterType(this);
+        rightShift->PushParameterType(&Integer::Instance());
+        overloads.emplace_back(SyntaxKind::RightShift, rightShift);
+
+        const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, this, "shl", LeftShift);
+        leftShift->PushParameterType(this);
+        leftShift->PushParameterType(&Integer::Instance());
+        overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
     }
 
     void Enum::BindLocal()
     {
-        for (const auto& characteristic : characteristics)
-            characteristic.second->BindLocal();
+        for (const auto characteristic : characteristics)
+            characteristic->BindLocal();
+    }
 
-        for (const auto& cast: explicitCasts)
-            cast.second->BindLocal();
+    void Enum::Transpile(Services::StringBuilder& builder) const
+    {
+        builder.PushLine();
+        builder.PushLine(std::format(".class {} sealed auto ansi {} extends [System.Runtime]System.Enum", AccessModifierString(this), name));
+
+        builder.PushLine(open_flower);
+        builder.IncreaseIndent();
+
+        builder.PushLine(".field public specialname rtspecialname int32 value__ ");
+
+        for (const auto characteristic : characteristics)
+            characteristic->Transpile(builder);
+
+        builder.DecreaseIndent();
+        builder.PushLine(close_flower);
     }
 
     void Enum::Print(const string& indent, const bool last) const
@@ -132,10 +228,13 @@ namespace Analysis::Structure::DataTypes
 
     Enum::~Enum()
     {
-        for (const auto& characteristic : characteristics)
-            delete characteristic.second;
+        for (const auto characteristic : characteristics)
+            delete characteristic;
 
-        for (const auto& cast: explicitCasts)
-            delete cast.second;
+        for (const auto cast: explicitCasts)
+            delete std::get<1>(cast);
+
+        for (const auto overload: overloads)
+            delete std::get<1>(overload);
     }
 }

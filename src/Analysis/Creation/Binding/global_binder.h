@@ -4,10 +4,12 @@
 #include "../../Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../Parsing/ParseNodes/Core/Interfaces/i_parse_node.h"
+#include "../../Structure/DataTypes/enum.h"
 
 namespace Analysis::Creation::Binding
 {
-    void BindEnumConstant(const ParseNodes::Core::Interfaces::IParseNode* expressionNode, Structure::Core::Interfaces::IUserDefinedType* dataType);
+    void BindEnumConstant(const ParseNodes::Core::Interfaces::IParseNode* expressionNode, Structure::DataTypes::Enum* dataType);
+
     void DeclareGlobalVariable(const ParseNodes::Core::Interfaces::IParseNode* declarationNode, Structure::Core::Interfaces::IUserDefinedType* dataType);
     void InitialiseGlobalVariable(const ParseNodes::Core::Interfaces::IParseNode* initialisationNode, Structure::Core::Interfaces::IUserDefinedType* dataType);
 
@@ -26,6 +28,7 @@ namespace Analysis::Creation::Binding
     void CreateOperatorOverload(const ParseNodes::Core::Interfaces::IParseNode* operatorOverloadNode, Structure::Core::Interfaces::IUserDefinedType* dataType);
 
     void TryDeclareExplicitString(Structure::Core::Interfaces::IUserDefinedType* dataType);
+    void TryDeclareStaticConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
     void TryDeclareDefaultConstructor(Structure::Core::Interfaces::IUserDefinedType* dataType);
 }
 

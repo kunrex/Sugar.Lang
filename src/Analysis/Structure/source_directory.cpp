@@ -57,6 +57,12 @@ namespace Analysis::Structure
             child->BindLocal();
     }
 
+    void SourceDirectory::Transpile(Services::StringBuilder& builder) const
+    {
+        for (const auto child: values())
+            child->Transpile(builder);
+    }
+
     void SourceDirectory::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Sugar Directory: " << name << std::endl;

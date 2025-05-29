@@ -12,6 +12,7 @@ namespace Analysis::Structure::Compilation
 {
     CompilationResult::CompilationResult(const IPrimitiveType* creationType, const short data) : creationType(creationType), data(data)
     { }
+
     CompilationResult::CompilationResult(const IPrimitiveType* creationType, const int data) : creationType(creationType), data(data)
     { }
 

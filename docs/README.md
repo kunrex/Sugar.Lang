@@ -18,28 +18,35 @@ int: x;
 ```
 
 The type of the variable is post fixed with a `:`, followed by the name. Variables may be initialized and you may declare multiple variables at once.
+
 ```c++
 int: x, y = 10;
 ```
+
 Although sugar is statically typed, it does let one use the `let` keyword to perform type inference.
+
 ```rust
 let: x = 10; //type inference to integer
 ```
 
 ### Functions
+
 ```c++
 int Add(int: x, int: y)
 {
     return x + y;
 }
 ```
+
 ```c++
 int: result = Add(10, 20);
 ```
+
 Function declarations and calling is similar to that in C# and C++.
 
 ### Conditions
-Sugar offers `if` conditions only as a control based structure. Sugar also offers C#/Java style ternary expression.
+Sugar offers `if` conditions only as a control based structure. Sugar also offers the ternary expression.
+
 ```python
 if (condition)
 {
@@ -59,6 +66,7 @@ string: result = 0 % 2 == 0 ? "0 is even" : "0 is odd";
 
 ### Loops
 Sugar offers the `for`, `while` and `do while`.
+
 ```c++
 while (condition)
 { }
@@ -71,6 +79,7 @@ do { } while(condition)
 
 ### I/O Functions
 Sugar uses the `print`, `println`, and `input` functions for output and input.
+
 ```python
 print("hello world: ");
 string: result = input();
@@ -140,13 +149,16 @@ These data types are built into sugar:
 
 Sugar supports the collections mentioned above.
 1. `array`: 
+
 ```c++
 let: collection = create array<int>(3);
 
 collection[2] = 3;
 print(collection[2]);
 ```
+
 2. `list`: 
+
 ```c++
 let: collection = create list<int>();
 
@@ -155,12 +167,14 @@ print(collection[0]);
 ```
 
 - You may create arrays and lists using the { } expression too
+
 ```
 let: array = create array<int> { 1, 2, 3 };
 let: list = create list<int> { 1, 2, 3, 4, 5 };
 ```
 
 3.  `dictionary`:
+
 ```c++
 let: collection = create dictionary<int, string>();
 
@@ -169,6 +183,7 @@ print(collection[10]);
 ```
 
 4.  `tuple`:
+
 ```c++
 let: collection = create tuple<int, string>(1, "one");
 
@@ -179,6 +194,7 @@ print(collection.Element2);
 A tuple is a value type in Sugar.
 
 #### Nullable
+
 ```cs
 let: nullableInt = create nullable<int>(); // int with value "null"
 
@@ -200,6 +216,7 @@ throw e;
 
 #### Delegates (?)
 Sugar offers partial delegate functionality using `func` and `action`.
+
 ```c++
 void HelloWorld(string: message) 
 { 
@@ -214,6 +231,7 @@ The `funcref` function is used to get the reference to a function. It contains 2
 The argument signature is passed in using generic expression. Unfortunately, sugar does not feature the ability to create functions dynamically. 
 
 Delegates may be invoked using the `invoke` function.
+
 ```c++
 int Add(int x, int y) 
 { 
@@ -223,9 +241,11 @@ int Add(int x, int y)
 func<int, int, int /* last argument is the return type */>: add = funcref<int, int>(Add);
 int: result = invoke(add, 10, 20);
 ```
+
 > Sugar technically supports generics, but only for built-in types and functions.
 
 ### Enums
+
 Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
 ```cs
 enum EncodingBase
@@ -240,6 +260,7 @@ enum EncodingBase
 Enums implicitly define bitwise operations and an explicit conversion to their integer value.
 
 ## Describers
+
 Taking inspiration from C#'s attributes, which I adore, sugar has describers.
 ```cs
 [public]
@@ -258,18 +279,14 @@ class Human
     }
 }
 ```
+
 Describers can contain the following keywords:
 1. `static`: Declares a member static.
 2. `public`: An access specifier for public items.
 3. `private`: An access specifier for private items.
-
-
 4. `const`: A runtime constant.
 5. `constexpr`: A compile time constant.
-
 6. `ref`: Allows reference like behaviour with structs.
-
-
 7. `entrypoint`: Defines the entrypoint for execution.
 
 ### `const` and `constexpr`
@@ -326,11 +343,7 @@ Properties in Sugar are a simpler version of their counterpart in C#. They serve
 [public] int: x { get; [private] set; }
 ```
 
-This declares a public getter and private setter for a compiler generated backing field. These properties may be inline initialised too.
-
-```cs
-[public] int: code { get; [private] set; } = 200;
-```
+The accessibility on the accessor is given preference over the accessibility of the field.  
 
 ##### Accessor Bodies
 
@@ -353,6 +366,8 @@ int: Property
 In these cases no backing field is generated and all accessors must define a body if any of them does.
 
 If a property defines only one accessor, it's expected to define a body since no backing field is generated.
+
+> Fields and Properties (that define backing fields) may be inline initialised to compile time constant values. 
 
 ```cs
 int: GetOnlyProperty 
@@ -412,13 +427,19 @@ struct Complex
     }
 }
 ```
-Cast and operator overloads must be public and static. Indexers and constructors, however, cannot be static. All structures have a default string conversion and parameterless constructor unless specified.
+
+Cast and operator overloads must be public and static. Indexers and constructors, however, cannot be static. 
+
+All structures implicitly define an explicit default string conversion and parameterless constructor. The constructor will initialise all fields to their default (or inlined) values. These structures can be overridden. 
 
 ## Import Statements
+
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
+
 ```java
 import "..directory.sub_directory.file.Class";
 ```
+
 ```java
 import "..directory.sub_directory.file.Class";
 
@@ -426,6 +447,7 @@ import "..directory.sub_directory.file.Class";
 
 let: x = create Class(param1, param2);
 ```
+
 Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 
 ## The Entry Point, Executables vs Libraries
@@ -446,13 +468,16 @@ class MyFirstProgram
 `entrypoint` in the describer defines that execution will begin from the `HelloWorld` function. By default, this function is also public and static. Naturally only one function can contain this describer. 
 
 When an entrypoint is defined, the compiler generates an executable (.exe). If no entrypoint is provided, the compiler instead produces a class library (.dll). A class library contains usable structures such as classes and functions, but it does not define a standalone path of execution.
+
 ## Questions ?!
+
 So yes there a few things here. No try-catch-finally blocks, no switch statements, no generics and no destructors.
 
 But the big question: What about OOP? In the original C# version it was included. But even with CILs amazing features I realised I was in over my head and took it out of this version.
 
 Will I add it? Maybe but sugar is functional. I'm not an OOP skeptic, I love it on the contrary. But it was too much for this project.
 That's not to say there's no chance of me revisiting it in the future. Here's the syntax I had planned for generics and OOP:
+
 ```cs
 interface IArea<TDimension : INumeric> 
 {

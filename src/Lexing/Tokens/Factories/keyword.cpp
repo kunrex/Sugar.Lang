@@ -53,7 +53,7 @@ namespace Tokens
             { "operator",    { SyntaxKind::Operator,    KeywordType::Function } },
             { "explicit",    { SyntaxKind::Explicit,    KeywordType::Function } },
             { "implicit",    { SyntaxKind::Implicit,    KeywordType::Function } },
-            { "constructor", { SyntaxKind::Constructor,      KeywordType::Function } },
+            { "constructor", { SyntaxKind::Constructor, KeywordType::Function } },
 
             { "ref",         { SyntaxKind::Ref,         KeywordType::Describer } },
             { "const",       { SyntaxKind::Const,       KeywordType::Describer } },
@@ -61,6 +61,7 @@ namespace Tokens
             { "public",      { SyntaxKind::Public,      KeywordType::Describer } },
             { "private",     { SyntaxKind::Private,     KeywordType::Describer } },
             { "constexpr",   { SyntaxKind::Constexpr,   KeywordType::Describer } },
+            { "entrypoint",  { SyntaxKind::Entrypoint,  KeywordType::Describer } },
 
             { "copy",        { SyntaxKind::Copy,        KeywordType::General } },
 

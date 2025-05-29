@@ -20,13 +20,6 @@ namespace Analysis::Structure::Core
 
     Scope* DefaultScoped::Scope() const { return scope; }
 
-    MemberType DefaultScoped::MemberType() const { return MemberType::Scope; }
-
-    const string& DefaultScoped::Name() const { return default_name; }
-    const string& DefaultScoped::FullName() const { return default_name; }
-
-    const IDataType* DefaultScoped::CreationType() const { return &Void::Instance(); }
-
     unsigned long DefaultScoped::ParameterCount() const { return 0; }
     const IDataType* DefaultScoped::ParameterAt(unsigned long index) const { return nullptr; }
 
@@ -39,9 +32,6 @@ namespace Analysis::Structure::Core
     { }
 
     void DefaultScoped::AddLocalVariable(const LocalVariable* const variable)
-    { }
-
-    void DefaultScoped::BindLocal()
     { }
 
     DefaultScoped::~DefaultScoped()

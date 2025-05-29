@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <format>
 #include <filesystem>
 
 #include "Exceptions/log_exception.h"
@@ -19,6 +20,8 @@
 #include "Analysis/Creation/Binding/project_binder.h"
 
 #include "Analysis/Creation/Transpiling/cil_transpiler.h"
+#include "Analysis/Structure/Global/Functions/void_function.h"
+#include "Analysis/Structure/Wrappers/Generic/array.h"
 
 #include "Analysis/Structure/Wrappers/Value/short.h"
 #include "Analysis/Structure/Wrappers/Value/integer.h"
@@ -28,9 +31,12 @@
 #include "Analysis/Structure/Wrappers/Value/boolean.h"
 #include "Analysis/Structure/Wrappers/Value/character.h"
 #include "Analysis/Structure/Wrappers/Reference/string.h"
+#include "Exceptions/Compilation/transpile_file_exception.h"
 
 using namespace std;
 namespace fs = std::filesystem;
+
+using namespace Services;
 
 using namespace Exceptions;
 
@@ -41,12 +47,14 @@ using namespace ParseNodes::Statements;
 
 using namespace Parsing;
 
-using namespace Analysis::Creation;
 using namespace Analysis::Creation::Binding;
+using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr string_view source_extension = ".sugar";
 
@@ -96,11 +104,48 @@ Compiler::Compiler(const std::string& sourcePath) : sourcePath(sourcePath)
         return;
     }
 
-    const auto name = path.filename().string();
+    name = path.filename().string();
     source = new SourceDirectory(name, true);
 
     ExceptionManager::Instance();
     PushStructure(sourcePath, source);
+}
+
+void Compiler::Transpile() const
+{
+    const auto outputDirectory = fs::path(std::format("{}/{}/bin", sourcePath, name));
+    if (!exists(outputDirectory))
+    {
+        if (create_directories(outputDirectory))
+            std::cout << "Output directory created: " << outputDirectory << std::endl;
+        else
+        {
+            ExceptionManager::Instance().AddChild(new TranspileFileException(outputDirectory));
+            return;
+        }
+    }
+
+    const auto outputFile = outputDirectory / fs::path(name + (Entrypoint::Instance() == nullptr ? ".dll" : ".exe"));
+    std::ofstream file(outputFile);
+    if (!file.is_open())
+    {
+        ExceptionManager::Instance().AddChild(new TranspileFileException(outputFile));
+        return;
+    }
+
+    file.close();
+
+    StringBuilder stringBuilder;
+
+    stringBuilder.PushLine(std::format(".assembly {} {}", name, "{}"));
+    stringBuilder.PushLine(".assembly extern mscorelib");
+    stringBuilder.PushLine(".assembly extern System.Runtime {}");
+    stringBuilder.PushLine(".assembly extern System.Collections.Generic.Runtime {}");
+
+    source->Transpile(stringBuilder);
+
+    if (!ExceptionManager::Instance().LogAllExceptions())
+        std::cout << "Compiled successfully at: " << outputFile << std::endl;
 }
 
 void Compiler::Compile() const
@@ -127,7 +172,7 @@ void Compiler::Compile() const
     steps.push_back(&SourceObject::LexParse);
     steps.push_back(&SourceObject::InitDataTypes);
     steps.push_back(&SourceObject::ManageImports);
-    steps.push_back(&SourceObject::BindGlobal);
+    //steps.push_back(&SourceObject::BindGlobal);
     //steps.push_back(&SourceObject::BindLocal);
 
     try
@@ -143,19 +188,13 @@ void Compiler::Compile() const
             }
         }
 
-        source->Print("", true);;
+        source->Print("", true);
+
+        //Transpile();
     }
     catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
-
-    /*
-    CILTranspiler transpiler(name, sourcePath, source);
-    transpiler.Transpile();
-
-    if (!ExceptionManager::Instance().LogAllExceptions())
-        cout << "Compiled successfully at " << transpiler.OutputFile() << endl;
-    */
 
     delete source;
 }

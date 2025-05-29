@@ -8,10 +8,11 @@
 
 #include "Core/nameable.h"
 #include "Core/Interfaces/i_bindable.h"
+#include "Core/Interfaces/i_transpilable.h"
 
 namespace Analysis::Structure
 {
-    class SourceObject : public Core::Nameable, public Services::Child<SourceObject>, public Services::Printable, public virtual Core::Interfaces::IGloballyBindable, public virtual Core::Interfaces::ILocallyBindable
+    class SourceObject : public Core::Nameable, public Services::Child<SourceObject>, public Services::Printable, public virtual Core::Interfaces::IGloballyBindable, public virtual Core::Interfaces::ILocallyBindable, public virtual Core::Interfaces::ITranspilable
     {
         protected:
             mutable std::string fullName;

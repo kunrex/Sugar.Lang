@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Core
 {
-    class DefaultScoped final : public Describable, public virtual Interfaces::IScoped
+    class DefaultScoped : public virtual Interfaces::IScoped
     {
         private:
             Local::Scope* const scope;
@@ -16,13 +16,6 @@ namespace Analysis::Structure::Core
             DefaultScoped();
 
             [[nodiscard]] Local::Scope* Scope() const override;
-
-            [[nodiscard]] Enums::MemberType MemberType() const override;
-
-            [[nodiscard]] const std::string& Name() const override;
-            [[nodiscard]] const std::string& FullName() const override;
-
-            [[nodiscard]] const Interfaces::IDataType* CreationType() const override;
 
             [[nodiscard]] unsigned long ParameterCount() const override;
             [[nodiscard]] const Interfaces::IDataType* ParameterAt(unsigned long index) const override;
@@ -34,8 +27,6 @@ namespace Analysis::Structure::Core
             void AddLocalVariable(const Local::LocalVariable* variable) override;
 
             [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const override;
-
-            void BindLocal() override;
 
             ~DefaultScoped() override;
     };

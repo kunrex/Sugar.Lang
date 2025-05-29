@@ -21,6 +21,8 @@ namespace Analysis::Structure::Enums
         Const = 16,
         Constexpr = 32 | Static,
 
+        Entrypoint = Public | Static | 64,
+
         AccessModifiers = Public | Private,
 
         PublicStatic = Public | Static,

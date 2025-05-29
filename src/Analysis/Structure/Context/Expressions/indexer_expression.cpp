@@ -13,7 +13,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const IContextNode* const operand) : DynamicContextCollection(indexer->CreationType()), slotCount(-1), indexer(indexer)
+    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const IContextNode* const operand, const bool isPublic) : DynamicContextCollection(indexer->CreationType()), slotCount(-1), indexer(indexer), isPublic(isPublic)
     {
         AddChild(operand);
     }
@@ -33,8 +33,8 @@ namespace Analysis::Structure::Context
         return slotCount;
     }
 
-    bool IndexerExpression::Readable() const { return indexer->Readable(); }
-    bool IndexerExpression::Writable() const { return indexer->Writable() && creationType->MemberType() == MemberType::Class; }
+    bool IndexerExpression::Readable() const { return indexer->Readable() && !isPublic || indexer->PublicGet();; }
+    bool IndexerExpression::Writable() const { return indexer->Writable() && creationType->MemberType() == MemberType::Class && !isPublic || indexer->PublicSet(); }
 
     string IndexerExpression::CILData() const { return ""; }
 

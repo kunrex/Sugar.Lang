@@ -5,8 +5,6 @@
 #include "../describable.h"
 #include "../Interfaces/Creation/i_function.h"
 
-#include "../../Global/global_node.h"
-
 namespace Analysis::Structure::Core
 {
     class Function : public Describable, public Created, public virtual Interfaces::IFunction

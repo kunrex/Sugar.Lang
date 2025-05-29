@@ -7,11 +7,12 @@
 #include "../i_created.h"
 #include "../i_bindable.h"
 #include "../i_describable.h"
+#include "../i_transpilable.h"
 #include "../i_fully_nameable.h"
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IFunction : public virtual INode, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual ILocallyBindable
+    class IFunction : public virtual INode, public virtual IFullyNameable, public virtual IDescribable, public virtual ICreated, public virtual IParametrized, public virtual ILocallyBindable, public virtual ITranspilable
     {
 
     };

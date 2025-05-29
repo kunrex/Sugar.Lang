@@ -3,15 +3,24 @@
 #include <format>
 
 #include "function_extensions.h"
+#include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
+#include "../../../Creation/Binding/binder_extensions.h"
 
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
+#include "../../../Creation/Transpiling/cil_transpiler.h"
 
 using namespace std;
 
+using namespace Services;
+
+using namespace Exceptions;
+
 using namespace ParseNodes;
 using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -36,5 +45,32 @@ namespace Analysis::Structure::Global
     void ImplicitCast::BindLocal()
     {
         BindScope(parseNode, scope, this, parent);
+
+        if (!IsReturnComplete(scope, creationType))
+            PushException(new ReturnValueException(parseNode->Token().Index(), parent->Parent()));
+    }
+
+    void ImplicitCast::Transpile(StringBuilder& builder) const
+    {
+        builder.PushLine("");
+        builder.PushLine(std::format(".method {} final {} {} {}({}) cil managed", AccessModifierString(this), StaticModifierString(this), creationType->FullName(), name, ScopedParameterString(this)));
+
+        builder.PushLine(open_flower);
+        builder.IncreaseIndent();
+
+        int maxSlotSize = 0;
+
+        auto innerBuilder = StringBuilder();
+        innerBuilder.SetIndent(builder.Indent());
+
+        TranspileScope(scope, innerBuilder, maxSlotSize);
+
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
+        builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+
+        builder.Push(innerBuilder.Value());
+
+        builder.DecreaseIndent();
+        builder.PushLine(close_flower);
     }
 }

@@ -1,12 +1,11 @@
 #ifndef CLASS_H
 #define CLASS_H
 
-#include <map>
+#include <tuple>
+#include <vector>
 
 #include "../Core/DataTypes/data_type.h"
 #include "../Core/Interfaces/DataTypes/i_user_defined_type.h"
-
-#include "../Global/Functions/constructor.h"
 
 namespace Analysis::Structure::DataTypes
 {
@@ -37,18 +36,18 @@ namespace Analysis::Structure::DataTypes
 
             mutable std::string fullName;
 
-            std::map<std::string, Core::Interfaces::ICharacteristic*> characteristics;
+            std::vector<Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::map<unsigned long, Core::Interfaces::IFunctionDefinition*> functions;
+            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunctionDefinition*>> functions;
 
-            std::map<unsigned long, Core::Interfaces::IFunction*> constructors;
+            std::vector<std::tuple<unsigned long, Core::Interfaces::IConstructor*>> constructors;
 
-            std::map<unsigned long, Core::Interfaces::IIndexerDefinition*> indexers;
+            std::vector<std::tuple<unsigned long, Core::Interfaces::IIndexerDefinition*>> indexers;
 
-            std::map<unsigned long, Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, Core::Interfaces::IFunction*> explicitCasts;
+            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> implicitCasts;
+            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*> overloads;
+            std::vector<std::tuple<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
 
         public:
             ClassSource(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);
@@ -63,8 +62,11 @@ namespace Analysis::Structure::DataTypes
             void PushFunction(Core::Interfaces::IFunctionDefinition* function) override;
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            void PushConstructor(Core::Interfaces::IFunction* constructor) override;
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            void PushConstructor(Core::Interfaces::IConstructor* constructor) override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] Core::Interfaces::IConstructor* StaticConstructor() const override;
+            [[nodiscard]] Core::Interfaces::IConstructor* InstanceConstructor() const override;
 
             void PushIndexer(Core::Interfaces::IIndexerDefinition* indexer) override;
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
@@ -79,6 +81,8 @@ namespace Analysis::Structure::DataTypes
 
             void BindGlobal() override;
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
 
             void Print(const std::string& indent, bool last) const override;
 

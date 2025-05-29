@@ -23,7 +23,7 @@ namespace Services
             void SetIndent(int indent);
 
             void Push(const std::string& content);
-            void PushLine(const std::string& content);
+            void PushLine(const std::string& content = "");
 
             void Clear();
     };

@@ -8,6 +8,7 @@
 #include "../../Creation/Binding/binder_extensions.h"
 
 #include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
+#include "../../Creation/Transpiling/cil_transpiler.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ using namespace ParseNodes::Enums;
 using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Creation::Binding;
+using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
@@ -57,77 +59,131 @@ namespace Analysis::Structure::DataTypes
 
     void ClassSource::PushCharacteristic(ICharacteristic* const characteristic)
     {
-        characteristics[characteristic->Name()] = characteristic;
+        characteristics.push_back(characteristic);
     }
 
     const ICharacteristic* ClassSource::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
     void ClassSource::PushFunction(IFunctionDefinition* const function)
     {
-        functions[std::hash<string>()(function->Name()) ^ ArgumentHash(function)] = function;
+        functions.emplace_back(std::hash<string>()(function->Name()) ^ ArgumentHash(function), function);
     }
 
     const IFunctionDefinition* ClassSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
-        return functions.contains(hash) ? functions.at(hash) : nullptr;
+
+        for (const auto function : functions)
+            if (std::get<0>(function) == hash)
+                return std::get<1>(function);
+
+        return nullptr;
     }
 
-    void ClassSource::PushConstructor(IFunction* const constructor)
+    void ClassSource::PushConstructor(IConstructor* const constructor)
     {
-        constructors[ArgumentHash(constructor)] = constructor;
+        if (constructor->CheckDescriber(Describer::Static))
+            constructors.insert(constructors.begin(), { ArgumentHash(constructor), constructor });
+        else if (constructor->ParameterCount() == 0)
+            constructors.insert(constructors.begin() + 1, { ArgumentHash(constructor), constructor });
+        else
+            constructors.emplace_back(ArgumentHash(constructor), constructor);
     }
 
-    const IFunction* ClassSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* ClassSource::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
+        if (argumentList.empty())
+            return std::get<1>(constructors[1]);
+
         const auto hash= ArgumentHash(argumentList);
-        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
+        for (auto i = 2; i < constructors.size(); i++)
+        {
+            if (std::get<0>(constructors[i]) == hash)
+                return std::get<1>(constructors[i]);
+        }
+
+        return nullptr;
+    }
+
+    IConstructor* ClassSource::StaticConstructor() const
+    {
+        const auto constructor = std::get<1>(constructors[0]);
+        return constructor->CheckDescriber(Describer::Static) ? constructor : nullptr;
+    }
+
+    IConstructor* ClassSource::InstanceConstructor() const
+    {
+        const auto constructor = std::get<1>(constructors[0]);
+        return !constructor->ParameterCount() ? constructor : nullptr;
     }
 
     void ClassSource::PushIndexer(IIndexerDefinition* const indexer)
     {
-        indexers[ArgumentHash(indexer)] = indexer;
+        indexers.emplace_back(ArgumentHash(indexer), indexer);
     }
 
     const IIndexerDefinition* ClassSource::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return indexers.contains(hash) ? indexers.at(hash) : nullptr;
+
+        for (const auto indexer : indexers)
+            if (std::get<0>(indexer) == hash)
+                return std::get<1>(indexer);
+
+        return nullptr;
     }
 
     void ClassSource::PushImplicitCast(IFunction* const cast)
     {
-        implicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
+        implicitCasts.emplace_back(ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)})), cast);
     }
 
     const IFunction* ClassSource::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
+
+        for (const auto cast : implicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     void ClassSource::PushExplicitCast(IFunction* const cast)
     {
-        explicitCasts[ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)}))] = cast;
+        explicitCasts.emplace_back(ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)})), cast);
     }
 
     const IFunction* ClassSource::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
-        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
+
+        for (const auto cast : explicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     void ClassSource::PushOverload(IOperatorOverload* const overload)
     {
-        overloads[overload->Operator()] = overload;
+        overloads.emplace_back(overload->Operator(), overload);
     }
 
     const IOperatorOverload* ClassSource::FindOverload(const SyntaxKind base) const
     {
-        return overloads.at(base);
+        for (const auto cast : overloads)
+            if (std::get<0>(cast) == base)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     void ClassSource::BindGlobal()
@@ -173,6 +229,8 @@ namespace Analysis::Structure::DataTypes
             }
         }
 
+        TryDeclareStaticConstructor(this);
+
         if (CheckDescriber(Describer::Static))
             return;
 
@@ -182,23 +240,53 @@ namespace Analysis::Structure::DataTypes
 
     void ClassSource::BindLocal()
     {
-        for (const auto& characteristic : characteristics)
-            characteristic.second->BindLocal();
+        for (const auto characteristic : characteristics)
+            characteristic->BindLocal();
 
         for (const auto function: functions)
-            function.second->BindLocal();
+            std::get<1>(function)->BindLocal();
 
         for (const auto constructor: constructors)
-            constructor.second->BindLocal();
+            std::get<1>(constructor)->BindLocal();
 
         for (const auto cast: implicitCasts)
-            cast.second->BindLocal();
+            std::get<1>(cast)->BindLocal();
 
         for (const auto cast: explicitCasts)
-            cast.second->BindLocal();
+            std::get<1>(cast)->BindLocal();
 
         for (const auto overload: overloads)
-            overload.second->BindLocal();
+            std::get<1>(overload)->BindLocal();
+    }
+
+    void ClassSource::Transpile(Services::StringBuilder& builder) const
+    {
+        builder.PushLine();
+        builder.PushLine(std::format(".class {} {} sequential ansi {} extends [System.Runtime]System.Object", AccessModifierString(this), StaticModifierString(this), name));
+
+        builder.PushLine(open_flower);
+        builder.IncreaseIndent();
+
+        for (const auto characteristic : characteristics)
+            characteristic->Transpile(builder);
+
+        for (const auto function: functions)
+            std::get<1>(function)->Transpile(builder);
+
+        for (const auto constructor: constructors)
+            std::get<1>(constructor)->Transpile(builder);
+
+        for (const auto cast: implicitCasts)
+            std::get<1>(cast)->Transpile(builder);
+
+        for (const auto cast: explicitCasts)
+            std::get<1>(cast)->Transpile(builder);
+
+        for (const auto overload: overloads)
+            std::get<1>(overload)->Transpile(builder);
+
+        builder.DecreaseIndent();
+        builder.PushLine(close_flower);
     }
 
     void ClassSource::Print(const string& indent, const bool last) const
@@ -209,26 +297,24 @@ namespace Analysis::Structure::DataTypes
     ClassSource::~ClassSource()
     {
         for (const auto& characteristic : characteristics)
-            delete characteristic.second;
+            delete characteristic;
 
         for (const auto function: functions)
-            delete function.second;
+            delete std::get<1>(function);
 
         for (const auto constructor: constructors)
-            delete constructor.second;
+            delete std::get<1>(constructor);
 
         for (const auto indexer: indexers)
-            delete indexer.second;
+            delete std::get<1>(indexer);
 
         for (const auto cast: implicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto cast: explicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto overload: overloads)
-            delete overload.second;
+            delete std::get<1>(overload);
     }
 }
-
-

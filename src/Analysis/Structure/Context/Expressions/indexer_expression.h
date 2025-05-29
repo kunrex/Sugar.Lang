@@ -10,11 +10,13 @@ namespace Analysis::Structure::Context
     class IndexerExpression final : public DynamicContextCollection
     {
         private:
+            const bool isPublic;
+
             mutable int slotCount;
             const Core::Interfaces::IIndexerDefinition* indexer;
 
         public:
-            IndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const IContextNode* operand);
+            IndexerExpression(const Core::Interfaces::IIndexerDefinition* indexer, const IContextNode* operand, bool isPublic);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

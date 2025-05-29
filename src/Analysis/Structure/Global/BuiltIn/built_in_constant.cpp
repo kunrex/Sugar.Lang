@@ -17,14 +17,19 @@ namespace Analysis::Structure::Global
     bool BuiltInConstant::Readable() const { return true; }
     bool BuiltInConstant::Writable() const { return false; }
 
-    bool BuiltInConstant::Compiled() const { return true; }
-
     const std::string& BuiltInConstant::FullName() const { return fullName; }
-
-    bool BuiltInConstant::IsDependent(const IConstant* constant) const { return false; }
-    void BuiltInConstant::PushDependency(const IConstant* constant) const
-    { }
 
     void BuiltInConstant::BindLocal()
     { }
+
+    void BuiltInConstant::Transpile(Services::StringBuilder& builder) const
+    { }
+
+    void BuiltInConstant::IncrementDependencyCount()
+    { }
+
+    void BuiltInConstant::PushDependant(ICharacteristic* const characteristic) const
+    { }
+
+    bool BuiltInConstant::HasDependant(const ICharacteristic* characteristic) const { return false; }
 }

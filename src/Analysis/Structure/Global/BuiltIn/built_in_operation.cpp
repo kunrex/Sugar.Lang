@@ -1,5 +1,6 @@
 #include "built_in_operation.h"
 
+#include "built_in_property.h"
 #include "../../Compilation/compilation_result.h"
 
 using namespace std;
@@ -25,5 +26,8 @@ namespace Analysis::Structure::Global
     CompilationResult BuiltInOperation::StaticCompile(const std::vector<CompilationResult>& arguments) const { return overloadDelegate(arguments); }
 
     void BuiltInOperation::BindLocal()
+    { }
+
+    void BuiltInProperty::Transpile(Services::StringBuilder& builder) const
     { }
 }

@@ -467,8 +467,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/Creation/i_variable.h
         Analysis/Structure/Core/Interfaces/Creation/i_function_definition.h
         Analysis/Structure/Core/Interfaces/Creation/i_property_signature.h
-        Analysis/Structure/Core/Creation/property_signature.cpp
-        Analysis/Structure/Core/Creation/property_signature.h
         Analysis/Structure/Core/Interfaces/Creation/i_indexer_definition.h
         Analysis/Structure/Core/Interfaces/Creation/i_characteristic.h
         Analysis/Structure/Core/Interfaces/Creation/i_operator_overload.h
@@ -511,8 +509,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/scoped/i_scoped.h
         Analysis/Structure/Wrappers/Reference/void.cpp
         Analysis/Structure/Wrappers/Reference/void.h
-        Analysis/Structure/Compilation/constant_compiler.cpp
-        Analysis/Structure/Compilation/constant_compiler.h
         Analysis/Structure/Compilation/compilation_result.cpp
         Analysis/Structure/Compilation/compilation_result.h
         Lexing/Tokens/Enums/operator_kind.h
@@ -526,7 +522,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/DataTypes/i_delegate_type.h
         Analysis/Structure/Context/Control/throw.cpp
         Analysis/Structure/Context/Control/throw.h
-        Analysis/Structure/Core/Interfaces/Creation/i_constant.h
         Analysis/Structure/Context/Expressions/ternary_expression.cpp
         Analysis/Structure/Context/Expressions/ternary_expression.h
         Analysis/Structure/Context/Expressions/invalid_ternary_expression.cpp
@@ -546,9 +541,19 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h
         Analysis/Structure/Wrappers/Value/built_in_functions.cpp
         Analysis/Structure/Wrappers/Value/built_in_functions.h
-        Analysis/Structure/Wrappers/Generic/enum_field.cpp
-        Analysis/Structure/Wrappers/Generic/enum_field.h
         Lexing/Tokens/Enums/type_kind.cpp
         Analysis/Structure/Core/Interfaces/i_bindable.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_parametrized.h
+        Analysis/Structure/Core/Interfaces/i_transpilable.h
+        Exceptions/Compilation/Analysis/Local/return_value_exception.cpp
+        Exceptions/Compilation/Analysis/Local/return_value_exception.h
+        Analysis/Structure/Core/Interfaces/Creation/i_constructor.h
+        Exceptions/Compilation/Analysis/Local/accessor_body_exception.cpp
+        Exceptions/Compilation/Analysis/Local/accessor_body_exception.h
+        Analysis/Creation/Binding/constant_binder.cpp
+        Analysis/Creation/Binding/constant_binder.h
+        Exceptions/Compilation/Analysis/Local/initialisation_exception.cpp
+        Exceptions/Compilation/Analysis/Local/initialisation_exception.h
+        Exceptions/Compilation/Analysis/Local/constant_expected_exception.cpp
+        Exceptions/Compilation/Analysis/Local/constant_expected_exception.h
 )

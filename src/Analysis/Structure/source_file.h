@@ -55,6 +55,8 @@ namespace Analysis::Structure
             void BindGlobal() override;
             void BindLocal() override;
 
+            void Transpile(Services::StringBuilder& builder) const override;
+
             void Print(const std::string& indent, bool last) const override;
 
             ~SourceFile() override;

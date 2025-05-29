@@ -324,7 +324,7 @@ namespace Analysis::Creation::Binding
                 case MemberType::Field:
                     return new FieldContext(characteristic, scoped->MemberType() == MemberType::Constructor);
                 case MemberType::Property:
-                    return new PropertyContext(dynamic_cast<const PropertyDefinition*>(characteristic));
+                    return new PropertyContext(dynamic_cast<const PropertyDefinition*>(characteristic), false);
                 default:
                     break;
             }
@@ -401,7 +401,7 @@ namespace Analysis::Creation::Binding
             if (dataType != creationType && !indexer->CheckDescriber(Describer::Public))
                 PushException(new AccessibilityException(std::format("{}::indexer", creationType->FullName()), index, source));
 
-            const auto indexerContext = new IndexerExpression(indexer, operand);
+            const auto indexerContext = new IndexerExpression(indexer, operand, creationType != dataType);
             for (const auto argument: arguments)
                 indexerContext->AddChild(argument);
 
@@ -494,7 +494,7 @@ namespace Analysis::Creation::Binding
                             case MemberType::Field:
                                 return new DotExpression(context, new FieldContext(characteristic, scoped->MemberType() == MemberType::Constructor));
                             case MemberType::Property:
-                                return new DotExpression(context, new PropertyContext(dynamic_cast<const Property*>(characteristic)));
+                                return new DotExpression(context, new PropertyContext(dynamic_cast<const Property*>(characteristic), context->CreationType() != dataType));
                             default:
                                 break;
                         }

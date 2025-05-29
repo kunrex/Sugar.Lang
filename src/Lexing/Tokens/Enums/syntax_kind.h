@@ -140,6 +140,7 @@ namespace Tokens::Enums
         Public,
         Private,
         Constexpr,
+        Entrypoint,
 
         Do,
         For,

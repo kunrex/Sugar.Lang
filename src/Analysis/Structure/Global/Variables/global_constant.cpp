@@ -1,6 +1,11 @@
 #include "global_constant.h"
 
+#include <format>
+
+#include "../../../Creation/Binding/constant_binder.h"
+#include "../../../Creation/Transpiling/cil_transpiler.h"
 #include "../../Compilation/constant_compiler.h"
+#include "../../Context/Constants/integer_constant.h"
 
 using namespace std;
 
@@ -8,14 +13,18 @@ using namespace Tokens::Enums;
 
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
+using namespace Analysis::Creation::Transpiling;
+
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependencies()
+    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependants()
     { }
 
     MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
@@ -25,28 +34,69 @@ namespace Analysis::Structure::Global
     bool GlobalConstant::Readable() const { return true; }
     bool GlobalConstant::Writable() const { return false; }
 
-    bool GlobalConstant::Compiled() const { return context != nullptr; }
-
-    void GlobalConstant::PushDependency(const IConstant* const constant) const
+    void GlobalConstant::BindLocal()
     {
-        dependencies.push_back(constant);
+        GlobalVariable::BindLocal();
+
+        if (context != nullptr)
+            for (const auto dependant: dependants)
+                dependant->BindLocal();
     }
 
-    bool GlobalConstant::IsDependent(const IConstant* const constant) const
+    void GlobalConstant::Transpile(Services::StringBuilder& builder) const
     {
-        for (const auto dependency : dependencies)
-            if (dependency == constant || dependency->IsDependent(constant))
+        builder.PushLine("");
+        builder.PushLine(std::format(".field literal {} {} = {}", creationType()->FullName(), name, ConstantString(this)));
+    }
+
+    void GlobalConstant::IncrementDependencyCount() { dependencyCount++; }
+
+    void GlobalConstant::PushDependant(ICharacteristic* const characteristic) const
+    {
+        if(ranges::find(dependants, characteristic) != dependants.end())
+        {
+            dependants.push_back(characteristic);
+            characteristic->IncrementDependencyCount();
+        }
+    }
+
+    bool GlobalConstant::HasDependant(const ICharacteristic* characteristic) const
+    {
+        for (const auto dependant: dependants)
+            if (dependant == characteristic || dependant->HasDependant(characteristic))
                 return true;
 
         return false;
     }
 
-    void GlobalConstant::BindLocal()
+    ImplicitEnumConstant::ImplicitEnumConstant(const std::string& name, const IDataType* const creationType, const ICharacteristic* const characteristic) : GlobalConstant(name, Describer::Public | Describer::Constexpr, creationType, nullptr), characteristic(characteristic)
+    {
+        if (characteristic == nullptr)
+        {
+            context = new IntegerConstant(0);
+            return;
+        }
+
+        characteristic->PushDependant(this);
+
+        dependencyCount = 1;
+        resolvedDependencyCount = 0;
+    }
+
+    void ImplicitEnumConstant::BindLocal()
     {
         if (context != nullptr)
             return;
 
-        context = CompileExpression(this, parent);
+        resolvedDependencyCount++;
+        if (resolvedDependencyCount < dependencyCount)
+            return;
+
+        const auto value = *reinterpret_cast<int*>(characteristic->Context()->Metadata());
+
+        context = new IntegerConstant(value + 1);
+        for (const auto dependant: dependants)
+            dependant->BindLocal();
     }
 }
 

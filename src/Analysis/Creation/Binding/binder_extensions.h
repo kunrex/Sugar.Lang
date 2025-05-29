@@ -3,8 +3,8 @@
 
 #include "../../../Exceptions/log_exception.h"
 
-#include "../../Structure/Core/DataTypes/data_type.h"
-#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
+#include "../../Structure/Core/describable.h"
+#include "../../Structure/Core/Interfaces/DataTypes/i_data_type.h"
 
 namespace Analysis::Creation::Binding
 {

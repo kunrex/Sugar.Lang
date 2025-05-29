@@ -1,6 +1,8 @@
 #ifndef CIL_TRANSPILER_H
 #define CIL_TRANSPILER_H
 
+#include <string>
+
 #include "../../../Services/string_builder.h"
 
 #include "../../Structure/source_file.h"
@@ -9,44 +11,28 @@
 #include "../../Structure/Core/Interfaces/Scoped/i_scoped.h"
 #include "../../Structure/Global/Variables/global_constant.h"
 
-namespace Analysis::Creation
+namespace Analysis::Creation::Transpiling
 {
-    class CILTranspiler final
-    {
-        private:
-            const std::string projectName;
-            const std::string projectDirectory;
+    const std::string open_flower = "{\n";
+    const std::string close_flower = "}\n";
 
-            std::string projectLocation;
+    const std::string pop = "pop";
+    const std::string dup = "dup";
+    const std::string load_this = "ldarg.0";
 
-            const Structure::SourceDirectory* source;
+    std::string_view AccessModifierString(const Structure::Core::Interfaces::IDescribable* describable);
 
-            Services::StringBuilder stringBuilder;
+    std::string_view StaticModifierString(const Structure::Core::Interfaces::IFunction* describable);
+    std::string_view StaticModifierString(const Structure::Core::Interfaces::IUserDefinedType* describable);
 
-            void PushTranscription();
+    std::string ConstantString(const Structure::Core::Interfaces::ICharacteristic* characteristic);
 
-            void TranspileDirectory(const Structure::SourceDirectory* directory);
+    std::string ScopedParameterString(const Structure::Core::Interfaces::IScoped* function);
+    std::string ScopedLocalVariableString(const Structure::Core::Interfaces::IScoped* function);
 
-            void TranspileFile(const Structure::SourceFile* file);
-            void TranspileDataType(const Structure::Core::Interfaces::IUserDefinedType* dataType);
+    void TranspileExpression(const Structure::Core::Interfaces::IContextNode* context, Services::StringBuilder& stringBuilder);
 
-            void TranspileConstant(const Structure::Core::Interfaces::ICharacteristic* constant);
-            void TranspileCharacteristic(const Structure::Core::Interfaces::ICharacteristic* characteristic);
-            void TranspileEnumField(const Structure::Core::Interfaces::ICharacteristic* constant, const std::string& enumType);
-
-            void TranspileFunction(const Structure::Core::Interfaces::IScoped* function);
-            void TranspileConstructor(const Structure::Core::Interfaces::IScoped* constructor, const std::string& precursor);
-
-            void TranspileFunctionBody(const Structure::Core::Interfaces::IScoped* scoped, const std::string& precursor);
-
-            void TranspileScope(const Structure::Local::Scope* scope, Services::StringBuilder& stringBuilder, int& maxSlotSize);
-
-        public:
-            CILTranspiler(std::string name, std::string directory, const Structure::SourceDirectory* source);
-
-            void Transpile();
-            [[nodiscard]] const std::string& OutputFile() const;
-    };
+    void TranspileScope(const Structure::Local::Scope* scope, Services::StringBuilder& stringBuilder, int& maxSlotSize);
 }
 
 #endif

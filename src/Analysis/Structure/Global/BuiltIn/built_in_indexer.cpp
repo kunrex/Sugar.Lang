@@ -8,16 +8,16 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    BuiltInIndexer::BuiltInIndexer(const Interfaces::IDataType* creationType, const bool readable, const string& getInstruction, const bool writable, const string& setInstruction) : IndexerDefinition(Describer::Public, creationType), BuiltInFunction(), readable(readable), writable(writable)
-    {
-        this->getInstruction = getInstruction;
-        this->setInstruction = setInstruction;
-    }
+    BuiltInIndexer::BuiltInIndexer(const IDataType* const creationType, const bool readable, string getInstruction, const bool writable, string setInstruction) : IndexerDefinition(Describer::Public, creationType), readable(readable), writable(writable), getInstruction(std::move(getInstruction)), setInstruction(std::move(setInstruction))
+    { }
 
     MemberType BuiltInIndexer::MemberType() const { return MemberType::BuiltInIndexer; }
 
     bool BuiltInIndexer::Readable() const { return readable; }
     bool BuiltInIndexer::Writable() const { return writable; }
+
+    bool BuiltInIndexer::PublicGet() const { return readable; }
+    bool BuiltInIndexer::PublicSet() const { return writable; }
 
     const std::string& BuiltInIndexer::SignatureGetString() const { return getInstruction; }
     const std::string& BuiltInIndexer::SignatureSetString() const

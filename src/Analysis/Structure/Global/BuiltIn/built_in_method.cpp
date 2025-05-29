@@ -22,4 +22,7 @@ namespace Analysis::Structure::Global
 
     void BuiltInMethod::BindLocal()
     { }
+
+    void BuiltInMethod::Transpile(Services::StringBuilder& builder) const
+    { }
 }

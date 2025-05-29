@@ -1,30 +1,25 @@
-#include "constant_compiler.h"
+#include "constant_binder.h"
 
-#include "compilation_result.h"
-#include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compilation/Analysis/Local/accessibility_exception.h"
-#include "../../../Parsing/ParseNodes/Constants/constant_node.h"
-#include "../../../Parsing/ParseNodes/Expressions/cast_expression_node.h"
-#include "../../../Parsing/ParseNodes/Expressions/dot_expression_node.h"
-#include "../../../Parsing/ParseNodes/Expressions/Binary/binary_node.h"
-#include "../../../Parsing/ParseNodes/Expressions/Unary/unary_node.h"
-#include "../../Creation/Binding/binder_extensions.h"
-#include "../Context/context_node.h"
-#include "../Context/Constants/float_constant.h"
-#include "../Context/Constants/integer_constant.h"
-#include "../Context/Constants/string_constant.h"
-#include "../Core/Interfaces/Creation/i_built_in_cast.h"
-#include "../Core/Interfaces/Creation/i_constant.h"
-#include "../Core/Interfaces/DataTypes/i_user_defined_type.h"
-#include "../Wrappers/Reference/object.h"
-#include "../Wrappers/Reference/string.h"
-#include "../Wrappers/Value/boolean.h"
-#include "../Wrappers/Value/character.h"
-#include "../Wrappers/Value/double.h"
-#include "../Wrappers/Value/float.h"
-#include "../Wrappers/Value/integer.h"
-#include "../Wrappers/Value/long.h"
-#include "../Wrappers/Value/short.h"
+#include <format>
+
+#include "binder_extensions.h"
+#include "../../../Exceptions/Compilation/Analysis/Local/constant_expected_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Local/overload_not_found_exception.h"
+#include "../../Structure/Context/Constants/float_constant.h"
+#include "../../Structure/Context/Constants/integer_constant.h"
+#include "../../Structure/Context/Constants/string_constant.h"
+#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
+#include "../../Structure/Wrappers/Generic/action.h"
+#include "../../Structure/Wrappers/Reference/string.h"
+#include "../../Structure/Wrappers/Value/boolean.h"
+#include "../../Structure/Wrappers/Value/character.h"
+#include "../../Structure/Wrappers/Value/double.h"
+#include "../../Structure/Wrappers/Value/float.h"
+#include "../../Structure/Wrappers/Value/integer.h"
+#include "../../Structure/Wrappers/Value/long.h"
+#include "../../Structure/Wrappers/Value/short.h"
+
+#include "../../Structure/Compilation/compilation_result.h"
 
 using namespace std;
 
@@ -35,39 +30,38 @@ using namespace Tokens::Enums;
 using namespace ParseNodes::Enums;
 using namespace ParseNodes::Core::Interfaces;
 
-using namespace Analysis::Creation::Binding;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Wrappers;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-namespace Analysis::Structure::Compilation
+namespace Analysis::Creation::Binding
 {
     const IPrimitiveType* BindPrimitiveType(const IParseNode* const node)
     {
         switch (node->Token().Kind())
         {
-        case SyntaxKind::Short:
-            return &Short::Instance();
-        case SyntaxKind::Int:
-            return &Integer::Instance();
-        case SyntaxKind::Long:
-            return &Long::Instance();
-        case SyntaxKind::Float:
-            return &Float::Instance();
-        case SyntaxKind::Double:
-            return &Double::Instance();
-        case SyntaxKind::String:
-            return &String::Instance();
-        case SyntaxKind::Character:
-            return &Character::Instance();
-        default:
-            return &Boolean::Instance();
+            case SyntaxKind::Short:
+                return &Short::Instance();
+            case SyntaxKind::Int:
+                return &Integer::Instance();
+            case SyntaxKind::Long:
+                return &Long::Instance();
+            case SyntaxKind::Float:
+                return &Float::Instance();
+            case SyntaxKind::Double:
+                return &Double::Instance();
+            case SyntaxKind::String:
+                return &String::Instance();
+            case SyntaxKind::Character:
+                return &Character::Instance();
+            default:
+                return &Boolean::Instance();
         }
     }
 
-    std::optional<CompilationResult> AsCompilationResult(const IConstant* const constant)
+    std::optional<CompilationResult> AsCompilationResult(const ICharacteristic* const constant)
     {
         switch (constant->CreationType()->Type())
         {
@@ -87,76 +81,80 @@ namespace Analysis::Structure::Compilation
             case TypeKind::Character:
                 return CompilationResult(&Character::Instance(), *reinterpret_cast<const char*>(constant->Context()->Metadata()));
             case TypeKind::String:
-                return CompilationResult(&String::Instance(), *reinterpret_cast<const string*>(constant->Context()->Metadata()));
+                return CompilationResult(&String::Instance(), *reinterpret_cast<const std::string*>(constant->Context()->Metadata()));
             default:
                 return std::nullopt;
         }
     }
 
-    std::optional<CompilationResult> TryCompileConstant(const IParseNode* const identifierNode, const IConstant* const constant, const IDataType* const creationType, const IUserDefinedType* const dataType)
+    std::optional<CompilationResult> TryCompileConstant(const IParseNode* const identifierNode, ICharacteristic* const constant, const IDataType* const creationType, const IUserDefinedType* const dataType)
     {
-        switch (const auto characteristic = creationType->FindCharacteristic(*identifierNode->Token().Value<string>()); characteristic->MemberType())
+        switch (const auto characteristic = creationType->FindCharacteristic(*identifierNode->Token().Value<std::string>()); characteristic->MemberType())
         {
             case MemberType::ConstantField:
                 {
-                    const auto constField = dynamic_cast<const IConstant*>(characteristic);
-                    if (constField->IsDependent(constant))
+                    if (characteristic->Context() != nullptr)
+                        return AsCompilationResult(characteristic);
+
+                    if (characteristic->HasDependant(constant))
                     {
-                        //exception
-                        return std::nullopt;
+                        PushException(new LogException(std::format("Cyclic dependency between: {} and: {}", constant->FullName(), characteristic->FullName()), identifierNode->Token().Index(), dataType->Parent()));
+                        constant->IncrementDependencyCount();
                     }
-
-                    constant->PushDependency(constField);
-
-                    if (!constField->Compiled())
-                        CompileExpression(constField, dataType);
-
-                    return AsCompilationResult(constField);
+                    else
+                         characteristic->PushDependant(constant);
                 }
                 break;
             default:
-                //exception
+                PushException(new ConstantNotFoundException(identifierNode->Token().Index(), dataType->Parent()));
+                break;
+        }
+
+        return std::nullopt;
+    }
+
+    std::optional<CompilationResult> CompileEntity(const IParseNode* const parseNode, ICharacteristic* const constant, const IUserDefinedType* const dataType)
+    {
+        const IDataType* currentType = dataType;
+        auto current = parseNode;
+
+        while (true)
+        {
+            if (current->NodeType() == NodeType::Identifier)
+                return TryCompileConstant(current, constant, currentType, dataType);
+
+            if (current->NodeType() != NodeType::Dot)
+            {
+                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                 return std::nullopt;
+            }
+
+            if (const auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
+            {
+                const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<string>());
+                if (characteristic == nullptr)
+                {
+                    PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                    return std::nullopt;
+                }
+
+                currentType = characteristic->CreationType();
+                current = parseNode->GetChild(static_cast<int>(ChildCode::RHS));
+
+                continue;
+            }
+
+            PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+            return std::nullopt;
         }
     }
 
-    std::optional<CompilationResult> CompileExpression(const IParseNode* const parseNode, const IConstant* const constant, const IUserDefinedType* const dataType)
+    std::optional<CompilationResult> CompileExpression(const IParseNode* const parseNode, ICharacteristic* const constant, const IUserDefinedType* const dataType)
     {
         switch (parseNode->NodeType())
         {
             case NodeType::Dot:
-                {
-                    const IDataType* currentType = dataType;
-                    auto current = parseNode;
-
-                    while (true)
-                    {
-                        if (current->NodeType() == NodeType::Identifier)
-                            return TryCompileConstant(current, constant, currentType, dataType);
-
-                        if (current->NodeType() != NodeType::Dot)
-                        {
-                            //exception
-                            return std::nullopt;
-                        }
-
-                        if (const auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
-                        {
-                            const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<string>());
-                            if (characteristic == nullptr)
-                            {
-                                //exception
-                                return std::nullopt;
-                            }
-
-                            currentType = characteristic->CreationType();
-                        }
-
-                        //exception
-                        return std::nullopt;
-                    }
-                }
-                break;
+                    return CompileEntity(parseNode, constant, dataType);
             case NodeType::Constant:
                 {
                     switch (const auto& token = parseNode->Token(); token.Kind())
@@ -178,7 +176,7 @@ namespace Analysis::Structure::Compilation
                             case SyntaxKind::String:
                                 return CompilationResult(&String::Instance(), *token.Value<long>());
                             default:
-                                //exception
+                                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                                 return std::nullopt;
                     }
                 }
@@ -195,7 +193,7 @@ namespace Analysis::Structure::Compilation
                     if (const auto cast = operand->creationType->FindBuiltInCast(type, operand->creationType); cast != nullptr)
                         return cast->StaticCompile(*operand);
 
-                    //exception
+                    PushException(new LogException("No built in cast not found", parseNode->Token().Index(), dataType->Parent()));
                     return std::nullopt;
                 }
             case NodeType::Unary:
@@ -207,7 +205,7 @@ namespace Analysis::Structure::Compilation
                     const auto operation = parseNode->Token().Kind();
                     if (operation == SyntaxKind::Increment || operation == SyntaxKind::Decrement)
                     {
-                        //exception
+                        PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
@@ -215,13 +213,12 @@ namespace Analysis::Structure::Compilation
 
                     if (overload == nullptr)
                     {
-                        //exception;
+                        PushException(new OverloadNotFoundException(operation, parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
                     return overload->StaticCompile({ *operand });
                 }
-                break;
             case NodeType::Binary:
                 {
                     const auto lhs = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::LHS)), constant, dataType);
@@ -235,7 +232,7 @@ namespace Analysis::Structure::Compilation
 
                     if (lhs->creationType != rhs->creationType)
                     {
-                        //exception
+                        PushException(new LogException(std::format("Cannot perform built int operation between types: {} and: {}", lhs->creationType->FullName(), rhs->creationType->FullName()), parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
@@ -243,21 +240,21 @@ namespace Analysis::Structure::Compilation
 
                     if (overload == nullptr)
                     {
-                        //exception;
+                        PushException(new OverloadNotFoundException(parseNode->Token().Kind(), parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
                     return overload->StaticCompile({ *lhs, *rhs });
                 }
             default:
-                //exception
+                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                 return std::nullopt;
         }
     }
 
-    const IContextNode* CompileExpression(const IConstant* const constant, const IUserDefinedType* const dataType)
+    const IContextNode* ConstantCompile(ICharacteristic* const characteristic, const IUserDefinedType* dataType)
     {
-        const auto result = CompileExpression(constant->ParseNode(), constant, dataType);
+        const auto result = CompileExpression(characteristic->ParseNode(), characteristic, dataType);
         if (!result)
             return nullptr;
 
@@ -283,7 +280,7 @@ namespace Analysis::Structure::Compilation
             case TypeKind::Character:
                 return new CharacterConstant(std::get<char>(result->data));
             case TypeKind::String:
-                return new StringConstant(std::get<string>(result->data));
+                return new StringConstant(std::get<std::string>(result->data));
             default:
                 return nullptr;
         }

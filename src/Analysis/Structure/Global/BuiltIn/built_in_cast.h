@@ -22,6 +22,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Compilation::CompilationResult StaticCompile(const Compilation::CompilationResult& argument) const override;
 
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
     };
 }
 

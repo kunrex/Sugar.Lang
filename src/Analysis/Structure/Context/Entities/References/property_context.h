@@ -10,10 +10,11 @@ namespace Analysis::Structure::Context
     class PropertyContext final : public ContextNode
     {
         private:
+            const bool isPublic;
             const Creation::PropertyDefinition* property;
 
         public:
-            explicit PropertyContext(const Creation::PropertyDefinition* property);
+            PropertyContext(const Creation::PropertyDefinition* property, bool isPublic);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

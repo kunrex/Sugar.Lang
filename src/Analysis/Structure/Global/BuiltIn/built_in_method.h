@@ -16,6 +16,8 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& FullName() const override;
 
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
     };
 }
 

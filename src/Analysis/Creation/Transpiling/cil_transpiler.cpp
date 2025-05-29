@@ -54,101 +54,14 @@ using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string open_flower = "\n{\n";
-const string close_flower = "\n}\n";
-
-const string prefix_auto = "auto";
-const string prefix_ansi = "ansi";
-const string prefix_sealed = "sealed";
-const string prefix_extends = "extends";
-const string prefix_sequential = "sequential";
-const string prefix_before = "beforefieldinit";
-
-const string ms_core_enum = "[System.Runtime]System.Enum";
-const string ms_core_class = "[System.Runtime]System.Object";
-const string ms_core_struct = "[System.Runtime]System.TypeValue";
-
-const string pop = "pop";
-const string dup = "dup";
-const string load_this = "ldarg.0";
-
-namespace Analysis::Creation
+namespace Analysis::Creation::Transpiling
 {
-    std::optional<string> CreateOutputFile(const string& outputDirectory, const string& fileName)
-    {
-        const auto outputFile = outputDirectory / fs::path(fileName);
+    std::string_view AccessModifierString(const IDescribable* const describable) { return describable->CheckDescriber(Describer::Public) ? "public" : "private"; }
 
-        if (std::ofstream file(outputFile); file.is_open())
-        {
-            file.close();
-            return string(outputFile);
-        }
+    std::string_view StaticModifierString(const IFunction* const describable) { return describable->CheckDescriber(Describer::Static) ? "static" : "instance"; }
+    std::string_view StaticModifierString(const IUserDefinedType* const describable) { return describable->CheckDescriber(Describer::Static) ? "sealed abstract" : "sealed"; }
 
-        ExceptionManager::Instance().AddChild(new TranspileFileException(outputFile));
-        return std::nullopt;
-    }
-
-    string AccessModifierString(const IDescribable* const describer) { return describer->CheckDescriber(Describer::Public) ? "public" : "private"; }
-
-    string DataTypeStaticString(const IDescribable* const describer) { return describer->CheckDescriber(Describer::Static) ? "sealed abstract" : "sealed"; }
-
-    string FieldDescriberString(const IDescribable* const describer)
-    {
-        std::vector<string> describers;
-
-        describers.emplace_back(AccessModifierString(describer));
-
-        if (describer->CheckDescriber(Describer::Const))
-            describers.emplace_back("literal");
-        else if (describer->CheckDescriber(Describer::Static))
-            describers.emplace_back("static");
-
-        if (describer->CheckDescriber(Describer::Constexpr))
-            describers.emplace_back("initonly");
-
-        if (!describers.empty())
-        {
-            string result;
-            for (const auto& value: describers)
-                result += value;
-
-            return result;
-        }
-
-        return "";
-    }
-
-    string FunctionStaticString(const IDescribable* const describer) { return describer->CheckDescriber(Describer::Static) ? "static" : "instance"; }
-
-    string FunctionParametersString(const IScoped* const function)
-    {
-        string parameters;
-        const auto parameterCount = function->ParameterCount();
-
-        for (auto i = 0; i < parameterCount; i++)
-        {
-            const auto parameter = *function->VariableAt(i);
-            parameters += std::format("{} {}{}", parameter.CreationType()->FullName(), parameter.Name(), i < parameterCount - 1 ? "," : "");
-        }
-
-        return parameters;
-    }
-
-    string FunctionVariablesString(const IScoped* const function)
-    {
-        string variables;
-        const auto variableCount = function->VariableCount() + function->ParameterCount();
-
-        for (auto i = 0; i < variableCount; i++)
-        {
-            const auto variable = *function->VariableAt(i);
-            variables += std::format("{} {}{}", variable.CreationType()->FullName(), variable.Name(), i < variableCount- 1 ? "," : "");
-        }
-
-        return variables;
-    }
-
-    string TranspileConstantString(const ICharacteristic* const characteristic)
+    string ConstantString(const ICharacteristic* const characteristic)
     {
         switch (characteristic->CreationType()->Type())
         {
@@ -167,16 +80,42 @@ namespace Analysis::Creation
             case TypeKind::Character:
                 return std::format("char()", static_cast<int>(*reinterpret_cast<const char*>(characteristic->Context()->Metadata())));
             case TypeKind::String:
-                return "" + *reinterpret_cast<const string*>(characteristic->Context()->Metadata()) + "";
+                return *reinterpret_cast<const string*>(characteristic->Context()->Metadata());
             default:
                 return "";
         }
     }
 
+    string ScopedParameterString(const IScoped* const function)
+    {
+        string parameters;
+        const auto parameterCount = function->ParameterCount();
+
+        for (auto i = 0; i < parameterCount; i++)
+        {
+            const auto parameter = *function->VariableAt(i);
+            parameters += std::format("{} {}{}", parameter.CreationType()->FullName(), parameter.Name(), i < parameterCount - 1 ? "," : "");
+        }
+
+        return parameters;
+    }
+
+    string ScopedLocalVariableString(const IScoped* const function)
+    {
+        string variables;
+        const auto variableCount = function->VariableCount() + function->ParameterCount();
+
+        for (auto i = 0; i < variableCount; i++)
+        {
+            const auto variable = *function->VariableAt(i);
+            variables += std::format("{} {}{}", variable.CreationType()->FullName(), variable.Name(), i < variableCount- 1 ? "," : "");
+        }
+
+        return variables;
+    }
+
     void TranspileLoad(const IContextNode* context, StringBuilder& stringBuilder);
     void TranspileLoad(const IContextNode* current, const IContextNode* context, StringBuilder& stringBuilder);
-
-    void TranspileExpression(const IContextNode* context, StringBuilder& stringBuilder);
 
     void TranspileLoadField(const IContextNode* const fieldContext, StringBuilder& stringBuilder, const bool loadAddress)
     {
@@ -676,269 +615,5 @@ namespace Analysis::Creation
                 }
                 break;
         }
-    }
-
-    CILTranspiler::CILTranspiler(string name, string directory, const SourceDirectory* const source) : projectName(std::move(name)), projectDirectory(std::move(directory)), projectLocation(), source(source), stringBuilder()
-    {
-        const auto outputDirectory = fs::path(std::format("{}/{}/bin", projectDirectory, projectName));
-        if (!exists(outputDirectory))
-        {
-            if (create_directories(outputDirectory))
-                std::cout << "Output directory created: " << outputDirectory << std::endl;
-            else
-            {
-                ExceptionManager::Instance().AddChild(new TranspileFileException(outputDirectory));
-                return;
-            }
-        }
-
-        const auto programSource = source->GetChild("program");
-        if (programSource == nullptr || programSource->SourceType() != SourceType::File)
-        {
-            //exception
-            return;
-        }
-
-        const auto sourceFile = dynamic_cast<const SourceFile*>(programSource);
-        const auto program = sourceFile->GetChild("Program");
-
-        if (program == nullptr)
-        {
-            //exception
-            return;
-        }
-
-        const auto main = program->FindFunction("Main", { Array::Instance(&String::Instance()) });
-        if (main == nullptr)
-        {
-            //exception
-            return;
-        }
-
-        const auto result = CreateOutputFile(outputDirectory, std::format("{}.{}", projectName, "dll"));
-        if (!result)
-        {
-            //exception
-            return;
-        }
-
-        projectLocation = *result;
-        stringBuilder.PushLine(std::format(".assembly {} {}", projectName, "{}"));
-        stringBuilder.PushLine(".assembly extern mscorelib");
-        stringBuilder.PushLine(".assembly extern System.Runtime {}");
-        stringBuilder.PushLine(".assembly extern  System.Collections.Generic.Runtime {}");
-
-
-        stringBuilder.PushLine("");
-        stringBuilder.PushLine("class public auto ansi beforefieldinit EntryPoint extends [mscorlib]System.Object");
-
-        stringBuilder.PushLine(open_flower);
-        stringBuilder.IncreaseIndent();
-
-        stringBuilder.PushLine(".method public hidebysig static void Main() cil managed");
-
-        stringBuilder.PushLine(open_flower);
-        stringBuilder.IncreaseIndent();
-
-        stringBuilder.PushLine(".entrypoint");
-        stringBuilder.PushLine("maxstack 8");
-        stringBuilder.PushLine(main->FullName());
-        stringBuilder.PushLine("ret");
-
-        stringBuilder.PushLine(close_flower);
-        stringBuilder.IncreaseIndent();
-
-        stringBuilder.PushLine(close_flower);
-        stringBuilder.IncreaseIndent();
-
-        PushTranscription();
-    }
-
-    const std::string& CILTranspiler::OutputFile() const { return projectLocation; }
-
-    void CILTranspiler::Transpile()
-    {
-        TranspileDirectory(source);
-    }
-
-    void CILTranspiler::PushTranscription()
-    {
-        if (std::ofstream file(projectLocation); file.is_open())
-        {
-            file << stringBuilder.Value();
-
-            file.close();
-            stringBuilder.Clear();
-        }
-    }
-
-    void CILTranspiler::TranspileDirectory(const SourceDirectory* const directory)
-    {
-        for (const auto child: directory->values())
-        {
-            if (child->SourceType() == SourceType::File)
-                TranspileFile(dynamic_cast<const SourceFile*>(child));
-            else
-                TranspileDirectory(dynamic_cast<const SourceDirectory*>(child));
-        }
-    }
-
-    void CILTranspiler::TranspileFile(const SourceFile* file)
-    {
-        for (const auto type : file->values())
-            TranspileDataType(type);
-    }
-
-    void CILTranspiler::TranspileConstant(const ICharacteristic* constant)
-    {
-        stringBuilder.PushLine("");
-        stringBuilder.PushLine(std::format(".field {} {} {} = {}", FieldDescriberString(constant), constant->CreationType()->FullName(), constant->Name(), TranspileConstantString(constant)));
-    }
-
-    void CILTranspiler::TranspileCharacteristic(const ICharacteristic* const characteristic)
-    {
-        stringBuilder.PushLine("");
-        stringBuilder.PushLine(std::format(".field {} {} {}", FieldDescriberString(characteristic), characteristic->CreationType()->FullName(), characteristic->Name()));
-    }
-
-    void CILTranspiler::TranspileFunction(const IScoped* const function)
-    {
-        stringBuilder.PushLine("");
-        stringBuilder.PushLine(std::format(".method {} final {} {} {}({}) cil managed", AccessModifierString(function), FunctionStaticString(function), function->CreationType()->FullName(), function->Name(), FunctionParametersString(function)));
-        stringBuilder.PushLine(open_flower);
-
-        stringBuilder.IncreaseIndent();
-
-        TranspileFunctionBody(function, "");
-
-        stringBuilder.DecreaseIndent();
-        stringBuilder.PushLine(close_flower);
-    }
-
-    void CILTranspiler::TranspileConstructor(const IScoped* const constructor, const string& precursor)
-    {
-        const auto result = FunctionVariablesString(constructor);
-
-        stringBuilder.PushLine("");
-        stringBuilder.PushLine(std::format(".method {} hidebysig specialname rtspecialname {} void {}({}) cil managed", AccessModifierString(constructor), FunctionStaticString(constructor), constructor->Name(), ParameterString(constructor)));
-        stringBuilder.PushLine(open_flower);
-
-        stringBuilder.IncreaseIndent();
-
-        TranspileFunctionBody(constructor, precursor);
-
-        stringBuilder.DecreaseIndent();
-        stringBuilder.PushLine(close_flower);
-    }
-
-    void CILTranspiler::TranspileFunctionBody(const IScoped* const scoped, const std::string& precursor)
-    {
-        int maxSlotSize = 0;
-        auto builder = StringBuilder();
-
-        builder.SetIndent(stringBuilder.Indent());
-
-        TranspileScope(scoped->Scope(), builder, maxSlotSize);
-
-        stringBuilder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        stringBuilder.PushLine(std::format(".localsinit({})", FunctionVariablesString(scoped)));
-
-        if (!precursor.empty())
-            stringBuilder.PushLine(precursor);
-
-        stringBuilder.Push(builder.Value());
-    }
-
-    void CILTranspiler::TranspileScope(const Scope* const scope, StringBuilder& stringBuilder, int& maxSlotSize)
-    {
-        const auto flag = scope->Type() != ScopeType::Scope;
-        if (flag)
-        {
-            stringBuilder.PushLine(std::format("{}:", scope->FullName()));
-            stringBuilder.IncreaseIndent();
-        }
-
-        for (const auto context: *scope)
-        {
-            TranspileContext(context, stringBuilder);
-            if (const auto size = context->SlotCount(); size > maxSlotSize)
-                maxSlotSize = size;
-        }
-
-        if (flag)
-            stringBuilder.DecreaseIndent();
-
-        const auto nestedCount = scope->NestedCount();
-        for (int i = 0; i < nestedCount; i++)
-        {
-            const auto nested = scope->NestedAt(i);
-            TranspileScope(nested, stringBuilder, maxSlotSize);
-        }
-    }
-
-    void CILTranspiler::TranspileDataType(const IUserDefinedType* const dataType)
-    {
-        stringBuilder.PushLine("");
-        switch (dataType->MemberType())
-        {
-            case MemberType::Enum:
-                stringBuilder.PushLine(std::format(".class {} {} {} {} {} {} {}", AccessModifierString(dataType), prefix_sealed, prefix_auto, prefix_ansi, dataType->Name(), prefix_extends, ms_core_enum));
-                break;
-            case MemberType::Class:
-                stringBuilder.PushLine(std::format(".class {} {} {} {} {} {} {}", AccessModifierString(dataType), DataTypeStaticString(dataType), prefix_sequential, prefix_ansi, dataType->Name(), prefix_extends, ms_core_class));
-                break;
-            case MemberType::ValueType:
-                stringBuilder.PushLine(std::format(".class {} {} {} {} {} {} {}", AccessModifierString(dataType), DataTypeStaticString(dataType), prefix_auto, prefix_ansi, dataType->Name(), prefix_extends, ms_core_struct));
-                break;
-            default:
-                break;
-        }
-
-        stringBuilder.PushLine(open_flower);
-        stringBuilder.IncreaseIndent();
-
-        if (dataType->MemberType() == MemberType::Enum)
-            stringBuilder.PushLine(".field public specialname rtspecialname int32 value__ ");
-
-
-        StringBuilder instancePrecursor, staticPrecursor;
-
-        staticPrecursor.SetIndent(stringBuilder.Indent() + 1);
-        instancePrecursor.SetIndent(stringBuilder.Indent() + 1);
-
-        instancePrecursor.PushLine("");
-
-        for (const auto characteristic: dataType->AllCharacteristics())
-        {
-            if (characteristic->MemberType() == MemberType::ConstantField)
-                TranspileConstant(characteristic);
-            else
-            {
-                TranspileCharacteristic(characteristic);
-
-                if (characteristic->CheckDescriber(Describer::Static))
-                    TranspileContext(characteristic->Context(), staticPrecursor);
-                else
-                    TranspileContext(characteristic->Context(), instancePrecursor);
-            }
-        }
-
-        if (!staticPrecursor.Value().empty())
-        {
-            //push static constructor
-        }
-
-        for (const auto scoped: dataType->AllScoped())
-        {
-            if (scoped->MemberType() == MemberType::Constructor)
-                TranspileConstructor(scoped, instancePrecursor.Value());
-            else
-                TranspileFunction(scoped);
-        }
-
-        stringBuilder.DecreaseIndent();
-        stringBuilder.PushLine(close_flower);
-
-        PushTranscription();
     }
 }

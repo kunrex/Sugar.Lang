@@ -6,6 +6,7 @@
 #include "../i_slot_size.h"
 #include "../i_describable.h"
 #include "../Creation/i_function.h"
+#include "../Creation/i_constructor.h"
 #include "../Creation/i_characteristic.h"
 #include "../Creation/i_operator_overload.h"
 #include "../Creation/i_indexer_definition.h"
@@ -22,7 +23,7 @@ namespace Analysis::Structure::Core::Interfaces
 
             [[nodiscard]] virtual const IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const = 0;
 
-            [[nodiscard]] virtual const IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const = 0;
+            [[nodiscard]] virtual const IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const = 0;
 
             [[nodiscard]] virtual const IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const = 0;
 

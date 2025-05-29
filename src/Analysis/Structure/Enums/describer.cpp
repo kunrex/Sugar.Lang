@@ -46,6 +46,9 @@ namespace Analysis::Structure::Enums
                 case SyntaxKind::Constexpr:
                     final = final | Describer::Constexpr;
                     break;
+                case SyntaxKind::Entrypoint:
+                    final = final | Describer::Entrypoint;
+                    break;
                 default:
                     break;
             }

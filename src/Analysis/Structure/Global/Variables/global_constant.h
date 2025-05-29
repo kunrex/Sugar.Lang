@@ -5,14 +5,12 @@
 
 #include "global_variable.h"
 
-#include "../../Core/Interfaces/Creation/i_constant.h"
-
 namespace Analysis::Structure::Global
 {
-    class GlobalConstant final : public GlobalVariable, public virtual Core::Interfaces::IConstant
+    class GlobalConstant : public GlobalVariable
     {
-        private:
-            mutable std::vector<const IConstant*> dependencies;
+        protected:
+            mutable std::vector<ICharacteristic*> dependants;
 
         public:
             GlobalConstant(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
@@ -24,10 +22,22 @@ namespace Analysis::Structure::Global
             [[nodiscard]] bool Readable() const override;
             [[nodiscard]] bool Writable() const override;
 
-            [[nodiscard]] bool Compiled() const override;
+            void BindLocal() override;
 
-            void PushDependency(const IConstant* constant) const override;
-            [[nodiscard]] bool IsDependent(const IConstant* constant) const override;
+            void Transpile(Services::StringBuilder& builder) const override;
+
+            void IncrementDependencyCount() override;
+            void PushDependant(ICharacteristic* characteristic) const override;
+            [[nodiscard]] bool HasDependant(const ICharacteristic* characteristic) const override;
+    };
+
+    class ImplicitEnumConstant final : public GlobalConstant
+    {
+        private:
+            const ICharacteristic* characteristic;
+
+        public:
+            ImplicitEnumConstant(const std::string& name, const Core::Interfaces::IDataType* creationType, const ICharacteristic* characteristic);
 
             void BindLocal() override;
     };

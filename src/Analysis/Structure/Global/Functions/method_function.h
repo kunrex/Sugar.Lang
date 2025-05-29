@@ -19,6 +19,25 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const std::string& FullName() const override;
 
             void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
+    };
+
+    class GeneratedGetFunction final : public Creation::MethodDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    {
+        private:
+            const std::string name;
+
+        public:
+            GeneratedGetFunction(Enums::Describer describer, std::string name, const Core::Interfaces::IDataType* creationType);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+
+            void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
     };
 }
 

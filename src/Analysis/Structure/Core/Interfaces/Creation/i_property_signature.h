@@ -10,6 +10,9 @@ namespace Analysis::Structure::Core::Interfaces
     class IPropertySignature : public virtual IReadWrite
     {
         public:
+            [[nodiscard]] virtual bool PublicGet() const = 0;
+            [[nodiscard]] virtual bool PublicSet() const = 0;
+
             [[nodiscard]] virtual const std::string& SignatureGetString() const = 0;
             [[nodiscard]] virtual const std::string& SignatureSetString() const = 0;
     };

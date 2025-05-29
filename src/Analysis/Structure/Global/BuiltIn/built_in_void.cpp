@@ -22,4 +22,7 @@ namespace Analysis::Structure::Global
 
     void BuiltInVoid::BindLocal()
     { }
+
+    void BuiltInVoid::Transpile(Services::StringBuilder& builder) const
+    { }
 }

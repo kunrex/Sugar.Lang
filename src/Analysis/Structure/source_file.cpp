@@ -105,6 +105,33 @@ namespace Analysis::Structure
         }
     }
 
+    void SourceFile::ManageImports()
+    {
+        const auto childCount = sourceNode->ChildCount();
+        for (auto i = 0; i < childCount; i++)
+        {
+            switch (const auto node = sourceNode->GetChild(i); node->NodeType())
+            {
+            case NodeType::Enum:
+            case NodeType::Class:
+            case NodeType::Struct:
+                break;
+            case NodeType::Import:
+                ImportStatement(node, this);
+                break;
+            default:
+                ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
+                break;
+            }
+        }
+    }
+
+    void SourceFile::Transpile(Services::StringBuilder& builder) const
+    {
+        for (const auto child: values())
+            child->Transpile(builder);
+    }
+
     void SourceFile::BindGlobal()
     {
         for (const auto type: values())
@@ -115,27 +142,6 @@ namespace Analysis::Structure
     {
         for (const auto type: values())
             type->BindLocal();
-    }
-
-    void SourceFile::ManageImports()
-    {
-        const auto childCount = sourceNode->ChildCount();
-        for (auto i = 0; i < childCount; i++)
-        {
-            switch (const auto node = sourceNode->GetChild(i); node->NodeType())
-            {
-                case NodeType::Enum:
-                case NodeType::Class:
-                case NodeType::Struct:
-                    break;
-                case NodeType::Import:
-                    ImportStatement(node, this);
-                    break;
-                default:
-                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
-                    break;
-            }
-        }
     }
 
     void SourceFile::Print(const string& indent, const bool last) const

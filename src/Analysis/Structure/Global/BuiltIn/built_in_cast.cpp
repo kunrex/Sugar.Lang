@@ -24,4 +24,7 @@ namespace Analysis::Structure::Global
 
     void BuiltInCast::BindLocal()
     { }
+
+    void BuiltInCast::Transpile(Services::StringBuilder& builder) const
+    { }
 }
