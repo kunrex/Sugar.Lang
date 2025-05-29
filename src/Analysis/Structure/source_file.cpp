@@ -77,10 +77,7 @@ namespace Analysis::Structure
         Lexer::Instance().Lex(this);
 
         if (ExceptionManager::Instance().ChildCount() == previous)
-        {
             sourceNode = Parser::Instance().Parse(this);
-            sourceNode->Print("", true);
-        }
     }
 
     void SourceFile::InitDataTypes()
