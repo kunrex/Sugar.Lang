@@ -16,21 +16,21 @@ const string cil_object = "[System.Runtime]System.Object";
 
 namespace Analysis::Structure::Wrappers
 {
-    Object::Object() : BuiltInClass(cil_object, Enums::Describer::Public), toString(nullptr)
+    Object::Object() : BuiltInClass(cil_object, Describer::Public), toString(nullptr)
     { }
 
     TypeKind Object::Type() const { return TypeKind::Void; }
 
-    const Object& Object::Instance()
+    const Object* Object::Instance()
     {
         static const Object instance;
-        return instance;
+        return &instance;
     }
 
     void Object::BindGlobal()
     {
-        toString = new BuiltInCast(&String::Instance(), "callvirt instance string class [System.Runtime]System.Object::ToString()", nullptr);
-        toString->PushParameterType(&Instance());
+        toString = new BuiltInCast(String::Instance(), "callvirt instance string class [System.Runtime]System.Object::ToString()", nullptr);
+        toString->PushParameterType(this);
     }
 
     const ICharacteristic* Object::FindCharacteristic(const string& name) const
@@ -39,7 +39,7 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Object::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Object::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Object::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Object::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -63,5 +63,4 @@ namespace Analysis::Structure::Wrappers
     {
         delete toString;
     }
-
 }

@@ -21,10 +21,10 @@ namespace Analysis::Structure::Wrappers
     void Void::BindGlobal()
     { }
 
-    const Void& Void::Instance()
+    const Void* Void::Instance()
     {
         static const Void instance;
-        return instance;
+        return &instance;
     }
 
     const ICharacteristic* Void::FindCharacteristic(const string& name) const
@@ -33,7 +33,7 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Void::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Void::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Void::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Void::FindIndexer(const std::vector<const IDataType*>& argumentList) const

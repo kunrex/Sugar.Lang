@@ -24,7 +24,7 @@ const string cil_tuple = "[System.Runtime]System.ValueTuple";
 
 namespace Analysis::Structure::Wrappers
 {
-    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), characteristics(), constructor(nullptr)
+    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), constructor(nullptr)
     { }
 
     const Tuple* Tuple::Instance(const std::vector<const IDataType*>& types)
@@ -61,7 +61,7 @@ namespace Analysis::Structure::Wrappers
             const auto getInstruction = std::format("call instance {} class {}::get_Item{}()", type->FullName(), genericSignature, i);
 
             const auto name = std::format("Element{}", i++);
-            characteristics[name] = new BuiltInProperty(name, Describer::Public, type, true, getInstruction, false, "");
+            characteristics.push_back(new BuiltInProperty(name, Describer::Public, type, true, getInstruction, false, ""));
 
             constructor->PushParameterType(type);
         }
@@ -69,13 +69,17 @@ namespace Analysis::Structure::Wrappers
 
     const ICharacteristic* Tuple::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
     const IFunctionDefinition* Tuple::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Tuple::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Tuple::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
     }

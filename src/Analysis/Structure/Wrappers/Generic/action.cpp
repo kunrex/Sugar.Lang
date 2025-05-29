@@ -61,7 +61,7 @@ namespace Analysis::Structure::Wrappers
     const ICharacteristic* Action::FindCharacteristic(const std::string& name) const
     { return nullptr; }
 
-    const IFunction* Action::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Action::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IFunctionDefinition* Action::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const

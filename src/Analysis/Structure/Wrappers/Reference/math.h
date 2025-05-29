@@ -12,9 +12,9 @@ namespace Analysis::Structure::Wrappers
     class Math final : public DataTypes::BuiltInClass, public Services::SingletonService
     {
         private:
-            std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
+            std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
 
             Math();
 
@@ -29,7 +29,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 

@@ -30,91 +30,100 @@ const string cil_character = "[System.Runtime]System.Char";
 
 namespace Analysis::Structure::Wrappers
 {
-    Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), characteristics(), functions(), implicitCasts(), explicitCasts(), overloads()
+    Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), functions(), implicitCasts(), explicitCasts(), overloads()
     { }
 
     int Character::SlotCount() const { return 1; }
 
     TypeKind Character::Type() const { return TypeKind::Character; }
 
-    const Character& Character::Instance()
+    const Character* Character::Instance()
     {
         static const Character instance;
-        return instance;
+        return &instance;
     }
 
     void Character::BindGlobal()
     {
-        characteristics["MinValue"] = new BuiltInProperty("MinValue", Describer::PublicStatic, &Instance(), true, "ldsfld char System.Char::MinValue", false, "");
-        characteristics["MaxValue"] = new BuiltInProperty("MaxValue", Describer::PublicStatic, &Instance(), true, "ldsfld char System.Char::MaxValue", false, "");
+        characteristics.push_back(new BuiltInProperty("MinValue", Describer::PublicStatic, this, true, "ldsfld char System.Char::MinValue", false, ""));
+        characteristics.push_back(new BuiltInProperty("MaxValue", Describer::PublicStatic, this, true, "ldsfld char System.Char::MaxValue", false, ""));
 
-        const auto isDigit = new BuiltInMethod("IsDigit", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsDigit(char)");
-        isDigit->PushParameterType(&Boolean::Instance());
-        functions[std::hash<string>()("IsDigit") ^ ArgumentHash(isDigit)] = isDigit;
+        const auto isDigit = new BuiltInMethod("IsDigit", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsDigit(char)");
+        isDigit->PushParameterType(this);
+        functions.emplace_back(std::hash<string>()("IsDigit") ^ ArgumentHash(isDigit), isDigit);
 
-        const auto isLetter = new BuiltInMethod("IsLetter", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetter(char)");
-        isDigit->PushParameterType(&Boolean::Instance());
-        functions[std::hash<string>()("IsLetter") ^ ArgumentHash(isLetter)] = isLetter;
+        const auto isLetter = new BuiltInMethod("IsLetter", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetter(char)");
+        isLetter->PushParameterType(this);
+        functions.emplace_back(std::hash<string>()("IsLetter") ^ ArgumentHash(isLetter), isLetter);
 
-        const auto isDigitOrLetter = new BuiltInMethod("IsLetterOrDigit", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetterOrDigit(char)");
-        isDigit->PushParameterType(&Boolean::Instance());
-        functions[std::hash<string>()("IsLetterOrDigit") ^ ArgumentHash(isDigitOrLetter)] = isDigitOrLetter;
+        const auto isDigitOrLetter = new BuiltInMethod("IsLetterOrDigit", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetterOrDigit(char)");
+        isDigitOrLetter->PushParameterType(this);
+        functions.emplace_back(std::hash<string>()("IsLetterOrDigit") ^ ArgumentHash(isDigitOrLetter), isDigitOrLetter);
 
-        const auto isWhiteSpace = new BuiltInMethod("IsWhiteSpace", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsWhiteSpace(char)");
-        isDigit->PushParameterType(&Boolean::Instance());
-        functions[std::hash<string>()("IsWhiteSpace") ^ ArgumentHash(isWhiteSpace)] = isWhiteSpace;
+        const auto isWhiteSpace = new BuiltInMethod("IsWhiteSpace", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsWhiteSpace(char)");
+        isWhiteSpace->PushParameterType(this);
+        functions.emplace_back(std::hash<string>()("IsWhiteSpace") ^ ArgumentHash(isWhiteSpace), isWhiteSpace);
 
-        const auto isPunctuation = new BuiltInMethod("IsPunctuation", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsPunctuation(char)");
-        isDigit->PushParameterType(&Boolean::Instance());
-        functions[std::hash<string>()("IsPunctuation") ^ ArgumentHash(isPunctuation)] = isPunctuation;
+        const auto isPunctuation = new BuiltInMethod("IsPunctuation", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsPunctuation(char)");
+        isPunctuation->PushParameterType(this);
+        functions.emplace_back(std::hash<string>()("IsPunctuation") ^ ArgumentHash(isPunctuation), isPunctuation);
 
-        const auto toUpper = new BuiltInMethod("ToUpper()", Describer::Public, &Instance(), "instance char valuetype [System.Runtime]System.Char::ToUpper()");
-        functions[std::hash<string>()("ToUpper") ^ ArgumentHash(toUpper)] = toUpper;
+        const auto toUpper = new BuiltInMethod("ToUpper()", Describer::Public, this, "instance char valuetype [System.Runtime]System.Char::ToUpper()");
+        functions.emplace_back(std::hash<string>()("ToUpper") ^ ArgumentHash(toUpper), toUpper);
 
-        const auto toLower = new BuiltInMethod("ToLower()", Describer::Public, &Instance(), "instance char valuetype [System.Runtime]System.Char::ToLower()");
-        functions[std::hash<string>()("ToLower") ^ ArgumentHash(toLower)] = toLower;
+        const auto toLower = new BuiltInMethod("ToLower()", Describer::Public, this, "instance char valuetype [System.Runtime]System.Char::ToLower()");
+        functions.emplace_back(std::hash<string>()("ToLower") ^ ArgumentHash(toLower), toLower);
 
-        const auto implicitInteger = new BuiltInCast(&Integer::Instance(), "conv.i4", IntCast<char>);
-        implicitInteger->PushParameterType(&Instance());
-        implicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
-        explicitCasts[ArgumentHash({ &Integer::Instance(), &Instance()})] = implicitInteger;
+        const auto implicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<char>);
+        implicitInteger->PushParameterType(this);
+        implicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInteger);
+        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInteger);
 
-        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ShortCast<char>);
-        explicitShort->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &Short::Instance(), &Instance()})] = explicitShort;
+        const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<char>);
+        explicitShort->PushParameterType(Instance());
+        explicitCasts.emplace_back(ArgumentHash({ Short::Instance(), this }), explicitShort);
 
-        const auto explicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", LongCast<char>);
-        explicitLong->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &Long::Instance(), &Instance()})] = explicitLong;
+        const auto explicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<char>);
+        explicitLong->PushParameterType(Instance());
+        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), explicitLong);
 
-        const auto implicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()", StringCast<char>);
-        implicitString->PushParameterType(&Instance());
-        implicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
-        explicitCasts[ArgumentHash({ &String::Instance(), &Instance()})] = implicitString;
+        const auto implicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()", StringCast<char>);
+        implicitString->PushParameterType(this);
+        implicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), implicitString);
+        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), implicitString);
 
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Instance(), "ceq", Equals<char>);
-        equals->PushParameterType(&Instance());
-        equals->PushParameterType(&Instance());
-        overloads[SyntaxKind::Equals] = equals;
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, this, "ceq", Equals<char>);
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Equals, equals);
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Instance(), "ceq ldc.i4.0 ceq", NotEquals<char>);
-        notEquals->PushParameterType(&Instance());
-        notEquals->PushParameterType(&Instance());
-        overloads[SyntaxKind::NotEquals] = notEquals;
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, this, "ceq ldc.i4.0 ceq", NotEquals<char>);
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::NotEquals, notEquals);
     }
 
     const ICharacteristic* Character::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
     const IFunctionDefinition* Character::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) & ArgumentHash(argumentList);
-        return functions.contains(hash) ? functions.at(hash) : nullptr;
+
+        for (const auto function: functions)
+            if (std::get<0>(function) == hash)
+                return std::get<1>(function);
+
+        return nullptr;
     }
 
-    const IFunction* Character::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Character::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Character::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -123,7 +132,12 @@ namespace Analysis::Structure::Wrappers
     const IFunction* Character::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
+
+        for (const auto cast: implicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     const IFunction* Character::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -134,32 +148,41 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Character::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
+
+        for (const auto cast: explicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     const IOperatorOverload* Character::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? overloads.at(base) : nullptr;
+        return FindBuiltInOverload(base);
     }
 
     const IBuiltInOverload* Character::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? overloads.at(base) : nullptr;
+        for (const auto cast: overloads)
+            if (std::get<0>(cast) == base)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     Character::~Character()
     {
         for (const auto function: functions)
-            delete function.second;
+            delete std::get<1>(function);
 
         for (const auto cast: implicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto cast: explicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto overload: overloads)
-            delete overload.second;
+            delete std::get<1>(overload);
     }
 }
 

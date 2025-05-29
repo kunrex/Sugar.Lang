@@ -57,62 +57,76 @@ namespace Analysis::Structure::Wrappers
     void List::BindGlobal()
     {
         const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
-        characteristics["Count"] = new BuiltInProperty("Count", Describer::Public, &Integer::Instance(), true, count, false, "");
+        characteristics.push_back(new BuiltInProperty("Count", Describer::Public, Integer::Instance(), true, count, false, ""));
 
         const auto capacity = std::format("callvirt instance int32 class {}::get_Capacity()", genericSignature);
-        characteristics["Capacity"] = new BuiltInProperty("Capacity", Describer::Public, &Integer::Instance(), true, capacity, false, "");
+        characteristics.push_back(new BuiltInProperty("Capacity", Describer::Public, Integer::Instance(), true, capacity, false, ""));
 
         const auto get = std::format("callvirt instance !0 class {}::get_Item(int32)", genericSignature);
         const auto set = std::format("callvirt instance void class {}::set_Item(int32, !0)", genericSignature);
         indexer = new BuiltInIndexer(listType, true, get, true, set);
-        indexer->PushParameterType(&Integer::Instance());
+        indexer->PushParameterType(Integer::Instance());
 
         const auto add = new BuiltInVoid("Add", Describer::Public, std::format("instance void class {}::Add(!0)", genericSignature));
         add->PushParameterType(listType);
-        functions[std::hash<string>()("Add") ^ ArgumentHash(add)] = add;
+        functions.emplace_back(std::hash<string>()("Add") ^ ArgumentHash(add), add);
 
         const auto clear = new BuiltInVoid("Clear", Describer::Public, std::format("instance void class {}::Clear()", genericSignature));
-        functions[std::hash<string>()("Clear") ^ ArgumentHash(clear)] = clear;
+        functions.emplace_back(std::hash<string>()("Clear") ^ ArgumentHash(clear), clear);
 
-        const auto contains = new BuiltInMethod("Contains", Describer::Public, &Boolean::Instance(), std::format("instance bool class {}::Contains(!0)", genericSignature));
+        const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Contains(!0)", genericSignature));
         contains->PushParameterType(listType);
-        functions[std::hash<string>()("Contains") ^ ArgumentHash(contains)] = contains;
+        functions.emplace_back(std::hash<string>()("Contains") ^ ArgumentHash(contains), contains);
 
-        const auto remove = new BuiltInMethod("Remove", Describer::Public, &Boolean::Instance(), std::format("instance bool class {}::Remove(!0)", genericSignature));
+        const auto remove = new BuiltInMethod("Remove", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Remove(!0)", genericSignature));
         remove->PushParameterType(listType);
-        functions[std::hash<string>()("Remove") ^ ArgumentHash(remove)] = remove;
+        functions.emplace_back(std::hash<string>()("Remove") ^ ArgumentHash(remove), remove);
 
         const auto reverse = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse()", genericSignature));
-        functions[std::hash<string>()("Reverse") ^ ArgumentHash(reverse)] = reverse;
+        functions.emplace_back(std::hash<string>()("Reverse") ^ ArgumentHash(reverse), reverse);
 
         const auto reverseBound = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse(int32, int32)", genericSignature));
-        reverseBound->PushParameterType(&Integer::Instance());
-        reverseBound->PushParameterType(&Integer::Instance());
-        functions[std::hash<string>()("Reverse") ^ ArgumentHash(reverseBound)] = reverseBound;
+        reverseBound->PushParameterType(Integer::Instance());
+        reverseBound->PushParameterType(Integer::Instance());
+        functions.emplace_back(std::hash<string>()("Reverse") ^ ArgumentHash(reverseBound), reverseBound);
 
         const auto defaultConstructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor()", genericSignature));
-        constructors[ArgumentHash(defaultConstructor)] = defaultConstructor;
+        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
 
         const auto constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor(int32)", genericSignature));
-        constructor->PushParameterType(&Integer::Instance());
-        constructors[ArgumentHash(constructor)] = constructor;
+        constructor->PushParameterType(Integer::Instance());
+        constructors.emplace_back(ArgumentHash(constructor), constructor);
     }
 
     const ICharacteristic* List::FindCharacteristic(const std::string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
-    const IFunction* List::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* List::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
+
+        for (const auto constructor: constructors)
+            if (std::get<0>(constructor) == hash)
+                return std::get<1>(constructor);
+
+        return nullptr;
     }
 
     const IFunctionDefinition* List::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
-        return functions.contains(hash) ? functions.at(hash) : nullptr;
+
+        for (const auto function: functions)
+            if (std::get<0>(function) == hash)
+                return std::get<1>(function);
+
+        return nullptr;
     }
 
     const IIndexerDefinition* List::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -131,14 +145,14 @@ namespace Analysis::Structure::Wrappers
 
     List::~List()
     {
-        for (const auto& characteristic: characteristics)
-            delete characteristic.second;
+        for (const auto characteristic: characteristics)
+            delete characteristic;
 
-        for (const auto& function: functions)
-            delete function.second;
+        for (const auto function: functions)
+            delete std::get<1>(function);
 
         for (const auto& constructor: constructors)
-            delete constructor.second;
+            delete std::get<1>(constructor);
 
         delete indexer;
     }

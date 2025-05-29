@@ -1,7 +1,8 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-#include <map>
+#include <tuple>
+#include <vector>
 
 #include "../../../../Services/singleton_service.h"
 
@@ -15,19 +16,17 @@ namespace Analysis::Structure::Wrappers
     class Character final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
-            std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
 
-            std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
 
-            std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
-
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
+            std::vector<std::tuple<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>> overloads;
 
             Character();
 
         public:
-            static const Character& Instance();
+            static const Character* Instance();
 
             [[nodiscard]] int SlotCount() const override;
 
@@ -39,7 +38,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 

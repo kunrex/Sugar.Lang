@@ -34,32 +34,32 @@ const string cil_integer = "[System.Runtime]System.Int32";
 
 namespace
 {
-    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) + std::get<int>(arguments[1].data)} ; }
-    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) - std::get<int>(arguments[1].data)} ; }
-    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) * std::get<int>(arguments[1].data)} ; }
-    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) / std::get<int>(arguments[1].data)} ; }
-    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) % std::get<int>(arguments[1].data)} ; }
+    CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) + std::get<int>(arguments[1].data)} ; }
+    CompilationResult Subtraction(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) - std::get<int>(arguments[1].data)} ; }
+    CompilationResult Multiplication(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) * std::get<int>(arguments[1].data)} ; }
+    CompilationResult Division(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) / std::get<int>(arguments[1].data)} ; }
+    CompilationResult Modulus(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) % std::get<int>(arguments[1].data)} ; }
 
-    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), arguments[0].data }; }
-    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), -std::get<int>(arguments[0].data) }; }
+    CompilationResult Plus(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), arguments[0].data }; }
+    CompilationResult Minus(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), -std::get<int>(arguments[0].data) }; }
 
-    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
-    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
-    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
-    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
-    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { &Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
+    CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), ~std::get<int>(arguments[0].data)} ; }
+    CompilationResult BitwiseAnd(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) & std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseOr(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) | std::get<int>(arguments[1].data)} ; }
+    CompilationResult RightShift(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) >> std::get<int>(arguments[1].data)} ; }
+    CompilationResult LeftShift(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) << std::get<int>(arguments[1].data)} ; }
+    CompilationResult BitwiseXor(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) ^ std::get<int>(arguments[1].data)} ; }
 }
 
 namespace Analysis::Structure::Wrappers
 {
-    Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), characteristics(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
+    Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
     { }
 
-    const Integer& Integer::Instance()
+    const Integer* Integer::Instance()
     {
         static const Integer instance;
-        return instance;
+        return &instance;
     }
 
 
@@ -69,141 +69,145 @@ namespace Analysis::Structure::Wrappers
 
     void Integer::BindGlobal()
     {
-        characteristics["Max"] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, &Instance(), new IntegerConstant(2147483647));
-        characteristics["Min"] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, &Instance(), new IntegerConstant(-2147483648));
+        characteristics.push_back(new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, this, new IntegerConstant(2147483647)));
+        characteristics.push_back(new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, this, new IntegerConstant(-2147483648)));
 
-        tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, &Boolean::Instance(), "bool valuetype [System.Runtime]System.Int32::TryParse(string, int32&)");
-        tryParse->PushParameterType(&String::Instance());
-        tryParse->PushParameterType(Referenced::Instance(&Instance()));
+        tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Int32::TryParse(string, int32&)");
+        tryParse->PushParameterType(String::Instance());
+        tryParse->PushParameterType(Referenced::Instance(this));
 
-        const auto explicitShort = new BuiltInCast(&Short::Instance(), "conv.i2", ShortCast<int>);
-        explicitShort->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &Short::Instance(), &Instance() })] = explicitShort;
+        const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<int>);
+        explicitShort->PushParameterType(this);
+        explicitCasts.emplace_back(ArgumentHash({ Short::Instance(), this }), explicitShort);
 
-        const auto implicitLong = new BuiltInCast(&Long::Instance(), "conv.i8", LongCast<int>);
-        implicitLong->PushParameterType(&Instance());
-        implicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = implicitLong;
-        explicitCasts[ArgumentHash({ &Long::Instance(), &Instance() })] = implicitLong;
+        const auto implicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<int>);
+        implicitLong->PushParameterType(this);
+        implicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
+        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
 
-        const auto explicitFloat = new BuiltInCast(&Float::Instance(), "conv.r4", FloatCast<int>);
-        explicitFloat->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &Float::Instance(), &Instance() })] = explicitFloat;
+        const auto explicitFloat = new BuiltInCast(Float::Instance(), "conv.r4", FloatCast<int>);
+        explicitFloat->PushParameterType(this);
+        explicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), explicitFloat);
 
-        const auto implicitDouble = new BuiltInCast(&Double::Instance(), "conv.r8", DoubleCast<int>);
-        implicitDouble->PushParameterType(&Instance());
-        implicitCasts[ArgumentHash({ { &Double::Instance(), &Instance() }})] = implicitDouble;
-        explicitCasts[ArgumentHash({ { &Double::Instance(), &Instance() }})] = implicitDouble;
+        const auto implicitDouble = new BuiltInCast(Double::Instance(), "conv.r8", DoubleCast<int>);
+        implicitDouble->PushParameterType(this);
+        implicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
+        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this}), implicitDouble);
 
-        const auto explicitString = new BuiltInCast(&String::Instance(), "call instance string valuetype [System.Runtime]System.Int32::ToString()", StringCast<int>);
-        explicitString->PushParameterType(&Instance());
-        explicitCasts[ArgumentHash({ &String::Instance(), &Instance() })] = explicitString;
+        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int32::ToString()", StringCast<int>);
+        explicitString->PushParameterType(this);
+        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitString);
 
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, &Boolean::Instance(), "ceq", Equals<int>);
-        equals->PushParameterType(&Instance());
-        equals->PushParameterType(&Instance());
-        overloads[SyntaxKind::Equals] = equals;
+        const auto equals = new BuiltInOperation(SyntaxKind::Equals, Boolean::Instance(), "ceq", Equals<int>);
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Equals, equals);
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, &Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals<int>);
-        notEquals->PushParameterType(&Instance());
-        notEquals->PushParameterType(&Instance());
-        overloads[SyntaxKind::NotEquals] = notEquals;
+        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals<int>);
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::NotEquals, notEquals);
 
-        const auto addition = new BuiltInOperation(SyntaxKind::Addition, &Instance(), "add", Addition);
-        addition->PushParameterType(&Instance());
-        addition->PushParameterType(&Instance());
-        overloads[SyntaxKind::Addition] = addition;
+        const auto addition = new BuiltInOperation(SyntaxKind::Addition, this, "add", Addition);
+        addition->PushParameterType(this);
+        addition->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Addition, addition);
 
-        const auto subtraction = new BuiltInOperation(SyntaxKind::Subtraction, &Instance(), "sub", Subtraction);
-        subtraction->PushParameterType(&Instance());
-        subtraction->PushParameterType(&Instance());
-        overloads[SyntaxKind::Subtraction] = subtraction;
+        const auto subtraction = new BuiltInOperation(SyntaxKind::Subtraction, this, "sub", Subtraction);
+        subtraction->PushParameterType(this);
+        subtraction->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Subtraction, subtraction);
 
-        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, &Instance(), "mul", Multiplication);
-        multiplication->PushParameterType(&Instance());
-        multiplication->PushParameterType(&Instance());
-        overloads[SyntaxKind::Multiplication] = multiplication;
+        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication, this, "mul", Multiplication);
+        multiplication->PushParameterType(this);
+        multiplication->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Multiplication, multiplication);
 
-        const auto division = new BuiltInOperation(SyntaxKind::Division, &Instance(), "div", Division);
-        division->PushParameterType(&Instance());
-        division->PushParameterType(&Instance());
-        overloads[SyntaxKind::Division] = division;
+        const auto division = new BuiltInOperation(SyntaxKind::Division, this, "div", Division);
+        division->PushParameterType(this);
+        division->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Division, division);
 
-        const auto remainder = new BuiltInOperation(SyntaxKind::Modulus, &Instance(), "rem",Modulus);
-        remainder->PushParameterType(&Instance());
-        remainder->PushParameterType(&Instance());
-        overloads[SyntaxKind::Modulus] = remainder;
+        const auto remainder = new BuiltInOperation(SyntaxKind::Modulus, this, "rem", Modulus);
+        remainder->PushParameterType(this);
+        remainder->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Modulus, remainder);
 
-        const auto plus = new BuiltInOperation(SyntaxKind::Plus, &Instance(), "", Plus);
-        plus->PushParameterType(&Instance());
-        overloads[SyntaxKind::Plus] = plus;
+        const auto plus = new BuiltInOperation(SyntaxKind::Plus, this, "", Plus);
+        plus->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Plus, plus);
 
-        const auto negation = new BuiltInOperation(SyntaxKind::Minus, &Instance(), "neg", Minus);
-        negation->PushParameterType(&Instance());
-        overloads[SyntaxKind::Minus] = negation;
+        const auto negation = new BuiltInOperation(SyntaxKind::Minus, this, "neg", Minus);
+        negation->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Minus, negation);
 
-        const auto increment = new BuiltInOperation(SyntaxKind::Increment, &Instance(), "ldc.r8 1.0 add", nullptr);
-        increment->PushParameterType(&Instance());
-        increment->PushParameterType(&Instance());
-        overloads[SyntaxKind::Increment] = increment;
+        const auto increment = new BuiltInOperation(SyntaxKind::Increment, this, "ldc.r8 1.0 add", nullptr);
+        increment->PushParameterType(this);
+        increment->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Increment, increment);
 
-        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, &Instance(), "ldc.r8 1.0 sub", nullptr);
-        decrement->PushParameterType(&Instance());
-        decrement->PushParameterType(&Instance());
-        overloads[SyntaxKind::Decrement] = decrement;
+        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, this, "ldc.r8 1.0 sub", nullptr);
+        decrement->PushParameterType(this);
+        decrement->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::Decrement, decrement);
 
-        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, &Boolean::Instance(), "cgt", GreaterThan<int>);
-        greater->PushParameterType(&Instance());
-        greater->PushParameterType(&Instance());
-        overloads[SyntaxKind::GreaterThan] = greater;
+        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, Boolean::Instance(), "cgt", GreaterThan<int>);
+        greater->PushParameterType(this);
+        greater->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::GreaterThan, greater);
 
-        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, &Boolean::Instance(), "clt", LesserThan<int>);
-        lesser->PushParameterType(&Instance());
-        lesser->PushParameterType(&Instance());
-        overloads[SyntaxKind::LesserThan] = lesser;
+        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, Boolean::Instance(), "clt", LesserThan<int>);
+        lesser->PushParameterType(this);
+        lesser->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::LesserThan, lesser);
 
-        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, &Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals<int>);
-        greaterEquals->PushParameterType(&Instance());
-        greaterEquals->PushParameterType(&Instance());
-        overloads[SyntaxKind::GreaterThanEquals] = greaterEquals;
+        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals<int>);
+        greaterEquals->PushParameterType(this);
+        greaterEquals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::GreaterThanEquals, greaterEquals);
 
-        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, &Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThanEquals<int>);
-        lesserEquals->PushParameterType(&Instance());
-        lesserEquals->PushParameterType(&Instance());
-        overloads[SyntaxKind::LesserThanEquals] = lesserEquals;
+        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThanEquals<int>);
+        lesserEquals->PushParameterType(this);
+        lesserEquals->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::LesserThanEquals, lesserEquals);
 
-        const auto bitwiseNot = new BuiltInOperation(SyntaxKind::BitwiseNot, &Instance(), "not", Not);
-        bitwiseNot->PushParameterType(&Instance());
-        overloads[SyntaxKind::BitwiseNot] = bitwiseNot;
+        const auto bitwiseNot = new BuiltInOperation(SyntaxKind::BitwiseNot, this, "not", Not);
+        bitwiseNot->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseNot, bitwiseNot);
 
-        const auto bitwiseAnd = new BuiltInOperation(SyntaxKind::BitwiseAnd, &Instance(), "and", BitwiseAnd);
-        bitwiseAnd->PushParameterType(&Instance());
-        bitwiseAnd->PushParameterType(&Instance());
-        overloads[SyntaxKind::BitwiseAnd] = bitwiseAnd;
+        const auto bitwiseAnd = new BuiltInOperation(SyntaxKind::BitwiseAnd, this, "and", BitwiseAnd);
+        bitwiseAnd->PushParameterType(this);
+        bitwiseAnd->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseAnd, bitwiseAnd);
 
-        const auto bitwiseOr = new BuiltInOperation(SyntaxKind::BitwiseOr, &Instance(), "or", BitwiseOr);
-        bitwiseOr->PushParameterType(&Instance());
-        bitwiseOr->PushParameterType(&Instance());
-        overloads[SyntaxKind::BitwiseOr] = bitwiseOr;
+        const auto bitwiseOr = new BuiltInOperation(SyntaxKind::BitwiseOr, this, "or", BitwiseOr);
+        bitwiseOr->PushParameterType(this);
+        bitwiseOr->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseOr, bitwiseOr);
 
-        const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor, &Instance(), "xor", BitwiseXor);
-        bitwiseXor->PushParameterType(&Instance());
-        bitwiseXor->PushParameterType(&Instance());
-        overloads[SyntaxKind::BitwiseXor] = bitwiseXor;
+        const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor,this, "xor", BitwiseXor);
+        bitwiseXor->PushParameterType(this);
+        bitwiseXor->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
 
-        const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, &Instance(), "shr", RightShift);
-        rightShift->PushParameterType(&Instance());
-        rightShift->PushParameterType(&Instance());
-        overloads[SyntaxKind::RightShift] = rightShift;
+        const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, this, "shr", RightShift);
+        rightShift->PushParameterType(this);
+        rightShift->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::RightShift, rightShift);
 
-        const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, &Instance(), "shl", LeftShift);
-        leftShift->PushParameterType(&Instance());
-        leftShift->PushParameterType(&Instance());
-        overloads[SyntaxKind::LeftShift] = leftShift;
+        const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, this, "shl", LeftShift);
+        leftShift->PushParameterType(this);
+        leftShift->PushParameterType(this);
+        overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
     }
 
     const ICharacteristic* Integer::FindCharacteristic(const string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
     const IFunctionDefinition* Integer::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
@@ -214,7 +218,7 @@ namespace Analysis::Structure::Wrappers
         return tryParse;
     }
 
-    const IFunction* Integer::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Integer::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IIndexerDefinition* Integer::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -223,7 +227,12 @@ namespace Analysis::Structure::Wrappers
     const IFunction* Integer::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return implicitCasts.contains(hash) ? implicitCasts.at(hash) : nullptr;
+
+        for (const auto cast: implicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     const IFunction* Integer::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
@@ -234,17 +243,26 @@ namespace Analysis::Structure::Wrappers
     const IBuiltInCast* Integer::FindBuiltInCast(const IDataType* returnType, const IDataType* fromType) const
     {
         const auto hash = ArgumentHash({ returnType , fromType });
-        return explicitCasts.contains(hash) ? explicitCasts.at(hash) : nullptr;
+
+        for (const auto cast: explicitCasts)
+            if (std::get<0>(cast) == hash)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     const IOperatorOverload* Integer::FindOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? overloads.at(base) : nullptr;
+        return FindBuiltInOverload(base);
     }
 
     const IBuiltInOverload* Integer::FindBuiltInOverload(const SyntaxKind base) const
     {
-        return overloads.contains(base) ? overloads.at(base) : nullptr;
+        for (const auto cast: overloads)
+            if (std::get<0>(cast) == base)
+                return std::get<1>(cast);
+
+        return nullptr;
     }
 
     Integer::~Integer()
@@ -252,13 +270,13 @@ namespace Analysis::Structure::Wrappers
         delete tryParse;
 
         for (const auto cast: implicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto cast: explicitCasts)
-            delete cast.second;
+            delete std::get<1>(cast);
 
         for (const auto overload: overloads)
-            delete overload.second;
+            delete std::get<1>(overload);
     }
 }
 

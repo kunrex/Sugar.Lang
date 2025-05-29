@@ -18,8 +18,6 @@ namespace Analysis::Structure::Wrappers
 
             std::vector<const IDataType*> types;
 
-            std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
-
             Global::BuiltInConstructor* constructor;
 
             explicit Tuple();
@@ -37,7 +35,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 

@@ -51,7 +51,7 @@ namespace Analysis::Structure::Wrappers
         return referencedType->FindCharacteristic(name);
     }
 
-    const IFunction* Referenced::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Referenced::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IFunctionDefinition* Referenced::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const

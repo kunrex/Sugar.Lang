@@ -24,7 +24,7 @@ const string cil_nullable = "[System.Runtime]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), SingletonService(), genericSignature(), nullableType(nullableType), characteristics(), constructors()
+    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), SingletonService(), genericSignature(), nullableType(nullableType), constructors()
     { }
 
     const Nullable* Nullable::Instance(const IDataType* const dataType)
@@ -51,28 +51,37 @@ namespace Analysis::Structure::Wrappers
     void Nullable::BindGlobal()
     {
         const auto isNull = std::format("call instance bool valuetype {}::get_HasValue()", genericSignature);
-        characteristics["IsNull"] = new BuiltInProperty("IsNull"", Describer::Public, &Boolean::Instance(), true, isNull, false, "");
+        characteristics.push_back(new BuiltInProperty("IsNull", Describer::Public, Boolean::Instance(), true, isNull, false, ""));
 
         const auto value = std::format("call instance !0 valuetype {}::get_Value()", genericSignature);
-        characteristics["Value"] = new BuiltInProperty("Value", Describer::Public, nullableType, true, value, false, "");
+        characteristics.push_back(new BuiltInProperty("Value", Describer::Public, nullableType, true, value, false, ""));
 
         const auto constructor = new BuiltInConstructor(this, std::format("call instance void valuetype {}::.ctor(!0)", genericSignature));
         constructor->PushParameterType(nullableType);
-        constructors[ArgumentHash(constructor)] = constructor;
+        constructors.emplace_back(ArgumentHash(constructor), constructor);
 
         const auto defaultConstructor = new BuiltInConstructor(this, std::format("initobj valuetype {}", genericSignature));
-        constructors[ArgumentHash(defaultConstructor)] = defaultConstructor;
+        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
     }
 
     const ICharacteristic* Nullable::FindCharacteristic(const std::string& name) const
     {
-        return characteristics.contains(name) ? characteristics.at(name) : nullptr;
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
     }
 
-    const IFunction* Nullable::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Nullable::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
-        return constructors.contains(hash) ? constructors.at(hash) : nullptr;
+
+        for (const auto constructor : constructors)
+            if (std::get<0>(constructor) == hash)
+                return std::get<1>(constructor);
+
+        return nullptr;
     }
 
     const IFunctionDefinition* Nullable::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
@@ -92,8 +101,8 @@ namespace Analysis::Structure::Wrappers
 
     Nullable::~Nullable()
     {
-        for (const auto& constructor: constructors)
-            delete constructor.second;
+        for (const auto constructor: constructors)
+            delete std::get<1>(constructor);
     }
 }
 

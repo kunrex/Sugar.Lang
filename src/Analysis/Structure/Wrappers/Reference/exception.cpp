@@ -33,7 +33,7 @@ namespace Analysis::Structure::Wrappers
     void Exception::BindGlobal()
     {
         constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
-        constructor->PushParameterType(&String::Instance());
+        constructor->PushParameterType(String::Instance());
     }
 
     const ICharacteristic* Exception::FindCharacteristic(const string& name) const
@@ -42,9 +42,15 @@ namespace Analysis::Structure::Wrappers
     const IFunctionDefinition* Exception::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Exception::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Exception::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
-        return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
+        if (argumentList.size() != 1)
+            return nullptr;
+
+        if (argumentList[0] != String::Instance())
+            return nullptr;
+
+        return constructor;
     }
 
     const IIndexerDefinition* Exception::FindIndexer(const std::vector<const IDataType*>& argumentList) const

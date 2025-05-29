@@ -1,7 +1,8 @@
 #ifndef BOOLEAN_H
 #define BOOLEAN_H
 
-#include <map>
+#include <tuple>
+#include <vector>
 
 #include "../../../../Services/singleton_service.h"
 
@@ -15,15 +16,15 @@ namespace Analysis::Structure::Wrappers
     class Boolean final : public DataTypes::BuiltInValueType, public Services::SingletonService, public virtual Core::Interfaces::IPrimitiveType
     {
         private:
-            std::map<unsigned long, const Core::Interfaces::IFunction*> implicitCasts;
-            std::map<unsigned long, const Core::Interfaces::IBuiltInCast*> explicitCasts;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
 
-            std::map<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*> overloads;
+            std::vector<std::tuple<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>> overloads;
 
             Boolean();
 
         public:
-            static const Boolean& Instance();
+            static const Boolean* Instance();
 
             [[nodiscard]] int SlotCount() const override;
 
@@ -35,7 +36,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 

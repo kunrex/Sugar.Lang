@@ -18,11 +18,11 @@ namespace Analysis::Structure::Wrappers
 
             const IDataType* listType;
 
-            std::map<std::string, const Core::Interfaces::ICharacteristic*> characteristics;
+            std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::map<unsigned long, const Core::Interfaces::IFunctionDefinition*> functions;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
 
-            std::map<unsigned long, const Core::Interfaces::IFunction*> constructors;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IConstructor*>> constructors;
 
             Global::BuiltInIndexer* indexer;
 
@@ -43,7 +43,7 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
-            [[nodiscard]] const Core::Interfaces::IFunction* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
 

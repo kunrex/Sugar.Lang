@@ -53,29 +53,29 @@ namespace Analysis::Structure::Wrappers
 
     void Array::BindGlobal()
     {
-        length = new BuiltInProperty("Length", Describer::Public, &Integer::Instance(), true, "ldlen", false, "");
+        length = new BuiltInProperty("Length", Describer::Public, Integer::Instance(), true, "ldlen", false, "");
 
         constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
-        constructor->PushParameterType(&Integer::Instance());
+        constructor->PushParameterType(Integer::Instance());
 
         if (arrayType->MemberType() == MemberType::Class)
         {
             indexer = new BuiltInIndexer(arrayType, true, "ldelem.ref", true, "stelem.ref");
-            indexer->PushParameterType(&Integer::Instance());
+            indexer->PushParameterType(Integer::Instance());
         }
         else
         {
             indexer = new BuiltInIndexer(arrayType, true, "ldelem", true, "stelem");
-            indexer->PushParameterType(&Integer::Instance());
+            indexer->PushParameterType(Integer::Instance());
         }
     }
 
     const ICharacteristic* Array::FindCharacteristic(const std::string& name) const
     {
-        return length->Name() == name ? length : nullptr;
+        return name == "Length" ? length : nullptr;
     }
 
-    const IFunction* Array::FindConstructor(const std::vector<const IDataType*>& argumentList) const
+    const IConstructor* Array::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
     }
