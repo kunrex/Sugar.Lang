@@ -72,6 +72,12 @@ namespace Analysis::Structure::Enums
             result += "Private, ";
         if (shortValue & static_cast<short>(Describer::Static))
             result += "Static, ";
+        if (shortValue & static_cast<short>(Describer::Const))
+            result += "Const, ";
+        if (shortValue & static_cast<short>(Describer::Constexpr))
+            result += "Constexpr, ";
+        if (shortValue & static_cast<short>(Describer::Entrypoint))
+            result += "Entrypoint, ";
 
         if (!result.empty())
             result.erase(result.size() - 2);

@@ -27,6 +27,7 @@
 #include "../ParseNodes/Types/Created/created_type_node.h"
 #include "../ParseNodes/Types/BuiltIn/built_in_type_node.h"
 #include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
+#include "../ParseNodes/Types/Keyword/void_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/func_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/list_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/tuple_type_node.h"
@@ -546,6 +547,8 @@ namespace Parsing
         {
             case SyntaxKind::Let:
                 return new AnonymousTypeNode(current);
+            case SyntaxKind::Void:
+                return new VoidTypeNode(current);
             case SyntaxKind::Int:
             case SyntaxKind::Long:
             case SyntaxKind::Short:
@@ -554,7 +557,7 @@ namespace Parsing
             case SyntaxKind::String:
             case SyntaxKind::Object:
             case SyntaxKind::Boolean:
-        case SyntaxKind::Character:
+            case SyntaxKind::Character:
                 return new BuiltInTypeNode(current);
             case SyntaxKind::List:
                 {

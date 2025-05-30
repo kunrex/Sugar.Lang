@@ -184,7 +184,7 @@ namespace Analysis::Creation::Binding
         MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
 
         ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
-        ValidateDescriber(globalVariable, Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
+        ValidateDescriber(globalVariable, Describer::Const | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
         globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);
@@ -216,7 +216,7 @@ namespace Analysis::Creation::Binding
         MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
 
         ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
-        ValidateDescriber(globalVariable, Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
+        ValidateDescriber(globalVariable, Describer::Const | Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
 
         globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);

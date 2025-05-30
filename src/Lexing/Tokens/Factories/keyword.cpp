@@ -47,8 +47,8 @@ namespace Tokens
             { "exception",   { SyntaxKind::Exception,   KeywordType::Type } },
             { "nullable",    { SyntaxKind::Nullable,    KeywordType::Type } },
             { "object",      { SyntaxKind::Object,      KeywordType::Type } },
+            { "void",        { SyntaxKind::Void,        KeywordType::Type } },
 
-            { "void",        { SyntaxKind::Void,        KeywordType::Function } },
             { "indexer",     { SyntaxKind::Indexer,     KeywordType::Function } },
             { "operator",    { SyntaxKind::Operator,    KeywordType::Function } },
             { "explicit",    { SyntaxKind::Explicit,    KeywordType::Function } },
