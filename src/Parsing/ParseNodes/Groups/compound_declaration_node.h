@@ -9,7 +9,17 @@ namespace ParseNodes::Groups
     class CompoundDeclarationNode final : public DynamicNodeCollection
     {
         public:
-            explicit CompoundDeclarationNode(const Tokens::Token& token);
+            CompoundDeclarationNode(const Tokens::Token& token, const Describers::DescriberNode* describer, const IParseNode* type);
+
+            [[nodiscard]] Enums::NodeType NodeType() const override;
+
+            void Print(const std::string& indent, bool last) const override;
+    };
+
+    class MultipleDeclarationNode final : public DynamicNodeCollection
+    {
+        public:
+            explicit MultipleDeclarationNode(const Tokens::Token& token);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

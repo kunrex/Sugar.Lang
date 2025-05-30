@@ -10,7 +10,7 @@ namespace ParseNodes::Functions::Creation
     class OperatorOverloadNode final : public virtual FixedNodeCollection<4>
     {
         public:
-            OperatorOverloadNode(const Describers::DescriberNode* describer, const IParseNode* type, const Tokens::Token& base, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body);
+            OperatorOverloadNode(const Describers::DescriberNode* describer, const IParseNode* type, const Tokens::Token& base, const Groups::MultipleDeclarationNode* parameters, const DynamicNodeCollection* body);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

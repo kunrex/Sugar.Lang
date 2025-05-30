@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    AssignedPropertyNode::AssignedPropertyNode(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier, const GetNode* const get, const SetNode* const set, const IParseNode* const value) : FixedNodeCollection(identifier->Token())
+    AssignedPropertyNode::AssignedPropertyNode(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier, const IParseNode* const get, const IParseNode* const set, const IParseNode* const value) : FixedNodeCollection(identifier->Token())
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);
@@ -28,8 +28,11 @@ namespace ParseNodes::Properties
         GetChild(static_cast<int>(ChildCode::Describer))->Print(indent + next, false);
         GetChild(static_cast<int>(ChildCode::Type))->Print(indent + next, false);
         GetChild(static_cast<int>(ChildCode::Identifier))->Print(indent + next, false);
-        GetChild(static_cast<int>(ChildCode::Get))->Print(indent + next, false);
-        GetChild(static_cast<int>(ChildCode::Set))->Print(indent + next, false);
+        if (const auto get = GetChild(static_cast<int>(ChildCode::Get)); get != nullptr)
+            get->Print(indent + next, false);
+
+        if (const auto set = GetChild(static_cast<int>(ChildCode::Set)); set != nullptr)
+            set->Print(indent + next, true);
         GetChild(static_cast<int>(ChildCode::Expression))->Print(indent + next, true);
     }
 }

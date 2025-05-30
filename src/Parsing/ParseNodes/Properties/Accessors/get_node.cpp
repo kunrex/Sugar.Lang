@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    GetNode::GetNode(const DescriberNode* const describer, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    GetNode::GetNode(const DescriberNode* const describer, const IParseNode* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Body, body);

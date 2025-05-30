@@ -1,7 +1,9 @@
 #include "parser.h"
+#include "../../Analysis/Structure/Wrappers/Reference/exception.h"
 
 #include "../../Exceptions/exception_manager.h"
 #include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
 
 #include "../../Lexing/Tokens/Enums/keyword_type.h"
 
@@ -32,109 +34,109 @@ using namespace ParseNodes::Functions::Calling;
 
 namespace Parsing
 {
+    void Parser::ParseCompoundDeclaration(CompoundDeclarationNode* const declarations, const SeparatorKind breakSeparator)
+    {
+        while (index < source->TokenCount())
+        {
+            if (!MatchType(Current(), TokenType::Identifier))
+            {
+                Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(Current(), source));
+                break;
+            }
+
+            declarations->AddChild(ParseIdentifier(true));
+
+            if (const auto& current = Current(); MatchToken(current, SyntaxKind::Assignment, true))
+                declarations->AddChild(ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma));
+            else
+                declarations->AddChild(new EmptyNode(current));
+
+            const auto& current = Current();
+            if (MatchSeparator(current, breakSeparator))
+                return;
+
+            TryMatchSeparator(current, SeparatorKind::Comma, true);
+        }
+    }
+
     const IParseNode* Parser::ParseVariableDeclaration(const DescriberNode* const describer, const IParseNode* const type, const SeparatorKind breakSeparator)
     {
         const auto identifier = ParseIdentifier(true);
 
         const auto& current = Current();
+
         if (MatchToken(current, SyntaxKind::FlowerOpenBracket))
             return ParseProperty(describer, type, identifier);
         if (MatchSeparator(current, breakSeparator))
             return new DeclarationNode(describer, type, identifier, current);
+        if (MatchToken(current, SyntaxKind::Comma, true))
+        {
+            const auto compound = new CompoundDeclarationNode(current, describer, type);
+            compound->AddChild(identifier);
 
-        const auto declarations = new CompoundDeclarationNode(current);
-
+            ParseCompoundDeclaration(compound, breakSeparator);
+            return compound;
+        }
         if (MatchToken(current, SyntaxKind::Assignment, true))
         {
-            const auto initialise = new InitialisationNode(describer, type, identifier, ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma), Current());
-
+            const auto value = ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma);
             if (MatchSeparator(Current(), breakSeparator))
+                return new InitialisationNode(describer, type, identifier, value, current);
+
+            if (MatchToken(Current(), SyntaxKind::Comma, true))
             {
-                delete declarations;
-                return initialise;
-            }
+                const auto compound = new CompoundDeclarationNode(current, describer, type);
+                compound->AddChild(identifier);
+                compound->AddChild(value);
 
-            declarations->AddChild(initialise);
-        }
-        else
-            declarations->AddChild(new DeclarationNode(describer, type, identifier, current));
-
-        if (MatchToken(Current(), SyntaxKind::Comma, true))
-        {
-            std::cout << *Current().Value<std::string>() << std::endl;
-            while (index < source->TokenCount())
-            {
-                const auto identify = ParseIdentifier(true);
-
-                if (const auto& cur = Current(); MatchToken(cur, SyntaxKind::Comma, true))
-                {
-                    declarations->AddChild(new DeclarationNode(describer, type, identify, cur));
-                    continue;
-                }
-                else if (MatchToken(cur, SyntaxKind::Assignment, true))
-                {
-                    declarations->AddChild(new InitialisationNode(describer, type, identifier, ParseNonEmptyExpression(breakSeparator | SeparatorKind::Comma), Current()));
-                    if (MatchToken(Current(), SyntaxKind::Comma, true))
-                        continue;;
-                }
-
-                if (MatchSeparator(Current(), breakSeparator))
-                    return declarations;
-
-                break;
+                ParseCompoundDeclaration(compound, breakSeparator);
+                return compound;
             }
         }
 
-        const auto invalid = ParseInvalid(breakSeparator);
-        invalid->AddChild(declarations);
+        Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
 
+        const auto invalid =  ParseInvalid(breakSeparator);
         TryMatchSeparator(Current(), breakSeparator);
+
         return invalid;
     }
 
     const DescriberNode* Parser::ParseDescriber()
     {
-        TryMatchToken(Current(), SyntaxKind::BoxOpenBracket, true);
+        const auto& start = Current();
+        TryMatchToken(start, SyntaxKind::BoxOpenBracket, true);
 
-        const auto describer = new DescriberNode(source->TokenAt(index - 1));
+        const auto describer = new DescriberNode(start);
+
         while (index < source->TokenCount())
         {
-            const auto& current = Current();
-            if (!MatchType(current, TokenType::Keyword))
+            if (const auto& current = Current(); !MatchType(current, TokenType::Keyword) || static_cast<KeywordType>(current.Metadata()) != KeywordType::Describer)
             {
                 Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
                 break;
             }
-
-            if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType != KeywordType::Describer)
+            else
             {
-                Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
-                break;
+                describer->AddChild(new DescriberKeywordNode(current));
+                index++;
             }
 
-            describer->AddChild(new DescriberKeywordNode(current));
-
-            if (MatchLookAhead(SeparatorKind::Comma, true))
+            if (MatchToken(Current(), SyntaxKind::BoxCloseBracket))
             {
-                index++;
-                continue;
-            }
-            if (MatchLookAhead(SeparatorKind::BoxCloseBracket, true))
-            {
-                index++;
-                if (MatchToken(Current(), SyntaxKind::BoxOpenBracket, true))
+                if (MatchLookAhead(SyntaxKind::BoxOpenBracket, true))
+                {
+                    index++;
                     continue;
+                }
 
-                return describer;
+                break;
             }
 
-            break;
+            TryMatchToken(Current(), SyntaxKind::Comma, true);
         }
 
-        const auto invalid = ParseInvalid(SeparatorKind::BoxCloseBracket);
-        delete invalid;
-
-        TryMatchToken(Current(), SyntaxKind::BoxCloseBracket);
+        TryMatchToken(Current(), SyntaxKind::BoxCloseBracket, true);
         return describer;
     }
 
@@ -209,6 +211,10 @@ namespace Parsing
                     TryMatchSeparator(Current(), SeparatorKind::Semicolon);
                     return new ContinueNode(keyword);
                 }
+            case SyntaxKind::Get:
+                return ParseGet(new DescriberNode(Current()));
+            case SyntaxKind::Set:
+                return ParseSet(new DescriberNode(Current()));
             case SyntaxKind::Enum:
                 return ParseEnumDefinition(new DescriberNode(Current()));
             case SyntaxKind::Class:
@@ -233,21 +239,28 @@ namespace Parsing
                 return ParseOperatorOverload(new DescriberNode(Current()));
             default:
                 {
-                    if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
+                    switch (static_cast<KeywordType>(current.Metadata()))
                     {
-                        const auto type = ParseType();
-                        index++;
+                        case KeywordType::Describer:
+                            return ParseDescriberStatement(breakSeparator);
+                        case KeywordType::Type:
+                            {
+                                const auto type = ParseType();
+                                index++;
 
-                        const auto& cur = Current();
-                        if (MatchToken(cur, SyntaxKind::Colon, true))
-                            return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
-                        if (MatchType(cur, TokenType::Identifier))
-                            return ParseFunction(new DescriberNode(Current()), type);
+                                const auto& cur = Current();
+                                if (MatchToken(cur, SyntaxKind::Colon, true))
+                                    return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
+                                if (MatchType(cur, TokenType::Identifier))
+                                    return ParseFunction(new DescriberNode(Current()), type);
 
-                        const auto invalid = ParseInvalid(breakSeparator);
-                        TryMatchSeparator(Current(), breakSeparator);
-                        invalid->AddChild(type);
-                        return invalid;
+                                const auto invalid = ParseInvalid(breakSeparator);
+                                TryMatchSeparator(Current(), breakSeparator);
+                                invalid->AddChild(type);
+                                return invalid;
+                            }
+                        default:
+                            break;
                     }
                 }
                 break;
@@ -304,6 +317,10 @@ namespace Parsing
 
                     switch (current.Kind())
                     {
+                        case SyntaxKind::Get:
+                            return ParseGet(describer);
+                        case SyntaxKind::Set:
+                            return ParseSet(describer);
                         case SyntaxKind::Enum:
                             return ParseEnumDefinition(describer);
                         case SyntaxKind::Class:

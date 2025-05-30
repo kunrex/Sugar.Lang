@@ -11,7 +11,7 @@ namespace ParseNodes::Functions::Creation
     class FunctionCreationNode final : public virtual FixedNodeCollection<5>
     {
         public:
-            FunctionCreationNode(const Describers::DescriberNode* describer, const IParseNode* type, const Values::IdentifierNode* identifier, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body);
+            FunctionCreationNode(const Describers::DescriberNode* describer, const IParseNode* type, const Values::IdentifierNode* identifier, const Groups::MultipleDeclarationNode* parameters, const DynamicNodeCollection* body);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

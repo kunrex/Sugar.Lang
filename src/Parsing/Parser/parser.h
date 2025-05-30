@@ -81,7 +81,7 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Values::IdentifierNode* ParseIdentifier(bool increment = false);
 
             void ParseFunctionArguments(ParseNodes::DynamicNodeCollection* function);
-            [[nodiscard]] const ParseNodes::Groups::CompoundDeclarationNode* ParseFunctionParameters();
+            [[nodiscard]] const ParseNodes::Groups::MultipleDeclarationNode* ParseFunctionParameters();
 
             [[nodiscard]] const ParseNodes::Functions::Calling::RefCallNode* ParseRefCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::PrintNode* ParsePrintCall();
@@ -96,7 +96,9 @@ namespace Parsing
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseConstructorCall();
             [[nodiscard]] const ParseNodes::Functions::Calling::FunctionCallNode* ParseFunctionCall(const ParseNodes::Values::IdentifierNode* identifier);
 
-            [[nodiscard]] std::tuple<const ParseNodes::Properties::GetNode*, const ParseNodes::Properties::SetNode*> ParseAccessors();
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseGet(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseSet(const ParseNodes::Describers::DescriberNode* describer);
+            [[nodiscard]] std::tuple<const ParseNodes::Core::Interfaces::IParseNode*, const ParseNodes::Core::Interfaces::IParseNode*> ParseAccessors();
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseProperty(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::Core::Interfaces::IParseNode* type, const ParseNodes::Values::IdentifierNode* identifier);
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseIndexer(const ParseNodes::Describers::DescriberNode* describer);
 
@@ -121,6 +123,7 @@ namespace Parsing
 
             [[nodiscard]] const ParseNodes::Describers::DescriberNode* ParseDescriber();
 
+            void ParseCompoundDeclaration(ParseNodes::Groups::CompoundDeclarationNode* declarations, Tokens::Enums::SeparatorKind breakSeparator);
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseVariableDeclaration(const ParseNodes::Describers::DescriberNode* describer, const ParseNodes::Core::Interfaces::IParseNode* type, Tokens::Enums::SeparatorKind breakSeparator);
 
             [[nodiscard]] const ParseNodes::Core::Interfaces::IParseNode* ParseKeywordStatement(Tokens::Enums::SeparatorKind breakSeparator);

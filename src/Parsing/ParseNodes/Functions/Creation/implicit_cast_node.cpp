@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    ImplicitCastNode::ImplicitCastNode(const DescriberNode* const describer, const IParseNode* const type, const CompoundDeclarationNode* const parameters, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    ImplicitCastNode::ImplicitCastNode(const DescriberNode* const describer, const IParseNode* const type, const MultipleDeclarationNode* const parameters, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);

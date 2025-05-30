@@ -7,7 +7,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    FunctionCreationNode::FunctionCreationNode(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier, const CompoundDeclarationNode* const parameters, const DynamicNodeCollection* const body) : FixedNodeCollection(identifier->Token())
+    FunctionCreationNode::FunctionCreationNode(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier, const MultipleDeclarationNode* const parameters, const DynamicNodeCollection* const body) : FixedNodeCollection(identifier->Token())
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);

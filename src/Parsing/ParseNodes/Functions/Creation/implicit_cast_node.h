@@ -10,7 +10,7 @@ namespace ParseNodes::Functions::Creation
     class ImplicitCastNode final : public virtual FixedNodeCollection<4>
     {
         public:
-            ImplicitCastNode(const Describers::DescriberNode* describer, const IParseNode* type, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            ImplicitCastNode(const Describers::DescriberNode* describer, const IParseNode* type, const Groups::MultipleDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

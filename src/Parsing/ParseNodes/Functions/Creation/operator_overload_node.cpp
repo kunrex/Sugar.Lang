@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    OperatorOverloadNode::OperatorOverloadNode(const DescriberNode* const describer, const IParseNode* const type, const Tokens::Token& base, const CompoundDeclarationNode* const parameters, const DynamicNodeCollection* const body) : FixedNodeCollection(base)
+    OperatorOverloadNode::OperatorOverloadNode(const DescriberNode* const describer, const IParseNode* const type, const Tokens::Token& base, const MultipleDeclarationNode* const parameters, const DynamicNodeCollection* const body) : FixedNodeCollection(base)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);

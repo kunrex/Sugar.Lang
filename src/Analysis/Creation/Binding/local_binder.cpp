@@ -118,8 +118,6 @@ namespace Analysis::Creation::Binding
     const IContextNode* BindEntity(const IParseNode* entity, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
     const IContextNode* BindEntity(const IParseNode* entity, const IContextNode* context, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
 
-    const IContextNode* BindExpression(const IParseNode* expression, IScoped* scoped, const Scope* scope, const IUserDefinedType* dataType);
-
     bool VariableExists(const IParseNode* identifier, const IScoped* const scoped, const Scope* scope)
     {
         const auto value = *identifier->Token().Value<string>();
@@ -133,12 +131,10 @@ namespace Analysis::Creation::Binding
         return false;
     }
 
-    void BindLocalDeclaration(const IParseNode* declaration, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* dataType)
+    void BindLocalDeclaration(const Describer describer, const IDataType* const creationType, const IParseNode* const identifier, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
-        const auto index = declaration->Token().Index();
-
-        const auto identifier = declaration->GetChild(static_cast<int>(ChildCode::Identifier));
+        const auto index = identifier->Token().Index();
 
         if (VariableExists(identifier, scoped, scope))
         {
@@ -146,24 +142,10 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto describer = FromNode(declaration->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
+        ValidateDescriber(variable, Describer::None, index, source);
 
-        switch (const auto typeNode = declaration->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType())
-        {
-            case NodeType::VoidType:
-            case NodeType::AnonymousType:
-                PushException(new DuplicateVariableDefinitionException(index, source));
-                break;
-            default:
-                {
-                    const auto type = BindDataType(typeNode, dataType->Parent());
-                    const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, type);
-
-                    ValidateDescriber(variable, Describer::None, index, source);
-                    scope->AddVariable(variable);
-                }
-                break;
-        }
+        scope->AddVariable(variable);
     }
 
     const IContextNode* BindCast(const IContextNode* const operand, const IDataType* const type, const IFunction* const operandCast, const IFunction* const typeCast, const unsigned long index, const SourceFile* const source)
@@ -175,8 +157,8 @@ namespace Analysis::Creation::Binding
         {
             if (typeValid)
             {
-                 PushException(new LogException(std::format("Ambiguous cast between casts defined in: `{}` and `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
-                 return new InvalidCastExpression(type, operand);
+                PushException(new LogException(std::format("Ambiguous cast between casts defined in: `{}` and `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
+                return new InvalidCastExpression(type, operand);
             }
 
             return new DefinedCastExpression(operandCast, operand);
@@ -188,19 +170,91 @@ namespace Analysis::Creation::Binding
         return new InvalidCastExpression(type, operand);
     }
 
-    void BindLocalInitialisation(const IParseNode* const initialisation, IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
+    void BindLocalInitialisation(const Describer describer, const IDataType* const creationType, const IParseNode* const identifier, const IParseNode* const value, IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
-        const auto index = initialisation->Token().Index();
+        const auto index = identifier->Token().Index();
 
-        const auto identifier = initialisation->GetChild(static_cast<int>(ChildCode::Identifier));
         if (VariableExists(identifier, scoped, scope))
         {
             PushException(new DuplicateVariableDefinitionException(index, source));
             return;
         }
 
-        const auto describer = FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer)));
+        const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
+
+        const auto expression = BindExpression(value, scoped, scope, dataType);
+        if (const auto expressionType = expression->CreationType(); expressionType != creationType)
+        {
+            if (creationType == Object::Instance())
+            {
+                if (expressionType->MemberType() == MemberType::ValueType)
+                    scope->AddChild(new BoxCastExpression(expression));
+                else
+                    scope->AddChild(expression);
+            }
+            else
+            {
+                const auto valueCast = expressionType->FindImplicitCast(creationType, expressionType);
+                const auto resultCast = expressionType->FindImplicitCast(creationType, expressionType);
+
+                scope->AddChild(BindCast(expression, creationType, valueCast, resultCast, index, source));
+            }
+        }
+        else
+            scope->AddChild(expression);
+
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), expression));
+
+        ValidateDescriber(variable, Describer::Const | Describer::Ref, index, source);
+        scope->AddVariable(variable);
+    }
+
+    void BindLocalDeclaration(const IParseNode* declaration, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* dataType)
+    {
+        const auto source = dataType->Parent();
+        const auto index = declaration->Token().Index();
+
+        const auto identifier = declaration->GetChild(static_cast<int>(ChildCode::Identifier));
+
+        switch (const auto typeNode = declaration->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType())
+        {
+            case NodeType::VoidType:
+            case NodeType::AnonymousType:
+                PushException(new DuplicateVariableDefinitionException(index, source));
+                break;
+            default:
+                BindLocalDeclaration(FromNode(declaration->GetChild(static_cast<int>(ChildCode::Describer))), BindDataType(typeNode, dataType->Parent()), identifier, scoped, scope, dataType);
+                break;
+        }
+    }
+
+    const IDataType* ResolveInitialisationType(const IParseNode* const typeNode, const Describer describer, const SourceFile* const source)
+    {
+        const auto creationType = BindDataType(typeNode, source);
+        const IDataType* type;
+        if ((describer & Describer::Ref) == Describer::Ref)
+        {
+            if (creationType->MemberType() == MemberType::Class)
+            {
+                PushException(new LogException("Only value types may be referenced", typeNode->Token().Index(), source));
+                type = creationType;
+            }
+            else
+                type = Referenced::Instance(creationType);
+        }
+        else
+            type = creationType;
+
+        return type;
+    }
+
+    void BindLocalInitialisation(const IParseNode* const initialisation, IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
+    {
+        const auto source = dataType->Parent();
+        const auto index = initialisation->Token().Index();
+
+        const auto identifier = initialisation->GetChild(static_cast<int>(ChildCode::Identifier));
 
         switch (const auto typeNode = initialisation->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType())
         {
@@ -210,56 +264,53 @@ namespace Analysis::Creation::Binding
             case NodeType::AnonymousType:
                 {
                     const auto context = BindExpression(initialisation->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType);
-                    const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, context->CreationType());
+                    const auto variable = new LocalVariable(*identifier->Token().Value<string>(), FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer))), context->CreationType());
 
-                    scope->AddChild(context);
+                    scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), context));
 
-                    ValidateDescriber(variable, Describer::None, index, source);
+                    ValidateDescriber(variable, Describer::Const, index, source);
                     scope->AddVariable(variable);
                 }
                 break;
             default:
                 {
-                    const auto creationType = BindDataType(typeNode, dataType->Parent());
-                    const IDataType* type;
-                    if ((describer & Describer::Ref) == Describer::Ref)
+                    const auto describer = FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer)));
+                    BindLocalInitialisation(FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer))), ResolveInitialisationType(typeNode, describer, source), identifier, initialisation->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType);
+                }
+                break;
+        }
+    }
+
+    void BindMultipleLocalDeclaration(const IParseNode* const statement, IScoped* const scoped, Scope* const scope, const IUserDefinedType* dataType)
+    {
+        switch (const auto typeNode = statement->GetChild(1); typeNode->NodeType())
+        {
+            case NodeType::VoidType:
+            case NodeType::AnonymousType:
+                PushException(new DuplicateVariableDefinitionException(typeNode->Token().Index(), dataType->Parent()));
+                break;
+            default:
+                {
+                    const auto describer = FromNode(statement->GetChild(0));
+                    const auto creationType = ResolveInitialisationType(typeNode, describer, dataType->Parent());
+
+                    const auto forceInit = creationType->Type() == TypeKind::Referenced;
+
+                    const auto count = statement->ChildCount();
+                    for (auto i = 2; i < count; i += 2)
                     {
-                        if (creationType->MemberType() == MemberType::Class)
+                        const auto identifier = statement->GetChild(i);
+
+                        if (const auto value = statement->GetChild(i + 1); value->NodeType() == NodeType::Empty)
                         {
-                            PushException(new LogException("Only value types may be referenced", index, source));
-                            type = creationType;
+                            if (forceInit)
+                                PushException(new LogException("References must be initialised", identifier->Token().Index(), dataType->Parent()));
+
+                            BindLocalDeclaration(describer, creationType, identifier, scoped, scope, dataType);
                         }
                         else
-                            type = Referenced::Instance(creationType);
+                            BindLocalInitialisation(describer, creationType, identifier, value, scoped, scope, dataType);
                     }
-                    else
-                        type = creationType;
-
-                    const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, type);
-                    const auto value = BindExpression(initialisation->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType);
-
-                    if (const auto valueType = value->CreationType(); valueType != type)
-                    {
-                        if (type == Object::Instance())
-                        {
-                            if (valueType->MemberType() == MemberType::ValueType)
-                                scope->AddChild(new BoxCastExpression(value));
-                            else
-                                scope->AddChild(value);
-                        }
-                        else
-                        {
-                            const auto valueCast = valueType->FindImplicitCast(type, valueType);
-                            const auto resultCast = type->FindImplicitCast(type, valueType);
-
-                            scope->AddChild(BindCast(value, type, valueCast, resultCast, index, source));
-                        }
-                    }
-                    else
-                        scope->AddChild(value);
-
-                    ValidateDescriber(variable, Describer::Ref, index, source);
-                    scope->AddVariable(variable);
                 }
                 break;
         }
@@ -1042,14 +1093,17 @@ namespace Analysis::Creation::Binding
     {
         switch (statement->NodeType())
         {
+            case NodeType::Expression:
+                scope->AddChild(BindExpression(statement->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType));
+                break;
             case NodeType::Declaration:
                 BindLocalDeclaration(statement, scoped, scope, dataType);
                 break;
             case NodeType::Initialisation:
-                BindLocalDeclaration(statement, scoped, scope, dataType);
+                BindLocalInitialisation(statement, scoped, scope, dataType);
                 break;
-        case NodeType::Expression:
-                scope->AddChild(BindExpression(statement->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType));
+            case NodeType::CompoundDeclaration:
+                BindMultipleLocalDeclaration(statement, scoped, scope, dataType);
                 break;
             default:
                 PushException(new InvalidStatementException(statement->Token().Index(), dataType->Parent()));
@@ -1270,7 +1324,7 @@ namespace Analysis::Creation::Binding
                     if (IsReturnComplete(current, expected))
                     {
                         result = true;
-                        break;;
+                        break;
                     }
                 }
 

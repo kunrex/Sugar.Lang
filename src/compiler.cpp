@@ -194,14 +194,14 @@ void Compiler::Compile() const
         Object::BindGlobalInstance();
         Math::BindGlobalInstance();
 
-        source->BindGlobal();
+        /*source->BindGlobal();
         if (ExceptionManager::Instance().LogAllExceptions())
         {
             delete source;
             return;
         }
 
-        /*source->BindLocal();
+        source->BindLocal();
         if (ExceptionManager::Instance().LogAllExceptions())
         {
             delete source;

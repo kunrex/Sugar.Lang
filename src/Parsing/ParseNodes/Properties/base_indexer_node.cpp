@@ -8,7 +8,7 @@ using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    BaseIndexerNode::BaseIndexerNode(const DescriberNode* const describer, const IParseNode* const type, const CompoundDeclarationNode* const parameters, const GetNode* const get, const SetNode* const set, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    BaseIndexerNode::BaseIndexerNode(const DescriberNode* const describer, const IParseNode* const type, const MultipleDeclarationNode* const parameters, const IParseNode* const get, const IParseNode* const set, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);

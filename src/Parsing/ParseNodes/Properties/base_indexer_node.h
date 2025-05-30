@@ -12,7 +12,7 @@ namespace ParseNodes::Properties
     class BaseIndexerNode final : public virtual FixedNodeCollection<5>
     {
         public:
-            BaseIndexerNode(const Describers::DescriberNode* describer, const IParseNode* type, const Groups::CompoundDeclarationNode* parameters, const GetNode* get, const SetNode* set, const Tokens::Token& keyword);
+            BaseIndexerNode(const Describers::DescriberNode* describer, const IParseNode* type, const Groups::MultipleDeclarationNode* parameters, const IParseNode* get, const IParseNode* set, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

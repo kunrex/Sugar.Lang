@@ -9,7 +9,7 @@ namespace ParseNodes::Properties
     class SetNode final : public virtual FixedNodeCollection<2>
     {
         public:
-            SetNode(const Describers::DescriberNode* describer, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            SetNode(const Describers::DescriberNode* describer, const IParseNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

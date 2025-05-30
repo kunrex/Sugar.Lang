@@ -16,6 +16,7 @@
 #include "../ParseNodes/Functions/Creation/function_creation_node.h"
 #include "../ParseNodes/Functions/Creation/operator_overload_node.h"
 #include "../ParseNodes/Functions/Calling/collection_construction_call_node.h"
+#include "../ParseNodes/Statements/empty_node.h"
 
 using namespace Exceptions;
 
@@ -35,12 +36,34 @@ using namespace ParseNodes::Functions::Creation;
 
 namespace Parsing
 {
+    const IParseNode* Parser::ParseGet(const DescriberNode* const describer)
+    {
+        const auto& keyword = Current();
+        index++;
+
+        if (MatchToken(Current(), SyntaxKind::Semicolon))
+            return new GetNode(describer, new EmptyNode(source->TokenAt(index - 1)), keyword);
+
+        return new GetNode(describer, ParseScope(), keyword);
+    }
+
+    const IParseNode* Parser::ParseSet(const DescriberNode* const describer)
+    {
+        const auto& keyword = Current();
+        index++;
+
+        if (MatchToken(Current(), SyntaxKind::Semicolon))
+            return new SetNode(describer, new EmptyNode(source->TokenAt(index - 1)), keyword);
+
+        return new SetNode(describer, ParseScope(), keyword);
+    }
+
     const IParseNode* Parser::ParseProperty(const DescriberNode* const describer, const IParseNode* const type, const IdentifierNode* const identifier)
     {
         TryMatchToken(Current(), SyntaxKind::FlowerOpenBracket, true);
 
         const auto result = ParseAccessors();
-        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
+        TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket, true);
 
         if (MatchToken(Current(), SyntaxKind::Equals, true))
         {
@@ -70,46 +93,62 @@ namespace Parsing
         return new BaseIndexerNode(describer, type, parameters, std::get<0>(result), std::get<1>(result), keyword);
     }
 
-    std::tuple<const GetNode*, const SetNode*> Parser::ParseAccessors()
+    std::tuple<const IParseNode*, const IParseNode*> Parser::ParseAccessors()
     {
-        const GetNode* get = nullptr;
-        const SetNode* set = nullptr;
+        const auto& firstToken = Current();
 
-        auto desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
-        if (MatchToken(Current(), SyntaxKind::Get))
+        const auto first = ParseStatement();
+        switch (first->NodeType())
         {
-            const auto& current = Current();
-            index++;
+            case NodeType::Get:
+                index++;
+                break;
+            case NodeType::Set:
+                {
+                    index++;
+                    TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
 
-            const auto body = ParseScope();
-            index++;
+                    return { nullptr, first };
+                }
+            default:
+                {
+                    ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Get, firstToken, source));
 
-            get = new GetNode(desc, body, current);
-            desc = MatchToken(Current(), SyntaxKind::BoxOpenBracket) ? ParseDescriber() : new DescriberNode(Current());
+                    const auto invalid = ParseInvalid(SeparatorKind::FlowerCloseBracket);
+                    invalid->AddChild(first);
+
+                    return { invalid, nullptr };
+                }
         }
 
-        if (MatchToken(Current(), SyntaxKind::Set))
+        const auto& secondToken = Current();
+        if (MatchToken(secondToken, SyntaxKind::FlowerCloseBracket))
+            return { first, nullptr };
+
+        switch (const auto& second = ParseStatement(); second->NodeType())
         {
-            const auto& current = Current();
-            index++;
+            case NodeType::Set:
+                {
+                    index++;
+                    TryMatchToken(Current(), SyntaxKind::FlowerCloseBracket);
 
-            const auto body = ParseScope();
-            index++;
+                    return { first, second };
+                }
+            default:
+                {
+                    ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Set, secondToken, source));
 
-            set = new SetNode(desc, body, current);
+                    const auto invalid = ParseInvalid(SeparatorKind::FlowerCloseBracket);
+                    invalid->AddChild(second);
+
+                    return { first, invalid };
+                }
         }
-        else if (desc != nullptr)
-        {
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Set, Current(), source));
-            delete desc;
-        }
-
-        return { get, set };
     }
 
-    const CompoundDeclarationNode* Parser::ParseFunctionParameters()
+    const MultipleDeclarationNode* Parser::ParseFunctionParameters()
     {
-        const auto parameters = new CompoundDeclarationNode(source->TokenAt(index));
+        const auto parameters = new MultipleDeclarationNode(source->TokenAt(index));
         if (!TryMatchToken(Current(), SyntaxKind::OpenBracket, true))
         {
             const auto invalid = ParseInvalid(SeparatorKind::CloseBracket | SeparatorKind::FlowerOpenBracket);
@@ -159,7 +198,9 @@ namespace Parsing
     void Parser::ParseFunctionArguments(DynamicNodeCollection* const function)
     {
         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
-        ParseExpressionCollection(function, SeparatorKind::CloseBracket);
+
+        if (!MatchToken(Current(), SyntaxKind::CloseBracket))
+             ParseExpressionCollection(function, SeparatorKind::CloseBracket);;
     }
 
     const IParseNode* Parser::ParseConstructorCall()

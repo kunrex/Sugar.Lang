@@ -10,7 +10,7 @@ namespace ParseNodes::Functions::Creation
     class ConstructorCreationNode final : public virtual FixedNodeCollection<3>
     {
         public:
-            ConstructorCreationNode(const Describers::DescriberNode* describer, const Groups::CompoundDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            ConstructorCreationNode(const Describers::DescriberNode* describer, const Groups::MultipleDeclarationNode* parameters, const DynamicNodeCollection* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

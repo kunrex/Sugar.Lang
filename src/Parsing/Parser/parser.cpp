@@ -130,7 +130,7 @@ namespace Parsing
         {
             if (const auto& current = Current(); MatchSeparator(current, match))
             {
-                if (MatchSeparator(current, extra) && !MatchSeparator(current, breakOut))
+                if (MatchSeparator(current, SeparatorKind::FlowerOpenBracket) && !MatchSeparator(current, breakOut))
                     index--;
 
                 break;

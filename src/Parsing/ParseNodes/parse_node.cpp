@@ -60,11 +60,11 @@ namespace ParseNodes
     DynamicNodeCollection::DynamicNodeCollection(const Tokens::Token& token) : ParseNode(token), children()
     { }
 
-    unsigned long DynamicNodeCollection::ChildCount() const { return static_cast<int>(children.size()); }
+    unsigned long DynamicNodeCollection::ChildCount() const { return children.size(); }
 
     const IParseNode* DynamicNodeCollection::GetChild(const int index) const
     {
-        return children.at(index);
+        return children[index];
     }
 
     void DynamicNodeCollection::AddChild(const IParseNode* const child)
