@@ -28,6 +28,11 @@ namespace Analysis::Structure::Context
     uintptr_t ShortConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string ShortConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
+    void ShortConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Short Constant: " << value << std::endl;
+    }
+
     IntegerConstant::IntegerConstant(const int value) : ContextNode(Integer::Instance()), value(value)
     { }
 
@@ -40,6 +45,11 @@ namespace Analysis::Structure::Context
 
     uintptr_t IntegerConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string IntegerConstant::CILData() const { return std::format("ldc.i4 {}", value); }
+
+    void IntegerConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Integer Constant: " << value << std::endl;
+    }
 
     LongConstant::LongConstant(const long value) : ContextNode(Long::Instance()), value(value)
     { }
@@ -54,6 +64,11 @@ namespace Analysis::Structure::Context
     uintptr_t LongConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string LongConstant::CILData() const { return std::format("ldc.i8 {}", value); }
 
+    void LongConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Long Constant: " << value << std::endl;
+    }
+
     CharacterConstant::CharacterConstant(const char value) : ContextNode(Character::Instance()), value(value)
     { }
 
@@ -67,8 +82,18 @@ namespace Analysis::Structure::Context
     uintptr_t CharacterConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string CharacterConstant::CILData() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
 
+    void CharacterConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Character Constant: " << value << std::endl;
+    }
+
     BoolConstant::BoolConstant(const bool value) : ContextNode(Boolean::Instance()), value(value)
     { }
+
+    void BoolConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Bool Constant: " << value << std::endl;
+    }
 
     uintptr_t BoolConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
 

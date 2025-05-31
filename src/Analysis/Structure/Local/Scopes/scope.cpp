@@ -51,6 +51,20 @@ namespace Analysis::Structure::Local
         return nullptr;
     }
 
+    void Scope::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Scope: " << name << std::endl;
+        const auto next = indent + (last ? " " : "| ");
+
+        auto i = 0;
+        for (const auto child: children)
+            child->Print(next, ++i == children.size());
+
+        const auto count = nested.size();
+        for (i = 0; i < count; i++)
+            nested[i]->Print(next, last);
+    }
+
     Scope::~Scope()
     {
         for (const auto nestedScope: nested)

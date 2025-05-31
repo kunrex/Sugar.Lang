@@ -27,6 +27,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] std::string CILData() const override;
             [[nodiscard]] uintptr_t Metadata() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

@@ -36,5 +36,11 @@ namespace Analysis::Structure::Context
 
     uintptr_t FunctionCallContext::Metadata() const { return reinterpret_cast<uintptr_t>(function); }
     string FunctionCallContext::CILData() const { return "call " + function->FullName(); }
+
+    void FunctionCallContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Function Call" << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }
 

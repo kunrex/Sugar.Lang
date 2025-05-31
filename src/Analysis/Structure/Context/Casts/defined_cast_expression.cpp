@@ -22,4 +22,10 @@ namespace Analysis::Structure::Context
     bool DefinedCastExpression::Writable() const { return false; }
 
     string DefinedCastExpression::CILData() const { return definition->MemberType() == MemberType::BuiltInCast ? definition->FullName() : std::format("call {}", definition->FullName()); }
+
+    void DefinedCastExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Defined Cast Expression: " << definition->CreationType()->FullName() << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

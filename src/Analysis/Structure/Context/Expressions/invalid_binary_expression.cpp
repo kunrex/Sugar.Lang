@@ -1,5 +1,7 @@
 #include "invalid_binary_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -17,5 +19,11 @@ namespace Analysis::Structure::Context
     bool InvalidBinaryExpression::Writable() const { return false; }
 
     string InvalidBinaryExpression::CILData() const { return ""; }
+
+    void InvalidBinaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Binary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
 

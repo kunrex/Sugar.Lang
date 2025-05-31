@@ -39,6 +39,12 @@ namespace Analysis::Structure::Context
         return "call " + constructor->FullName();
     }
 
+    void CreationContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Creation: " << creationType->FullName() << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
+
     CollectionCreationContext::CollectionCreationContext(const IDataType* const collectionType) : DynamicContextCollection(collectionType), slotCount(-1), collectionType(collectionType)
     { }
 
@@ -61,4 +67,10 @@ namespace Analysis::Structure::Context
     bool CollectionCreationContext::Writable() const { return creationType->MemberType() == MemberType::Class; }
 
     string CollectionCreationContext::CILData() const { return ""; }
+
+    void CollectionCreationContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Creation: " << creationType->FullName() << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }

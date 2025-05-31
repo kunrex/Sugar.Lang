@@ -18,4 +18,9 @@ namespace Analysis::Structure::Context
     bool InvalidContext::Writable() const { return false; }
 
     std::string InvalidContext::CILData() const { return ""; }
+
+    void InvalidContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Context" << std::endl;
+    }
 }

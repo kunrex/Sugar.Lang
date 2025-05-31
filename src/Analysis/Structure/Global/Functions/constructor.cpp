@@ -63,7 +63,7 @@ namespace Analysis::Structure::Global
 
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
-        builder.PushLine(".maxstack " + maxSlotSize);
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.PushLine(load_this);
@@ -71,6 +71,8 @@ namespace Analysis::Structure::Global
 
         parent->InstanceConstructor()->Transpile(builder);
         builder.Push(innerBuilder.Value());
+
+        builder.Push("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -111,6 +113,7 @@ namespace Analysis::Structure::Global
         builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");
 
         PushTranspilation(builder);
+        builder.Push("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -160,6 +163,8 @@ namespace Analysis::Structure::Global
             builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
         }
 
+        builder.PushLine("ret");
+
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
@@ -202,7 +207,7 @@ namespace Analysis::Structure::Global
 
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
-        builder.PushLine(".maxstack " + maxSlotSize);
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.PushLine(load_this);
@@ -210,6 +215,8 @@ namespace Analysis::Structure::Global
 
         PushTranspilation(builder);
         builder.Push(innerBuilder.Value());
+
+        builder.PushLine("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -257,7 +264,7 @@ namespace Analysis::Structure::Global
 
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
-        builder.PushLine(".maxstack " + maxSlotSize);
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
 
         if (!characteristics.empty())
         {
@@ -269,6 +276,8 @@ namespace Analysis::Structure::Global
         }
 
         builder.Push(innerBuilder.Value());
+
+        builder.PushLine("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

@@ -25,6 +25,11 @@ namespace Analysis::Structure::Context
     uintptr_t FloatConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string FloatConstant::CILData() const { return std::format("ldc.r4 {}", value); }
 
+    void FloatConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Float Constant: " << value << std::endl;
+    }
+
     DoubleConstant::DoubleConstant(const double value) : ContextNode(Double::Instance()), value(value)
     { }
 
@@ -37,4 +42,9 @@ namespace Analysis::Structure::Context
 
     uintptr_t DoubleConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
     string DoubleConstant::CILData() const { return std::format("ldc.r8 {}", value); }
+
+    void DoubleConstant::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Double Constant: " << value << std::endl;
+    }
 }

@@ -18,5 +18,11 @@ namespace Analysis::Structure::Context
     bool RefContext::Writable() const { return false; }
 
     std::string RefContext::CILData() const { return ""; }
+
+    void RefContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Ref" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
 

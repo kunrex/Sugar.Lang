@@ -1,5 +1,7 @@
 #include "invalid_indexer_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -19,5 +21,11 @@ namespace Analysis::Structure::Context
     bool InvalidIndexerExpression::Writable() const { return false; }
 
     string InvalidIndexerExpression::CILData() const { return ""; }
+
+    void InvalidIndexerExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Indexer Expression" << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }
 

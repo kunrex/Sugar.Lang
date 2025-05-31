@@ -13,7 +13,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const IContextNode* const operand, const bool isPublic) : DynamicContextCollection(indexer->CreationType()), slotCount(-1), indexer(indexer), isPublic(isPublic)
+    IndexerExpression::IndexerExpression(const IIndexerDefinition* const indexer, const IContextNode* const operand, const bool isPublic) : DynamicContextCollection(indexer->CreationType()), isPublic(isPublic), slotCount(-1), indexer(indexer)
     {
         AddChild(operand);
     }
@@ -39,6 +39,12 @@ namespace Analysis::Structure::Context
     string IndexerExpression::CILData() const { return ""; }
 
     uintptr_t IndexerExpression::Metadata() const { return reinterpret_cast<uintptr_t>(indexer); }
+
+    void IndexerExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Indexer Expression: " << GetChild(0)->CreationType()->FullName() << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }
 
 

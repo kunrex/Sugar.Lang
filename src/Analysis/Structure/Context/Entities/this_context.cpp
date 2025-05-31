@@ -1,5 +1,7 @@
 #include "this_context.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -18,4 +20,9 @@ namespace Analysis::Structure::Context
     bool ThisContext::Writable() const { return false; }
 
     string ThisContext::CILData() const { return "ldarg.0"; }
+
+    void ThisContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "This" << std::endl;
+    }
 }

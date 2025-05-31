@@ -16,4 +16,10 @@ namespace Analysis::Structure::Context
     bool CopyContext::Writable() const { return false; }
 
     std::string CopyContext::CILData() const { return "ldobj " + referencedType->FullName(); }
+
+    void CopyContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Copy" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

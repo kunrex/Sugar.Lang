@@ -15,4 +15,9 @@ namespace Analysis::Structure::Context
     MemberType ParameterContext::MemberType() const { return MemberType::FunctionParameterContext; }
 
     std::string ParameterContext::CILData() const { return std::to_string(index); }
+
+    void ParameterContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Parameter Context: " << variable->FullName() << "; Index: " << index << std::endl;
+    }
 }

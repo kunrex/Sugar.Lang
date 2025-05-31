@@ -20,4 +20,10 @@ namespace Analysis::Structure::Context
     bool InvalidFuncRefContext::Writable() const { return false; }
 
     string InvalidFuncRefContext::CILData() const { return ""; }
+
+    void InvalidFuncRefContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invlaid Function Reference" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

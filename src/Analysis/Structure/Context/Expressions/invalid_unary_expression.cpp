@@ -1,5 +1,7 @@
 #include "invalid_unary_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -17,4 +19,10 @@ namespace Analysis::Structure::Context
     bool InvalidUnaryExpression::Writable() const { return false; }
 
     string InvalidUnaryExpression::CILData() const { return ""; }
+
+    void InvalidUnaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Unary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

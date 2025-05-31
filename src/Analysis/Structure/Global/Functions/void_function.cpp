@@ -41,6 +41,7 @@ namespace Analysis::Structure::Global
     void VoidFunction::BindLocal()
     {
         BindScope(parseNode, scope, this, parent);
+        scope->Print("", true);
     }
 
     void VoidFunction::Transpile(StringBuilder& builder) const
@@ -62,6 +63,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.Push(innerBuilder.Value());
+        builder.PushLine("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -102,6 +104,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.Push(innerBuilder.Value());
+        builder.PushLine("ret");
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

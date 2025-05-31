@@ -1,5 +1,7 @@
 #include "dot_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace ParseNodes::Enums;
@@ -19,4 +21,10 @@ namespace Analysis::Structure::Context
     bool DotExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Writable() && GetChild(static_cast<int>(ChildCode::RHS))->Writable(); }
 
     string DotExpression::CILData() const { return ""; }
+
+    void DotExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Dot Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

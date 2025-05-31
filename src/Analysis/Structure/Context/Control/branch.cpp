@@ -22,4 +22,9 @@ namespace Analysis::Structure::Context
     bool Branch::Writable() const { return false; }
 
     string Branch::CILData() const { return cilInstruction; }
+
+    void Branch::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Branch: " << cilInstruction << std::endl;
+    }
 }

@@ -15,7 +15,7 @@
 
 namespace Analysis::Structure::Local
 {
-    class Scope final : public Core::Nameable, Services::ConstantChild<Scope>, public Services::ConstantCollection<Core::Interfaces::IContextNode>, public virtual Core::Interfaces::INode
+    class Scope final : public Core::Nameable, Services::ConstantChild<Scope>, public Services::Printable, public Services::ConstantCollection<Core::Interfaces::IContextNode>, public virtual Core::Interfaces::INode
     {
         private:
             const Enums::ScopeType type;
@@ -40,6 +40,8 @@ namespace Analysis::Structure::Local
             void AddNested(Scope* scope);
             [[nodiscard]] unsigned long NestedCount() const;
             [[nodiscard]] const Scope* NestedAt(unsigned long index) const;
+
+            void Print(const std::string& indent, bool last) const override;
 
             ~Scope() override;
     };

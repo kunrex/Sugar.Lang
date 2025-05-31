@@ -24,4 +24,9 @@ namespace Analysis::Structure::Context
     bool Return::Writable() const { return false; }
 
     string Return::CILData() const { return "ret"; }
+
+    void Return::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Return" << std::endl;
+    }
 }

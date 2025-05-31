@@ -23,6 +23,11 @@ namespace Analysis::Structure::Context
 
     string BranchTrue::CILData() const { return cilInstruction; }
 
+    void BranchTrue::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Branch True: " << cilInstruction << std::endl;
+    }
+
     BranchFalse::BranchFalse(const string& name) : ContextNode(Object::Instance()), cilInstruction(std::format("brfalse {}", name))
     { }
 
@@ -34,5 +39,10 @@ namespace Analysis::Structure::Context
     bool BranchFalse::Writable() const { return false; }
 
     string BranchFalse::CILData() const { return cilInstruction; }
+
+    void BranchFalse::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Branch False: " << cilInstruction << std::endl;
+    }
 }
 

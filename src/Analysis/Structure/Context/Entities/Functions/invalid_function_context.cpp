@@ -20,6 +20,12 @@ namespace Analysis::Structure::Context
     bool InvalidFunctionContext::Writable() const { return false; }
 
     string InvalidFunctionContext::CILData() const { return ""; }
+
+    void InvalidFunctionContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Function Call" << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }
 
 

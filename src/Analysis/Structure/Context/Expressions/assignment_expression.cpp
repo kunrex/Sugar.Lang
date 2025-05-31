@@ -1,5 +1,7 @@
 #include "assignment_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace ParseNodes::Enums;
@@ -19,4 +21,10 @@ namespace Analysis::Structure::Context
     bool AssignmentExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Writable(); }
 
     string AssignmentExpression::CILData() const { return ""; }
+
+    void AssignmentExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Assignment Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

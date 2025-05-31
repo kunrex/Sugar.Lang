@@ -23,4 +23,9 @@ namespace Analysis::Structure::Context
 
     uintptr_t FieldContext::Metadata() const { return reinterpret_cast<uintptr_t>(characteristic); }
     std::string FieldContext::CILData() const { return ""; }
+
+    void FieldContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Field Context: " << characteristic->FullName() << std::endl;
+    }
 }

@@ -1,5 +1,7 @@
 #include "invalid_cast_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -18,4 +20,10 @@ namespace Analysis::Structure::Context
     bool InvalidCastExpression::Writable() const { return false; }
 
     string InvalidCastExpression::CILData() const { return ""; }
+
+    void InvalidCastExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Cast Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

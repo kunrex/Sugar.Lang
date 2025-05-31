@@ -1,5 +1,9 @@
 #include "static_reference_context.h"
 
+#include <iostream>
+
+#include "../../Core/Interfaces/DataTypes/i_data_type.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;
@@ -18,4 +22,9 @@ namespace Analysis::Structure::Context
     bool StaticReferenceContext::Writable() const { return false; }
 
     string StaticReferenceContext::CILData() const { return ""; }
+
+    void StaticReferenceContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << "Static Reference: " << creationType->FullName() << std::endl;
+    }
 }

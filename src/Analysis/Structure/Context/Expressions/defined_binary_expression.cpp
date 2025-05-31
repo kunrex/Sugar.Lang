@@ -27,5 +27,11 @@ namespace Analysis::Structure::Context
     bool DefinedBinaryExpression::Writable() const { return false; }
 
     string DefinedBinaryExpression::CILData() const { return operation->MemberType() == MemberType::BuiltInOperation ? operation->FullName() : std::format("call {}", operation->FullName()); }
+
+    void DefinedBinaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Defined Binary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
 

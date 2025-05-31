@@ -52,6 +52,16 @@ namespace Analysis::Structure::Context
             delete std::get<1>(child);
     }
 
+    template <int childCount>
+    void FixedContextCollection<childCount>::Print(const std::string& indent, const bool last) const
+    {
+        const auto next = indent + (last ? " " : "| ");
+
+        auto i = 0;
+        for (const auto child: children)
+            std::get<1>(child)->Print(next, ++i == children.size());
+    }
+
     DynamicContextCollection::DynamicContextCollection(const IDataType* const creationType) : Created(creationType), children()
     { }
 
@@ -69,6 +79,15 @@ namespace Analysis::Structure::Context
     {
         for (const auto child: children)
             delete child;
+    }
+
+    void DynamicContextCollection::Print(const std::string& indent, bool last) const
+    {
+        const auto next = indent + (last ? " " : "| ");
+
+        auto i = 0;
+        for (const auto child: children)
+            child->Print(next, ++i == children.size());
     }
 
     template class FixedContextCollection<1>;

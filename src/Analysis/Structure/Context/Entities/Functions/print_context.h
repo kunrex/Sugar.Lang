@@ -23,6 +23,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] bool Writable() const override;
 
             [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class PrintCharContext final : public PrintContext

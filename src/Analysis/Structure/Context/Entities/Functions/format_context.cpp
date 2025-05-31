@@ -31,10 +31,22 @@ namespace Analysis::Structure::Context
 
     string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
 
-    FormatSingleContext::FormatSingleContext(const IContextNode* const operand) : UnaryContextNode(String::Instance(), operand), slotCount(std::max(String::Instance()->SlotCount(), operand->SlotCount()))
+    void FormatContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Format" << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
+
+    FormatSingleContext::FormatSingleContext(const IContextNode* const arg, const IContextNode* const operand) : BinaryContextNode(String::Instance(), arg, operand), slotCount(-1)
     { }
 
-    int FormatSingleContext::SlotCount() const { return slotCount; }
+    int FormatSingleContext::SlotCount() const
+    {
+        if (slotCount < 0)
+            slotCount = CalculateFunctionCallSlotSize(this);
+
+        return slotCount;
+    }
 
     MemberType FormatSingleContext::MemberType() const { return MemberType::FormatSingleContext; }
 
@@ -43,13 +55,46 @@ namespace Analysis::Structure::Context
 
     string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
 
-    FormatDoubleContext::FormatDoubleContext(const IContextNode* const arg1, const IContextNode* const arg2) : BinaryContextNode(String::Instance(), arg1, arg2), slotCount(-1)
-    { }
+    void FormatSingleContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Format Single" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
+
+    FormatDoubleContext::FormatDoubleContext(const IContextNode* const arg, const IContextNode* const arg1, const IContextNode* const arg2) : FixedContextCollection<3>(String::Instance()), slotCount(-1)
+    {
+        AddChild(ChildCode::Expression, arg);
+        AddChild(ChildCode::LHS, arg1);
+        AddChild(ChildCode::RHS, arg2);
+    }
 
     int FormatDoubleContext::SlotCount() const
     {
         if (slotCount < 0)
-            slotCount = std::max(creationType->SlotCount(), CalculateFunctionCallSlotSize(this));
+        {
+            slotCount = 0;
+            int argCount = 0;
+            const auto arg = GetChild(static_cast<int>(ChildCode::Expression)), lhs = GetChild(static_cast<int>(ChildCode::LHS)), rhs = GetChild(static_cast<int>(ChildCode::LHS));
+
+            if (const auto size = arg->SlotCount(); size > slotCount - argCount)
+                slotCount = size + argCount;
+
+            auto value = arg->CreationType()->SlotCount();
+            argCount += value;
+            slotCount += value;
+
+            if (const auto size = lhs->SlotCount(); size > slotCount - argCount)
+                slotCount = size + argCount;
+
+            value = lhs->CreationType()->SlotCount();
+            argCount += value;
+            slotCount += value;
+
+            if (const auto size = rhs->SlotCount(); size > slotCount - argCount)
+                slotCount = size + argCount;
+
+            slotCount += rhs->CreationType()->SlotCount();
+        }
 
         return slotCount;
     }
@@ -60,4 +105,10 @@ namespace Analysis::Structure::Context
     bool FormatDoubleContext::Writable() const { return false; }
 
     string FormatDoubleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object, object)"; }
+
+    void FormatDoubleContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Format Double" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

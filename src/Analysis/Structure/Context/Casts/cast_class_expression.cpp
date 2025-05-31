@@ -23,4 +23,10 @@ namespace Analysis::Structure::Context
     bool CastClassExpression::Writable() const { return false; }
 
     string CastClassExpression::CILData() const { return std::format("castclass {}", creationType->FullName()); }
+
+    void CastClassExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Cast Class Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

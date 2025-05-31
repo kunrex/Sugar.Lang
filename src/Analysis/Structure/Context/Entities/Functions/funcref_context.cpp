@@ -25,4 +25,10 @@ namespace Analysis::Structure::Context
     {
         return "ldftn " + function->Signature();
     }
+
+    void FuncRefContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Function Reference: " << function->Signature() << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

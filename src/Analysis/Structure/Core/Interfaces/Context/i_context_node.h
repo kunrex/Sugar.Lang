@@ -8,9 +8,11 @@
 #include "../i_slot_size.h"
 #include "../i_read_write.h"
 
+#include "../../../../../Services/printable.h"
+
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IContextNode : public virtual INode, public virtual ICreated, public virtual ISlotCount, public virtual IReadWrite
+    class IContextNode : public virtual INode, public virtual ICreated, public virtual ISlotCount, public virtual IReadWrite, public virtual Services::Printable
     {
         public:
             [[nodiscard]] virtual uintptr_t Metadata() const = 0;

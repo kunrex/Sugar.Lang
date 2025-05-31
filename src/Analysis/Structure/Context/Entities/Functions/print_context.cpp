@@ -3,14 +3,17 @@
 #include <format>
 
 #include "../../../Wrappers/Reference/object.h"
+#include "../References/property_context.h"
 
 using namespace std;
+
+using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
-constexpr std::string_view cil_write = "call void [System.Runtime]System.Console::Write";
-constexpr std::string_view cil_write_line = "call void [System.Runtime]System.Console::WriteLine";
+constexpr std::string_view cil_write = "call void [System.Console]System.Console::Write";
+constexpr std::string_view cil_write_line = "call void [System.Console]System.Console::WriteLine";
 
 namespace Analysis::Structure::Context
 {
@@ -28,6 +31,13 @@ namespace Analysis::Structure::Context
     bool PrintContext::Writable() const { return false; }
 
     string PrintContext::CILData() const { return std::format("{}()", ln ? cil_write : cil_write_line); }
+
+    void PrintContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Print" << (ln ? "ln" : "") << std::endl;
+        if (GetChild(static_cast<int>(ChildCode::Expression)) != nullptr)
+            FixedContextCollection::Print(indent, last);
+    }
 
     PrintCharContext::PrintCharContext(const bool ln) : PrintContext(ln)
     { }

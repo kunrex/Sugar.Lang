@@ -1,5 +1,7 @@
 #include "ternary_expression.h"
 
+#include <iostream>
+
 using namespace std;
 
 using namespace ParseNodes::Enums;
@@ -24,4 +26,10 @@ namespace Analysis::Structure::Context
     bool TernaryExpression::Writable() const { return false; }
 
     std::string TernaryExpression::CILData() const { return ""; }
+
+    void TernaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Ternary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

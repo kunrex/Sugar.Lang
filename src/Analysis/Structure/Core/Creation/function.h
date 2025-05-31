@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Core
 {
-    class Function : public Describable, public Created, public Services::Printable, public virtual Interfaces::IFunction
+    class Function : public Describable, public Created, public virtual Interfaces::IFunction
     {
         protected:
             mutable std::string fullName;

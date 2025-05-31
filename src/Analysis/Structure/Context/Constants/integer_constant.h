@@ -22,6 +22,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class IntegerConstant final : public ContextNode
@@ -41,6 +43,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class LongConstant final : public ContextNode
@@ -60,6 +64,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class CharacterConstant final : public ContextNode
@@ -79,6 +85,8 @@ namespace Analysis::Structure::Context
 
             [[nodiscard]] uintptr_t Metadata() const override;
             [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class BoolConstant : public ContextNode
@@ -89,6 +97,8 @@ namespace Analysis::Structure::Context
 
         public:
             [[nodiscard]] uintptr_t Metadata() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 
     class TrueConstant final : public BoolConstant

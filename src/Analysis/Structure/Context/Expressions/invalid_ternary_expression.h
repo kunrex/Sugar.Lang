@@ -13,6 +13,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] int SlotCount() const override;
+
+            void Print(const std::string& indent, bool last) const override;
     };
 }
 

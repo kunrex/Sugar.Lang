@@ -13,4 +13,10 @@ namespace Analysis::Structure::Context
     MemberType InvalidTernaryExpression::MemberType() const { return MemberType::Invalid; }
 
     int InvalidTernaryExpression::SlotCount() const { return 0; }
+
+    void InvalidTernaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invalid Ternary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }

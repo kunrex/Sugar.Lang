@@ -22,4 +22,9 @@ namespace Analysis::Structure::Context
 
     uintptr_t LocalVariableContext::Metadata() const { return reinterpret_cast<uintptr_t>(variable); }
     std::string LocalVariableContext::CILData() const { return std::to_string(index); }
+
+    void LocalVariableContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Local Variable Context: " << variable->FullName() << "; Index: " << index << std::endl;
+    }
 }

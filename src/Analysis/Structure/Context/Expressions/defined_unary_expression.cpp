@@ -23,5 +23,11 @@ namespace Analysis::Structure::Context
     bool DefinedUnaryExpression::Writable() const { return true; }
 
     string DefinedUnaryExpression::CILData() const { return operation->MemberType() == MemberType::BuiltInOperation ? operation->FullName() : std::format("call {}", operation->FullName()); }
+
+    void DefinedUnaryExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Defined Unary Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
 

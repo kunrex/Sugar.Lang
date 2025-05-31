@@ -23,4 +23,9 @@ namespace Analysis::Structure::Context
 
     uintptr_t PropertyContext::Metadata() const { return reinterpret_cast<uintptr_t>(property); }
     string PropertyContext::CILData() const { return ""; }
+
+    void PropertyContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Property Context: " << property->FullName() << std::endl;
+    }
 }

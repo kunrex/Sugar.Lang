@@ -23,5 +23,11 @@ namespace Analysis::Structure::Context
     bool UnboxCastExpression::Writable() const { return false; }
 
     string UnboxCastExpression::CILData() const { return std::format("box {}", creationType->FullName()); }
+
+    void UnboxCastExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Unbox Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
 

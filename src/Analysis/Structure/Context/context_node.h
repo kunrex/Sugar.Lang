@@ -39,6 +39,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] unsigned long ChildCount() const override;
             [[nodiscard]] const IContextNode* GetChild(int index) const override;
 
+            void Print(const std::string& indent, bool last) const override;
+
             ~FixedContextCollection() override;
     };
 
@@ -56,6 +58,8 @@ namespace Analysis::Structure::Context
             [[nodiscard]] const IContextNode* GetChild(int index) const override;
 
             void AddChild(const IContextNode* child);
+
+            void Print(const std::string& indent, bool last) const override;
 
             ~DynamicContextCollection() override;
     };

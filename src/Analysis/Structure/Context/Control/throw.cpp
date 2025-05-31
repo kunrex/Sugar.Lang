@@ -21,5 +21,10 @@ namespace Analysis::Structure::Context
     bool Throw::Writable() const { return false; }
 
     string Throw::CILData() const { return "ret"; }
+
+    void Throw::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Throw" << std::endl;
+    }
 }
 

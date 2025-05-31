@@ -50,4 +50,10 @@ namespace Analysis::Structure::Context
 
         return std::format("callvirt instance void {}::Invoke({})", delegateType->DelegateSignature(), parameterString);
     }
+
+    void InvokeContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Invoke" << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
 }

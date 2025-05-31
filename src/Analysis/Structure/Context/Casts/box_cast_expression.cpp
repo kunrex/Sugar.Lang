@@ -25,4 +25,10 @@ namespace Analysis::Structure::Context
     bool BoxCastExpression::Writable() const { return false; }
 
     string BoxCastExpression::CILData() const { return std::format("box {}", GetChild(static_cast<int>(ChildCode::Expression))->CreationType()->FullName()); }
+
+    void BoxCastExpression::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Box Expression" << std::endl;
+        FixedContextCollection::Print(indent, last);
+    }
 }
