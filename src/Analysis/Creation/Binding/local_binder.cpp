@@ -55,6 +55,7 @@
 #include "../../Structure/Context/Entities/References/local_variable_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_funcref_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
+#include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/invalid_ternary_expression.h"
 #include "../../Structure/Context/Expressions/ternary_expression.h"
 #include "../../Structure/Core/Interfaces/DataTypes/i_collection_type.h"
@@ -931,36 +932,35 @@ namespace Analysis::Creation::Binding
                 {
                     const auto kind = expression->Token().Kind();
 
-                    const auto operand = BindExpression(expression->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType);
-
-                    if (const auto operation = Operator::IsAssignment(kind); operation)
-                    {
-                        if (!operand->Writable())
-                        {
-                            PushException(new WriteException(index, source));
-                            return new InvalidUnaryExpression(operand);
-                        }
-
-                        const auto definition = operand->CreationType()->FindOverload(*operation);
-                        if (definition == nullptr)
-                        {
-                            PushException(new OverloadNotFoundException(*operation, index, source));
-                            return new InvalidUnaryExpression(operand);
-                        }
-
-                        return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, operand));
-                    }
+                    const auto operandNode = expression->GetChild(static_cast<int>(ChildCode::Expression));
+                    const auto operand = BindExpression(operandNode, scoped, scope, dataType);
 
                     const IOperatorOverload* definition;
                     switch (kind)
                     {
                         case SyntaxKind::Increment:
                         case SyntaxKind::IncrementPrefix:
-                            definition = operand->CreationType()->FindOverload(SyntaxKind::Increment);
+                            {
+                                if (!operand->Writable())
+                                {
+                                    PushException(new WriteException(operandNode->Token().Index(), source));
+                                    return new InvalidUnaryExpression(operand);
+                                }
+
+                                definition = operand->CreationType()->FindOverload(SyntaxKind::Increment);
+                            }
                             break;
                         case SyntaxKind::Decrement:
                         case SyntaxKind::DecrementPrefix:
-                            definition = operand->CreationType()->FindOverload(SyntaxKind::Decrement);
+                            {
+                                if (!operand->Writable())
+                                {
+                                    PushException(new WriteException(operandNode->Token().Index(), source));
+                                    return new InvalidUnaryExpression(operand);
+                                }
+
+                                definition = operand->CreationType()->FindOverload(SyntaxKind::Decrement);
+                            }
                             break;
                         default:
                             definition = operand->CreationType()->FindOverload(kind);
@@ -973,7 +973,17 @@ namespace Analysis::Creation::Binding
                         return new InvalidUnaryExpression(operand);
                     }
 
-                    return new DefinedUnaryExpression(definition, operand);
+                    switch (kind)
+                    {
+                        case SyntaxKind::Increment:
+                        case SyntaxKind::Decrement:
+                            return new AssignmentExpression(operand, new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
+                        case SyntaxKind::IncrementPrefix:
+                        case SyntaxKind::DecrementPrefix:
+                            return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
+                        default:
+                            return new DefinedUnaryExpression(definition, operand);
+                    }
                 }
             case NodeType::Binary:
                 {
@@ -982,9 +992,17 @@ namespace Analysis::Creation::Binding
                     const auto lhs = BindExpression(expression->GetChild(static_cast<int>(ChildCode::LHS)), scoped, scope, dataType);
                     const auto rhs = BindExpression(expression->GetChild(static_cast<int>(ChildCode::RHS)), scoped, scope, dataType);
 
-                    if (kind == SyntaxKind::Assignment && lhs->Writable())
-                        return new AssignmentExpression(lhs, rhs);
+                    if (kind == SyntaxKind::Assignment)
+                    {
+                        if (lhs->Writable())
+                        {
+                            //check for references and possible implicit conversions
+                            return new AssignmentExpression(lhs, new DuplicateExpression(rhs));
+                        }
 
+                        PushException(new WriteException(index, source));
+                        return new InvalidBinaryExpression(lhs, rhs);
+                    }
                     if (const auto operation = Operator::IsAssignment(kind); operation)
                     {
                         if (!lhs->Writable())
@@ -1000,7 +1018,7 @@ namespace Analysis::Creation::Binding
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
-                        return new AssignmentExpression(lhs, new DefinedBinaryExpression(definition, lhs, rhs));
+                        return new AssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, rhs)));
                     }
 
                     const auto lhsCreationType = lhs->CreationType();

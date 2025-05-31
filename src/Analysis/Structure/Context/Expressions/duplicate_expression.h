@@ -5,7 +5,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class DuplicateExpression final : UnaryContextNode
+    class DuplicateExpression final : public UnaryContextNode
     {
         public:
             explicit DuplicateExpression(const IContextNode* operand);

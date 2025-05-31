@@ -149,12 +149,12 @@ namespace Analysis::Structure::Wrappers
         negation->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::Minus, negation);
 
-        const auto increment = new BuiltInOperation(SyntaxKind::Increment, this, "ldc.r8 1.0 add", nullptr);
+        const auto increment = new BuiltInOperation(SyntaxKind::Increment, this, "ldc.i4 1 add", nullptr);
         increment->PushParameterType(this);
         increment->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::Increment, increment);
 
-        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, this, "ldc.r8 1.0 sub", nullptr);
+        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, this, "ldc.i4 1 sub", nullptr);
         decrement->PushParameterType(this);
         decrement->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::Decrement, decrement);

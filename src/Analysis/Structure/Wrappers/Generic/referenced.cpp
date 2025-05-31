@@ -39,8 +39,6 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Referenced::Type() const { return TypeKind::Referenced; }
 
-    bool Referenced::Writable() const { return false; }
-
     const IDataType* Referenced::ReferencedType() const { return referencedType; }
 
     void Referenced::BindGlobal()

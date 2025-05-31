@@ -523,6 +523,33 @@ namespace Analysis::Creation::Transpiling
         }
     }
 
+    void TranspileReferenceAssignment(const IDataType* const assignedType, StringBuilder& stringBuilder)
+    {
+        switch (assignedType->Type())
+        {
+            case TypeKind::Short:
+                stringBuilder.PushLine("stind.i2");
+                break;
+            case TypeKind::Int:
+            case TypeKind::Boolean:
+            case TypeKind::Character:
+                stringBuilder.PushLine("stind.i4");
+                break;
+            case TypeKind::Long:
+                stringBuilder.PushLine("stind.i8");
+                break;
+            case TypeKind::Float:
+                stringBuilder.PushLine("stind.r4");
+                break;
+            case TypeKind::Double:
+                stringBuilder.PushLine("stind.r8");
+                break;
+            default:
+                stringBuilder.PushLine(std::format("cpobj {}", assignedType->FullName()));
+                break;
+        }
+    }
+
     void TranspileExpression(const IContextNode* const context, StringBuilder& stringBuilder)
     {
         switch (context->MemberType())
@@ -558,7 +585,6 @@ namespace Analysis::Creation::Transpiling
                     }
 
                     TranspileExpression(rhs, stringBuilder);
-                    stringBuilder.PushLine(dup);
 
                     switch (finalContext->MemberType())
                     {
@@ -572,10 +598,26 @@ namespace Analysis::Creation::Transpiling
                             stringBuilder.PushLine(reinterpret_cast<const PropertyDefinition*>(finalContext->Metadata())->SignatureSetString());
                             break;
                         case MemberType::LocalVariableContext:
-                            stringBuilder.PushLine("stloc." + finalContext->CILData());
+                            {
+                                if (finalContext->CreationType()->Type() == TypeKind::Referenced)
+                                {
+                                    stringBuilder.PushLine("ldloc." + finalContext->CILData());
+                                    TranspileReferenceAssignment(rhs->CreationType(), stringBuilder);
+                                }
+                                else
+                                    stringBuilder.PushLine("stloc." + finalContext->CILData());
+                            }
                             break;
                         case MemberType::FunctionParameterContext:
-                            stringBuilder.PushLine("starg." + finalContext->CILData());
+                            {
+                                if (finalContext->CreationType()->Type() == TypeKind::Referenced)
+                                {
+                                    stringBuilder.PushLine("ldarg." + finalContext->CILData());
+                                    TranspileReferenceAssignment(rhs->CreationType(), stringBuilder);
+                                }
+                                else
+                                    stringBuilder.PushLine("starg." + finalContext->CILData());
+                            }
                             break;
                         default:
                             break;

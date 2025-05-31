@@ -23,8 +23,6 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] const std::string& FullName() const override;
 
-            [[nodiscard]] bool Writable() const override;
-
             [[nodiscard]] const IDataType* ReferencedType() const;
 
             void BindGlobal() override;

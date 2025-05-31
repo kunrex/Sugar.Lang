@@ -11,7 +11,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    FieldContext::FieldContext(const ICharacteristic* const characteristic, const bool bypassWrite) : ContextNode(characteristic->CreationType()),writable(characteristic->Writable() && (characteristic->CheckDescriber(Describer::Const) && bypassWrite)), characteristic(characteristic)
+    FieldContext::FieldContext(const ICharacteristic* const characteristic, const bool bypassWrite) : ContextNode(characteristic->CreationType()), writable(characteristic->Writable() && (!characteristic->CheckDescriber(Describer::Const) || bypassWrite)), characteristic(characteristic)
     { }
 
     MemberType FieldContext::MemberType() const { return MemberType::FieldContext; }

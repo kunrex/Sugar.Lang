@@ -14,7 +14,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotCount, public virtual IReadWrite, public virtual IGloballyBindable, public virtual ILocallyBindable
+    class IDataType : public virtual INode, public virtual INameable, public virtual IFullyNameable, public virtual IDescribable, public virtual ISlotCount, public virtual IGloballyBindable, public virtual ILocallyBindable
     {
         public:
             [[nodiscard]] virtual Tokens::Enums::TypeKind Type() const = 0;
