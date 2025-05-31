@@ -64,7 +64,8 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        if (children.size() - parameterCount > 0)
+            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.PushLine(load_this);
         builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");
@@ -208,7 +209,8 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        if (children.size() - parameterCount > 0)
+            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.PushLine(load_this);
         builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");

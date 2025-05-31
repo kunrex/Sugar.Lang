@@ -9,7 +9,7 @@
 
 namespace Analysis::Structure::Core
 {
-    class Scoped : Services::ConstantCollection<Local::LocalVariable>, public virtual Interfaces::IScoped
+    class Scoped : protected Services::ConstantCollection<Local::LocalVariable>, public virtual Interfaces::IScoped
     {
         protected:
             const ParseNodes::Core::Interfaces::IParseNode* parseNode;

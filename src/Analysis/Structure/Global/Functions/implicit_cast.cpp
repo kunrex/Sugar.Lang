@@ -66,7 +66,8 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        if (children.size() - parameterCount > 0)
+            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.Push(innerBuilder.Value());
 
