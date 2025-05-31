@@ -184,27 +184,21 @@ namespace Analysis::Creation::Binding
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
 
         const auto expression = BindExpression(value, scoped, scope, dataType);
+        const IContextNode* finalExpression = expression;
         if (const auto expressionType = expression->CreationType(); expressionType != creationType)
         {
-            if (creationType == Object::Instance())
-            {
-                if (expressionType->MemberType() == MemberType::ValueType)
-                    scope->AddChild(new BoxCastExpression(expression));
-                else
-                    scope->AddChild(expression);
-            }
+            if (creationType == Object::Instance() && expressionType->MemberType() == MemberType::ValueType)
+                finalExpression = new BoxCastExpression(expression);
             else
             {
                 const auto valueCast = expressionType->FindImplicitCast(creationType, expressionType);
                 const auto resultCast = expressionType->FindImplicitCast(creationType, expressionType);
 
-                scope->AddChild(BindCast(expression, creationType, valueCast, resultCast, index, source));
+                finalExpression = BindCast(expression, creationType, valueCast, resultCast, index, source);
             }
         }
-        else
-            scope->AddChild(expression);
 
-        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), expression));
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), finalExpression));
 
         ValidateDescriber(variable, Describer::Const | Describer::Ref, index, source);
         scope->AddVariable(variable);
@@ -640,6 +634,58 @@ namespace Analysis::Creation::Binding
         return new DotExpression(context, new InvalidContext());
     }
 
+    const IContextNode* BindFormat(const IParseNode* const formatNode, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    {
+        switch (formatNode->ChildCount())
+        {
+            case 2:
+                {
+                    const auto arg = BindExpression(formatNode->GetChild(0), scoped, scope, dataType);
+                    const auto arg1 = BindExpression(formatNode->GetChild(1), scoped, scope, dataType);
+
+                    if (arg->CreationType() != String::Instance())
+                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+
+                    return new FormatSingleContext(arg, arg1->CreationType()->MemberType() == MemberType::Class ? arg1 : new BoxCastExpression(arg1));
+                }
+            case 3:
+                {
+                    const auto arg = BindExpression(formatNode->GetChild(0), scoped, scope, dataType);
+                    const auto arg1 = BindExpression(formatNode->GetChild(1), scoped, scope, dataType);
+                    const auto arg2 = BindExpression(formatNode->GetChild(2), scoped, scope, dataType);
+
+                    if (arg->CreationType() != String::Instance())
+                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+
+                    const auto actualArg1 = arg1->CreationType()->MemberType() == MemberType::Class ? arg1 : new BoxCastExpression(arg1);
+                    const auto actualArg2 = arg2->CreationType()->MemberType() == MemberType::Class ? arg2 : new BoxCastExpression(arg2);
+
+                    return new FormatDoubleContext(arg, actualArg1, actualArg2);
+                }
+                break;
+            default:
+                {
+                    std::vector<const IContextNode*> arguments;
+                    std::vector<const IDataType*> argumentTypes;
+                    BindArgumentContexts(formatNode, 0, arguments, argumentTypes, scoped, scope, dataType);
+
+                    if (argumentTypes[0] != String::Instance())
+                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+
+                    const auto format = new FormatContext();
+                    for (auto i = 0; i < argumentTypes.size(); i++)
+                    {
+                        if (const auto current = arguments[i]; argumentTypes[i]->MemberType() == MemberType::Class)
+                            format->AddChild(current);
+                        else
+                            format->AddChild(new BoxCastExpression(current));
+                    }
+
+                    return format;
+                }
+        }
+    }
+
     const IContextNode* BindPrint(const IContextNode* const operand, const bool ln)
     {
         if (operand->CreationType() == Short::Instance())
@@ -704,42 +750,8 @@ namespace Analysis::Creation::Binding
                 return BindIndexerExpression(entity, BindEntity(entity->GetChild(0), scoped, scope, dataType), scoped, scope, dataType);
             case NodeType::Input:
                 return new InputContext();
-            case NodeType::Print:
-                {
-                    if (entity->ChildCount() > 0)
-                    {
-                        const auto arg = entity->GetChild(0);
-                        const auto context = BindExpression(arg, scoped, scope, dataType);
-                        return BindPrint(context, false);
-                    }
-
-                    return new PrintContext(false);
-                }
-                break;
-            case NodeType::Println:
-                {
-                    if (entity->ChildCount() > 0)
-                    {
-                        const auto arg = entity->GetChild(0);
-                        const auto context = BindExpression(arg, scoped, scope, dataType);
-                        return BindPrint(context, true);
-                    }
-
-                    return new PrintContext(true);
-                }
-                break;
             case NodeType::Format:
-                {
-                    std::vector<const IContextNode*> arguments;
-                    std::vector<const IDataType*> argumentTypes;
-                    BindArgumentContexts(entity, 0, arguments, argumentTypes, scoped, scope, dataType);
-
-                    const auto format = new FormatContext();
-                    for (const auto argument: arguments)
-                        format->AddChild(argument);
-
-                    return format;
-                }
+                return BindFormat(entity, scoped, scope, dataType);
             case NodeType::Invoke:
                 {
                     std::vector<const IContextNode*> arguments;
@@ -1124,6 +1136,30 @@ namespace Analysis::Creation::Binding
                 case NodeType::Declaration:
                 case NodeType::Initialisation:
                     BindStatement(child, current, scoped, dataType);
+                    break;
+                case NodeType::Print:
+                    {
+                        if (child->ChildCount() > 0)
+                        {
+                            const auto arg = child->GetChild(0);
+                            const auto context = BindExpression(arg, scoped, scope, dataType);
+                            scope->AddChild(BindPrint(context, false));
+                        }
+                        else
+                            scope->AddChild(new PrintContext(false));
+                    }
+                    break;
+                case NodeType::Println:
+                    {
+                        if (child->ChildCount() > 0)
+                        {
+                            const auto arg = child->GetChild(0);
+                            const auto context = BindExpression(arg, scoped, scope, dataType);
+                            scope->AddChild(BindPrint(context, true));
+                        }
+                        else
+                            scope->AddChild(new PrintContext(true));
+                    }
                     break;
                 case NodeType::Throw:
                     {

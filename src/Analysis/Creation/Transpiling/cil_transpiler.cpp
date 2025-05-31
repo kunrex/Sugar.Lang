@@ -407,48 +407,39 @@ namespace Analysis::Creation::Transpiling
             case MemberType::IndexerExpression:
                 TranspileIndexerExpression(context, stringBuilder);
                 break;
-            case MemberType::PrintContext:
             case MemberType::InputContext:
             case MemberType::ConstantContext:
                 stringBuilder.PushLine(context->CILData());
+                break;
+            case MemberType::PrintContext:
+                {
+                    if (const auto value = context->GetChild(static_cast<int>(ChildCode::Expression)); value != nullptr)
+                        TranspileExpression(value, stringBuilder);
+
+                    stringBuilder.PushLine(context->CILData());
+                }
+                break;
             case MemberType::FormatContext:
                 {
                     for (auto i = 0; i < context->ChildCount(); i++)
-                    {
-                        const auto child = context->GetChild(i);
-                        TranspileExpression(child, stringBuilder);
+                        TranspileExpression(context->GetChild(i), stringBuilder);
 
-                        if (child->MemberType() != MemberType::Class)
-                            stringBuilder.PushLine(std::format("box {}", child->CreationType()->FullName()));
-                    }
-
-                    stringBuilder.Push(context->CILData());
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::FormatSingleContext:
                 {
-                    const auto operand = context->GetChild(static_cast<int>(ChildCode::Expression));
-
-                    TranspileExpression(operand, stringBuilder);
-                    if (operand->CreationType()->MemberType() != MemberType::Class)
-                        stringBuilder.PushLine(std::format("box {}", operand->CreationType()->FullName()));
-
-                    stringBuilder.Push(context->CILData());
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::FormatDoubleContext:
                 {
-                    const auto lhs = context->GetChild(static_cast<int>(ChildCode::LHS)), rhs = context->GetChild(static_cast<int>(ChildCode::RHS));
-
-                    TranspileExpression(lhs, stringBuilder);
-                    if (lhs->CreationType()->MemberType() != MemberType::Class)
-                        stringBuilder.PushLine(std::format("box {}", lhs->CreationType()->FullName()));
-
-                    TranspileExpression(rhs, stringBuilder);
-                    if (rhs->CreationType()->MemberType() != MemberType::Class)
-                        stringBuilder.PushLine(std::format("box {}", rhs->CreationType()->FullName()));
-
-                    stringBuilder.Push(context->CILData());
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder);
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::InvokeContext:
@@ -472,7 +463,6 @@ namespace Analysis::Creation::Transpiling
 
                     return TranspileArrayCollection(context->CreationType(), context, stringBuilder);
                 }
-                break;
             case MemberType::RefContext:
                 {
                     switch (const auto finalContext = TranspileReturnLoad(context->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder); finalContext->MemberType())

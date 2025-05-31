@@ -129,7 +129,7 @@ void Compiler::Transpile() const
         }
     }
 
-    const auto outputFile = outputDirectory / fs::path(name + (Entrypoint::Instance() == nullptr ? ".dll" : ".exe"));
+    const auto outputFile = outputDirectory / fs::path(name + ".il");
     std::ofstream file(outputFile);
     if (!file.is_open())
     {
@@ -141,12 +141,21 @@ void Compiler::Transpile() const
 
     StringBuilder stringBuilder;
 
-    stringBuilder.PushLine(std::format(".assembly {} {}", name, "{}"));
-    stringBuilder.PushLine(".assembly extern mscorelib");
     stringBuilder.PushLine(".assembly extern System.Runtime {}");
+    stringBuilder.PushLine(".assembly extern System.Console {}");
     stringBuilder.PushLine(".assembly extern System.Collections.Generic.Runtime {}");
 
+    stringBuilder.PushLine(std::format(".assembly {} {}", name, "{}"));
+    stringBuilder.PushLine(std::format(".module {}.{}", name, Entrypoint::Instance() == nullptr ? "dll" : "exe"));
+
+    std::ofstream output(outputFile);
+    output << stringBuilder.Value() << std::endl;
+
+    stringBuilder.Clear();
     source->Transpile(stringBuilder);
+
+    output << stringBuilder.Value() << std::endl;
+    output.close();
 
     if (!ExceptionManager::Instance().LogAllExceptions())
         std::cout << "Compiled successfully at: " << outputFile << std::endl;
@@ -201,16 +210,14 @@ void Compiler::Compile() const
             return;
         }
 
-        /*source->BindLocal();
+        source->BindLocal();
         if (ExceptionManager::Instance().LogAllExceptions())
         {
             delete source;
             return;
-        }*/
+        }
 
-        source->Print("", true);
-
-        //Transpile();
+        Transpile();
     }
     catch (const std::exception& e) {
         std::cout << e.what() << std::endl;

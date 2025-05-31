@@ -13,8 +13,8 @@
 
 namespace Analysis::Creation::Transpiling
 {
-    const std::string open_flower = "{\n";
-    const std::string close_flower = "}\n";
+    const std::string open_flower = "{";
+    const std::string close_flower = "}";
 
     const std::string pop = "pop";
     const std::string dup = "dup";
