@@ -171,6 +171,25 @@ namespace Analysis::Creation::Binding
         return new InvalidCastExpression(type, operand);
     }
 
+    const IContextNode* TryBindCast(const IContextNode* const expression, const IDataType* const type, const unsigned long index, const SourceFile* const source)
+    {
+        const IContextNode* finalExpression = expression;
+        if (const auto expressionType = expression->CreationType(); expressionType != type)
+        {
+            if (type == Object::Instance() && expressionType->MemberType() == MemberType::ValueType)
+                finalExpression = new BoxCastExpression(expression);
+            else
+            {
+                const auto valueCast = expressionType->FindImplicitCast(type, expressionType);
+                const auto resultCast = expressionType->FindImplicitCast(type, expressionType);
+
+                finalExpression = BindCast(expression, type, valueCast, resultCast, index, source);
+            }
+        }
+
+        return finalExpression;
+    }
+
     void BindLocalInitialisation(const Describer describer, const IDataType* const creationType, const IParseNode* const identifier, const IParseNode* const value, IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
@@ -183,21 +202,7 @@ namespace Analysis::Creation::Binding
         }
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
-
-        const auto expression = BindExpression(value, scoped, scope, dataType);
-        const IContextNode* finalExpression = expression;
-        if (const auto expressionType = expression->CreationType(); expressionType != creationType)
-        {
-            if (creationType == Object::Instance() && expressionType->MemberType() == MemberType::ValueType)
-                finalExpression = new BoxCastExpression(expression);
-            else
-            {
-                const auto valueCast = expressionType->FindImplicitCast(creationType, expressionType);
-                const auto resultCast = expressionType->FindImplicitCast(creationType, expressionType);
-
-                finalExpression = BindCast(expression, creationType, valueCast, resultCast, index, source);
-            }
-        }
+        const auto finalExpression = TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source);
 
         scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), finalExpression));
 
@@ -921,6 +926,24 @@ namespace Analysis::Creation::Binding
         return new InvalidContext();
     }
 
+    const IContextNode* TryBindAssignmentCast(const IContextNode* const expression, const IDataType* const type, unsigned long index, const SourceFile* const sourceFile)
+    {
+        if (type->Type() == TypeKind::Referenced)
+        {
+            if (expression->CreationType() == type)
+            {
+                PushException(new LogException("Cannot reassign the value of a reference", index, sourceFile));
+                return expression;
+            }
+            if (Referenced::Instance(expression->CreationType()) != type)
+                PushException(new LogException("Cannot resolve type to reference", index, sourceFile));
+
+            return expression;
+        }
+
+        return TryBindCast(expression, type, index, sourceFile);
+    }
+
     const IContextNode* BindExpression(const IParseNode* expression, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
@@ -995,10 +1018,7 @@ namespace Analysis::Creation::Binding
                     if (kind == SyntaxKind::Assignment)
                     {
                         if (lhs->Writable())
-                        {
-                            //check for references and possible implicit conversions
-                            return new AssignmentExpression(lhs, new DuplicateExpression(rhs));
-                        }
+                            return new AssignmentExpression(lhs, new DuplicateExpression(TryBindAssignmentCast(rhs, lhs->CreationType(), expression->Token().Index(), dataType->Parent())));
 
                         PushException(new WriteException(index, source));
                         return new InvalidBinaryExpression(lhs, rhs);
