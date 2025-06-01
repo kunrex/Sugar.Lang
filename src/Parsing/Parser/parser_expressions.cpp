@@ -88,6 +88,7 @@ namespace Parsing
                             if (MatchLookAhead(SyntaxKind::OpenBracket))
                             {
                                 index++;
+
                                 output.push(ParseFunctionCall(identifier));
                             }
                             else
@@ -243,7 +244,7 @@ namespace Parsing
                                 default:
                                     {
                                         if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
-                                            output.push(ParseType());
+                                            output.push(ParseEntity(SeparatorKind::Any));
                                         else
                                             invalid = breakOut = true;
                                     }

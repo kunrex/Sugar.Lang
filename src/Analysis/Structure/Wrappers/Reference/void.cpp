@@ -30,9 +30,6 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Void::Type() const { return TypeKind::Void; }
 
-    bool Void::Readable() const { return false; }
-    bool Void::Writable() const { return false; }
-
     void Void::BindGlobal()
     { }
 

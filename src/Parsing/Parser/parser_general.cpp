@@ -18,6 +18,7 @@
 #include "../ParseNodes/Statements/throw_statement_node.h"
 #include "../ParseNodes/Statements/Control/continue_node.h"
 #include "../ParseNodes/Statements/expression_statement_node.h"
+#include "../ParseNodes/Types/Keyword/void_type_node.h"
 
 using namespace Tokens::Enums;
 
@@ -227,6 +228,8 @@ namespace Parsing
                     TryMatchToken(Current(), SyntaxKind::Colon, true);
                     return ParseVariableDeclaration(new DescriberNode(Current()), new AnonymousTypeNode(current), breakSeparator);
                 }
+            case SyntaxKind::Void:
+                return ParseFunction(new DescriberNode(Current()), new VoidTypeNode(Current()));
             case SyntaxKind::Indexer:
                 return ParseIndexer(new DescriberNode(Current()));
             case SyntaxKind::Constructor:
@@ -245,19 +248,22 @@ namespace Parsing
                             return ParseDescriberStatement(breakSeparator);
                         case KeywordType::Type:
                             {
-                                const auto type = ParseType();
-                                index++;
+                                if (MatchLookAhead(SyntaxKind::Colon))
+                                {
+                                    const auto type = ParseType();
+                                    index += 2;
 
-                                const auto& cur = Current();
-                                if (MatchToken(cur, SyntaxKind::Colon, true))
                                     return ParseVariableDeclaration(new DescriberNode(Current()), type, breakSeparator);
-                                if (MatchType(cur, TokenType::Identifier))
-                                    return ParseFunction(new DescriberNode(Current()), type);
+                                }
+                                if (MatchLookAhead(TokenType::Identifier))
+                                {
+                                    const auto type = ParseType();
+                                    index++;
 
-                                const auto invalid = ParseInvalid(breakSeparator);
-                                TryMatchSeparator(Current(), breakSeparator);
-                                invalid->AddChild(type);
-                                return invalid;
+                                    return ParseFunction(new DescriberNode(Current()), type);
+                                }
+
+                                return new ExpressionStatementNode(ParseExpression(SeparatorKind::Semicolon), Current());
                             }
                         default:
                             break;
@@ -298,23 +304,6 @@ namespace Parsing
                 }
             case TokenType::Keyword:
                 {
-                    if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
-                    {
-                        const auto type = ParseType();
-                        index++;
-
-                        const auto& cur = Current();
-                        if (MatchToken(cur, SyntaxKind::Colon, true))
-                            return ParseVariableDeclaration(describer, type, breakSeparator);
-                        if (MatchType(cur, TokenType::Identifier))
-                            return ParseFunction(describer, type);
-
-                        const auto invalid = ParseInvalid(breakSeparator);
-                        TryMatchSeparator(Current(), breakSeparator);
-                        invalid->AddChild(type);
-                        return invalid;
-                    }
-
                     switch (current.Kind())
                     {
                         case SyntaxKind::Get:
@@ -327,6 +316,8 @@ namespace Parsing
                             return ParseClassDefinition(describer);
                         case SyntaxKind::Struct:
                             return ParseStructDefinition(describer);
+                        case SyntaxKind::Void:
+                            return ParseFunction(describer, new VoidTypeNode(Current()));
                         case SyntaxKind::Indexer:
                             return ParseIndexer(describer);
                         case SyntaxKind::Constructor:
@@ -345,6 +336,23 @@ namespace Parsing
                             }
                         default:
                             break;
+                    }
+
+                    if (const auto keywordType = static_cast<KeywordType>(current.Metadata()); keywordType == KeywordType::Type)
+                    {
+                        const auto type = ParseType();
+                        index++;
+
+                        const auto& cur = Current();
+                        if (MatchToken(cur, SyntaxKind::Colon, true))
+                            return ParseVariableDeclaration(describer, type, breakSeparator);
+                        if (MatchType(cur, TokenType::Identifier))
+                            return ParseFunction(describer, type);
+
+                        const auto invalid = ParseInvalid(breakSeparator);
+                        TryMatchSeparator(Current(), breakSeparator);
+                        invalid->AddChild(type);
+                        return invalid;
                     }
                 }
                 break;

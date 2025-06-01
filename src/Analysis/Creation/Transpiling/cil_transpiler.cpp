@@ -184,7 +184,7 @@ namespace Analysis::Creation::Transpiling
 
     void TranspileFunctionCall(const IContextNode* const functionCallContext, StringBuilder& stringBuilder)
     {
-        TranspileLoadArguments(functionCallContext, 1, stringBuilder);
+        TranspileLoadArguments(functionCallContext, 0, stringBuilder);
         if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); !function->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(load_this);
 
@@ -193,6 +193,7 @@ namespace Analysis::Creation::Transpiling
 
     void TranspileFunctionCall(const IContextNode* const functionCallContext, const IContextNode* const context, StringBuilder& stringBuilder)
     {
+        TranspileLoadArguments(functionCallContext, 0, stringBuilder);
         if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
             stringBuilder.PushLine(pop);
 

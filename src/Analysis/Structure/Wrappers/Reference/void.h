@@ -22,9 +22,6 @@ namespace Analysis::Structure::Wrappers
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;
 
-            [[nodiscard]] bool Readable() const override;
-            [[nodiscard]] bool Writable() const override;
-
             void BindGlobal() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
