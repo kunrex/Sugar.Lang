@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="../sugar.png" width="700"/>
+  <picture>
+    <source srcset="../img/sugar.png" media="(prefers-color-scheme: dark)">
+    <source srcset="../img/sugar_br.png" media="(prefers-color-scheme: light)">
+    <img src="../img/sugar.png" width="700" alt="Sugar">
+  </picture>
 </p>
 
 # Sugar.Lang

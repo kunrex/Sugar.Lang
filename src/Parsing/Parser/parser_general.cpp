@@ -190,7 +190,7 @@ namespace Parsing
                 return ParseForLoop();
             case SyntaxKind::Break:
                 {
-                    const auto& keyword = Current();
+                    const auto& keyword = current;
                     index++;
 
                     TryMatchSeparator(Current(), SeparatorKind::Semicolon);
@@ -206,22 +206,22 @@ namespace Parsing
                 }
             case SyntaxKind::Continue:
                 {
-                    const auto keyword = Current();
+                    const auto keyword = current;
                     index++;
 
                     TryMatchSeparator(Current(), SeparatorKind::Semicolon);
                     return new ContinueNode(keyword);
                 }
             case SyntaxKind::Get:
-                return ParseGet(new DescriberNode(Current()));
+                return ParseGet(new DescriberNode(current));
             case SyntaxKind::Set:
-                return ParseSet(new DescriberNode(Current()));
+                return ParseSet(new DescriberNode(current));
             case SyntaxKind::Enum:
-                return ParseEnumDefinition(new DescriberNode(Current()));
+                return ParseEnumDefinition(new DescriberNode(current));
             case SyntaxKind::Class:
-                return ParseClassDefinition(new DescriberNode(Current()));
+                return ParseClassDefinition(new DescriberNode(current));
             case SyntaxKind::Struct:
-                return ParseStructDefinition(new DescriberNode(Current()));
+                return ParseStructDefinition(new DescriberNode(current));
             case SyntaxKind::Let:
                 {
                     index++;
@@ -229,17 +229,23 @@ namespace Parsing
                     return ParseVariableDeclaration(new DescriberNode(Current()), new AnonymousTypeNode(current), breakSeparator);
                 }
             case SyntaxKind::Void:
-                return ParseFunction(new DescriberNode(Current()), new VoidTypeNode(Current()));
+                {
+                    const auto describer = new DescriberNode(current);
+                    const auto type = new VoidTypeNode(current);
+                    index++;
+
+                    return ParseFunction(describer, type);
+                }
             case SyntaxKind::Indexer:
-                return ParseIndexer(new DescriberNode(Current()));
+                return ParseIndexer(new DescriberNode(current));
             case SyntaxKind::Constructor:
-                return ParseConstructor(new DescriberNode(Current()));
+                return ParseConstructor(new DescriberNode(current));
             case SyntaxKind::Explicit:
-                return ParseExplicitCast(new DescriberNode(Current()));
+                return ParseExplicitCast(new DescriberNode(current));
             case SyntaxKind::Implicit:
-                return ParseImplicitCast(new DescriberNode(Current()));
+                return ParseImplicitCast(new DescriberNode(current));
             case SyntaxKind::Operator:
-                return ParseOperatorOverload(new DescriberNode(Current()));
+                return ParseOperatorOverload(new DescriberNode(current));
             default:
                 {
                     switch (static_cast<KeywordType>(current.Metadata()))
@@ -317,7 +323,12 @@ namespace Parsing
                         case SyntaxKind::Struct:
                             return ParseStructDefinition(describer);
                         case SyntaxKind::Void:
-                            return ParseFunction(describer, new VoidTypeNode(Current()));
+                            {
+                                const auto type = new VoidTypeNode(current);
+                                index++;
+
+                                return ParseFunction(describer, type);
+                            }
                         case SyntaxKind::Indexer:
                             return ParseIndexer(describer);
                         case SyntaxKind::Constructor:
