@@ -354,7 +354,6 @@ namespace Analysis::Creation::Binding
 
         if (const auto local = scope->GetVariable(value); local)
         {
-            std::cout << "local found: " << value << std::endl;
             const auto variable = scoped->VariableAt(*local);
             return new LocalVariableContext(variable, *local - scoped->ParameterCount());
         }

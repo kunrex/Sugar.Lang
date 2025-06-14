@@ -400,7 +400,10 @@ namespace Parsing
                 return scope;
 
             if (MatchToken(Current(), SyntaxKind::FlowerOpenBracket))
+            {
                 scope->AddChild(ParseScope());
+                continue;
+            }
 
             scope->AddChild(ParseStatement());
         }
