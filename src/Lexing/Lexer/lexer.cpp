@@ -294,6 +294,10 @@ namespace Lexing
 
         if (const auto result = Keyword::TryMatchKeyword(value, start))
             source->PushBackToken(*result);
+        else if (value == "true")
+            source->PushBackToken(Constant::True(start));
+        else if (value == "false")
+            source->PushBackToken(Constant::False(start));
         else
             source->PushBackToken(Token::Identifier(start, value));
     }

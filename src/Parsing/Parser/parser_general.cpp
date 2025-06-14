@@ -174,7 +174,7 @@ namespace Parsing
             case SyntaxKind::Invoke:
             case SyntaxKind::Create:
             case SyntaxKind::ToString:
-                return ParseExpression(breakSeparator);
+                return new ExpressionStatementNode(ParseExpression(breakSeparator), current);
             case SyntaxKind::Throw:
                 {
                     index++;

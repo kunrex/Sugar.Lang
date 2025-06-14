@@ -18,13 +18,12 @@ namespace Parsing
         const auto chain = new IfChainNode(Current());
         for (; index < source->TokenCount(); index++)
         {
-            const auto& keyword = Current();
-            index++;
-
-            switch (keyword.Kind())
+            switch (const auto& keyword = Current(); keyword.Kind())
             {
                 case SyntaxKind::If:
                     {
+                        index++;
+
                         if (flag)
                         {
                             index -= 2;
@@ -44,6 +43,7 @@ namespace Parsing
                     break;
                 case SyntaxKind::Elif:
                     {
+                        index++;
                         TryMatchToken(Current(), SyntaxKind::OpenBracket, true);
                         const auto condition = ParseNonEmptyExpression(SeparatorKind::CloseBracket);
                         TryMatchToken(Current(), SyntaxKind::CloseBracket, true);
@@ -55,12 +55,16 @@ namespace Parsing
                     break;
                 case SyntaxKind::Else:
                     {
+                        index++;
                         flag = false;
                         chain->AddChild(new ElseNode(ParseLazyScope(), keyword));;
                     }
                     break;
                 default:
-                    flag = false;
+                    {
+                        index--;
+                        flag = false;
+                    }
                     break;
             }
 

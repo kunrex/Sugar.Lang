@@ -1181,10 +1181,10 @@ namespace Analysis::Creation::Binding
                         {
                             const auto arg = child->GetChild(0);
                             const auto context = BindExpression(arg, scoped, scope, dataType);
-                            scope->AddChild(BindPrint(context, false));
+                            current->AddChild(BindPrint(context, false));
                         }
                         else
-                            scope->AddChild(new PrintContext(false));
+                            current->AddChild(new PrintContext(false));
                     }
                     break;
                 case NodeType::Println:
@@ -1193,10 +1193,10 @@ namespace Analysis::Creation::Binding
                         {
                             const auto arg = child->GetChild(0);
                             const auto context = BindExpression(arg, scoped, scope, dataType);
-                            scope->AddChild(BindPrint(context, true));
+                            current->AddChild(BindPrint(context, true));
                         }
                         else
-                            scope->AddChild(new PrintContext(true));
+                            current->AddChild(new PrintContext(true));
                     }
                     break;
                 case NodeType::Throw:
@@ -1253,11 +1253,14 @@ namespace Analysis::Creation::Binding
                         const auto ifCount = child->ChildCount();
 
                         const auto ifScope = new Scope(ScopeType::Condition, std::format("{}_{}", name, CHECK), scoped);
+                        current->AddNested(ifScope);
 
                         for (auto k = 0; k < ifCount; k++)
                         {
                             const auto conditionNode = child->GetChild(k);
+
                             const auto conditionScope = new Scope(ScopeType::ConditionScope, std::format("{}{}", ifScope->FullName(), k), scoped);
+                            ifScope->AddNested(conditionScope);
 
                             if (const auto condition = conditionNode->GetChild(static_cast<int>(ChildCode::Expression)); condition != nullptr)
                             {
@@ -1265,15 +1268,14 @@ namespace Analysis::Creation::Binding
                                 conditionScope->AddChild(conditionContext);
                                 if (k < ifCount - 1)
                                     conditionScope->AddChild(new BranchFalse(std::format("{}{}", ifScope->FullName(), k + 1)));
+                                else
+                                    conditionScope->AddChild(new BranchFalse(std::format("{}_{}", ifScope->FullName(), END)));
                             }
 
                             BindScope(conditionNode->GetChild(static_cast<int>(ChildCode::Body)), conditionScope, scoped, dataType);
-                            ifScope->AddNested(conditionScope);
                         }
 
-                        current->AddNested(ifScope);
-
-                        const auto ifEnd = new Scope(ScopeType::Scope, std::format("{}_{}_{}", name, CHECK, END), scoped);
+                        const auto ifEnd = new Scope(ScopeType::ConditionScope, std::format("{}_{}", ifScope->FullName(), END), scoped);
                         current->AddNested(ifEnd);
                         current = ifEnd;
                     }
@@ -1283,23 +1285,27 @@ namespace Analysis::Creation::Binding
                         const auto name = current->FullName();
 
                         const auto loopScope = new Scope(ScopeType::Loop, std::format("{}_{}", name, LOOP), scoped);
-                        BindStatement(child->GetChild(static_cast<int>(ChildCode::Pre)), loopScope, scoped, dataType);
                         current->AddNested(loopScope);
 
+                        BindStatement(child->GetChild(static_cast<int>(ChildCode::Pre)), loopScope, scoped, dataType);
+
                         const auto conditionScope = new Scope(ScopeType::LoopCondition, std::format("{}_{}", loopScope->FullName(), CHECK), scoped);
-                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
                         loopScope->AddNested(conditionScope);
 
+                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
+
                         const auto bodyScope = new Scope(ScopeType::LoopBody, std::format("{}_{}", loopScope->FullName(), BODY), scoped);
-                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
                         loopScope->AddNested(bodyScope);
+
+                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
 
                         conditionScope->AddChild(new BranchTrue(bodyScope->FullName()));
 
                         const auto incrementBlock = new Scope(ScopeType::Increment, std::format("{}_{}", loopScope->FullName(), POST), scoped);
+                        loopScope->AddNested(incrementBlock);
+
                         incrementBlock->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Post)), scoped, incrementBlock, dataType));
                         incrementBlock->AddChild(new Branch(conditionScope->FullName()));
-                        loopScope->AddNested(incrementBlock);
 
                         const auto endBlock = new Scope(ScopeType::Scope, std::format("{}_{}", loopScope->FullName(), END), scoped);
                         current->AddNested(endBlock);
@@ -1313,18 +1319,21 @@ namespace Analysis::Creation::Binding
                         const auto name = current->FullName();
 
                         const auto conditionScope = new Scope(ScopeType::LoopCondition, std::format("{}_{}_{}", name, LOOP, CHECK), scoped);
-                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
                         current->AddNested(conditionScope);
 
+                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
+
                         const auto bodyScope = new Scope(ScopeType::LoopBody, std::format("{}_{}_{}", name, LOOP, BODY), scoped);
-                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
                         current->AddNested(bodyScope);
+
+                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
 
                         conditionScope->AddChild(new BranchTrue(bodyScope->FullName()));
 
                         const auto incrementBlock = new Scope(ScopeType::Increment, std::format("{}_{}_{}", name, LOOP, POST), scoped);
-                        incrementBlock->AddChild(new Branch(conditionScope->FullName()));
                         current->AddNested(incrementBlock);
+
+                        incrementBlock->AddChild(new Branch(conditionScope->FullName()));
 
                         const auto endBlock = new Scope(ScopeType::Scope,std::format("{}_{}_{}", name, LOOP, END), scoped);
                         current->AddNested(endBlock);
@@ -1338,13 +1347,15 @@ namespace Analysis::Creation::Binding
                         const auto name = current->FullName();
 
                         const auto bodyScope = new Scope(ScopeType::LoopBody, std::format("{}_{}_{}", name, LOOP, BODY), scoped);
-                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
                         current->AddNested(bodyScope);
 
+                        BindScope(child->GetChild(static_cast<int>(ChildCode::Body)), bodyScope, scoped, dataType);
+
                         const auto incrementBlock = new Scope(ScopeType::Increment, std::format("{}_{}_{}", name, LOOP, POST), scoped);
+                        current->AddNested(incrementBlock);
+
                         incrementBlock->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
                         incrementBlock->AddChild(new BranchTrue(bodyScope->FullName()));
-                        current->AddNested(incrementBlock);
 
                         const auto endBlock = new Scope(ScopeType::Scope, std::format("{}_{}_{}", name, LOOP, END), scoped);
                         current->AddNested(endBlock);
@@ -1355,9 +1366,9 @@ namespace Analysis::Creation::Binding
                     {
                         const auto name = current->FullName();
                         const auto newScope = new Scope(ScopeType::Scope, std::format("{}_{}", name, SCOPE), scoped);
+                        current->AddNested(newScope);
 
                         BindScope(child, newScope, scoped, dataType);
-                        current->AddNested(newScope);
 
                         const auto continuation = new Scope(ScopeType::Scope, std::format("{}_{}", name, CONTINUATION), scoped);
                         current->AddNested(continuation);

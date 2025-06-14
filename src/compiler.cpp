@@ -145,6 +145,7 @@ void Compiler::Transpile() const
     stringBuilder.PushLine(".assembly extern System.Console {}");
     stringBuilder.PushLine(".assembly extern System.Collections.Generic.Runtime {}");
 
+    stringBuilder.PushLine();
     stringBuilder.PushLine(std::format(".assembly {} {}", name, "{}"));
     stringBuilder.PushLine(std::format(".module {}.{}", name, Entrypoint::Instance() == nullptr ? "dll" : "exe"));
 

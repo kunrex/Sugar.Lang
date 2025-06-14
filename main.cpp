@@ -1,7 +1,5 @@
 #include "src/compiler.h"
 
-#include <iostream>
-
 #include <string>
 #include <filesystem>
 
