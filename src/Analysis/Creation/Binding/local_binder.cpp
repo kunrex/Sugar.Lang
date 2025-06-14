@@ -354,6 +354,7 @@ namespace Analysis::Creation::Binding
 
         if (const auto local = scope->GetVariable(value); local)
         {
+            std::cout << "local found: " << value << std::endl;
             const auto variable = scoped->VariableAt(*local);
             return new LocalVariableContext(variable, *local - scoped->ParameterCount());
         }
@@ -1000,10 +1001,10 @@ namespace Analysis::Creation::Binding
                     {
                         case SyntaxKind::Increment:
                         case SyntaxKind::Decrement:
-                            return new AssignmentExpression(operand, new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
+                            return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
                         case SyntaxKind::IncrementPrefix:
                         case SyntaxKind::DecrementPrefix:
-                            return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
+                            return new AssignmentExpression(operand, new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
                         default:
                             return new DefinedUnaryExpression(definition, operand);
                     }
@@ -1264,8 +1265,7 @@ namespace Analysis::Creation::Binding
 
                             if (const auto condition = conditionNode->GetChild(static_cast<int>(ChildCode::Expression)); condition != nullptr)
                             {
-                                const auto conditionContext = BindExpression(condition, scoped, scope, dataType);
-                                conditionScope->AddChild(conditionContext);
+                                conditionScope->AddChild(BindExpression(condition, scoped, current, dataType));
                                 if (k < ifCount - 1)
                                     conditionScope->AddChild(new BranchFalse(std::format("{}{}", ifScope->FullName(), k + 1)));
                                 else
@@ -1292,7 +1292,7 @@ namespace Analysis::Creation::Binding
                         const auto conditionScope = new Scope(ScopeType::LoopCondition, std::format("{}_{}", loopScope->FullName(), CHECK), scoped);
                         loopScope->AddNested(conditionScope);
 
-                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, current, dataType));
+                        conditionScope->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Expression)), scoped, loopScope, dataType));
 
                         const auto bodyScope = new Scope(ScopeType::LoopBody, std::format("{}_{}", loopScope->FullName(), BODY), scoped);
                         loopScope->AddNested(bodyScope);
@@ -1304,7 +1304,7 @@ namespace Analysis::Creation::Binding
                         const auto incrementBlock = new Scope(ScopeType::Increment, std::format("{}_{}", loopScope->FullName(), POST), scoped);
                         loopScope->AddNested(incrementBlock);
 
-                        incrementBlock->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Post)), scoped, incrementBlock, dataType));
+                        incrementBlock->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Post)), scoped, loopScope, dataType));
                         incrementBlock->AddChild(new Branch(conditionScope->FullName()));
 
                         const auto endBlock = new Scope(ScopeType::Scope, std::format("{}_{}", loopScope->FullName(), END), scoped);

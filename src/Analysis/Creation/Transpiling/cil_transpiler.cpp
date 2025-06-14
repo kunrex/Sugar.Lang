@@ -21,6 +21,7 @@
 #include "../../Structure/Context/Entities/References/property_context.h"
 #include "../../Structure/Context/Expressions/assignment_expression.h"
 #include "../../Structure/Context/Expressions/dot_expression.h"
+#include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/indexer_expression.h"
 #include "../../Structure/Core/DataTypes/data_type.h"
 
@@ -557,18 +558,17 @@ namespace Analysis::Creation::Transpiling
         {
             case MemberType::CastExpression:
             case MemberType::UnaryExpression:
+            case MemberType::DuplicateExpression:
                 {
-                    const auto unaryExpression = dynamic_cast<const UnaryContextNode*>(context);
-                    TranspileExpression(unaryExpression->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder);
-                    stringBuilder.PushLine(unaryExpression->CILData());
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::Expression)), stringBuilder);
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::BinaryExpression:
                 {
-                    const auto binaryExpression = dynamic_cast<const BinaryContextNode*>(context);
-                    TranspileExpression(binaryExpression->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
-                    TranspileExpression(binaryExpression->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
-                    stringBuilder.PushLine(binaryExpression->CILData());
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::AssignmentExpression:
