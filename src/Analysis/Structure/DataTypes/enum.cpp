@@ -207,7 +207,7 @@ namespace Analysis::Structure::DataTypes
     void Enum::Transpile(Services::StringBuilder& builder) const
     {
         builder.PushLine();
-        builder.PushLine(std::format(".class {} sealed auto ansi {} extends [System.Runtime]System.Enum", AccessModifierString(this), name));
+        builder.PushLine(std::format(".class {} sealed auto ansi {} extends [System.Runtime]System.Enum", AccessModifierString(this), fullName));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();

@@ -26,17 +26,14 @@ namespace Analysis::Structure::Context
         return slotCount;
     }
 
-    MemberType CreationContext::MemberType() const { return MemberType::FunctionCallContext; }
+    MemberType CreationContext::MemberType() const { return MemberType::ConstructorCallContext; }
 
     bool CreationContext::Readable() const { return true; }
     bool CreationContext::Writable() const { return constructor->CreationType()->MemberType() == MemberType::Class; }
 
     string CreationContext::CILData() const
     {
-        if (constructor->MemberType() == MemberType::BuiltInConstructor)
-            return constructor->FullName();
-
-        return "call " + constructor->FullName();
+        return constructor->FullName();
     }
 
     void CreationContext::Print(const std::string& indent, const bool last) const

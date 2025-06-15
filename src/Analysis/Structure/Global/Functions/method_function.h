@@ -26,10 +26,10 @@ namespace Analysis::Structure::Global
     class GeneratedGetFunction final : public Creation::MethodDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
-            const std::string name;
+            const std::string variableName;
 
         public:
-            GeneratedGetFunction(Enums::Describer describer, std::string name, const Core::Interfaces::IDataType* creationType);
+            GeneratedGetFunction(Enums::Describer describer, std::string variableName, const Core::Interfaces::IDataType* creationType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

@@ -59,6 +59,7 @@ namespace Analysis::Structure::Enums
         FunctionParameterContext,
 
         FunctionCallContext,
+        ConstructorCallContext,
         CollectorConstructorCallContext,
 
         StaticReferenceContext,

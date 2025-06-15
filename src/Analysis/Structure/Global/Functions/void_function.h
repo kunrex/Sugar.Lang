@@ -40,11 +40,11 @@ namespace Analysis::Structure::Global
     class GeneratedSetFunction final : public Creation::VoidDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
-            const std::string name;
+            const std::string variableName;
             const Core::Interfaces::IDataType* creationType;
 
         public:
-            GeneratedSetFunction(Enums::Describer describer, std::string name, const Core::Interfaces::IDataType* creationType);
+            GeneratedSetFunction(Enums::Describer describer, std::string variableName, const Core::Interfaces::IDataType* creationType);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

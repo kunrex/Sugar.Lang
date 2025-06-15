@@ -266,7 +266,7 @@ namespace Analysis::Structure::DataTypes
     void ClassSource::Transpile(Services::StringBuilder& builder) const
     {
         builder.PushLine();
-        builder.PushLine(std::format(".class {} {} sequential ansi {} extends [System.Runtime]System.Object", AccessModifierString(this), StaticModifierString(this), name));
+        builder.PushLine(std::format(".class {} {} sequential ansi {} extends [System.Runtime]System.Object", AccessModifierString(this), StaticModifierString(this), fullName));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();

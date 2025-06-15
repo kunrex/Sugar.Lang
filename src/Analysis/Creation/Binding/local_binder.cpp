@@ -1236,14 +1236,16 @@ namespace Analysis::Creation::Binding
                         if (const auto value = child->GetChild(static_cast<int>(ChildCode::Expression)); value != nullptr)
                         {
                             const auto expression = BindExpression(value, scoped, current, dataType);
-                            current->AddChild(new Return(expression->CreationType()));
+                            current->AddChild(new Return(expression));
 
                             if (scoped->CreationType() != expression->CreationType())
                                 PushException(new LogException(std::format("Return type does not match expected type: `{}`", scoped->CreationType()->FullName()), child->Token().Index(), dataType->Parent()));
+
+                            return;
                         }
 
                         current->AddChild(new Return());
-                        if (scoped->CreationType() != Void::Instance())
+                        if (scoped->CreationType() == Void::Instance())
                             PushException(new LogException("Unexpected return argument", child->Token().Index(), dataType->Parent()));
                     }
                     return;

@@ -93,7 +93,7 @@ namespace Analysis::Structure::Global
     const std::string& ImplicitConstructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} instance void {} {}::.ctor{}", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), ParameterString(this));
+            fullName = std::format("{} instance void {} {}::.ctor()", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName());
 
         return fullName;
     }

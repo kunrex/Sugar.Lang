@@ -25,8 +25,8 @@ namespace Parsing
         if (index >= source->TokenCount() - 1)
             return std::nullopt;
 
-        Token token = source->TokenAt(index + 1);
-        return token;
+        const auto& token = source->TokenAt(index + 1);
+        return { std::ref(const_cast<Token&>(token)) };
     }
 
     bool Parser::MatchType(const Token& token, const TokenType tokenType, const bool increment)
@@ -36,7 +36,7 @@ namespace Parsing
             if (increment)
                 index++;
 
-            return  true;
+            return true;
         }
 
         return  false;

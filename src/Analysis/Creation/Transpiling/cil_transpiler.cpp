@@ -192,6 +192,12 @@ namespace Analysis::Creation::Transpiling
         stringBuilder.PushLine(functionCallContext->CILData());
     }
 
+    void TranspileConstructorCall(const IContextNode* const constructorCallContext, StringBuilder& stringBuilder)
+    {
+        TranspileLoadArguments(constructorCallContext, 0, stringBuilder);
+        stringBuilder.PushLine(constructorCallContext->CILData());
+    }
+
     void TranspileFunctionCall(const IContextNode* const functionCallContext, const IContextNode* const context, StringBuilder& stringBuilder)
     {
         TranspileLoadArguments(functionCallContext, 0, stringBuilder);
@@ -405,6 +411,9 @@ namespace Analysis::Creation::Transpiling
                 break;
             case MemberType::FunctionCallContext:
                 TranspileFunctionCall(context, stringBuilder);
+                break;
+            case MemberType::ConstructorCallContext:
+                TranspileConstructorCall(context, stringBuilder);
                 break;
             case MemberType::IndexerExpression:
                 TranspileIndexerExpression(context, stringBuilder);
@@ -636,10 +645,16 @@ namespace Analysis::Creation::Transpiling
         switch (context->MemberType())
         {
             case MemberType::Throw:
-            case MemberType::Return:
             case MemberType::BranchJump:
                 stringBuilder.PushLine(context->CILData());
                 break;
+            case MemberType::Return:
+                {
+                    if (const auto expression = context->GetChild(static_cast<int>(ChildCode::Expression)); expression != nullptr)
+                        TranspileExpression(expression, stringBuilder);
+
+                    stringBuilder.PushLine(context->CILData());
+                }
             default:
                 {
                     TranspileExpression(context, stringBuilder);

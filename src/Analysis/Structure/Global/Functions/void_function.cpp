@@ -111,7 +111,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, std::string name, const IDataType* const creationType) : VoidDefinition("__set__" + name, describer), DefaultScoped(), name(std::move(name)), creationType(creationType)
+    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : VoidDefinition("set_" + variableName, describer), DefaultScoped(), variableName(std::move(variableName)), creationType(creationType)
     { }
 
     MemberType GeneratedSetFunction::MemberType() const { return MemberType::VoidDefinition; }
@@ -147,7 +147,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(".maxstack 2");
         builder.PushLine(load_this);
         builder.PushLine("ldarg.1");
-        builder.PushLine(std::format("st{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(name)->FullName()));
+        builder.PushLine(std::format("st{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(variableName)->FullName()));
         builder.PushLine("ret");
 
         builder.DecreaseIndent();

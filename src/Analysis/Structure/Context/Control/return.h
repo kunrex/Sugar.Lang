@@ -1,15 +1,18 @@
 #ifndef RETURN_H
 #define RETURN_H
 
-#include "../context_node.h"
+#include "../unary_context_node.h"
 
 namespace Analysis::Structure::Context
 {
-    class Return final : public ContextNode
+    class Return final : public UnaryContextNode
     {
+        private:
+            const int slotCount;
+
         public:
             Return();
-            explicit Return(const Core::Interfaces::IDataType* dataType);
+            explicit Return(const IContextNode* expression);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
