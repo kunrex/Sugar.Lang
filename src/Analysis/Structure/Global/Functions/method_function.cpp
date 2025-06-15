@@ -75,7 +75,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    GeneratedGetFunction::GeneratedGetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : MethodDefinition("get_" + variableName, describer, creationType), DefaultScoped(), variableName(std::move(variableName))
+    GeneratedGetFunction::GeneratedGetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : MethodDefinition("__get__" + variableName, describer, creationType), DefaultScoped(), variableName(std::move(variableName))
     { }
 
     MemberType GeneratedGetFunction::MemberType() const { return MemberType::MethodDefinition; }

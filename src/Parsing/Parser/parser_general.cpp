@@ -421,6 +421,8 @@ namespace Parsing
             return ParseKeywordStatement(SeparatorKind::Semicolon);
         if (MatchType(current, TokenType::Identifier))
             return ParseIdentifierStatement(SeparatorKind::Semicolon);
+        if (MatchType(current, TokenType::Constant))
+            return new ExpressionStatementNode(ParseExpression(SeparatorKind::Semicolon), current);
         if (MatchToken(current, SyntaxKind::Semicolon))
             return new EmptyNode(current);
 

@@ -57,6 +57,7 @@
 #include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
 #include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/invalid_ternary_expression.h"
+#include "../../Structure/Context/Expressions/pop_expression.h"
 #include "../../Structure/Context/Expressions/ternary_expression.h"
 #include "../../Structure/Core/Interfaces/DataTypes/i_collection_type.h"
 #include "../../Structure/Core/Scoped/default_scoped.h"
@@ -178,6 +179,8 @@ namespace Analysis::Creation::Binding
         {
             if (type == Object::Instance() && expressionType->MemberType() == MemberType::ValueType)
                 finalExpression = new BoxCastExpression(expression);
+            else if (type->MemberType() == MemberType::Class && expression->MemberType() == MemberType::NullConstantContext)
+                finalExpression = expression;
             else
             {
                 const auto valueCast = expressionType->FindImplicitCast(type, expressionType);
@@ -1144,7 +1147,7 @@ namespace Analysis::Creation::Binding
         switch (statement->NodeType())
         {
             case NodeType::Expression:
-                scope->AddChild(BindExpression(statement->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType));
+                scope->AddChild(new PopExpression(BindExpression(statement->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType)));
                 break;
             case NodeType::Declaration:
                 BindLocalDeclaration(statement, scoped, scope, dataType);
@@ -1235,12 +1238,7 @@ namespace Analysis::Creation::Binding
                     {
                         if (const auto value = child->GetChild(static_cast<int>(ChildCode::Expression)); value != nullptr)
                         {
-                            const auto expression = BindExpression(value, scoped, current, dataType);
-                            current->AddChild(new Return(expression));
-
-                            if (scoped->CreationType() != expression->CreationType())
-                                PushException(new LogException(std::format("Return type does not match expected type: `{}`", scoped->CreationType()->FullName()), child->Token().Index(), dataType->Parent()));
-
+                            current->AddChild(new Return(TryBindCast(BindExpression(value, scoped, current, dataType), scoped->CreationType(), value->Token().Index(), dataType->Parent())));
                             return;
                         }
 
@@ -1391,12 +1389,7 @@ namespace Analysis::Creation::Binding
         for (const auto context: *scope)
         {
             if (context->MemberType() == MemberType::Return)
-            {
-                if (context->CreationType() == expected)
-                    return true;
-
-                return false;
-            }
+                return true;
         }
 
         bool result = false;

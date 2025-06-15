@@ -60,7 +60,8 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        if (children.size() - parameterCount > 0)
+            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
 
         builder.Push(innerBuilder.Value());
         builder.PushLine("ret");
@@ -111,7 +112,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : VoidDefinition("set_" + variableName, describer), DefaultScoped(), variableName(std::move(variableName)), creationType(creationType)
+    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : VoidDefinition("__set__" + variableName, describer), DefaultScoped(), variableName(std::move(variableName)), creationType(creationType)
     { }
 
     MemberType GeneratedSetFunction::MemberType() const { return MemberType::VoidDefinition; }

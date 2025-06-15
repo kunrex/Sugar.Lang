@@ -23,6 +23,7 @@
 #include "../../Structure/Context/Expressions/dot_expression.h"
 #include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/indexer_expression.h"
+#include "../../Structure/Context/Expressions/pop_expression.h"
 #include "../../Structure/Core/DataTypes/data_type.h"
 
 #include "../../Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
@@ -104,7 +105,7 @@ namespace Analysis::Creation::Transpiling
     string ScopedLocalVariableString(const IScoped* const function)
     {
         string variables;
-        const auto variableCount = function->VariableCount() + function->ParameterCount();
+        const auto variableCount = function->VariableCount() - function->ParameterCount();
 
         for (auto i = 0; i < variableCount; i++)
         {
@@ -420,6 +421,7 @@ namespace Analysis::Creation::Transpiling
                 break;
             case MemberType::InputContext:
             case MemberType::ConstantContext:
+            case MemberType::NullConstantContext:
                 stringBuilder.PushLine(context->CILData());
                 break;
             case MemberType::PrintContext:
@@ -565,6 +567,7 @@ namespace Analysis::Creation::Transpiling
     {
         switch (context->MemberType())
         {
+            case MemberType::PopExpression:
             case MemberType::CastExpression:
             case MemberType::UnaryExpression:
             case MemberType::DuplicateExpression:
@@ -656,11 +659,7 @@ namespace Analysis::Creation::Transpiling
                     stringBuilder.PushLine(context->CILData());
                 }
             default:
-                {
-                    TranspileExpression(context, stringBuilder);
-                    if (context->Readable())
-                        stringBuilder.PushLine(pop);
-                }
+                TranspileExpression(context, stringBuilder);
                 break;
         }
     }

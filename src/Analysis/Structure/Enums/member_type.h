@@ -41,6 +41,7 @@ namespace Analysis::Structure::Enums
         BranchJump,
 
         ConstantContext,
+        NullConstantContext,
 
         RefContext,
         CopyContext,
@@ -74,6 +75,7 @@ namespace Analysis::Structure::Enums
         TernaryExpression,
         AssignmentExpression,
 
+        PopExpression,
         DuplicateExpression,
 
         Invalid,
