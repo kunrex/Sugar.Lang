@@ -529,9 +529,7 @@ namespace Analysis::Creation::Binding
                         return new DotExpression(lhsContext, new InvalidContext());
                     }
 
-                    const auto rhsContext = BindEntity(rhs->GetChild(static_cast<int>(ChildCode::RHS)), lhsContext, scoped, scope, dataType);
-
-                    return new DotExpression(context, new DotExpression(lhsContext, rhsContext));
+                    return new DotExpression(lhsContext, BindEntity(rhs->GetChild(static_cast<int>(ChildCode::RHS)), lhsContext, scoped, scope, dataType));
                 }
             case NodeType::Identifier:
                 {
@@ -545,9 +543,9 @@ namespace Analysis::Creation::Binding
                         switch (characteristic->MemberType())
                         {
                             case MemberType::Field:
-                                return new DotExpression(context, new FieldContext(characteristic, scoped->MemberType() == MemberType::Constructor));
+                                return new FieldContext(characteristic, scoped->MemberType() == MemberType::Constructor);
                             case MemberType::Property:
-                                return new DotExpression(context, new PropertyContext(dynamic_cast<const Property*>(characteristic), context->CreationType() != dataType));
+                                return new PropertyContext(dynamic_cast<const Property*>(characteristic), context->CreationType() != dataType);
                             default:
                                 break;
                         }
@@ -569,17 +567,17 @@ namespace Analysis::Creation::Binding
                         if (dataType != context->CreationType() && !function->CheckDescriber(Describer::Public))
                             PushException(new AccessibilityException(function->Signature(), index, source));
 
-                        return new DotExpression(context, CreateFunctionContext(function, arguments));
+                        return CreateFunctionContext(function, arguments);
                     }
 
-                    return new DotExpression(context, CreateInvalidFunctionContext(arguments, identifier, index, source));
+                    return CreateInvalidFunctionContext(arguments, identifier, index, source);
                 }
             default:
                 break;
         }
 
         PushException(new InvalidStatementException(index, source));
-        return new DotExpression(context, new InvalidContext());
+        return new InvalidContext();
     }
 
     const IContextNode* BindEntity(const IParseNode* const entity, const IContextNode* const context, IScoped* const scoped, const Scope* scope, const IUserDefinedType* const dataType)
@@ -598,9 +596,7 @@ namespace Analysis::Creation::Binding
                         return new DotExpression(lhsContext, new InvalidContext());
                     }
 
-                    const auto rhsContext = BindEntity(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhsContext, scoped, scope, dataType);
-
-                    return new DotExpression(context, new DotExpression(lhsContext, rhsContext));
+                    return new DotExpression(lhsContext, BindEntity(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhsContext, scoped, scope, dataType));
                 }
             case NodeType::Identifier:
                 {
@@ -610,8 +606,7 @@ namespace Analysis::Creation::Binding
                         if (dataType != creationType && !characteristic->CheckDescriber(Describer::Public))
                             PushException(new AccessibilityException(characteristic->FullName(), index, source));
 
-                        const auto field = new FieldContext(characteristic, context->MemberType() == MemberType::ThisContext && scoped->MemberType() == MemberType::Constructor);
-                        return new DotExpression(context, field);
+                        return new FieldContext(characteristic, context->MemberType() == MemberType::ThisContext && scoped->MemberType() == MemberType::Constructor);
                     }
                 }
                 break;
@@ -628,19 +623,19 @@ namespace Analysis::Creation::Binding
                         if (dataType != context->CreationType() && !function->CheckDescriber(Describer::Public))
                             PushException(new AccessibilityException(function->Signature(), index, source));
 
-                        return new DotExpression(context, CreateFunctionContext(function, arguments));
+                        return CreateFunctionContext(function, arguments);
                     }
 
-                    return new DotExpression(context, CreateInvalidFunctionContext(arguments, identifier, index, source));
+                    return CreateInvalidFunctionContext(arguments, identifier, index, source);
                 }
             case NodeType::Indexer:
-                return new DotExpression(context, BindIndexerExpression(entity, BindEntity(entity->GetChild(0), context, scoped, scope, dataType), scoped, scope, dataType));
+                return BindIndexerExpression(entity, BindEntity(entity->GetChild(0), context, scoped, scope, dataType), scoped, scope, dataType);
             default:
                 break;
         }
 
         PushException(new InvalidStatementException(index, source));
-        return new DotExpression(context, new InvalidContext());
+        return new InvalidContext();
     }
 
     const IContextNode* BindFormat(const IParseNode* const formatNode, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
@@ -671,7 +666,6 @@ namespace Analysis::Creation::Binding
 
                     return new FormatDoubleContext(arg, actualArg1, actualArg2);
                 }
-                break;
             default:
                 {
                     std::vector<const IContextNode*> arguments;
@@ -735,7 +729,7 @@ namespace Analysis::Creation::Binding
                     const auto lhs = BindDotLHS(entity->GetChild(static_cast<int>(ChildCode::LHS)), scoped, scope, dataType);
 
                     if (lhs->MemberType() == MemberType::StaticReferenceContext)
-                        return BindStaticDotRHS(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhs, scoped, scope, dataType);
+                        return new DotExpression(lhs, BindStaticDotRHS(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhs, scoped, scope, dataType));
 
                     if (!lhs->Readable())
                     {
@@ -743,7 +737,7 @@ namespace Analysis::Creation::Binding
                         return new DotExpression(lhs, new InvalidContext());
                     }
 
-                    return BindEntity(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhs, scoped, scope, dataType);
+                    return new DotExpression(lhs, BindEntity(entity->GetChild(static_cast<int>(ChildCode::RHS)), lhs, scoped, scope, dataType));
                 }
             case NodeType::Constant:
                 return BindConstant(entity);
