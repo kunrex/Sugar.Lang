@@ -238,7 +238,7 @@ namespace Analysis::Structure::DataTypes
             case NodeType::PropertyInitialisation:
                 InitialiseProperty(child, this);
                 break;
-            case NodeType::Indexer:
+            case NodeType::IndexerDeclaration:
                 CreateIndexer(child, this);
                 break;
             case NodeType::FunctionDeclaration:

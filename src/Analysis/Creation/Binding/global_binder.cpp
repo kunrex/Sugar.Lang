@@ -515,7 +515,7 @@ namespace Analysis::Creation::Binding
         if (getDescriber == Describer::None)
             getDescriber = describer;
 
-        const auto get = new MethodFunction("__get__", getDescriber, creationType, getNode);
+        const auto get = new MethodFunction("__get__", getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(get->Name(), parameters) != nullptr)
         {
             PushException(new DuplicateFunctionDefinition(getNode->Token().Index(), dataType->Parent()));
@@ -542,7 +542,7 @@ namespace Analysis::Creation::Binding
         std::vector extended(parameters);
         extended.push_back(creationType);
 
-        const auto set = new VoidFunction("__set__", setDescriber, setNode);
+        const auto set = new VoidFunction("__set__", setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(set->Name(), extended) != nullptr)
         {
             PushException(new DuplicateFunctionDefinition(setNode->Token().Index(), dataType->Parent()));
@@ -658,14 +658,14 @@ namespace Analysis::Creation::Binding
 
         if (getNode == nullptr)
         {
-            if (setNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() != NodeType::Empty)
+            if (setNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
                 PushException(new LogException("Expected set accessor to define a body", setNode->Token().Index(), source));
             else
                 CreateSetIndexer(indexerNode, parameters, dataType);
         }
         else if (setNode == nullptr)
         {
-            if (getNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() != NodeType::Empty)
+            if (getNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
                 PushException(new LogException("Expected get accessor to define a body", getNode->Token().Index(), source));
             else
                 CreateGetIndexer(indexerNode, parameters, dataType);
@@ -676,7 +676,7 @@ namespace Analysis::Creation::Binding
             const auto setBody = getNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() != NodeType::Empty;
 
             if (getBody && setBody)
-                CreateSetIndexer(indexerNode, parameters, dataType);
+                CreateGetSetIndexer(indexerNode, parameters, dataType);
             else
                 PushException(new LogException("Expected both accessors to define a body", getNode->Token().Index(), source));
         }
