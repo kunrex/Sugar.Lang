@@ -3,6 +3,7 @@
 #include <format>
 
 #include "binder_extensions.h"
+#include "../../../Exceptions/exception_manager.h"
 
 #include "../../../Exceptions/Compilation/Analysis/Local/read_write_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
@@ -184,7 +185,7 @@ namespace Analysis::Creation::Binding
             else
             {
                 const auto valueCast = expressionType->FindImplicitCast(type, expressionType);
-                const auto resultCast = expressionType->FindImplicitCast(type, expressionType);
+                const auto resultCast = type->FindImplicitCast(type, expressionType);
 
                 finalExpression = BindCast(expression, type, valueCast, resultCast, index, source);
             }
@@ -904,7 +905,8 @@ namespace Analysis::Creation::Binding
                     for (int i = 1; i < entity->ChildCount(); i++)
                     {
                         const auto child = entity->GetChild(i);
-                        const auto context = BindExpression(child, scoped, scope, dataType);
+                        const auto context = TryBindCast(BindExpression(child, scoped, scope, dataType), genericType, child->Token().Index(), source);
+
                         if (context->CreationType() != genericType)
                             PushException(new LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
 
@@ -914,6 +916,8 @@ namespace Analysis::Creation::Binding
                     const auto context = new CollectionCreationContext(collectionType);
                     for (const auto argument : arguments)
                         context->AddChild(argument);
+
+                    return context;
                 }
             default:
                 break;

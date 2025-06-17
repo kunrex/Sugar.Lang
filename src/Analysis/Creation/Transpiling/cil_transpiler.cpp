@@ -308,9 +308,9 @@ namespace Analysis::Creation::Transpiling
 
         const auto addString = listType->FindFunction("Add", { arguments->GetChild(0)->CreationType() })->FullName();
 
-        for (auto i = 0; i < arguments->ChildCount(); i++)
+        for (auto i = 1; i < arguments->ChildCount(); i++)
         {
-            if (i++ < arguments->ChildCount() - 1)
+            if (i < arguments->ChildCount() - 1)
                 stringBuilder.PushLine(dup);
 
             TranspileExpression(arguments->GetChild(i), stringBuilder);
@@ -327,10 +327,10 @@ namespace Analysis::Creation::Transpiling
 
         for (auto i = 0; i < arguments->ChildCount(); i++)
         {
-            if (i++ < arguments->ChildCount() - 1)
+            if (i < arguments->ChildCount() - 1)
                 stringBuilder.PushLine(dup);
 
-            stringBuilder.PushLine("ldc.i4 " + std::to_string(i++));
+            stringBuilder.PushLine("ldc.i4 " + std::to_string(i));
             TranspileExpression(arguments->GetChild(i), stringBuilder);
             stringBuilder.PushLine(indexerString);
         }
