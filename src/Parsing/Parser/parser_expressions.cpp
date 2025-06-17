@@ -591,7 +591,7 @@ namespace Parsing
                     if (tuple->ChildCount() > max_tuple_length)
                         ExceptionManager::Instance().AddChild(new GenericArgumentException(max_tuple_length, current, source));
 
-                    return new TupleTypeNode(current);
+                    return tuple;
                 }
             case SyntaxKind::Dictionary:
                 {

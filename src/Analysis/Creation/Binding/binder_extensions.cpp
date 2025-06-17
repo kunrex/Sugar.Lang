@@ -115,6 +115,8 @@ namespace Analysis::Creation::Binding
     const IDataType* BindTuple(const IParseNode* const node, const SourceFile* const source)
     {
         std::vector<const IDataType*> types;
+        types.reserve(node->ChildCount());
+
         for (auto i = 0; i < node->ChildCount(); i++)
             types.push_back(BindDataType(node->GetChild(i), source));
 
@@ -124,6 +126,8 @@ namespace Analysis::Creation::Binding
     const IDataType* BindAction(const IParseNode* const node, const SourceFile* const source)
     {
         std::vector<const IDataType*> types;
+        types.reserve(node->ChildCount());
+
         for (auto i = 0; i < node->ChildCount(); i++)
             types.push_back(BindDataType(node->GetChild(i), source));
 
@@ -133,6 +137,8 @@ namespace Analysis::Creation::Binding
     const IDataType* BindFunc(const IParseNode* const node, const SourceFile* const source)
     {
         std::vector<const IDataType*> types;
+        types.reserve(node->ChildCount());
+
         for (auto i = 0; i < node->ChildCount(); i++)
             types.push_back(BindDataType(node->GetChild(i), source));
 

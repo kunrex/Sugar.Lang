@@ -31,6 +31,7 @@ namespace Analysis::Structure::Wrappers
     {
         static std::map<unsigned long, const Tuple*> map;
 
+        std::cout << types.size() << std::endl;
         const auto hash = ArgumentHash(types);
 
         if (map.contains(hash))
