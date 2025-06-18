@@ -106,7 +106,7 @@ namespace Analysis::Creation::Binding
         {
             case NodeType::Identifier:
                 {
-                    const auto identifier = expressionNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+                    const auto& identifier = expressionNode->Token();
                     const auto value = *identifier.Value<string>();
 
                     if (dataType->FindCharacteristic(value) != nullptr)

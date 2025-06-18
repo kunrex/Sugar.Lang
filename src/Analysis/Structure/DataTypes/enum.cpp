@@ -148,17 +148,7 @@ namespace Analysis::Structure::DataTypes
     {
         const auto count = skeleton->ChildCount();
         for (auto i = 0; i < count; i++)
-        {
-            switch (const auto child = skeleton->GetChild(i); child->NodeType())
-            {
-                case ParseNodes::Enums::NodeType::Expression:
-                    BindEnumConstant(child, this);
-                    break;
-                default:
-                    PushException(new Exceptions::InvalidGlobalStatementException(child->Token().Index(), parent));
-                    break;
-            }
-        }
+            BindEnumConstant(skeleton->GetChild(i), this);
 
         const auto explicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", nullptr);
         explicitInteger->PushParameterType(this);

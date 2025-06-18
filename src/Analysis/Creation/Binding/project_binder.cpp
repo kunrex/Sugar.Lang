@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "binder_extensions.h"
+#include "../../../Exceptions/exception_manager.h"
 
 #include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
 #include "../../../Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.h"
@@ -47,7 +48,7 @@ namespace Analysis::Creation::Binding
         const auto describer = FromNode(node->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto enumSource = new Enum(identifier, describer == Describer::None ? Describer::Public : describer, node->GetChild(static_cast<int>(ChildCode::Body)));
 
-        ValidateDescriber(enumSource, Describer::AccessModifiers, index, sourceFile);
+        ValidateDescriber(enumSource, Describer::AccessModifiers | Describer::Static, index, sourceFile);
         sourceFile->AddChild(identifier, enumSource);
     }
 

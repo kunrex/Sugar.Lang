@@ -109,16 +109,16 @@ namespace Analysis::Structure
         {
             switch (const auto node = sourceNode->GetChild(i); node->NodeType())
             {
-            case NodeType::Enum:
-            case NodeType::Class:
-            case NodeType::Struct:
-                break;
-            case NodeType::Import:
-                ImportStatement(node, this);
-                break;
-            default:
-                ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
-                break;
+                case NodeType::Enum:
+                case NodeType::Class:
+                case NodeType::Struct:
+                    break;
+                case NodeType::Import:
+                    ImportStatement(node, this);
+                    break;
+                default:
+                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
+                    break;
             }
         }
     }

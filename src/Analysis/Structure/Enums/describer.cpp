@@ -64,19 +64,19 @@ namespace Analysis::Structure::Enums
         const auto shortValue = static_cast<short>(describer);
         std::string result;
 
-        if (shortValue & static_cast<short>(Describer::Ref))
+        if ((shortValue & static_cast<short>(Describer::Ref)) == static_cast<short>(Describer::Ref))
             result += "Ref, ";
-        if (shortValue & static_cast<short>(Describer::Public))
+        if ((shortValue & static_cast<short>(Describer::Public)) == static_cast<short>(Describer::Public))
             result += "Public, ";
-        if (shortValue & static_cast<short>(Describer::Private))
+        if ((shortValue & static_cast<short>(Describer::Private)) == static_cast<short>(Describer::Private))
             result += "Private, ";
-        if (shortValue & static_cast<short>(Describer::Static))
+        if ((shortValue & static_cast<short>(Describer::Static)) == static_cast<short>(Describer::Static))
             result += "Static, ";
-        if (shortValue & static_cast<short>(Describer::Const))
+        if ((shortValue & static_cast<short>(Describer::Const)) == static_cast<short>(Describer::Const))
             result += "Const, ";
-        if (shortValue & static_cast<short>(Describer::Constexpr))
+        if ((shortValue & static_cast<short>(Describer::Constexpr)) == static_cast<short>(Describer::Constexpr))
             result += "Constexpr, ";
-        if (shortValue & static_cast<short>(Describer::Entrypoint))
+        if ((shortValue & static_cast<short>(Describer::Entrypoint)) == static_cast<short>(Describer::Entrypoint))
             result += "Entrypoint, ";
 
         if (!result.empty())
