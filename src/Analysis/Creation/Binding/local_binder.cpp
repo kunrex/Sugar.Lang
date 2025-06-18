@@ -1001,10 +1001,10 @@ namespace Analysis::Creation::Binding
                     {
                         case SyntaxKind::Increment:
                         case SyntaxKind::Decrement:
-                            return new AssignmentExpression(operand, new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
+                            return new AssignmentExpression(BindExpression(operandNode, scoped, scope, dataType), new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
                         case SyntaxKind::IncrementPrefix:
                         case SyntaxKind::DecrementPrefix:
-                            return new AssignmentExpression(operand, new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
+                            return new AssignmentExpression(BindExpression(operandNode, scoped, scope, dataType), new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
                         default:
                             return new DefinedUnaryExpression(definition, operand);
                     }
@@ -1213,6 +1213,7 @@ namespace Analysis::Creation::Binding
                         {
                             const auto result = std::format("{}_{}", name.substr(0, pos + LOOP.size()), END);
                             current->AddChild(new Branch(result));
+                            return;
                         }
 
                         PushException(new LogException("No loop found to break out of", child->Token().Index(), dataType->Parent()));
@@ -1226,6 +1227,7 @@ namespace Analysis::Creation::Binding
                         {
                             const auto result = std::format("{}_{}", name.substr(0, pos + LOOP.size()), POST);
                             current->AddChild(new Branch(result));
+                            return;
                         }
 
                         PushException(new LogException("No loop found to continue to next iteration", child->Token().Index(), dataType->Parent()));
@@ -1301,7 +1303,8 @@ namespace Analysis::Creation::Binding
                         const auto incrementBlock = new Scope(ScopeType::Increment, std::format("{}_{}", loopScope->FullName(), POST), scoped);
                         loopScope->AddNested(incrementBlock);
 
-                        incrementBlock->AddChild(BindExpression(child->GetChild(static_cast<int>(ChildCode::Post)), scoped, loopScope, dataType));
+                        const auto incrementExpression = BindExpression(child->GetChild(static_cast<int>(ChildCode::Post)), scoped, loopScope, dataType);
+                        incrementBlock->AddChild(incrementExpression->Readable() ? new PopExpression(incrementExpression) : incrementExpression);
                         incrementBlock->AddChild(new Branch(conditionScope->FullName()));
 
                         const auto endBlock = new Scope(ScopeType::Scope, std::format("{}_{}", loopScope->FullName(), END), scoped);

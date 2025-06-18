@@ -68,6 +68,9 @@ namespace Analysis::Structure::Local
     Scope::~Scope()
     {
         for (const auto nestedScope: nested)
+        {
+            std::cout << nestedScope->Name() << std::endl;
             delete nestedScope;
+        }
     }
 }
