@@ -384,6 +384,9 @@ namespace Analysis::Creation::Binding
             }
         }
 
+        if (const auto type = dataType->Parent()->GetReference(value); type != nullptr)
+            return new StaticReferenceContext(type);
+
         return nullptr;
     }
 
@@ -478,9 +481,6 @@ namespace Analysis::Creation::Binding
                 {
                     if (const auto characteristic = BindIdentifier(lhs, scoped, scope, dataType); characteristic != nullptr)
                         return characteristic;
-
-                    if (const auto type = dataType->Parent()->GetReference(*lhs->Token().Value<string>()); type != nullptr)
-                        return new StaticReferenceContext(type);
                 }
                 break;
             case NodeType::FunctionCall:
@@ -721,6 +721,26 @@ namespace Analysis::Creation::Binding
         return invoke;
     }
 
+    const IContextNode* BindFuncRefObject(const IParseNode* const objectNode, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    {
+        switch (objectNode->NodeType())
+        {
+            case NodeType::Identifier:
+                    return BindIdentifier(objectNode, scoped, scope, dataType);
+                case NodeType::BuiltInType:
+                case NodeType::FuncType:
+                case NodeType::ListType:
+                case NodeType::TupleType:
+                case NodeType::ArrayType:
+                case NodeType::ActionType:
+                case NodeType::NullableType:
+                case NodeType::DictionaryType:
+                    return new StaticReferenceContext(BindDataType(objectNode, dataType->Parent()));
+                default:
+                    return BindExpression(objectNode, scoped, scope, dataType);
+        }
+    }
+
     const IContextNode* BindEntity(const IParseNode* entity, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         switch (entity->NodeType())
@@ -745,7 +765,12 @@ namespace Analysis::Creation::Binding
             case NodeType::Identifier:
                 {
                     if (const auto character = BindIdentifier(entity, scoped, scope, dataType); character != nullptr)
+                    {
+                        if (character->MemberType() == MemberType::StaticReferenceContext)
+                            PushException(new LogException("Unexpected type", entity->Token().Index(), dataType->Parent()));
+
                         return character;
+                    }
                 }
                 break;
             case NodeType::FunctionCall:
@@ -762,26 +787,45 @@ namespace Analysis::Creation::Binding
                     std::vector<const IDataType*> argumentTypes;
                     BindArgumentContexts(entity, 0, arguments, argumentTypes, scoped, scope, dataType);
 
-                    switch (const auto delegate = arguments.at(0); delegate->CreationType()->Type())
+                    switch (const auto delegate = arguments[0]; delegate->CreationType()->Type())
                     {
                         case TypeKind::Func:
+                            {
+                                const auto delegateType = dynamic_cast<const IDelegateType*>(delegate->CreationType());
+                                const auto typeCount = delegateType->TypeCount();
+
+                                if (argumentTypes.size() != typeCount)
+                                    break;
+
+                                bool invalid = false;
+                                for (int i = 0; i < typeCount - 1; i++)
+                                    if (delegateType->TypeAt(i) != argumentTypes[i + 1])
+                                    {
+                                        invalid = true;
+                                        break;
+                                    }
+
+                                if (!invalid)
+                                    return BindInvoke(delegateType->TypeAt(typeCount - 1), delegateType, arguments);
+                            }
                         case TypeKind::Action:
                             {
                                 const auto delegateType = dynamic_cast<const IDelegateType*>(delegate->CreationType());
                                 const auto typeCount = delegateType->TypeCount();
 
+                                if (argumentTypes.size() != typeCount + 1)
+                                    break;
+
                                 bool invalid = false;
-                                for (int i = 1; i < arguments.size(); i++)
-                                {
-                                    if (i >= typeCount || argumentTypes[i] != delegateType->TypeAt(i - 1))
+                                for (int i = 0; i < typeCount; i++)
+                                    if (delegateType->TypeAt(i) != argumentTypes[i + 1])
                                     {
                                         invalid = true;
                                         break;
                                     }
-                                }
 
                                 if (!invalid)
-                                    return BindInvoke(delegate->CreationType()->Type() == TypeKind::Action ? Void::Instance() : delegateType->TypeAt(typeCount - 1), delegateType, arguments);
+                                    return BindInvoke(Void::Instance(), delegateType, arguments);
                             }
                             break;
                         default:
@@ -797,34 +841,24 @@ namespace Analysis::Creation::Binding
                     const auto childCount = entity->ChildCount();
 
                     const auto objectNode = entity->GetChild(childCount - 2);
+                    const auto functionNameNode = entity->GetChild(childCount - 1);
 
-                    const auto functionCallNode = entity->GetChild(childCount - 1);
-                    if (functionCallNode->NodeType() != NodeType::Identifier)
+                    if (functionNameNode->NodeType() != NodeType::Identifier)
                     {
-                        PushException(new LogException("Expected name of the function as second argument", functionCallNode->Token().Index(), source));
+                        PushException(new LogException("Expected name of the function as second argument", functionNameNode->Token().Index(), source));
                         return new InvalidContext();
                     }
 
-                    const auto identifier = *functionCallNode->Token().Value<string>();
+                    const auto identifier = *functionNameNode->Token().Value<string>();
 
-                    bool flag = false;
-                    const IContextNode* objectContext = nullptr;
-                    if (objectNode->NodeType() == NodeType::Identifier)
-                    {
-                        if (const auto type = BindDataType(objectNode, dataType->Parent()); type != nullptr)
-                        {
-                            flag = true;
-                            objectContext = new StaticReferenceContext(type);
-                        }
-                    }
-
-                    if (objectContext == nullptr)
-                        objectContext = BindExpression(objectNode, scoped, scope, dataType);
+                    const auto objectContext = BindFuncRefObject(objectNode, scoped, scope, dataType);
+                    const auto flag = objectContext->MemberType() == MemberType::StaticReferenceContext;
 
                     if (!objectContext->Readable())
                         PushException(new ReadException(objectNode->Token().Index(), source));
 
-                    std::vector<const IDataType*> genericTypes(childCount - 2);
+                    std::vector<const IDataType*> genericTypes;
+                    genericTypes.reserve(childCount - 2);
                     for (int i = 0; i < childCount - 2; i++)
                         genericTypes.push_back(BindDataType(entity->GetChild(i), dataType->Parent()));
 

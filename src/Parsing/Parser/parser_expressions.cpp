@@ -617,9 +617,13 @@ namespace Parsing
                 {
                     index++;
                     const auto action = new ActionTypeNode(current);
-                    ParseGeneric(action);
-                    if (action->ChildCount() > max_delegate_length)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+
+                    if (MatchToken(Current(), SyntaxKind::LesserThan))
+                    {
+                        ParseGeneric(action);
+                        if (action->ChildCount() > max_delegate_length)
+                            ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+                    }
 
                     return action;
                 }

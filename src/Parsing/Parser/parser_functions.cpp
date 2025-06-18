@@ -383,7 +383,12 @@ namespace Parsing
         const auto funcRef = new FuncRefNode(keyword);
         index++;
 
-        ParseGeneric(funcRef);
+        if (MatchToken(Current(), SyntaxKind::LesserThan))
+        {
+            ParseGeneric(funcRef);
+            if (Current().Kind() == SyntaxKind::GreaterThan)
+                index++;
+        }
 
         const auto genericLength = funcRef->ChildCount();
         ParseFunctionArguments(funcRef);
