@@ -195,7 +195,7 @@ namespace Analysis::Creation::Binding
                 return TryCompileConstant(parseNode, constant, dataType, dataType);
             case NodeType::Cast:
                 {
-                    const auto operand = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::Expression)), constant, dataType);
+                    const auto operand = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::LHS)), constant, dataType);
                     if (!operand)
                         return std::nullopt;
 
@@ -346,6 +346,7 @@ namespace Analysis::Creation::Binding
             return context;
         }
 
+        PushException(new LogException(std::format("No appropriate constructor for: `{}` was found", creationType->FullName()), constructorCallNode->Token().Index(), source));
         return new InvalidContext();
     }
 
@@ -367,8 +368,13 @@ namespace Analysis::Creation::Binding
         {
             const auto child = constructorCallNode->GetChild(i);
 
-            if (const auto context = VariableCompile(child, characteristic, dataType); context != nullptr && context->CreationType() != genericType)
+            if (const auto context = VariableCompile(child, characteristic, dataType); context != nullptr)
+            {
+                if (context->CreationType() != genericType)
+                    PushException(new LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
+
                 arguments.push_back(context);
+            }
             else
             {
                 flag = true;
