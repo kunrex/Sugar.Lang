@@ -53,8 +53,13 @@ namespace Analysis::Structure::Global
             return;
 
         context = VariableCompile(this, parent);
-        if (context != nullptr && context->CreationType() != creationType)
+        if (context == nullptr)
+            return;
+
+        if (context->CreationType() != creationType)
             PushException(new InitialisationException(context->CreationType(), creationType, parseNode->Token().Index(), parent->Parent()));
+
+        context->Print("", true);
     }
 
     void GlobalVariable::Transpile(Services::StringBuilder& builder) const

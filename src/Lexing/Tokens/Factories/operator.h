@@ -45,6 +45,8 @@ namespace Tokens
             static Token LesserThanEquals(unsigned long i);
             static Token GreaterThanEquals(unsigned long i);
 
+            static Token As(unsigned long i);
+
             static Token Increment(unsigned long i);
             static Token Decrement(unsigned long i);
 

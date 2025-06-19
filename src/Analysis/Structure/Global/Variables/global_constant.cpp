@@ -27,8 +27,6 @@ namespace Analysis::Structure::Global
 
     MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
 
-    const std::string& GlobalConstant::FullName() const { return fullName; }
-
     bool GlobalConstant::Readable() const { return true; }
     bool GlobalConstant::Writable() const { return false; }
 
@@ -51,7 +49,7 @@ namespace Analysis::Structure::Global
 
     void GlobalConstant::PushDependant(ICharacteristic* const characteristic) const
     {
-        if(ranges::find(dependants, characteristic) != dependants.end())
+        if(ranges::find(dependants, characteristic) == dependants.end())
         {
             dependants.push_back(characteristic);
             characteristic->IncrementDependencyCount();

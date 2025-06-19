@@ -22,7 +22,6 @@ namespace Tokens
             { "throw",       { SyntaxKind::Throw,       KeywordType::General } },
             { "invoke",      { SyntaxKind::Invoke,      KeywordType::General } },
             { "funcref",     { SyntaxKind::FuncRef,     KeywordType::General } },
-            { "as",          { SyntaxKind::As,          KeywordType::General } },
             { "import",      { SyntaxKind::Import,      KeywordType::General } },
 
             { "enum",        { SyntaxKind::Enum,        KeywordType::DataType } },

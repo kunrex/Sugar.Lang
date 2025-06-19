@@ -61,6 +61,8 @@ namespace Tokens
     Token Operator::LesserThanEquals(const unsigned long i) { return Binary(i, SyntaxKind::LesserThanEquals, "<=", 5); }
     Token Operator::GreaterThanEquals(const unsigned long i) { return Binary(i, SyntaxKind::GreaterThanEquals, ">=", 5); }
 
+    Token Operator::As(const unsigned long i) { return Binary(i, SyntaxKind::As, "as", 1); }
+
     Token Operator::Increment(const unsigned long i) { return Unary(i, SyntaxKind::Increment, "++", true, 0); }
     Token Operator::Decrement(const unsigned long i) { return Unary(i, SyntaxKind::Decrement, "++", true, 0); }
 

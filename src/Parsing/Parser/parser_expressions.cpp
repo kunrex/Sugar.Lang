@@ -208,9 +208,6 @@ namespace Parsing
                         {
                             switch (current.Kind())
                             {
-                                case SyntaxKind::As:
-                                    tokens.push(&current);
-                                    break;
                                 case SyntaxKind::Ref:
                                     output.push(ParseRefCall());
                                     break;
@@ -329,10 +326,11 @@ namespace Parsing
                                 case TokenType::AssignmentOperator:
                                     {
                                         tokens.push(&current);
-                                        expected = TokenType::Constant | TokenType::Identifier;
 
                                         if (MatchLookAhead(SyntaxKind::OpenBracket))
-                                            expected = expected | TokenType::Separator;
+                                            expected = TokenType::Separator;
+                                        else
+                                            expected = TokenType::Constant | TokenType::Identifier;
                                     }
                                     break;
                                 case TokenType::Separator:
@@ -345,10 +343,11 @@ namespace Parsing
                                         else
                                         {
                                             tokens.push(&current);
-                                            expected = TokenType::Constant | TokenType::Identifier;
 
                                             if (MatchLookAhead(SyntaxKind::OpenBracket))
-                                                expected = expected | TokenType::Separator;
+                                                expected = TokenType::Separator;
+                                            else
+                                                expected = TokenType::Constant | TokenType::Identifier;
                                         }
                                     }
                                     break;
@@ -380,10 +379,11 @@ namespace Parsing
                             }
 
                             tokens.push(&current);
-                            expected = TokenType::Identifier | TokenType::Keyword | TokenType::Constant | TokenType::UnaryOperator;
 
                             if (MatchLookAhead(SyntaxKind::OpenBracket))
-                                expected = expected | TokenType::Separator;
+                                expected = TokenType::Separator;
+                            else
+                                expected = TokenType::Identifier | TokenType::Keyword | TokenType::Constant | TokenType::UnaryOperator;
                         }
                         break;
                     default:

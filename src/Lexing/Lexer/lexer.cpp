@@ -294,6 +294,8 @@ namespace Lexing
 
         if (const auto result = Keyword::TryMatchKeyword(value, start))
             source->PushBackToken(*result);
+        else if (value == "as")
+            source->PushBackToken(Operator::As(start));
         else if (value == "null")
             source->PushBackToken(Constant::Null(start));
         else if (value == "true")

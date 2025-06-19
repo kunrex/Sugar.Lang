@@ -168,27 +168,27 @@ namespace Analysis::Creation::Binding
                     return CompileEntity(parseNode, constant, dataType);
             case NodeType::Constant:
                 {
-                    switch (const auto& token = parseNode->Token(); token.Kind())
+                    switch (const auto& token = parseNode->Token(); static_cast<TypeKind>(token.Metadata()))
                     {
-                        case SyntaxKind::Short:
-                                return CompilationResult(Short::Instance(), *token.Value<long>());
-                            case SyntaxKind::Int:
-                                return CompilationResult(Integer::Instance(), *token.Value<long>());
-                            case SyntaxKind::Long:
-                                return CompilationResult(Long::Instance(), *token.Value<long>());
-                            case SyntaxKind::Character:
-                                return CompilationResult(Character::Instance(), *token.Value<long>());
-                            case SyntaxKind::Boolean:
-                                return CompilationResult(Boolean::Instance(), *token.Value<long>());
-                            case SyntaxKind::Float:
-                                return CompilationResult(Float::Instance(), *token.Value<long>());
-                            case SyntaxKind::Double:
-                                return CompilationResult(Double::Instance(), *token.Value<long>());
-                            case SyntaxKind::String:
-                                return CompilationResult(String::Instance(), *token.Value<long>());
-                            default:
-                                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
-                                return std::nullopt;
+                        case TypeKind::Short:
+                            return CompilationResult(Short::Instance(), static_cast<short>(*token.Value<long>()));
+                        case TypeKind::Int:
+                            return CompilationResult(Integer::Instance(), static_cast<int>(*token.Value<long>()));
+                        case TypeKind::Long:
+                            return CompilationResult(Long::Instance(), *token.Value<long>());
+                        case TypeKind::Character:
+                            return CompilationResult(Character::Instance(), static_cast<char>(*token.Value<long>()));
+                        case TypeKind::Boolean:
+                            return CompilationResult(Boolean::Instance(), static_cast<bool>(*token.Value<long>()));
+                        case TypeKind::Float:
+                            return CompilationResult(Float::Instance(), static_cast<float>(*token.Value<double>()));
+                        case TypeKind::Double:
+                            return CompilationResult(Double::Instance(), *token.Value<double>());
+                        case TypeKind::String:
+                            return CompilationResult(String::Instance(), *token.Value<std::string>());
+                        default:
+                            PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                            return std::nullopt;
                     }
                 }
             case NodeType::Identifier:
@@ -259,9 +259,9 @@ namespace Analysis::Creation::Binding
         }
     }
 
-    const IContextNode* ConstantCompile(ICharacteristic* const characteristic, const IUserDefinedType* dataType)
+    const IContextNode* ConstantCompile(const IParseNode* const parseNode, ICharacteristic* const characteristic, const IUserDefinedType* const dataType)
     {
-        const auto result = CompileExpression(characteristic->ParseNode(), characteristic, dataType);
+        const auto result = CompileExpression(parseNode, characteristic, dataType);
         if (!result)
             return nullptr;
 
@@ -293,6 +293,10 @@ namespace Analysis::Creation::Binding
         }
     }
 
+    const IContextNode* ConstantCompile(ICharacteristic* const characteristic, const IUserDefinedType* dataType)
+    {
+        return ConstantCompile(characteristic->ParseNode(), characteristic, dataType);
+    }
 
     const IContextNode* CompileConstructor(const IParseNode* const constructorCallNode, ICharacteristic* const characteristic, const IUserDefinedType* const dataType)
     {
@@ -392,7 +396,7 @@ namespace Analysis::Creation::Binding
             case NodeType::CollectionConstructorCall:
                 return CompileCollectionConstructor(parseNode, characteristic, dataType);
             default:
-                return ConstantCompile(characteristic, dataType);
+                return ConstantCompile(parseNode, characteristic, dataType);
         }
     }
 
