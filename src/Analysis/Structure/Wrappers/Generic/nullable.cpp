@@ -60,7 +60,7 @@ namespace Analysis::Structure::Wrappers
         constructor->PushParameterType(nullableType);
         constructors.emplace_back(ArgumentHash(constructor), constructor);
 
-        const auto defaultConstructor = new BuiltInConstructor(this, std::format("initobj valuetype {}", genericSignature));
+        const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
         constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
     }
 

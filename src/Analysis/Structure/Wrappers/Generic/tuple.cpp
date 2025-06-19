@@ -24,7 +24,7 @@ const string cil_tuple = "[System.Runtime]System.ValueTuple";
 
 namespace Analysis::Structure::Wrappers
 {
-    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), constructor(nullptr)
+    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), constructors()
     { }
 
     const Tuple* Tuple::Instance(const std::vector<const IDataType*>& types)
@@ -54,7 +54,7 @@ namespace Analysis::Structure::Wrappers
 
     void Tuple::BindGlobal()
     {
-        constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor({})", genericSignature, MapGenericCallSignature(types)));
+        const auto constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor({})", genericSignature, MapGenericCallSignature(types)));
 
         int i = 1;
         for (const auto type: types)
@@ -66,6 +66,11 @@ namespace Analysis::Structure::Wrappers
 
             constructor->PushParameterType(type);
         }
+
+        constructors.emplace_back(ArgumentHash(constructor), constructor);
+
+        const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
+        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
     }
 
     const ICharacteristic* Tuple::FindCharacteristic(const string& name) const
@@ -82,7 +87,13 @@ namespace Analysis::Structure::Wrappers
 
     const IConstructor* Tuple::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
-        return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
+        const auto hash = ArgumentHash(argumentList);
+
+        for (const auto constructor : constructors)
+            if (std::get<0>(constructor) == hash)
+                return std::get<1>(constructor);
+
+        return nullptr;
     }
 
     const IIndexerDefinition* Tuple::FindIndexer(const std::vector<const IDataType*>& argumentList) const
@@ -99,6 +110,7 @@ namespace Analysis::Structure::Wrappers
 
     Tuple::~Tuple()
     {
-        delete constructor;
+        for (const auto constructor: constructors)
+            delete std::get<1>(constructor);
     }
 }

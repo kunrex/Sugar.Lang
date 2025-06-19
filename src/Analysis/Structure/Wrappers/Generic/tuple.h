@@ -18,7 +18,7 @@ namespace Analysis::Structure::Wrappers
 
             std::vector<const IDataType*> types;
 
-            Global::BuiltInConstructor* constructor;
+            std::vector<std::tuple<unsigned long, const Core::Interfaces::IConstructor*>> constructors;
 
             explicit Tuple();
 

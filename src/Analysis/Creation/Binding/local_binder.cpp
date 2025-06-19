@@ -134,6 +134,34 @@ namespace Analysis::Creation::Binding
         return false;
     }
 
+    const IContextNode* InitialiseLocalDeclaration(const IDataType* const creationType)
+    {
+        if (creationType->MemberType() == MemberType::Class)
+            return new NullConstant();
+        if (creationType->MemberType() == MemberType::Enum)
+            return new IntegerConstant(0);
+
+        switch (creationType->Type())
+        {
+            case TypeKind::Int:
+                return new IntegerConstant(0);
+            case TypeKind::Long:
+                return new LongConstant(0);
+            case TypeKind::Short:
+                return new ShortConstant(0);
+            case TypeKind::Float:
+                return new FloatConstant(0);
+            case TypeKind::Double:
+                return new DoubleConstant(0);
+            case TypeKind::Character:
+                return new CharacterConstant('\0');
+            case TypeKind::Boolean:
+                return new FalseConstant();
+            default:
+                return new CreationContext(creationType->FindConstructor({ }));
+        }
+    }
+
     void BindLocalDeclaration(const Describer describer, const IDataType* const creationType, const IParseNode* const identifier, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
@@ -149,6 +177,8 @@ namespace Analysis::Creation::Binding
 
         ValidateDescriber(variable, Describer::None, index, source);
         scope->AddVariable(variable);
+
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), InitialiseLocalDeclaration(creationType)));
     }
 
     const IContextNode* BindCast(const IContextNode* const operand, const IDataType* const type, const IFunction* const operandCast, const IFunction* const typeCast, const unsigned long index, const SourceFile* const source)
@@ -206,12 +236,11 @@ namespace Analysis::Creation::Binding
         }
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
-        const auto finalExpression = TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source);
-
-        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), finalExpression));
 
         ValidateDescriber(variable, Describer::Const | Describer::Ref, index, source);
         scope->AddVariable(variable);
+
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source)));
     }
 
     void BindLocalDeclaration(const IParseNode* declaration, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* dataType)
