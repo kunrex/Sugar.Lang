@@ -175,10 +175,10 @@ namespace Analysis::Creation::Binding
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
 
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), InitialiseLocalDeclaration(creationType)));
+
         ValidateDescriber(variable, Describer::None, index, source);
         scope->AddVariable(variable);
-
-        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), InitialiseLocalDeclaration(creationType)));
     }
 
     const IContextNode* BindCast(const IContextNode* const operand, const IDataType* const type, const IFunction* const operandCast, const IFunction* const typeCast, const unsigned long index, const SourceFile* const source)
@@ -237,10 +237,10 @@ namespace Analysis::Creation::Binding
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
 
+        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source)));
+
         ValidateDescriber(variable, Describer::Const | Describer::Ref, index, source);
         scope->AddVariable(variable);
-
-        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source)));
     }
 
     void BindLocalDeclaration(const IParseNode* declaration, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* dataType)
