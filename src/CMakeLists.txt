@@ -558,4 +558,6 @@ add_library(Sugar STATIC
         Exceptions/Compilation/Analysis/Local/constant_expected_exception.h
         Analysis/Structure/Context/Expressions/pop_expression.cpp
         Analysis/Structure/Context/Expressions/pop_expression.h
+        Analysis/Structure/Context/Expressions/aggregate_assignment_expression.cpp
+        Analysis/Structure/Context/Expressions/aggregate_assignment_expression.h
 )

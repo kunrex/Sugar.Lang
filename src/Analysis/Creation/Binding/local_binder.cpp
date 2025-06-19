@@ -56,6 +56,7 @@
 #include "../../Structure/Context/Entities/References/local_variable_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_funcref_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
+#include "../../Structure/Context/Expressions/aggregate_assignment_expression.h"
 #include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/invalid_ternary_expression.h"
 #include "../../Structure/Context/Expressions/pop_expression.h"
@@ -1064,10 +1065,10 @@ namespace Analysis::Creation::Binding
                     {
                         case SyntaxKind::Increment:
                         case SyntaxKind::Decrement:
-                            return new AssignmentExpression(BindExpression(operandNode, scoped, scope, dataType), new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
+                            return new AggregateAssignmentExpression(operand, new DefinedUnaryExpression(definition, new DuplicateExpression(operand)));
                         case SyntaxKind::IncrementPrefix:
                         case SyntaxKind::DecrementPrefix:
-                            return new AssignmentExpression(BindExpression(operandNode, scoped, scope, dataType), new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
+                            return new AggregateAssignmentExpression(operand, new DuplicateExpression(new DefinedUnaryExpression(definition, operand)));
                         default:
                             return new DefinedUnaryExpression(definition, operand);
                     }
@@ -1102,7 +1103,7 @@ namespace Analysis::Creation::Binding
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
-                        return new AssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, rhs)));
+                        return new AggregateAssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, rhs)));
                     }
 
                     const auto lhsCreationType = lhs->CreationType();
