@@ -294,9 +294,9 @@ class Test
 }
 ```
 
-Structs will always define a non static parameterless constructor. The compiler will provide one in the case the programmer does not. This constructor is used to initialise local variables.
+Classes and structs always define a non-static parameterless constructor. The compiler will generate one if the programmer does not. 
 
-Classes will define a compiler generated parameterless constructor as long as no other constructors are defined.
+The compiler generated version will initialise fields to default or inlined values. 
 
 ### Enums
 
