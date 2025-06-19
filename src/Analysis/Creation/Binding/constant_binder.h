@@ -8,6 +8,7 @@
 namespace Analysis::Creation::Binding
 {
     const Structure::Core::Interfaces::IContextNode* ConstantCompile(Structure::Core::Interfaces::ICharacteristic* characteristic, const Structure::Core::Interfaces::IUserDefinedType* dataType);
+    const Structure::Core::Interfaces::IContextNode* VariableCompile(Structure::Core::Interfaces::ICharacteristic* characteristic, const Structure::Core::Interfaces::IUserDefinedType* dataType);
 }
 
 #endif

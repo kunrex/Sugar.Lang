@@ -12,7 +12,7 @@ Sugar is a compiled (transpiled) programming language I started working on a cou
 
 It initially started as a C# project. I transitioned to C++ in an attempt to grow comfortable with the language as this is my first "proper" C++ project.
 
-I aimed to create something simple but useful. Sugar inspired by C#, C++, and Python mainly but C# gets most of the credit. Personally, I think C# is a wonderful language and while sugar doesn't come close to it in regard of features, I've tried my best at implementing those aspects which I think are fundamental.
+Sugar is inspired by C#, C++, and Python mainly but C# gets most of the credit. Personally, I think C# is a wonderful language and while sugar doesn't come close to it in regard of features, I've tried my best at implementing those which I think are fundamental.
 
 ## The Basics
 
@@ -248,6 +248,56 @@ int: result = invoke(add, 10, 20);
 
 > Sugar technically supports generics, but only for built-in types and functions.
 
+> Local variables are automatically initialized by default.
+> The initial value depends on the variable’s type:
+> 1.	Reference types (including string): initialized to null.
+> 2.	Value types:
+>  -	Numeric types (e.g., int, float, double): initialized to 0.
+>  -	Boolean: initialized to false.
+>  -	Character (char): initialized to the null character '\0'.
+>  -	Structs: initialized using their parameterless constructor.
+>  -	Tuples: each element is initialized to the default of its respective type.
+>  -	Nullable value types: the 'null value'
+
+
+### Constructors 
+
+Constructors are functions used to initialise values in sugar. They're called using the `create` keyword
+
+```c#
+class Test 
+{
+    [public] int: x;
+    
+    [public]
+    constructor(int: x)
+    {
+        this.x = x;
+    }
+}
+
+let: test = create Test(10);
+```
+
+All structures define an overridable private, static, parameterless constructor. 
+
+```c#
+class Test 
+{
+    [public, static] int: x;
+    
+    [private, static]
+    constructor()
+    {
+        x = 100;
+    }
+}
+```
+
+Structs will always define a non static parameterless constructor. The compiler will provide one in the case the programmer does not. This constructor is used to initialise local variables.
+
+Classes will define a compiler generated parameterless constructor as long as no other constructors are defined.
+
 ### Enums
 
 Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
@@ -371,7 +421,7 @@ In these cases no backing field is generated and all accessors must define a bod
 
 If a property defines only one accessor, it's expected to define a body since no backing field is generated.
 
-> Fields and Properties (that define backing fields) may be inline initialised to compile time constant values. 
+> Fields and Properties (that define backing fields) may be inline initialised to compile time constant values or a `create` expression with compile time contant values.
 
 ```cs
 int: GetOnlyProperty 
@@ -386,7 +436,7 @@ int: GetOnlyProperty
 Properties may be `static`. They cannot be `const` or `constexpr`.
 
 ## Special Functions
-Sugar features functions for cast overloading, operator overloading, indexers and constructors.
+Sugar provides functions for cast overloading, operator overloading and indexers.
 
 ```cs
 struct Complex
@@ -395,9 +445,10 @@ struct Complex
     float: imaginary { [public] get; [private] set; }
     
     [public]
-    constructor() 
+    constructor(float: r, float: i) 
     {
-        real = imaginary = 0;
+        real = r;
+        imaginary = i;
     }
 
     [public]
@@ -432,9 +483,9 @@ struct Complex
 }
 ```
 
-Cast and operator overloads must be public and static. Indexers cannot be static. The static constructor can be overridden and must be private and parameterless.   
+Cast and operator overloads must be public and static. Indexers cannot be static. 
 
-All structures implicitly define an explicit string conversion and parameterless constructor. The constructor will initialise all fields to their default (or inlined) values. These structures can be overridden.
+All structures implicitly define an (overridable) explicit string conversion. 
 
 ## Import Statements
 

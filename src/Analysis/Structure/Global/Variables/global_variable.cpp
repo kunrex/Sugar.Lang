@@ -52,7 +52,7 @@ namespace Analysis::Structure::Global
         if (resolvedDependencyCount < dependencyCount)
             return;
 
-        context = ConstantCompile(this, parent);
+        context = VariableCompile(this, parent);
         if (context != nullptr && context->CreationType() != creationType)
             PushException(new InitialisationException(context->CreationType(), creationType, parseNode->Token().Index(), parent->Parent()));
     }

@@ -146,8 +146,8 @@ namespace Analysis::Creation::Binding
         }
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
-        ValidateDescriber(variable, Describer::None, index, source);
 
+        ValidateDescriber(variable, Describer::None, index, source);
         scope->AddVariable(variable);
     }
 
@@ -726,18 +726,18 @@ namespace Analysis::Creation::Binding
         switch (objectNode->NodeType())
         {
             case NodeType::Identifier:
-                    return BindIdentifier(objectNode, scoped, scope, dataType);
-                case NodeType::BuiltInType:
-                case NodeType::FuncType:
-                case NodeType::ListType:
-                case NodeType::TupleType:
-                case NodeType::ArrayType:
-                case NodeType::ActionType:
-                case NodeType::NullableType:
-                case NodeType::DictionaryType:
-                    return new StaticReferenceContext(BindDataType(objectNode, dataType->Parent()));
-                default:
-                    return BindExpression(objectNode, scoped, scope, dataType);
+                return BindIdentifier(objectNode, scoped, scope, dataType);
+            case NodeType::BuiltInType:
+            case NodeType::FuncType:
+            case NodeType::ListType:
+            case NodeType::TupleType:
+            case NodeType::ArrayType:
+            case NodeType::ActionType:
+            case NodeType::NullableType:
+            case NodeType::DictionaryType:
+                return new StaticReferenceContext(BindDataType(objectNode, dataType->Parent()));
+            default:
+                return BindExpression(objectNode, scoped, scope, dataType);
         }
     }
 

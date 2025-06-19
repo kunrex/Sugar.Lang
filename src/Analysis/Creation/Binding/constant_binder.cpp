@@ -20,6 +20,10 @@
 #include "../../Structure/Wrappers/Value/short.h"
 
 #include "../../Structure/Compilation/compilation_result.h"
+#include "../../Structure/Context/invalid_context.h"
+#include "../../Structure/Context/Entities/Functions/creation_context.h"
+#include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
+#include "../../Structure/Core/Interfaces/DataTypes/i_collection_type.h"
 
 using namespace std;
 
@@ -38,6 +42,8 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Creation::Binding
 {
+    const IContextNode* VariableCompile(const IParseNode* parseNode, ICharacteristic* characteristic, const IUserDefinedType* dataType);
+
     const IPrimitiveType* BindPrimitiveType(const IParseNode* const node)
     {
         switch (node->Token().Kind())
@@ -227,13 +233,9 @@ namespace Analysis::Creation::Binding
             case NodeType::Binary:
                 {
                     const auto lhs = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::LHS)), constant, dataType);
-                    if (!lhs)
-                        return std::nullopt;
-
                     const auto rhs = CompileExpression(parseNode->GetChild(static_cast<int>(ChildCode::RHS)), constant, dataType);
-                    if (!rhs) {
+                    if (!lhs || !rhs)
                         return std::nullopt;
-                    }
 
                     if (lhs->creationType != rhs->creationType)
                     {
@@ -289,5 +291,113 @@ namespace Analysis::Creation::Binding
             default:
                 return nullptr;
         }
+    }
+
+
+    const IContextNode* CompileConstructor(const IParseNode* const constructorCallNode, ICharacteristic* const characteristic, const IUserDefinedType* const dataType)
+    {
+        const auto source = dataType->Parent();
+        const auto creationType = BindDataType(constructorCallNode->GetChild(0), source);
+        if (creationType != characteristic->CreationType())
+            return new InvalidContext();
+
+        std::vector<const IContextNode*> arguments;
+        std::vector<const IDataType*> argumentTypes;
+
+        arguments.reserve(constructorCallNode->ChildCount() - 1);
+        argumentTypes.reserve(constructorCallNode->ChildCount() - 1);
+
+        bool flag = false;
+        for (int i = 1; i < constructorCallNode->ChildCount(); i++)
+        {
+            if (const auto context = VariableCompile(constructorCallNode->GetChild(i), characteristic, dataType); context != nullptr)
+            {
+                arguments.push_back(context);
+                argumentTypes.push_back(context->CreationType());
+            }
+            else
+            {
+                flag = true;
+                const auto value = new InvalidContext();
+
+                arguments.push_back(value);
+                argumentTypes.push_back(value->CreationType());
+            }
+        }
+
+        if (flag)
+        {
+            for (const auto argument : arguments)
+                delete argument;
+        }
+
+        if (const auto constructor = creationType->FindConstructor(argumentTypes); constructor != nullptr)
+        {
+            const auto context = new CreationContext(constructor);
+            for (const auto argument: arguments)
+                context->AddChild(argument);
+
+            return context;
+        }
+
+        return new InvalidContext();
+    }
+
+    const IContextNode* CompileCollectionConstructor(const IParseNode* const constructorCallNode, ICharacteristic* const characteristic, const IUserDefinedType* const dataType)
+    {
+        const auto source = dataType->Parent();
+        const auto creationType = BindDataType(constructorCallNode->GetChild(0), source);
+        if (creationType != characteristic->CreationType())
+            return new InvalidContext();
+
+        const auto collectionType = dynamic_cast<const ICollectionType*>(creationType);
+        const auto genericType = collectionType->GenericType();
+
+        std::vector<const IContextNode*> arguments;
+        arguments.reserve(constructorCallNode->ChildCount() - 1);
+
+        bool flag = false;
+        for (int i = 1; i < constructorCallNode->ChildCount(); i++)
+        {
+            const auto child = constructorCallNode->GetChild(i);
+
+            if (const auto context = VariableCompile(child, characteristic, dataType); context != nullptr && context->CreationType() != genericType)
+                arguments.push_back(context);
+            else
+            {
+                flag = true;
+                arguments.push_back(new InvalidContext());
+            }
+        }
+
+        if (flag)
+        {
+            for (const auto argument : arguments)
+                delete argument;
+        }
+
+        const auto context = new CollectionCreationContext(collectionType);
+        for (const auto argument : arguments)
+            context->AddChild(argument);
+
+        return context;
+    }
+
+    const IContextNode* VariableCompile(const IParseNode* const parseNode, ICharacteristic* const characteristic, const IUserDefinedType* dataType)
+    {
+        switch (parseNode->NodeType())
+        {
+            case NodeType::ConstructorCall:
+                return CompileConstructor(parseNode, characteristic, dataType);
+            case NodeType::CollectionConstructorCall:
+                return CompileCollectionConstructor(parseNode, characteristic, dataType);
+            default:
+                return ConstantCompile(characteristic, dataType);
+        }
+    }
+
+    const IContextNode* VariableCompile(ICharacteristic* const characteristic, const IUserDefinedType* const dataType)
+    {
+        return VariableCompile(characteristic->ParseNode(), characteristic, dataType);
     }
 }
