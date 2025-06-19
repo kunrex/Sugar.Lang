@@ -57,7 +57,7 @@ namespace Analysis::Structure::Global
             return;
 
         if (context->CreationType() != creationType)
-            PushException(new InitialisationException(context->CreationType(), creationType, parseNode->Token().Index(), parent->Parent()));
+            PushException(new InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
 
         context->Print("", true);
     }

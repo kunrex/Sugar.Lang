@@ -333,6 +333,8 @@ namespace Analysis::Creation::Binding
         {
             for (const auto argument : arguments)
                 delete argument;
+
+            return nullptr;
         }
 
         if (const auto constructor = creationType->FindConstructor(argumentTypes); constructor != nullptr)
@@ -378,6 +380,8 @@ namespace Analysis::Creation::Binding
         {
             for (const auto argument : arguments)
                 delete argument;
+
+            return nullptr;
         }
 
         const auto context = new CollectionCreationContext(collectionType);
