@@ -7,6 +7,7 @@
 #include "../../../Creation/Binding/binder_extensions.h"
 
 #include "../../Core/DataTypes/data_type.h"
+#include "../../Compilation/compilation_result.h"
 
 #include "../../../Creation/Binding/local_binder.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
@@ -24,11 +25,12 @@ using namespace Analysis::Creation::Transpiling;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Creation::Binding;
+using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(std::format("__operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
+    OperatorOverload::OperatorOverload(const SyntaxKind baseOperator, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(std::format("operator__{}", static_cast<short>(baseOperator))), OverloadDefinition(baseOperator, describer, creationType), Scoped(body)
     { }
 
     MemberType OperatorOverload::MemberType() const { return MemberType::OperatorOverload; }
@@ -66,11 +68,33 @@ namespace Analysis::Structure::Global
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+            builder.PushLine(std::format(".locals init({})", ScopedLocalVariableString(this)));
 
         builder.Push(innerBuilder.Value());
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
+
+    ImplicitOverload::ImplicitOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), BuiltInFunction()
+    {
+        fullName = instruction;
+    }
+
+    MemberType ImplicitOverload::MemberType() const { return MemberType::GeneratedOverload; }
+
+    const string& ImplicitOverload::FullName() const { return fullName; }
+
+    void ImplicitOverload::BindLocal()
+    { }
+
+    void ImplicitOverload::Transpile(StringBuilder& builder) const
+    { }
+
+    BuiltInOverload::BuiltInOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const string& instruction, const OverloadFunction overloadDelegate) : ImplicitOverload(baseOperator, creationType, instruction), overloadDelegate(overloadDelegate)
+    { }
+
+    const string& BuiltInOverload::FullName() const { return fullName; }
+
+    CompilationResult BuiltInOverload::StaticCompile(const std::vector<CompilationResult>& arguments) const { return overloadDelegate(arguments); }
 }

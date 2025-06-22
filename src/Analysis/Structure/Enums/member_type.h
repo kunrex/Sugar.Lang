@@ -22,15 +22,14 @@ namespace Analysis::Structure::Enums
         MethodDefinition,
         BuiltInDefinition,
 
-        BuiltInCast,
-        ImplicitCast,
-        ExplicitCast,
+        CastOverload,
+        GeneratedCast,
 
-        BuiltInOperation,
         OperatorOverload,
+        GeneratedOverload,
 
         Constructor,
-        BuiltInConstructor,
+        GeneratedConstructor,
 
         LocalVariable,
         FunctionParameter,

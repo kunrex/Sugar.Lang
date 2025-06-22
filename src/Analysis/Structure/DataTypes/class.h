@@ -1,7 +1,6 @@
 #ifndef CLASS_H
 #define CLASS_H
 
-#include <tuple>
 #include <vector>
 
 #include "../Core/DataTypes/data_type.h"
@@ -11,6 +10,11 @@ namespace Analysis::Structure::DataTypes
 {
     class Class : public Core::DataType
     {
+        protected:
+            [[nodiscard]] static Core::Interfaces::IFunctionDefinition* GetHash();
+
+            [[nodiscard]] Core::Interfaces::IFunction* ImplicitObject() const;
+
         public:
             Class(const std::string& name, Enums::Describer describer);
 
@@ -29,6 +33,28 @@ namespace Analysis::Structure::DataTypes
             void BindLocal() override;
     };
 
+    class ImplicitClass : public BuiltInClass
+    {
+        protected:
+            const Core::Interfaces::IFunctionDefinition* getHash;
+
+            const Core::Interfaces::IFunction* explicitString;
+
+            const Core::Interfaces::IFunction* implicitObject;
+
+            ImplicitClass(const std::string& name, Enums::Describer describer);
+
+            void BindGlobal() override;
+
+        public:
+            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+            [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+
+            ~ImplicitClass() override;
+    };
+
     class ClassSource final : public Class, public virtual Core::Interfaces::IUserDefinedType
     {
         private:
@@ -38,16 +64,16 @@ namespace Analysis::Structure::DataTypes
 
             std::vector<Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunctionDefinition*>> functions;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunctionDefinition*>> functions;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IConstructor*>> constructors;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IConstructor*>> constructors;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IIndexerDefinition*>> indexers;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IIndexerDefinition*>> indexers;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> implicitCasts;
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> implicitCasts;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
+            std::vector<std::pair<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
 
         public:
             ClassSource(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);

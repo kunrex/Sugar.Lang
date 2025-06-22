@@ -1,7 +1,11 @@
 #include "object.h"
 
 #include "./string.h"
-#include "../../DataTypes/data_type_extensions.h"
+
+#include "../Value/boolean.h"
+
+#include "../../Global/Functions/cast_overload.h"
+#include "../../Global/Functions/operator_overload.h"
 
 using namespace std;
 
@@ -16,7 +20,7 @@ const string cil_object = "[System.Runtime]System.Object";
 
 namespace Analysis::Structure::Wrappers
 {
-    Object::Object() : BuiltInClass(cil_object, Describer::Public), toString(nullptr)
+    Object::Object() : ImplicitClass(cil_object, Describer::Public)
     { }
 
     Object Object::instance;
@@ -38,14 +42,18 @@ namespace Analysis::Structure::Wrappers
 
     void Object::BindGlobal()
     {
-        toString = new BuiltInCast(String::Instance(), "callvirt instance string class [System.Runtime]System.Object::ToString()", nullptr);
-        toString->PushParameterType(this);
+        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads[0] = { SyntaxKind::Equals, equals };
+
+        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads[1] = { SyntaxKind::NotEquals, notEquals };
     }
 
     const ICharacteristic* Object::FindCharacteristic(const string& name) const
-    { return nullptr; }
-
-    const IFunctionDefinition* Object::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
     const IConstructor* Object::FindConstructor(const std::vector<const IDataType*>& argumentList) const
@@ -54,22 +62,18 @@ namespace Analysis::Structure::Wrappers
     const IIndexerDefinition* Object::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Object::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
-    const IFunction* Object::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    const IOperatorOverload* Object::FindOverload(const SyntaxKind base) const
     {
-        if (ArgumentHash( { toString->CreationType(), toString->ParameterAt(0) }) == ArgumentHash({ returnType, fromType }))
-            return toString;
+        for (const auto overload: overloads)
+            if (overload.first == base)
+                return overload.second;
 
         return nullptr;
     }
 
-    const IOperatorOverload* Object::FindOverload(const SyntaxKind base) const
-    { return nullptr; }
-
     Object::~Object()
     {
-        delete toString;
+        for (const auto overload : overloads)
+            delete overload.second;
     }
 }

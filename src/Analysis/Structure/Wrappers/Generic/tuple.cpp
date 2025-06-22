@@ -1,15 +1,14 @@
 #include "tuple.h"
 
+#include <map>
 #include <format>
 
 #include "generic_extensions.h"
 
-#include <map>
-
 #include "../../DataTypes/data_type_extensions.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
 
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../../Global/Properties/property.h"
+#include "../../Global/Functions/constructor.h"
 
 using namespace std;
 
@@ -24,7 +23,7 @@ const string cil_tuple = "[System.Runtime]System.ValueTuple";
 
 namespace Analysis::Structure::Wrappers
 {
-    Tuple::Tuple() : BuiltInValueType(cil_tuple, Describer::Public), SingletonService(), genericSignature(), types(), constructors()
+    Tuple::Tuple() : ImplicitValueType(cil_tuple, Describer::Public), SingletonService()
     { }
 
     const Tuple* Tuple::Instance(const std::vector<const IDataType*>& types)
@@ -50,6 +49,28 @@ namespace Analysis::Structure::Wrappers
 
     TypeKind Tuple::Type() const { return TypeKind::Tuple; }
 
+    int Tuple::SlotCount() const
+    {
+        if (slotCount < 0)
+        {
+            int totalSize = 0, maxSize = 0;
+
+            for (const auto& characteristic : characteristics)
+            {
+                const auto size = characteristic->CreationType()->SlotCount();
+                const auto actual_size = size + (word_size - 1) & ~(word_size - 1);
+
+                totalSize += actual_size;
+                if (actual_size > maxSize)
+                    maxSize = actual_size;
+            }
+
+            slotCount = std::ceil(totalSize + (maxSize - 1) & ~(maxSize - 1) / word_size);
+        }
+
+        return slotCount;
+    }
+
     const std::string& Tuple::FullName() const { return genericSignature; }
 
     void Tuple::BindGlobal()
@@ -67,10 +88,12 @@ namespace Analysis::Structure::Wrappers
             constructor->PushParameterType(type);
         }
 
-        constructors.emplace_back(ArgumentHash(constructor), constructor);
+        constructors[0] = { ArgumentHash(constructor), constructor };
 
         const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
-        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
+        constructors[1] = { ArgumentHash(defaultConstructor), defaultConstructor };
+
+        ImplicitValueType::BindGlobal();
     }
 
     const ICharacteristic* Tuple::FindCharacteristic(const string& name) const
@@ -82,16 +105,13 @@ namespace Analysis::Structure::Wrappers
         return nullptr;
     }
 
-    const IFunctionDefinition* Tuple::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr; }
-
     const IConstructor* Tuple::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
         const auto hash = ArgumentHash(argumentList);
 
         for (const auto constructor : constructors)
-            if (std::get<0>(constructor) == hash)
-                return std::get<1>(constructor);
+            if (constructor.first == hash)
+                return constructor.second;
 
         return nullptr;
     }
@@ -110,7 +130,10 @@ namespace Analysis::Structure::Wrappers
 
     Tuple::~Tuple()
     {
+        for (const auto characteristic: characteristics)
+            delete characteristic;
+
         for (const auto constructor: constructors)
-            delete std::get<1>(constructor);
+            delete constructor.second;
     }
 }

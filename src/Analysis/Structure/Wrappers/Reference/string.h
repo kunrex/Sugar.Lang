@@ -1,15 +1,14 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include <map>
+#include <array>
 
-#include "../../../../Services/singleton_service.h"
+#include "../../DataTypes/class.h"
 
 #include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
 #include "../../Core/Interfaces/Creation/i_built_in_overload.h"
 
-#include "../../DataTypes/class.h"
-#include "../../Global/BuiltIn/built_in_indexer.h"
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -18,13 +17,15 @@ namespace Analysis::Structure::Wrappers
         private:
             static String instance;
 
-            std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
+            std::array<const Core::Interfaces::ICharacteristic*, 2> characteristics;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 17> functions;
 
-            Global::BuiltInIndexer* indexer;
+            const Core::Interfaces::IIndexerDefinition* indexer;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>> overloads;
+            const Core::Interfaces::IFunction* implicitObject;
+
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>, 4> overloads;
 
             String();
 

@@ -1,16 +1,14 @@
 #ifndef FLOAT_H
 #define FLOAT_H
 
-#include <tuple>
-#include <vector>
+#include <array>
 
-#include "../../../../Services/singleton_service.h"
+#include "../../DataTypes/value_type.h"
 
 #include "../../Core/Interfaces/Creation/i_built_in_cast.h"
 #include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
 
-#include "../../DataTypes/value_type.h"
-#include "../../Global/BuiltIn/built_in_method.h"
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -19,12 +17,15 @@ namespace Analysis::Structure::Wrappers
         private:
             static Float instance;
 
-            Global::BuiltInMethod* tryParse;
+            std::array<const Core::Interfaces::ICharacteristic*, 6> characteristics;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 2> functions;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>> overloads;
+            const Core::Interfaces::IFunction* implicitDouble;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IBuiltInCast*>, 5> explicitCasts;
+
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*>, 2> overloads;
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>, 12> builtInOverloads;
 
             Float();
 

@@ -1,10 +1,12 @@
 #include "exception.h"
 
-#include "../../DataTypes/data_type_extensions.h"
-
-#include "../../Global/BuiltIn/built_in_constructor.h"
-
 #include "./string.h"
+
+#include "../Value/boolean.h"
+
+#include "../../Global/Properties/property.h"
+#include "../../Global/Functions/constructor.h"
+#include "../../Global/Functions/operator_overload.h"
 
 using namespace std;
 
@@ -19,7 +21,7 @@ const string cil_exception = "[System.Runtime]System.Exception";
 
 namespace Analysis::Structure::Wrappers
 {
-    Exception::Exception() : BuiltInClass(cil_exception, Describer::Public), SingletonService(), constructor(nullptr)
+    Exception::Exception() : ImplicitClass(cil_exception, Describer::Public), SingletonService(), message(nullptr), constructor(nullptr)
     { }
 
     Exception Exception::instance;
@@ -41,15 +43,32 @@ namespace Analysis::Structure::Wrappers
 
     void Exception::BindGlobal()
     {
-        constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
+        message = new BuiltInProperty("Message", Describer::Public, String::Instance(), true, "callvirt instance string [System.Runtime]System.Exception::get_Message()", false, "");
+
+        const auto constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
         constructor->PushParameterType(String::Instance());
+        this->constructor = constructor;
+
+        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads[0] = { SyntaxKind::Equals, equals };
+
+        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads[1] = { SyntaxKind::NotEquals, notEquals };
+
+        ImplicitClass::BindGlobal();
     }
 
     const ICharacteristic* Exception::FindCharacteristic(const string& name) const
-    { return nullptr; }
+    {
+        if (name == message->Name())
+            return message;
 
-    const IFunctionDefinition* Exception::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr; }
+        return nullptr;
+    }
 
     const IConstructor* Exception::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
@@ -65,17 +84,22 @@ namespace Analysis::Structure::Wrappers
     const IIndexerDefinition* Exception::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Exception::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
-    const IFunction* Exception::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
     const IOperatorOverload* Exception::FindOverload(const SyntaxKind base) const
-    { return nullptr; }
+    {
+        for (const auto overload: overloads)
+            if (overload.first == base)
+                return overload.second;
+
+        return nullptr;
+    }
 
     Exception::~Exception()
     {
+        delete message;
+
         delete constructor;
+
+        for (const auto overload : overloads)
+            delete overload.second;
     }
 }

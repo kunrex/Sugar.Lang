@@ -18,7 +18,7 @@ namespace Analysis::Structure::Context
     int DotExpression::SlotCount() const { return slotCount; }
 
     bool DotExpression::Readable() const { return GetChild(static_cast<int>(ChildCode::RHS))->Readable(); }
-    bool DotExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Writable() && GetChild(static_cast<int>(ChildCode::RHS))->Writable(); }
+    bool DotExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::RHS))->Writable(); }
 
     string DotExpression::CILData() const { return ""; }
 

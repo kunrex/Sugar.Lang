@@ -1,15 +1,14 @@
 #ifndef BOOLEAN_H
 #define BOOLEAN_H
 
-#include <tuple>
-#include <vector>
+#include <array>
 
-#include "../../../../Services/singleton_service.h"
+#include "../../DataTypes/value_type.h"
 
 #include "../../Core/Interfaces/Creation/i_built_in_cast.h"
 #include "../../Core/Interfaces/DataTypes/i_primitive_type.h"
 
-#include "../../DataTypes/value_type.h"
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -18,10 +17,11 @@ namespace Analysis::Structure::Wrappers
         private:
             static Boolean instance;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunction*>> implicitCasts;
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IBuiltInCast*>> explicitCasts;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 2> functions;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>> overloads;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IBuiltInCast*>, 4> explicitCasts;
+
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IBuiltInOverload*>, 5> overloads;
 
             Boolean();
 

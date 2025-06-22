@@ -1,16 +1,17 @@
 #include "array.h"
 
 #include <map>
-
 #include <format>
 
-#include "../../Global/BuiltIn/built_in_property.h"
+#include "../Value/integer.h"
+#include "../Value/boolean.h"
+#include "../Reference/object.h"
 
 #include "../../DataTypes/data_type_extensions.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
-#include "../../Global/BuiltIn/built_in_indexer.h"
+#include "../../Global/Functions/operator_overload.h"
 
-#include "../Value/integer.h"
+#include "../../Global/Properties/indexer.h"
+#include "../../Global/Properties/property.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Array::Array(const IDataType* const arrayType) : BuiltInClass(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonService(), genericSignature(), arrayType(arrayType), length(nullptr), constructor(nullptr), indexer(nullptr)
+    Array::Array(const IDataType* const arrayType) : ImplicitClass(std::format("{} {}[]", arrayType->MemberType() == MemberType::Class ? "class" : "valuetype", arrayType->FullName()), Describer::Public), SingletonService(), genericSignature(), arrayType(arrayType), length(nullptr), constructor(nullptr), indexer(nullptr)
     { }
 
     const Array* Array::Instance(const IDataType* const dataType)
@@ -55,47 +56,125 @@ namespace Analysis::Structure::Wrappers
     {
         length = new BuiltInProperty("Length", Describer::Public, Integer::Instance(), true, "ldlen", false, "");
 
-        constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
+        const auto constructor = new BuiltInConstructor(this, std::format("newarr {}", arrayType->FullName()));
         constructor->PushParameterType(Integer::Instance());
+        this->constructor = constructor;
 
         if (arrayType->MemberType() == MemberType::Class)
         {
-            indexer = new BuiltInIndexer(arrayType, true, "ldelem.ref", true, "stelem.ref");
+            const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.ref", true, "stelem.ref");
             indexer->PushParameterType(Integer::Instance());
+            this->indexer = indexer;
         }
         else
         {
-            indexer = new BuiltInIndexer(arrayType, true, "ldelem", true, "stelem");
-            indexer->PushParameterType(Integer::Instance());
+            switch (arrayType->Type())
+            {
+                case TypeKind::Short:
+                case TypeKind::Character:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.i2", true, "stelem.i2");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                case TypeKind::Int:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.i4", true, "stelem.i4");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                case TypeKind::Long:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.i8", true, "stelem.i8");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                case TypeKind::Boolean:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.i1", true, "stelem.i1");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                case TypeKind::Float:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.r4", true, "stelem.r4");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                case TypeKind::Double:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem.r8", true, "stelem.r8");
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+                default:
+                    {
+                        const auto indexer = new BuiltInIndexer(arrayType, true, "ldelem " + arrayType->FullName(), true, "stelem " + arrayType->FullName());
+                        indexer->PushParameterType(Integer::Instance());
+                        this->indexer = indexer;
+                    }
+                    break;
+            }
+
         }
+
+        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads[0] = { SyntaxKind::Equals, equals };
+
+        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads[1] = { SyntaxKind::NotEquals, notEquals };
+
+        ImplicitClass::BindGlobal();
     }
 
     const ICharacteristic* Array::FindCharacteristic(const std::string& name) const
     {
-        return name == "Length" ? length : nullptr;
+        if (name == length->Name())
+            return length;
+
+        return nullptr;
     }
 
     const IConstructor* Array::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     {
-        return ArgumentHash(constructor) == ArgumentHash(argumentList) ? constructor : nullptr;
-    }
+        if (argumentList.size() != 1)
+            return nullptr;
 
-    const IFunctionDefinition* Array::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr; }
+        if (argumentList[0] != Integer::Instance())
+            return nullptr;
+
+        return constructor;
+    }
 
     const IIndexerDefinition* Array::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
-        return ArgumentHash(indexer) == ArgumentHash(argumentList) ? indexer : nullptr;
+        if (argumentList.size() != 1)
+            return nullptr;
+
+        if (argumentList[0] != Integer::Instance())
+            return nullptr;
+
+        return indexer;
     }
 
-    const IFunction* Array::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
-    const IFunction* Array::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
     const IOperatorOverload* Array::FindOverload(const SyntaxKind base) const
-    { return nullptr; }
+    {
+        for (const auto overload: overloads)
+            if (overload.first == base)
+                return overload.second;
+
+        return nullptr;
+    }
 
     Array::~Array()
     {
@@ -104,5 +183,8 @@ namespace Analysis::Structure::Wrappers
         delete constructor;
 
         delete indexer;
+
+        for (const auto overload : overloads)
+            delete overload.second;
     }
 }

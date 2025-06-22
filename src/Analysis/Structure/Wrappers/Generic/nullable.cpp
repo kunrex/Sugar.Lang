@@ -3,13 +3,12 @@
 #include <map>
 #include <format>
 
+#include "../Value/boolean.h"
+
 #include "../../DataTypes/data_type_extensions.h"
 
-#include "../../Global/BuiltIn/built_in_indexer.h"
-#include "../../Global/BuiltIn/built_in_property.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
-
-#include "../Value/boolean.h"
+#include "../../Global/Properties/property.h"
+#include "../../Global/Functions/constructor.h"
 
 using namespace std;
 
@@ -24,7 +23,7 @@ const string cil_nullable = "[System.Runtime]System.Nullable";
 
 namespace Analysis::Structure::Wrappers
 {
-    Nullable::Nullable(const IDataType* const nullableType) : BuiltInValueType(cil_nullable, Describer::Public), SingletonService(), genericSignature(), nullableType(nullableType), constructors()
+    Nullable::Nullable(const IDataType* const nullableType) : ImplicitValueType(cil_nullable, Describer::Public), SingletonService(), nullableType(nullableType), characteristics()
     { }
 
     const Nullable* Nullable::Instance(const IDataType* const dataType)
@@ -44,24 +43,45 @@ namespace Analysis::Structure::Wrappers
         return nullable;
     }
 
+    int Nullable::SlotCount() const
+    {
+        if (slotCount < 0)
+        {
+            int totalSize = 0, maxSize = 0;
+
+            for (const auto& characteristic : characteristics)
+            {
+                const auto size = characteristic->CreationType()->SlotCount();
+                const auto actual_size = size + (word_size - 1) & ~(word_size - 1);
+
+                totalSize += actual_size;
+                if (actual_size > maxSize)
+                    maxSize = actual_size;
+            }
+
+            slotCount = std::ceil(totalSize + (maxSize - 1) & ~(maxSize - 1) / word_size);
+        }
+
+        return slotCount;
+    }
+
     TypeKind Nullable::Type() const { return TypeKind::Nullable; }
 
     const std::string& Nullable::FullName() const { return genericSignature; }
 
     void Nullable::BindGlobal()
     {
-        const auto isNull = std::format("call instance bool valuetype {}::get_HasValue()", genericSignature);
-        characteristics.push_back(new BuiltInProperty("IsNull", Describer::Public, Boolean::Instance(), true, isNull, false, ""));
-
-        const auto value = std::format("call instance !0 valuetype {}::get_Value()", genericSignature);
-        characteristics.push_back(new BuiltInProperty("Value", Describer::Public, nullableType, true, value, false, ""));
+        characteristics[0] = new BuiltInProperty("IsNull", Describer::Public, Boolean::Instance(), true, std::format("call instance bool valuetype {}::get_HasValue()", genericSignature), false, "");
+        characteristics[1] = new BuiltInProperty("Value", Describer::Public, nullableType, true, std::format("call instance !0 valuetype {}::get_Value()", genericSignature), false, "");
 
         const auto constructor = new BuiltInConstructor(this, std::format("call instance void valuetype {}::.ctor(!0)", genericSignature));
         constructor->PushParameterType(nullableType);
-        constructors.emplace_back(ArgumentHash(constructor), constructor);
+        constructors[0] = { ArgumentHash(constructor), constructor };
 
         const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
-        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
+        constructors[1] = { ArgumentHash(defaultConstructor), defaultConstructor };
+
+        ImplicitValueType::BindGlobal();
     }
 
     const ICharacteristic* Nullable::FindCharacteristic(const std::string& name) const
@@ -78,14 +98,11 @@ namespace Analysis::Structure::Wrappers
         const auto hash = ArgumentHash(argumentList);
 
         for (const auto constructor : constructors)
-            if (std::get<0>(constructor) == hash)
-                return std::get<1>(constructor);
+            if (constructor.first == hash)
+                return constructor.second;
 
         return nullptr;
     }
-
-    const IFunctionDefinition* Nullable::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr; }
 
     const IIndexerDefinition* Nullable::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
@@ -101,8 +118,11 @@ namespace Analysis::Structure::Wrappers
 
     Nullable::~Nullable()
     {
+        for (const auto characteristic : characteristics)
+            delete characteristic;
+
         for (const auto constructor: constructors)
-            delete std::get<1>(constructor);
+            delete constructor.second;
     }
 }
 

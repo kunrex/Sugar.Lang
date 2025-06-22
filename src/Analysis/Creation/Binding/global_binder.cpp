@@ -18,9 +18,6 @@
 #include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/DataTypes/class.h"
 
-#include "../../Structure/Global/BuiltIn/built_in_cast.h"
-#include "../../Structure/Global/BuiltIn/built_in_constructor.h"
-
 #include "../../Structure/Global/Properties/indexer.h"
 #include "../../Structure/Global/Properties/property.h"
 
@@ -28,8 +25,7 @@
 #include "../../Structure/Global/Variables/global_variable.h"
 
 #include "../../Structure/Global/Functions/constructor.h"
-#include "../../Structure/Global/Functions/explicit_cast.h"
-#include "../../Structure/Global/Functions/implicit_cast.h"
+#include "../../Structure/Global/Functions/cast_overload.h"
 #include "../../Structure/Global/Functions/void_function.h"
 #include "../../Structure/Global/Functions/method_function.h"
 #include "../../Structure/Global/Functions/operator_overload.h"
@@ -1007,16 +1003,6 @@ namespace Analysis::Creation::Binding
 
         operatorOverload->SetParent(dataType);
         dataType->PushOverload(operatorOverload);
-    }
-
-    void TryDeclareExplicitString(IUserDefinedType* const dataType)
-    {
-        if (dataType->FindExplicitCast(String::Instance(), dataType) != nullptr)
-            return;
-
-        const auto cast = new BuiltInCast(String::Instance(), std::format("call instance string class {}::ToString()", dataType->FullName()), nullptr);
-        cast->PushParameterType(dataType);
-        dataType->PushExplicitCast(cast);
     }
 
     void TryDeclareStaticConstructor(IUserDefinedType* const dataType)

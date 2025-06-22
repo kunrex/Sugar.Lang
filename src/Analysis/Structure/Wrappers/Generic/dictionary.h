@@ -1,14 +1,11 @@
 #ifndef DICTIONARY_WRAPPER_H
 #define DICTIONARY_WRAPPER_H
 
-#include <map>
-
-#include "../../../../Services/singleton_service.h"
+#include <array>
 
 #include "../../DataTypes/class.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
-#include "../../Global/BuiltIn/built_in_indexer.h"
-#include "../../Global/BuiltIn/built_in_property.h"
+
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -20,13 +17,19 @@ namespace Analysis::Structure::Wrappers
             const IDataType* keyType;
             const IDataType* valueType;
 
-            Global::BuiltInProperty* count;
+            const Core::Interfaces::ICharacteristic* count;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 5> functions;
 
-            Global::BuiltInConstructor* constructor;
+            const Core::Interfaces::IConstructor* constructor;
 
-            Global::BuiltInIndexer* indexer;
+            const Core::Interfaces::IIndexerDefinition* indexer;
+
+            const Core::Interfaces::IFunction* implicitObject;
+
+            const Core::Interfaces::IFunction* explicitString;
+
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*>, 2> overloads;
 
             explicit Dictionary(const IDataType* keyType, const IDataType* valueType);
 

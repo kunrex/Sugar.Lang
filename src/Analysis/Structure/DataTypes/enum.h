@@ -18,9 +18,11 @@ namespace Analysis::Structure::DataTypes
 
             std::vector<Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+            Core::Interfaces::IFunctionDefinition* hashCode;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+
+            std::vector<std::pair<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
 
         public:
             Enum(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);

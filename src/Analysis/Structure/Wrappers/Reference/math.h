@@ -1,7 +1,7 @@
 #ifndef MATH_H
 #define MATH_H
 
-#include <map>
+#include <array>
 
 #include "../../../../Services/singleton_service.h"
 
@@ -14,9 +14,9 @@ namespace Analysis::Structure::Wrappers
         private:
             static Math instance;
 
-            std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
+            std::array<Core::Interfaces::ICharacteristic*, 2> characteristics;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 21> functions;
 
             Math();
 

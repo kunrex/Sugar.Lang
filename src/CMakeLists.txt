@@ -215,20 +215,14 @@ add_library(Sugar STATIC
         Analysis/Structure/Creation/Functions/overload_definition.h
         Analysis/Structure/Creation/Properties/property_definition.cpp
         Analysis/Structure/Creation/Properties/property_definition.h
-        Analysis/Structure/Global/BuiltIn/built_in_cast.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_cast.h
-        Analysis/Structure/Global/BuiltIn/built_in_operation.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_operation.h
         Analysis/Structure/Global/Functions/void_function.cpp
         Analysis/Structure/Global/Functions/void_function.h
         Analysis/Structure/Global/Functions/method_function.cpp
         Analysis/Structure/Global/Functions/method_function.h
         Analysis/Structure/Global/Functions/operator_overload.cpp
         Analysis/Structure/Global/Functions/operator_overload.h
-        Analysis/Structure/Global/Functions/implicit_cast.cpp
-        Analysis/Structure/Global/Functions/implicit_cast.h
-        Analysis/Structure/Global/Functions/explicit_cast.cpp
-        Analysis/Structure/Global/Functions/explicit_cast.h
+        Analysis/Structure/Global/Functions/cast_overload.cpp
+        Analysis/Structure/Global/Functions/cast_overload.h
         Analysis/Structure/Creation/Properties/indexer_definition.cpp
         Analysis/Structure/Creation/Properties/indexer_definition.h
         Analysis/Structure/Creation/Functions/constructor_definition.cpp
@@ -270,8 +264,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/dot_expression.h
         Analysis/Structure/Context/Expressions/indexer_expression.cpp
         Analysis/Structure/Context/Expressions/indexer_expression.h
-        Analysis/Structure/Global/BuiltIn/built_in_indexer.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_indexer.h
         Analysis/Structure/Context/Expressions/defined_unary_expression.cpp
         Analysis/Structure/Context/Expressions/defined_unary_expression.h
         Analysis/Structure/Context/Expressions/defined_binary_expression.cpp
@@ -323,8 +315,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Groups/source_file_node.h
         Analysis/Structure/Wrappers/Reference/string.cpp
         Analysis/Structure/Wrappers/Reference/string.h
-        Analysis/Structure/Global/BuiltIn/built_in_property.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_property.h
 
         Exceptions/Compilation/transpile_file_exception.cpp
         Exceptions/Compilation/transpile_file_exception.h
@@ -367,10 +357,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Wrappers/Value/Float.h
         Analysis/Structure/Wrappers/Value/Double.cpp
         Analysis/Structure/Wrappers/Value/Double.h
-        Analysis/Structure/Global/BuiltIn/built_in_void.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_void.h
-        Analysis/Structure/Global/BuiltIn/built_in_method.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_method.h
         Analysis/Structure/Wrappers/Generic/action.cpp
         Analysis/Structure/Wrappers/Generic/action.h
         Analysis/Structure/Wrappers/Generic/func.cpp
@@ -383,8 +369,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Properties/assigned_property_node.h
         Analysis/Creation/Binding/local_binder.cpp
         Analysis/Creation/Binding/local_binder.h
-        Analysis/Structure/Global/BuiltIn/built_in_constructor.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_constructor.h
         Analysis/Structure/Creation/Functions/function_definition.cpp
         Analysis/Structure/Creation/Functions/function_definition.h
         Analysis/Structure/Global/Properties/indexer.cpp
@@ -534,8 +518,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Describers/describer_keyword_node.h
         Analysis/Structure/Core/Scoped/default_scoped.cpp
         Analysis/Structure/Core/Scoped/default_scoped.h
-        Analysis/Structure/Global/BuiltIn/built_in_constant.cpp
-        Analysis/Structure/Global/BuiltIn/built_in_constant.h
         Analysis/Structure/Core/Interfaces/DataTypes/i_primitive_type.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_overload.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h

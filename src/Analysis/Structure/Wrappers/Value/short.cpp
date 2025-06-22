@@ -1,23 +1,25 @@
 #include "short.h"
 
-#include "../../DataTypes/data_type_extensions.h"
-
 #include "integer.h"
 #include "long.h"
 #include "./float.h"
 #include "double.h"
 #include "boolean.h"
 #include "built_in_functions.h"
+
 #include "../Reference/string.h"
 #include "../Generic/referenced.h"
 
+#include "../../DataTypes/data_type_extensions.h"
+
 #include "../../Compilation/compilation_result.h"
+
 #include "../../Context/Constants/integer_constant.h"
 
-#include "../../Global/BuiltIn/built_in_cast.h"
-#include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_constant.h"
-#include "../../Global/BuiltIn/built_in_operation.h"
+#include "../../Global/Functions/cast_overload.h"
+#include "../../Global/Functions/method_function.h"
+#include "../../Global/Variables/global_constant.h"
+#include "../../Global/Functions/operator_overload.h"
 
 using namespace std;
 
@@ -53,7 +55,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Short::Short() : BuiltInValueType(cil_short, Describer::Public), SingletonService(), tryParse(nullptr), implicitCasts(), explicitCasts(), overloads()
+    Short::Short() : BuiltInValueType(cil_short, Describer::Public), SingletonService(), characteristics()
     { }
 
     Short Short::instance;
@@ -77,138 +79,142 @@ namespace Analysis::Structure::Wrappers
 
     void Short::BindGlobal()
     {
-        characteristics.push_back(new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, this, new ShortConstant(32767)));
-        characteristics.push_back(new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, this, new ShortConstant(-32767)));
+        characteristics[0] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, this, new ShortConstant(32767));
+        characteristics[1] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, this, new ShortConstant(-32767));
 
-        tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Int16::TryParse(string, int16&)");
+        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Int16::TryParse(string, int16&)");
         tryParse->PushParameterType(String::Instance());
         tryParse->PushParameterType(Referenced::Instance(this));
+        functions[0] = { ArgumentHash(tryParse), tryParse };
+
+        const auto getHash = GetHash();
+        functions[1] = { ArgumentHash(getHash), getHash };
 
         const auto implicitInt = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<short>);
         implicitInt->PushParameterType(this);
-        implicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), implicitInt);
-        explicitCasts.emplace_back(ArgumentHash({ Integer::Instance(), this }), new BuiltInCast(*implicitInt));
+        implicitCasts[0] = { ArgumentHash({ Integer::Instance(), this }), implicitInt };
+        explicitCasts[0] = { ArgumentHash({ Integer::Instance(), this }), new BuiltInCast(*implicitInt) };
 
         const auto implicitLong = new BuiltInCast(Long::Instance(), "conv.i8", LongCast<short>);
         implicitLong->PushParameterType(this);
-        implicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), implicitLong);
-        explicitCasts.emplace_back(ArgumentHash({ Long::Instance(), this }), new BuiltInCast(*implicitLong));
+        implicitCasts[1] = { ArgumentHash({ Long::Instance(), this }), implicitLong };
+        explicitCasts[1] =  { ArgumentHash({ Long::Instance(), this }), new BuiltInCast(*implicitLong) };
 
         const auto implicitFloat = new BuiltInCast(Float::Instance(), "conv.r4", FloatCast<short>);
         implicitFloat->PushParameterType(this);
-        implicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), implicitFloat);
-        explicitCasts.emplace_back(ArgumentHash({ Float::Instance(), this }), new BuiltInCast(*implicitFloat));
+        implicitCasts[2] =  { ArgumentHash({ Float::Instance(), this }), implicitFloat };
+        explicitCasts[2] = { ArgumentHash({ Float::Instance(), this }), new BuiltInCast(*implicitFloat) };
 
         const auto implicitDouble = new BuiltInCast(Double::Instance(), "conv.r8", DoubleCast<short>);
         implicitDouble->PushParameterType(this);
-        implicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), implicitDouble);
-        explicitCasts.emplace_back(ArgumentHash({ Double::Instance(), this }), new BuiltInCast(*implicitDouble));
+        implicitCasts[3] =  { ArgumentHash({ Double::Instance(), this }), implicitDouble };
+        explicitCasts[3] = { ArgumentHash({ Double::Instance(), this }), new BuiltInCast(*implicitDouble) };
 
         const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int16::ToString()", StringCast<short>);
         explicitString->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash({ String::Instance(), this }), explicitString);
+        explicitCasts[4] = { ArgumentHash({ String::Instance(), this }), explicitString };
 
-        const auto equals = new BuiltInOperation(SyntaxKind::Equals, Boolean::Instance(), "ceq", Equals<short>);
+        const auto equals = new BuiltInOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq", Equals<short>);
         equals->PushParameterType(this);
         equals->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Equals, equals);
+        builtInOverloads[0] = { SyntaxKind::Equals, equals };
 
-        const auto notEquals = new BuiltInOperation(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals<short>);
+        const auto notEquals = new BuiltInOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq", NotEquals<short>);
         notEquals->PushParameterType(this);
         notEquals->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::NotEquals, notEquals);
+        builtInOverloads[1] = { SyntaxKind::NotEquals, notEquals };
 
-        const auto addition = new BuiltInOperation(SyntaxKind::Addition, this, "add conv.i2", Addition);
+        const auto addition = new BuiltInOverload(SyntaxKind::Addition, this, "add conv.i2", Addition);
         addition->PushParameterType(this);
         addition->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Addition, addition);
+        builtInOverloads[2] = { SyntaxKind::Addition, addition };
 
-        const auto subtraction = new BuiltInOperation(SyntaxKind::Subtraction, this, "sub conv.i2", Subtraction);
+        const auto subtraction = new BuiltInOverload(SyntaxKind::Subtraction, this, "sub conv.i2", Subtraction);
         subtraction->PushParameterType(this);
         subtraction->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Subtraction, subtraction);
+        builtInOverloads[3] = { SyntaxKind::Subtraction, subtraction };
 
-        const auto multiplication = new BuiltInOperation(SyntaxKind::Multiplication,this, "mul conv.i2", Multiplication);
+        const auto multiplication = new BuiltInOverload(SyntaxKind::Multiplication,this, "mul conv.i2", Multiplication);
         multiplication->PushParameterType(this);
         multiplication->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Multiplication, multiplication);
+        builtInOverloads[4] = { SyntaxKind::Multiplication, multiplication };
 
-        const auto division = new BuiltInOperation(SyntaxKind::Division, this, "div conv.i2", Division);
+        const auto division = new BuiltInOverload(SyntaxKind::Division, this, "div conv.i2", Division);
         division->PushParameterType(this);
         division->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Division, division);
+        builtInOverloads[5] = { SyntaxKind::Division, division };
 
-        const auto remainder = new BuiltInOperation(SyntaxKind::Modulus, this, "rem conv.i2", Modulus);
+        const auto remainder = new BuiltInOverload(SyntaxKind::Modulus, this, "rem conv.i2", Modulus);
         remainder->PushParameterType(this);
         remainder->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Modulus, remainder);
+        builtInOverloads[6] = { SyntaxKind::Modulus, remainder };
 
-        const auto plus = new BuiltInOperation(SyntaxKind::Plus,this, "", Plus);
+        const auto plus = new BuiltInOverload(SyntaxKind::Plus,this, "nop", Plus);
         plus->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Plus, plus);
+        builtInOverloads[7] = { SyntaxKind::Plus, plus };
 
-        const auto negation = new BuiltInOperation(SyntaxKind::Minus, this, "neg", Minus);
+        const auto negation = new BuiltInOverload(SyntaxKind::Minus, this, "neg", Minus);
         negation->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Minus, negation);
+        builtInOverloads[8] = { SyntaxKind::Minus, negation };
 
-        const auto increment = new BuiltInOperation(SyntaxKind::Increment, this, "ldc.i2 1 add", nullptr);
+        const auto increment = new ImplicitOverload(SyntaxKind::Increment, this, "ldc.i2 1 add");
         increment->PushParameterType(this);
         increment->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Increment, increment);
+        overloads[0] = { SyntaxKind::Increment, increment };
 
-        const auto decrement = new BuiltInOperation(SyntaxKind::Decrement, this, "ldc.i2 1 sub", nullptr);
+        const auto decrement = new ImplicitOverload(SyntaxKind::Decrement, this, "ldc.i2 1 sub");
         decrement->PushParameterType(this);
         decrement->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::Decrement, decrement);
+        overloads[1] = { SyntaxKind::Decrement, decrement };
 
-        const auto greater = new BuiltInOperation(SyntaxKind::GreaterThan, Boolean::Instance(), "cgt", GreaterThan<short>);
+        const auto greater = new BuiltInOverload(SyntaxKind::GreaterThan, Boolean::Instance(), "cgt", GreaterThan<short>);
         greater->PushParameterType(this);
         greater->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::GreaterThan, greater);
+        builtInOverloads[9] = { SyntaxKind::GreaterThan, greater };
 
-        const auto lesser = new BuiltInOperation(SyntaxKind::LesserThan, Boolean::Instance(), "clt", LesserThan<short>);
+        const auto lesser = new BuiltInOverload(SyntaxKind::LesserThan, Boolean::Instance(), "clt", LesserThan<short>);
         lesser->PushParameterType(this);
         lesser->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::LesserThan, lesser);
+        builtInOverloads[10] = { SyntaxKind::LesserThan, lesser };
 
-        const auto greaterEquals = new BuiltInOperation(SyntaxKind::GreaterThanEquals, Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals<short>);
+        const auto greaterEquals = new BuiltInOverload(SyntaxKind::GreaterThanEquals, Boolean::Instance(), "clt ldc.i4.0 ceq", GreaterThanEquals<short>);
         greaterEquals->PushParameterType(this);
         greaterEquals->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::GreaterThanEquals, greaterEquals);
+        builtInOverloads[11] = { SyntaxKind::GreaterThanEquals, greaterEquals };
 
-        const auto lesserEquals = new BuiltInOperation(SyntaxKind::LesserThanEquals, Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThanEquals<short>);
+        const auto lesserEquals = new BuiltInOverload(SyntaxKind::LesserThanEquals, Boolean::Instance(), "cgt ldc.i4.0 ceq", LesserThanEquals<short>);
         lesserEquals->PushParameterType(this);
         lesserEquals->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::LesserThanEquals, lesserEquals);
+        builtInOverloads[12] = { SyntaxKind::LesserThanEquals, lesserEquals };
 
-        const auto bitwiseNot = new BuiltInOperation(SyntaxKind::BitwiseNot, Integer::Instance(), "not", Not);
+        const auto bitwiseNot = new BuiltInOverload(SyntaxKind::BitwiseNot, Integer::Instance(), "not", Not);
         bitwiseNot->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseNot, bitwiseNot);
+        builtInOverloads[13] = { SyntaxKind::BitwiseNot, bitwiseNot };
 
-        const auto bitwiseAnd = new BuiltInOperation(SyntaxKind::BitwiseAnd, Integer::Instance(), "and", BitwiseAnd);
+        const auto bitwiseAnd = new BuiltInOverload(SyntaxKind::BitwiseAnd, Integer::Instance(), "and", BitwiseAnd);
         bitwiseAnd->PushParameterType(this);
         bitwiseAnd->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseAnd, bitwiseAnd);
+        builtInOverloads[14] = { SyntaxKind::BitwiseAnd, bitwiseAnd };
 
-        const auto bitwiseOr = new BuiltInOperation(SyntaxKind::BitwiseOr, Integer::Instance(), "or", BitwiseOr);
+        const auto bitwiseOr = new BuiltInOverload(SyntaxKind::BitwiseOr, Integer::Instance(), "or", BitwiseOr);
         bitwiseOr->PushParameterType(this);
         bitwiseOr->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseOr, bitwiseOr);
+        builtInOverloads[15] = { SyntaxKind::BitwiseOr, bitwiseOr };
 
-        const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor, Integer::Instance(), "xor", BitwiseXor);
+        const auto bitwiseXor = new BuiltInOverload(SyntaxKind::BitwiseXor, Integer::Instance(), "xor", BitwiseXor);
         bitwiseXor->PushParameterType(this);
         bitwiseXor->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
+        builtInOverloads[16] = { SyntaxKind::BitwiseXor, bitwiseXor };
 
-        const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, Integer::Instance(), "shr", RightShift);
+        const auto rightShift = new BuiltInOverload(SyntaxKind::RightShift, Integer::Instance(), "shr", RightShift);
         rightShift->PushParameterType(this);
         rightShift->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::RightShift, rightShift);
+        builtInOverloads[17] = { SyntaxKind::RightShift, rightShift };
 
-        const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, Integer::Instance(), "shl", LeftShift);
+        const auto leftShift = new BuiltInOverload(SyntaxKind::LeftShift, Integer::Instance(), "shl", LeftShift);
         leftShift->PushParameterType(this);
         leftShift->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
+        builtInOverloads[18] = { SyntaxKind::LeftShift, leftShift };
     }
 
     const ICharacteristic* Short::FindCharacteristic(const string& name) const
@@ -222,10 +228,13 @@ namespace Analysis::Structure::Wrappers
 
     const IFunctionDefinition* Short::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
     {
-        if (name != "TryParse" || ArgumentHash(argumentList) != ArgumentHash(tryParse))
-            return nullptr;
+        const auto hash = std::hash<string>()(name) & ArgumentHash(argumentList);
 
-        return tryParse;
+        for (const auto function: functions)
+            if (function.first == hash)
+                return function.second;
+
+        return nullptr;
     }
 
     const IConstructor* Short::FindConstructor(const std::vector<const IDataType*>& argumentList) const
@@ -239,8 +248,8 @@ namespace Analysis::Structure::Wrappers
         const auto hash = ArgumentHash({ returnType , fromType });
 
         for (const auto cast: implicitCasts)
-            if (std::get<0>(cast) == hash)
-                return std::get<1>(cast);
+            if (cast.first == hash)
+                return cast.second;
 
         return nullptr;
     }
@@ -255,37 +264,52 @@ namespace Analysis::Structure::Wrappers
         const auto hash = ArgumentHash({ returnType , fromType });
 
         for (const auto cast: explicitCasts)
-            if (std::get<0>(cast) == hash)
-                return std::get<1>(cast);
+            if (cast.first == hash)
+                return cast.second;
 
         return nullptr;
     }
 
     const IOperatorOverload* Short::FindOverload(const SyntaxKind base) const
     {
-        return FindBuiltInOverload(base);
+        switch (base)
+        {
+            case SyntaxKind::Increment:
+                return overloads[0].second;
+            case SyntaxKind::Decrement:
+                return overloads[1].second;
+            default:
+                return FindBuiltInOverload(base);
+        }
     }
 
     const IBuiltInOverload* Short::FindBuiltInOverload(const SyntaxKind base) const
     {
-        for (const auto cast: overloads)
-            if (std::get<0>(cast) == base)
-                return std::get<1>(cast);
+        for (const auto overload: builtInOverloads)
+            if (overload.first == base)
+                return overload.second;
 
         return nullptr;
     }
 
     Short::~Short()
     {
-        delete tryParse;
+        for (const auto characteristic : characteristics)
+            delete characteristic;
+
+        for (const auto function: functions)
+            delete function.second;
 
         for (const auto cast: implicitCasts)
-            delete std::get<1>(cast);
+            delete cast.second;
 
         for (const auto cast: explicitCasts)
-            delete std::get<1>(cast);
+            delete cast.second;
 
         for (const auto overload: overloads)
-            delete std::get<1>(overload);
+            delete overload.second;
+
+        for (const auto overload: builtInOverloads)
+            delete overload.second;
     }
 }

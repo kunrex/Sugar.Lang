@@ -9,6 +9,10 @@
 
 #include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
 #include "../../Creation/Transpiling/cil_transpiler.h"
+#include "../Global/Functions/cast_overload.h"
+#include "../Global/Functions/method_function.h"
+#include "../Wrappers/Reference/string.h"
+#include "../Wrappers/Value/integer.h"
 
 using namespace std;
 
@@ -25,20 +29,70 @@ using namespace Analysis::Creation::Transpiling;
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
+using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
 
 constexpr int word_size = 8;
 
 namespace Analysis::Structure::DataTypes
 {
-    ValueType::ValueType(const string& name, const Enums::Describer describer) : DataType(name, describer)
-    {
-        slotCount = -1;
-    }
+    ValueType::ValueType(const string& name, const Enums::Describer describer) : DataType(name, describer), slotCount(-1)
+    { }
 
     MemberType ValueType::MemberType() const { return MemberType::ValueType; }
 
-    int ValueType::SlotCount() const
+    IFunctionDefinition* ValueType::GetHash() const
+    {
+        return new BuiltInMethod(std::string(hashCodeFunction), Describer::Public, Integer::Instance(), std::format("constrained. {} callvirt instance int32 [System.Runtime]System.Object::GetHashCode()", FullName()));
+    }
+
+    BuiltInValueType::BuiltInValueType(const std::string& name, const Enums::Describer describer) : ValueType(name, describer)
+    { }
+
+    const string& BuiltInValueType::FullName() const { return name; }
+
+    void BuiltInValueType::BindLocal()
+    { }
+
+    ImplicitValueType::ImplicitValueType(const std::string& name, const Enums::Describer describer) : BuiltInValueType(name, describer), getHash(nullptr), explicitString(nullptr)
+    { }
+
+    void ImplicitValueType::BindGlobal()
+    {
+        getHash = GetHash();
+
+        const auto explicitString = new GeneratedCast(String::Instance(), std::format("constrained. valuetype {} call instance string [System.Runtime]System.Object::ToString()", FullName()));
+        explicitString->PushParameterType(this);
+        this->explicitString = explicitString;
+    }
+
+    const IFunctionDefinition* ImplicitValueType::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
+    {
+        if (name == getHash->Name() && argumentList.empty())
+            return getHash;
+
+        return nullptr;
+    }
+
+    const IFunction* ImplicitValueType::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
+    {
+        if (returnType == String::Instance() && fromType == this)
+            return explicitString;
+
+        return nullptr;
+    }
+
+    ImplicitValueType::~ImplicitValueType()
+    {
+        delete getHash;
+
+        delete explicitString;
+    }
+
+    StructSource::StructSource(const string& name, const Enums::Describer describer, const IParseNode* const skeleton) : ValueType(name, describer), skeleton(skeleton), fullName()
+    { }
+
+    int StructSource::SlotCount() const
     {
         if (slotCount < 0)
         {
@@ -46,6 +100,9 @@ namespace Analysis::Structure::DataTypes
 
             for (const auto& characteristic : characteristics)
             {
+                if (characteristic->CheckDescriber(Describer::Static))
+                    continue;
+
                 const auto size = characteristic->CreationType()->SlotCount();
                 const auto actual_size = size + (word_size - 1) & ~(word_size - 1);
 
@@ -59,32 +116,6 @@ namespace Analysis::Structure::DataTypes
 
         return slotCount;
     }
-
-    const ICharacteristic* ValueType::FindCharacteristic(const string& name) const
-    {
-        for (const auto characteristic : characteristics)
-            if (characteristic->Name() == name)
-                return characteristic;
-
-        return nullptr;
-    }
-
-    ValueType::~ValueType()
-    {
-        for (const auto characteristic : characteristics)
-            delete characteristic;
-    }
-
-    BuiltInValueType::BuiltInValueType(const std::string& name, const Enums::Describer describer) : ValueType(name, describer)
-    { }
-
-    const string& BuiltInValueType::FullName() const { return name; }
-
-    void BuiltInValueType::BindLocal()
-    { }
-
-    StructSource::StructSource(const string& name, const Enums::Describer describer, const IParseNode* const skeleton) : ValueType(name, describer), skeleton(skeleton), fullName()
-    { }
 
     TypeKind StructSource::Type() const { return TypeKind::Custom; }
 
@@ -101,6 +132,15 @@ namespace Analysis::Structure::DataTypes
         characteristics.push_back(characteristic);
     }
 
+    const ICharacteristic* StructSource::FindCharacteristic(const string& name) const
+    {
+        for (const auto characteristic : characteristics)
+            if (characteristic->Name() == name)
+                return characteristic;
+
+        return nullptr;
+    }
+
     void StructSource::PushFunction(IFunctionDefinition* const function)
     {
         functions.emplace_back(std::hash<string>()(function->Name()) ^ ArgumentHash(function), function);
@@ -111,8 +151,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
 
         for (const auto function : functions)
-            if (std::get<0>(function) == hash)
-                return std::get<1>(function);
+            if (function.first == hash)
+                return function.second;
 
         return nullptr;
     }
@@ -130,8 +170,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash= ArgumentHash(argumentList);
         for (int i = StaticConstructor() != nullptr; i < constructors.size(); i++)
         {
-            if (const auto current = constructors[i]; std::get<0>(current) == hash)
-                return std::get<1>(current);
+            if (const auto current = constructors[i]; current.first == hash)
+                return current.second;
         }
 
         return nullptr;
@@ -142,7 +182,7 @@ namespace Analysis::Structure::DataTypes
         if (constructors.empty())
             return nullptr;
 
-        const auto constructor = std::get<1>(constructors[0]);
+        const auto constructor = constructors[0].second;
         return constructor->CheckDescriber(Describer::Static) ? constructor : nullptr;
     }
 
@@ -150,7 +190,7 @@ namespace Analysis::Structure::DataTypes
     {
         for (int i = StaticConstructor() != nullptr; i < constructors.size(); i++)
         {
-            if (const auto current = std::get<1>(constructors[i]); !current->ParameterCount())
+            if (const auto current = constructors[i].second; !current->ParameterCount())
                 return current;
         }
 
@@ -167,8 +207,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash = ArgumentHash(argumentList);
 
         for (const auto indexer : indexers)
-            if (std::get<0>(indexer) == hash)
-                return std::get<1>(indexer);
+            if (indexer.first == hash)
+                return indexer.second;
 
         return nullptr;
     }
@@ -183,8 +223,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
 
         for (const auto cast : implicitCasts)
-            if (std::get<0>(cast) == hash)
-                return std::get<1>(cast);
+            if (cast.first == hash)
+                return cast.second;
 
         return nullptr;
     }
@@ -199,8 +239,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
 
         for (const auto cast : explicitCasts)
-            if (std::get<0>(cast) == hash)
-                return std::get<1>(cast);
+            if (cast.first == hash)
+                return cast.second;
 
         return nullptr;
     }
@@ -212,53 +252,55 @@ namespace Analysis::Structure::DataTypes
 
     const IOperatorOverload* StructSource::FindOverload(const SyntaxKind base) const
     {
-        for (const auto cast : overloads)
-            if (std::get<0>(cast) == base)
-                return std::get<1>(cast);
+        for (const auto overload : overloads)
+            if (overload.first == base)
+                return overload.second;
 
         return nullptr;
     }
 
     void StructSource::BindGlobal()
     {
+        PushFunction(GetHash());
+
         const auto count = skeleton->ChildCount();
         for (auto i = 0; i < count; i++)
         {
             switch (const auto child = skeleton->GetChild(i); child->NodeType())
             {
-            case NodeType::Declaration:
-                DeclareGlobalVariable(child, this);
-                break;
-            case NodeType::Initialisation:
-                InitialiseGlobalVariable(child, this);
-                break;
-            case NodeType::Property:
-                CreateProperty(child, this);
-                break;
-            case NodeType::PropertyInitialisation:
-                InitialiseProperty(child, this);
-                break;
-            case NodeType::IndexerDeclaration:
-                CreateIndexer(child, this);
-                break;
-            case NodeType::FunctionDeclaration:
-                CreateFunction(child, this);
-                break;
-            case NodeType::ConstructorDeclaration:
-                CreateConstructor(child, this);
-                break;
-            case NodeType::ImplicitDeclaration:
-                CreateImplicit(child, this);
-                break;
-            case NodeType::ExplicitDeclaration:
-                CreateExplict(child, this);
-                break;
-            case NodeType::OperatorOverload:
-                CreateOperatorOverload(child, this);
-                break;
-            default:
-                PushException(new InvalidGlobalStatementException(child->Token().Index(), parent));
-                break;
+                case NodeType::Declaration:
+                    DeclareGlobalVariable(child, this);
+                    break;
+                case NodeType::Initialisation:
+                    InitialiseGlobalVariable(child, this);
+                    break;
+                case NodeType::Property:
+                    CreateProperty(child, this);
+                    break;
+                case NodeType::PropertyInitialisation:
+                    InitialiseProperty(child, this);
+                    break;
+                case NodeType::IndexerDeclaration:
+                    CreateIndexer(child, this);
+                    break;
+                case NodeType::FunctionDeclaration:
+                    CreateFunction(child, this);
+                    break;
+                case NodeType::ConstructorDeclaration:
+                    CreateConstructor(child, this);
+                    break;
+                case NodeType::ImplicitDeclaration:
+                    CreateImplicit(child, this);
+                    break;
+                case NodeType::ExplicitDeclaration:
+                    CreateExplict(child, this);
+                    break;
+                case NodeType::OperatorOverload:
+                    CreateOperatorOverload(child, this);
+                    break;
+                default:
+                    PushException(new InvalidGlobalStatementException(child->Token().Index(), parent));
+                    break;
             }
         }
 
@@ -267,8 +309,23 @@ namespace Analysis::Structure::DataTypes
         if (CheckDescriber(Describer::Static))
             return;
 
-        TryDeclareExplicitString(this);
         TryDeclareInstanceConstructor(this);
+
+        if (FindExplicitCast(String::Instance(), this) == nullptr)
+        {
+            const auto cast = new GeneratedCast(String::Instance(), std::format("constrained. {} callvirt instance string class [System.Runtime]Object::ToString()", FullName()));
+            cast->PushParameterType(this);
+            PushExplicitCast(cast);
+        }
+
+        if (FindOverload(SyntaxKind::Equals) == nullptr ^ FindOverload(SyntaxKind::NotEquals) == nullptr)
+            PushException(new LogException(std::format("Type: {} must define overloads for both == and !=", FullName()), skeleton->Token().Index(), parent));
+
+        if (FindOverload(SyntaxKind::GreaterThan) == nullptr ^ FindOverload(SyntaxKind::LesserThan) == nullptr)
+            PushException(new LogException(std::format("Type: {} must define overloads for both < and >", FullName()), skeleton->Token().Index(), parent));
+
+        if (FindOverload(SyntaxKind::GreaterThanEquals) == nullptr ^ FindOverload(SyntaxKind::LesserThanEquals) == nullptr)
+            PushException(new LogException(std::format("Type: {} must define overloads for both <= and >=", FullName()), skeleton->Token().Index(), parent));
     }
 
     void StructSource::BindLocal()
@@ -277,19 +334,19 @@ namespace Analysis::Structure::DataTypes
             characteristic->BindLocal();
 
         for (const auto function: functions)
-            std::get<1>(function)->BindLocal();
+            function.second->BindLocal();
 
         for (const auto constructor: constructors)
-            std::get<1>(constructor)->BindLocal();
+            constructor.second->BindLocal();
 
         for (const auto cast: implicitCasts)
-            std::get<1>(cast)->BindLocal();
+            cast.second->BindLocal();
 
         for (const auto cast: explicitCasts)
-            std::get<1>(cast)->BindLocal();
+            cast.second->BindLocal();
 
         for (const auto overload: overloads)
-            std::get<1>(overload)->BindLocal();
+            overload.second->BindLocal();
     }
 
     void StructSource::Transpile(Services::StringBuilder& builder) const
@@ -304,19 +361,19 @@ namespace Analysis::Structure::DataTypes
             characteristic->Transpile(builder);
 
         for (const auto function: functions)
-            std::get<1>(function)->Transpile(builder);
+            function.second->Transpile(builder);
 
         for (const auto constructor: constructors)
-            std::get<1>(constructor)->Transpile(builder);
+            constructor.second->Transpile(builder);
 
         for (const auto cast: implicitCasts)
-            std::get<1>(cast)->Transpile(builder);
+            cast.second->Transpile(builder);
 
         for (const auto cast: explicitCasts)
-            std::get<1>(cast)->Transpile(builder);
+            cast.second->Transpile(builder);
 
         for (const auto overload: overloads)
-            std::get<1>(overload)->Transpile(builder);
+            overload.second->Transpile(builder);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -329,22 +386,25 @@ namespace Analysis::Structure::DataTypes
 
     StructSource::~StructSource()
     {
+        for (const auto characteristic : characteristics)
+            delete characteristic;
+
         for (const auto function: functions)
-            delete std::get<1>(function);
+            delete function.second;
 
         for (const auto constructor: constructors)
-            delete std::get<1>(constructor);
+            delete constructor.second;
 
         for (const auto indexer: indexers)
-            delete std::get<1>(indexer);
+            delete indexer.second;
 
         for (const auto cast: implicitCasts)
-            delete std::get<1>(cast);
+            delete cast.second;
 
         for (const auto cast: explicitCasts)
-            delete std::get<1>(cast);
+            delete cast.second;
 
         for (const auto overload: overloads)
-            delete std::get<1>(overload);
+            delete overload.second;
     }
 }

@@ -1,9 +1,9 @@
 #ifndef REFERENCED_H
 #define REFERENCED_H
 
-#include "../../../../Services/singleton_service.h"
-
 #include "../../DataTypes/class.h"
+
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {

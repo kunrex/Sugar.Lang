@@ -7,6 +7,7 @@
 #include "../../Core/Interfaces/Creation/i_constructor.h"
 
 #include "../../../../Services/child.h"
+#include "../../Core/built_in_function.h"
 #include "../../Core/Scoped/default_scoped.h"
 
 namespace Analysis::Structure::Global
@@ -95,6 +96,23 @@ namespace Analysis::Structure::Global
 
         public:
             StaticDefinedConstructor(const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+
+            void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
+
+            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
+    };
+
+    class BuiltInConstructor final : public Creation::ConstructorDefinition, public Core::BuiltInFunction
+    {
+        public:
+            BuiltInConstructor(const Core::Interfaces::IDataType* creationType, const std::string& instruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

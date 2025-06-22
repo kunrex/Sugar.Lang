@@ -88,7 +88,7 @@ namespace Analysis::Structure::Global
     ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), DefaultScoped(), characteristics()
     { }
 
-    MemberType ImplicitConstructor::MemberType() const { return MemberType::Constructor; }
+    MemberType ImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
 
     const std::string& ImplicitConstructor::FullName() const
     {
@@ -138,7 +138,7 @@ namespace Analysis::Structure::Global
     StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), DefaultScoped(), characteristics()
     { }
 
-    MemberType StaticImplicitConstructor::MemberType() const { return MemberType::Constructor; }
+    MemberType StaticImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
 
     const std::string& StaticImplicitConstructor::FullName() const { return name; }
 
@@ -289,5 +289,26 @@ namespace Analysis::Structure::Global
     { }
 
     void StaticDefinedConstructor::PushTranspilation(const ICharacteristic* const characteristic) { characteristics.push_back(characteristic); }
+
+    BuiltInConstructor::BuiltInConstructor(const IDataType* const creationType, const string& instruction) : ConstructorDefinition(Describer::Public, creationType), BuiltInFunction()
+    {
+        fullName = instruction;
+    }
+
+    MemberType BuiltInConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
+
+    const string& BuiltInConstructor::FullName() const { return fullName; }
+
+    void BuiltInConstructor::BindLocal()
+    { }
+
+    void BuiltInConstructor::Transpile(Services::StringBuilder& builder) const
+    { }
+
+    void BuiltInConstructor::PushTranspilation(Services::StringBuilder& builder) const
+    { }
+
+    void BuiltInConstructor::PushTranspilation(const ICharacteristic* const characteristic)
+    { }
 }
 

@@ -107,4 +107,19 @@ namespace Analysis::Structure::Global
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
+
+    BuiltInMethod::BuiltInMethod(const string& name, const Enums::Describer describer, const IDataType* const creationType, const string& instruction) : MethodDefinition(name, describer, creationType), BuiltInFunction()
+    {
+        fullName = instruction;
+    }
+
+    MemberType BuiltInMethod::MemberType() const { return MemberType::BuiltInDefinition; }
+
+    const string& BuiltInMethod::FullName() const { return fullName; }
+
+    void BuiltInMethod::BindLocal()
+    { }
+
+    void BuiltInMethod::Transpile(StringBuilder& builder) const
+    { }
 }

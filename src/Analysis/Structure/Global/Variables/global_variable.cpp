@@ -59,7 +59,8 @@ namespace Analysis::Structure::Global
         if (context->CreationType() != creationType)
             PushException(new InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
 
-        context->Print("", true);
+        const auto constructor = CheckDescriber(Describer::Static) ? parent->StaticConstructor() : parent->InstanceConstructor();
+        constructor->PushTranspilation(this);
     }
 
     void GlobalVariable::Transpile(Services::StringBuilder& builder) const

@@ -9,12 +9,13 @@
 
 #include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
 #include "../../Creation/Transpiling/cil_transpiler.h"
-#include "../Global/BuiltIn/built_in_cast.h"
-#include "../Global/BuiltIn/built_in_operation.h"
 #include "../Wrappers/Generic/action.h"
 #include "../Wrappers/Value/integer.h"
 
 #include "../Compilation/compilation_result.h"
+#include "../Global/Functions/cast_overload.h"
+#include "../Global/Functions/method_function.h"
+#include "../Global/Functions/operator_overload.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ namespace
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : DataType(name, describer | Describer::Static), skeleton(skeleton), fullName(), explicitCasts()
+    Enum::Enum(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : DataType(name, describer | Describer::Static), skeleton(skeleton), fullName(), hashCode(nullptr), explicitCasts()
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
@@ -87,7 +88,12 @@ namespace Analysis::Structure::DataTypes
     { }
 
     const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr;}
+    {
+        if (name == hashCode->Name() && argumentList.empty())
+            return hashCode;
+
+        return nullptr;
+    }
 
     void Enum::PushConstructor(IConstructor* constructor)
     { }
@@ -126,8 +132,8 @@ namespace Analysis::Structure::DataTypes
         const auto hash = ArgumentHash(std::vector({ returnType, fromType}));
 
         for (const auto cast : explicitCasts)
-            if (std::get<0>(cast) == hash)
-                return std::get<1>(cast);
+            if (cast.first == hash)
+                return cast.second;
 
         return nullptr;
     }
@@ -138,8 +144,8 @@ namespace Analysis::Structure::DataTypes
     const IOperatorOverload* Enum::FindOverload(const SyntaxKind base) const
     {
         for (const auto overload : overloads)
-            if (std::get<0>(overload) == base)
-                return std::get<1>(overload);
+            if (overload.first == base)
+                return overload.second;
 
         return nullptr;
     }
@@ -150,39 +156,41 @@ namespace Analysis::Structure::DataTypes
         for (auto i = 0; i < count; i++)
             BindEnumConstant(skeleton->GetChild(i), this);
 
-        const auto explicitInteger = new BuiltInCast(Integer::Instance(), "conv.i4", nullptr);
+        hashCode = new BuiltInMethod(std::string(hashCodeFunction), Describer::Public, Integer::Instance(), std::format("constrained. {} callvirt instance int32 [System.Runtime]System.Object::GetHashCode()", FullName()));
+
+        const auto explicitInteger = new GeneratedCast(Integer::Instance(), "conv.i4");
         explicitInteger->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash(explicitInteger), explicitInteger);
 
-        const auto explicitString = new BuiltInCast(Integer::Instance(), std::format("box {} callvirt instance string [System.Runtime]System.Enum::ToString()", fullName), nullptr);
+        const auto explicitString = new GeneratedCast(Integer::Instance(), std::format("constrained. {} callvirt instance string [System.Runtime]System.Object::ToString()", FullName()));
         explicitString->PushParameterType(this);
         explicitCasts.emplace_back(ArgumentHash(explicitString), explicitString);
 
-        const auto bitwiseNot = new BuiltInOperation(SyntaxKind::BitwiseNot, this, "not", Not);
+        const auto bitwiseNot = new BuiltInOverload(SyntaxKind::BitwiseNot, this, "not", Not);
         bitwiseNot->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::BitwiseNot, bitwiseNot);
 
-        const auto bitwiseAnd = new BuiltInOperation(SyntaxKind::BitwiseAnd, this, "and", BitwiseAnd);
+        const auto bitwiseAnd = new BuiltInOverload(SyntaxKind::BitwiseAnd, this, "and", BitwiseAnd);
         bitwiseAnd->PushParameterType(this);
         bitwiseAnd->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::BitwiseAnd, bitwiseAnd);
 
-        const auto bitwiseOr = new BuiltInOperation(SyntaxKind::BitwiseOr, this, "or", BitwiseOr);
+        const auto bitwiseOr = new BuiltInOverload(SyntaxKind::BitwiseOr, this, "or", BitwiseOr);
         bitwiseOr->PushParameterType(this);
         bitwiseOr->PushParameterType(this);
         overloads.emplace_back(SyntaxKind::BitwiseOr, bitwiseOr);
 
-        const auto bitwiseXor = new BuiltInOperation(SyntaxKind::BitwiseXor, this, "xor", BitwiseXor);
+        const auto bitwiseXor = new BuiltInOverload(SyntaxKind::BitwiseXor, this, "xor", BitwiseXor);
         bitwiseXor->PushParameterType(this);
         bitwiseXor->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
 
-        const auto rightShift = new BuiltInOperation(SyntaxKind::RightShift, this, "shr", RightShift);
+        const auto rightShift = new BuiltInOverload(SyntaxKind::RightShift, this, "shr", RightShift);
         rightShift->PushParameterType(this);
         rightShift->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::RightShift, rightShift);
 
-        const auto leftShift = new BuiltInOperation(SyntaxKind::LeftShift, this, "shl", LeftShift);
+        const auto leftShift = new BuiltInOverload(SyntaxKind::LeftShift, this, "shl", LeftShift);
         leftShift->PushParameterType(this);
         leftShift->PushParameterType(Integer::Instance());
         overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
@@ -222,9 +230,9 @@ namespace Analysis::Structure::DataTypes
             delete characteristic;
 
         for (const auto cast: explicitCasts)
-            delete std::get<1>(cast);
+            delete cast.second;
 
         for (const auto overload: overloads)
-            delete std::get<1>(overload);
+            delete overload.second;
     }
 }

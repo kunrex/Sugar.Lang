@@ -95,7 +95,7 @@ Sugar supports custom data structures: `class`, `struct` and `enum`.
 
 ### Memory Implications (`class` vs `struct`)
 
-Sugar is garbage collected since it compiles to CIL. The only difference between a class and a struct in sugar is how they're handled in memory.
+Sugar is garbage collected since it compiles to CIL. The primary difference between a class and a struct in sugar is how they're handled in memory.
 
 | Criteria  | Class                 | Struct                              |
 |:---------:|-----------------------|-------------------------------------|
@@ -136,6 +136,131 @@ a.Modify(); // the original is modified, the copy is unchanged.
 print(a.x) // prints 10
 print(b.x) // prints 0
 ```
+
+### Constructors
+
+Constructors are functions used to initialise values in sugar. They're called using the `create` keyword
+
+```c#
+class Test 
+{
+    [public] int: x;
+    
+    [public]
+    constructor(int: x)
+    {
+        this.x = x;
+    }
+}
+
+let: test = create Test(10);
+```
+
+All structures define an overridable private, static, parameterless constructor.
+
+```c#
+class Test 
+{
+    [public, static] int: x;
+    
+    [private, static]
+    constructor()
+    {
+        x = 100;
+    }
+}
+```
+
+Classes and structs always define a non-static parameterless constructor. The compiler will generate one if the programmer does not.
+
+The compiler generated version will initialise fields to default or inlined values.
+
+### Special Functions
+Sugar provides functions for cast overloading, operator overloading and indexers.
+
+```cs
+struct Complex
+{
+    float: real { [public] get; [private] set; }
+    float: imaginary { [public] get; [private] set; }
+    
+    [public]
+    constructor(float: r, float: i) 
+    {
+        real = r;
+        imaginary = i;
+    }
+
+    [public]
+    indexer float (int: index) // allows instances of complex to be indexed using []
+    {
+        get { return index == 0 ? real : imaginary; }
+        [private] set { if (index == 0) real = value; else imaginary = value; }
+    }
+    
+    [public, static]
+    explicit string(Complex: person) //allows the explicit conversion of complex to a string, internally called by tostring() and format()
+    {
+        return format("{0} + {1}j", real, imaginary);
+    }
+    
+    [public, static]
+    implicit float(Complex: person) //allows the implicit conversion of complex to a float
+    {
+        return math.pow(real * real + imaginary * imaginary, 0.5);
+    }
+    
+    [public, static]
+    operator Complex +(Complex: a, Complex b) //allows the usage of + operator between two complexs
+    {
+        Complex: complex = create Complex();
+        
+        complex.real = a.real + b.real;
+        complex.imaginary = a.imaginary + b.imaginary;
+        
+        return complex;
+    }
+}
+```
+
+Cast and operator overloads must be public and static. Indexers cannot be static.
+
+### Enums
+
+Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
+```cs
+enum EncodingBase
+{
+    Binary = 2,
+    Octal = Binary << 2,
+    Hex = Binary << 3,
+    Base64 = Binary << 5
+}
+```
+
+Enums implicitly define bitwise operations and an explicit conversion to their integer value.
+
+
+### Compiler Generated Functions
+
+1. Non Static Classes
+
+- An `(overridable)` explicit conversion to string.
+- `(overridable)` Operator overloads for `==` and `!=`
+- A `GetHash` function.
+
+2. Non Static Structs
+
+- An `(overridable)` explicit conversion to string.
+- A `GetHash` function.
+
+3. Enums
+
+- An explicit conversion to string
+- A `GetHas` function.
+- Operator Overloads for `~`, `&`, `|`, `>>`, `<<` and `^`
+
+Static structs and classes have no implicitly defined functions except an (overridable) static constructor, whenever required.
 
 ### Built In Types
 These data types are built into sugar:
@@ -216,8 +341,6 @@ let: e = create Exception("something went wrong!");
 throw e;
 ```
 
-> Object creation in sugar is carried out through the `create` keyword. 
-
 #### Delegates (?)
 Sugar offers partial delegate functionality using `func` and `action`.
 
@@ -258,60 +381,6 @@ int: result = invoke(add, 10, 20);
 >  -	Structs: initialized using their parameterless constructor.
 >  -	Tuples: each element is initialized to the default of its respective type.
 >  -	Nullable value types: the 'null value'
-
-
-### Constructors 
-
-Constructors are functions used to initialise values in sugar. They're called using the `create` keyword
-
-```c#
-class Test 
-{
-    [public] int: x;
-    
-    [public]
-    constructor(int: x)
-    {
-        this.x = x;
-    }
-}
-
-let: test = create Test(10);
-```
-
-All structures define an overridable private, static, parameterless constructor. 
-
-```c#
-class Test 
-{
-    [public, static] int: x;
-    
-    [private, static]
-    constructor()
-    {
-        x = 100;
-    }
-}
-```
-
-Classes and structs always define a non-static parameterless constructor. The compiler will generate one if the programmer does not. 
-
-The compiler generated version will initialise fields to default or inlined values. 
-
-### Enums
-
-Enums in sugar are a collection of immutable constant integers. Members are initialised to compile time constant values.
-```cs
-enum EncodingBase
-{
-    Binary = 2,
-    Octal = Binary << 2,
-    Hex = Binary << 3,
-    Base64 = Binary << 5
-}
-```
-
-Enums implicitly define bitwise operations and an explicit conversion to their integer value.
 
 ## Describers
 
@@ -421,8 +490,6 @@ In these cases no backing field is generated and all accessors must define a bod
 
 If a property defines only one accessor, it's expected to define a body since no backing field is generated.
 
-> Fields and Properties (that define backing fields) may be inline initialised to compile time constant values or a `create` expression with compile time contant values.
-
 ```cs
 int: GetOnlyProperty 
 { 
@@ -435,73 +502,19 @@ int: GetOnlyProperty
 
 Properties may be `static`. They cannot be `const` or `constexpr`.
 
-## Special Functions
-Sugar provides functions for cast overloading, operator overloading and indexers.
-
-```cs
-struct Complex
-{
-    float: real { [public] get; [private] set; }
-    float: imaginary { [public] get; [private] set; }
-    
-    [public]
-    constructor(float: r, float: i) 
-    {
-        real = r;
-        imaginary = i;
-    }
-
-    [public]
-    indexer float (int: index) // allows instances of complex to be indexed using []
-    {
-        get { return index == 0 ? real : imaginary; }
-        [private] set { if (index == 0) real = value; else imaginary = value; }
-    }
-    
-    [public, static]
-    explicit string(Complex: person) //allows the explicit conversion of complex to a string, internally called by tostring() and format()
-    {
-        return format("{0} + {1}j", real, imaginary);
-    }
-    
-    [public, static]
-    implicit float(Complex: person) //allows the implicit conversion of complex to a float
-    {
-        return math.pow(real * real + imaginary * imaginary, 0.5);
-    }
-    
-    [public, static]
-    operator Complex +(Complex: a, Complex b) //allows the usage of + operator between two complexs
-    {
-        Complex: complex = create Complex();
-        
-        complex.real = a.real + b.real;
-        complex.imaginary = a.imaginary + b.imaginary;
-        
-        return complex;
-    }
-}
-```
-
-Cast and operator overloads must be public and static. Indexers cannot be static. 
-
-All structures implicitly define an (overridable) explicit string conversion. 
+> Fields and Properties (that define backing fields) may be inline initialised to compile time constant values or a `create` expression with compile time contant values.
 
 ## Import Statements
 
 Sugar defaults the directory structure as the project structure. Import statements are used to navigate this structure using relative file paths.
 
 ```java
-import "..directory.sub_directory.file.Class";
-```
-
-```java
-import "..directory.sub_directory.file.Class";
-
-//code
+import "...grandparent_directory.sub_directory.file.Class";
 
 let: x = create Class(param1, param2);
 ```
+
+> The first `.` corresponds to the current directory and is redundant. Every additional `.` is a step into the corresponding parent directory.
 
 Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 

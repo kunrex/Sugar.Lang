@@ -1,13 +1,13 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <map>
-
-#include "../../../../Services/singleton_service.h"
+#include <array>
 
 #include "../../DataTypes/class.h"
-#include "../../Global/BuiltIn/built_in_indexer.h"
+
 #include "../../Core/Interfaces/DataTypes/i_collection_type.h"
+
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
@@ -18,13 +18,19 @@ namespace Analysis::Structure::Wrappers
 
             const IDataType* listType;
 
-            std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
+            std::array<const Core::Interfaces::ICharacteristic*, 2> characteristics;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IFunctionDefinition*>> functions;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IFunctionDefinition*>, 7> functions;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IConstructor*>> constructors;
+            std::array<std::pair<unsigned long, const Core::Interfaces::IConstructor*>, 2> constructors;
 
-            Global::BuiltInIndexer* indexer;
+            const Core::Interfaces::IIndexerDefinition* indexer;
+
+            const Core::Interfaces::IFunction* implicitObject;
+
+            const Core::Interfaces::IFunction* explicitString;
+
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*>, 2> overloads;
 
             explicit List(const IDataType* listType);
 

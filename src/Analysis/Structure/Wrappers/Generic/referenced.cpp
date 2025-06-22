@@ -3,8 +3,6 @@
 #include <map>
 #include <format>
 
-#include "../../Global/BuiltIn/built_in_cast.h"
-
 using namespace std;
 
 using namespace Tokens::Enums;
@@ -15,7 +13,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Wrappers
 {
-    Referenced::Referenced(const IDataType* const referencedType) : BuiltInClass(std::format("{}&", referencedType->Name()), Describer::Public), SingletonService(), referencedType(referencedType)
+    Referenced::Referenced(const IDataType* const referencedType) : BuiltInClass(std::format("{}&", referencedType->FullName()), Describer::Public), SingletonService(), referencedType(referencedType)
     { }
 
     const Referenced* Referenced::Instance(const IDataType* const dataType)

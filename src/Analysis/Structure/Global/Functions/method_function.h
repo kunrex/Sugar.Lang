@@ -2,6 +2,7 @@
 #define METHOD_FUNCTION_H
 
 #include "../../Core/Scoped/scoped.h"
+#include "../../Core/built_in_function.h"
 #include "../../Creation/Functions/method_definition.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
@@ -30,6 +31,20 @@ namespace Analysis::Structure::Global
 
         public:
             GeneratedGetFunction(Enums::Describer describer, std::string variableName, const Core::Interfaces::IDataType* creationType);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
+
+            void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
+    };
+
+    class BuiltInMethod final : public Creation::MethodDefinition, public Core::BuiltInFunction
+    {
+        public:
+            BuiltInMethod(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const std::string& instruction);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

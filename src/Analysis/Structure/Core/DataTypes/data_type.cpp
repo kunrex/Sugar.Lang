@@ -1,5 +1,7 @@
 #include "data_type.h"
 
+#include "../../Global/Functions/method_function.h"
+
 using namespace std;
 
 using namespace Analysis::Structure::Enums;

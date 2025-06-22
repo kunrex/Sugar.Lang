@@ -1,27 +1,31 @@
 #ifndef NULLABLE_H
 #define NULLABLE_H
 
-#include <map>
-
-#include "../../../../Services/singleton_service.h"
+#include <array>
 
 #include "../../DataTypes/value_type.h"
 
+#include "../../../../Services/singleton_service.h"
+
 namespace Analysis::Structure::Wrappers
 {
-    class Nullable final : public DataTypes::BuiltInValueType, public Services::SingletonService
+    class Nullable final : public DataTypes::ImplicitValueType, public Services::SingletonService
     {
         private:
             mutable std::string genericSignature;
 
             const IDataType* nullableType;
 
-            std::vector<std::tuple<unsigned long, const Core::Interfaces::IConstructor*>> constructors;
+            std::array<const Core::Interfaces::ICharacteristic*, 2> characteristics;
+
+            std::array<std::pair<unsigned long, const Core::Interfaces::IConstructor*>, 2> constructors;
 
             explicit Nullable(const IDataType* nullableType);
 
         public:
             static const Nullable* Instance(const IDataType* dataType);
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
@@ -30,8 +34,6 @@ namespace Analysis::Structure::Wrappers
             void BindGlobal() override;
 
             [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
-
-            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 

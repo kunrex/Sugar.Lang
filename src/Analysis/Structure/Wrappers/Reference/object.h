@@ -1,19 +1,20 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "../../../../Services/singleton_service.h"
+#include <array>
 
 #include "../../DataTypes/class.h"
-#include "../../Global/BuiltIn/built_in_cast.h"
+
+#include "../../../../Services/singleton_service.h"
 
 namespace Analysis::Structure::Wrappers
 {
-    class Object final : public DataTypes::BuiltInClass, public Services::SingletonService
+    class Object final : public DataTypes::ImplicitClass, public Services::SingletonService
     {
         private:
             static Object instance;
 
-            Global::BuiltInCast* toString;
+            std::array<std::pair<Tokens::Enums::SyntaxKind, const Core::Interfaces::IOperatorOverload*>, 2> overloads;
 
             Object();
 
@@ -21,20 +22,15 @@ namespace Analysis::Structure::Wrappers
             static const Object* Instance();
             static void BindGlobalInstance();
 
-            [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;
-
             void BindGlobal() override;
 
-            [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
+            [[nodiscard]] Tokens::Enums::TypeKind Type() const override;;
 
-            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
+            [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
             [[nodiscard]] const Core::Interfaces::IConstructor* FindConstructor(const std::vector<const IDataType*>& argumentList) const override;
 
             [[nodiscard]] const Core::Interfaces::IIndexerDefinition* FindIndexer(const std::vector<const IDataType*>& argumentList) const override;
-
-            [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
-            [[nodiscard]] const Core::Interfaces::IFunction* FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
 
             [[nodiscard]] const Core::Interfaces::IOperatorOverload* FindOverload(Tokens::Enums::SyntaxKind base) const override;
 

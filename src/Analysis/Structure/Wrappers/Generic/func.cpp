@@ -5,13 +5,17 @@
 
 #include "generic_extensions.h"
 
+#include "../Value/boolean.h"
+
 #include "../../DataTypes/data_type_extensions.h"
+#include "../../Global/Functions/operator_overload.h"
 
 using namespace std;
 
 using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
+using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -19,7 +23,7 @@ const string cil_func = "[System.Runtime]System.Func";
 
 namespace Analysis::Structure::Wrappers
 {
-    Func::Func() : BuiltInClass(cil_func, Describer::Public), SingletonService(), genericSignature(), types()
+    Func::Func() : ImplicitClass(cil_func, Describer::Public), SingletonService()
     { }
 
     const Func* Func::Instance(const std::vector<const IDataType*>& types)
@@ -54,7 +58,17 @@ namespace Analysis::Structure::Wrappers
     const std::string& Func::DelegateSignature() const { return genericSignature; }
 
     void Func::BindGlobal()
-    { }
+    {
+        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate)");
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads[0] = { SyntaxKind::Equals, equals };
+
+        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate) ldc.i4.0 ceq");
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads[1] = { SyntaxKind::NotEquals, notEquals };
+    }
 
     const ICharacteristic* Func::FindCharacteristic(const std::string& name) const
     { return nullptr; }
@@ -62,18 +76,22 @@ namespace Analysis::Structure::Wrappers
     const IConstructor* Func::FindConstructor(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunctionDefinition* Func::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
-    { return nullptr; }
-
     const IIndexerDefinition* Func::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     { return nullptr; }
 
-    const IFunction* Func::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
-    const IFunction* Func::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
-
     const IOperatorOverload* Func::FindOverload(const SyntaxKind base) const
-    { return nullptr; }
+    {
+        for (const auto overload: overloads)
+            if (overload.first == base)
+                return overload.second;
+
+        return nullptr;
+    }
+
+    Func::~Func()
+    {
+        for (const auto overload : overloads)
+            delete overload.second;
+    }
+
 }

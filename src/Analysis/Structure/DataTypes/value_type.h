@@ -14,17 +14,12 @@ namespace Analysis::Structure::DataTypes
         protected:
             mutable int slotCount;
 
-            std::vector<Core::Interfaces::ICharacteristic*> characteristics;
+            [[nodiscard]] Core::Interfaces::IFunctionDefinition* GetHash() const;
 
         public:
             ValueType(const std::string& name, Enums::Describer describer);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
-            [[nodiscard]] int SlotCount() const override;
-
-            [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
-
-            ~ValueType() override;
     };
 
     class BuiltInValueType : public ValueType
@@ -38,6 +33,25 @@ namespace Analysis::Structure::DataTypes
             void BindLocal() override;
     };
 
+    class ImplicitValueType : public BuiltInValueType
+    {
+        protected:
+            const Core::Interfaces::IFunctionDefinition* getHash;
+
+            const Core::Interfaces::IFunction* explicitString;
+
+            ImplicitValueType(const std::string& name, Enums::Describer describer);
+
+            void BindGlobal() override;
+
+        public:
+            [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;
+
+            [[nodiscard]] const Core::Interfaces::IFunction* FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const override;
+
+            ~ImplicitValueType() override;
+    };
+
     class StructSource final : public ValueType, public virtual Core::Interfaces::IUserDefinedType
     {
         private:
@@ -45,25 +59,30 @@ namespace Analysis::Structure::DataTypes
 
             mutable std::string fullName;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunctionDefinition*>> functions;
+            std::vector<Core::Interfaces::ICharacteristic*> characteristics;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IConstructor*>> constructors;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunctionDefinition*>> functions;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IIndexerDefinition*>> indexers;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IConstructor*>> constructors;
 
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> implicitCasts;
-            std::vector<std::tuple<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IIndexerDefinition*>> indexers;
 
-            std::vector<std::tuple<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> implicitCasts;
+            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+
+            std::vector<std::pair<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
 
         public:
             StructSource(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);
+
+            [[nodiscard]] int SlotCount() const override;
 
             [[nodiscard]] Tokens::Enums::TypeKind Type() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
 
             void PushCharacteristic(Core::Interfaces::ICharacteristic* characteristic) override;
+            [[nodiscard]] const Core::Interfaces::ICharacteristic* FindCharacteristic(const std::string& name) const override;
 
             void PushFunction(Core::Interfaces::IFunctionDefinition* function) override;
             [[nodiscard]] const Core::Interfaces::IFunctionDefinition* FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const override;

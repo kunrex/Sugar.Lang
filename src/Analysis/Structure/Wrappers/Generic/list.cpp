@@ -3,16 +3,19 @@
 #include <map>
 #include <format>
 
-#include "../../DataTypes/data_type_extensions.h"
-
-#include "../../Global/BuiltIn/built_in_void.h"
-#include "../../Global/BuiltIn/built_in_method.h"
-#include "../../Global/BuiltIn/built_in_indexer.h"
-#include "../../Global/BuiltIn/built_in_property.h"
-#include "../../Global/BuiltIn/built_in_constructor.h"
-
 #include "../Value/boolean.h"
 #include "../Value/integer.h"
+#include "../Reference/string.h"
+#include "../Reference/object.h"
+
+#include "../../DataTypes/data_type_extensions.h"
+#include "../../Global/Functions/cast_overload.h"
+
+#include "../../Global/Properties/indexer.h"
+#include "../../Global/Properties/property.h"
+#include "../../Global/Functions/void_function.h"
+#include "../../Global/Functions/method_function.h"
+#include "../../Global/Functions/operator_overload.h"
 
 using namespace std;
 
@@ -27,7 +30,7 @@ const string cil_list = "[System.Collections.Generic]System.Collections.Generic.
 
 namespace Analysis::Structure::Wrappers
 {
-    List::List(const IDataType* const listType) : BuiltInClass(cil_list, Describer::Public), SingletonService(), genericSignature(), listType(listType), characteristics(), functions(), constructors(), indexer(nullptr)
+    List::List(const IDataType* const listType) : BuiltInClass(cil_list, Describer::Public), SingletonService(), listType(listType), characteristics(), indexer(nullptr), implicitObject(nullptr), explicitString(nullptr)
     { }
 
     const List* List::Instance(const IDataType* const dataType)
@@ -56,46 +59,61 @@ namespace Analysis::Structure::Wrappers
 
     void List::BindGlobal()
     {
-        const auto count = std::format("callvirt instance int32 class {}::get_Count()", genericSignature);
-        characteristics.push_back(new BuiltInProperty("Count", Describer::Public, Integer::Instance(), true, count, false, ""));
+        characteristics[0] = new BuiltInProperty("Count", Describer::Public, Integer::Instance(), true, std::format("callvirt instance int32 class {}::get_Count()", genericSignature), false, "");
+        characteristics[1] = new BuiltInProperty("Capacity", Describer::Public, Integer::Instance(), true, std::format("callvirt instance int32 class {}::get_Capacity()", genericSignature), true, std::format("callvirt instance void class {}::set_Capacity(int32)", genericSignature));
 
-        const auto capacity = std::format("callvirt instance int32 class {}::get_Capacity()", genericSignature);
-        characteristics.push_back(new BuiltInProperty("Capacity", Describer::Public, Integer::Instance(), true, capacity, false, ""));
-
-        const auto get = std::format("callvirt instance !0 class {}::get_Item(int32)", genericSignature);
-        const auto set = std::format("callvirt instance void class {}::set_Item(int32, !0)", genericSignature);
-        indexer = new BuiltInIndexer(listType, true, get, true, set);
+        const auto indexer = new BuiltInIndexer(listType, true, std::format("callvirt instance !0 class {}::get_Item(int32)", genericSignature), true, std::format("callvirt instance void class {}::set_Item(int32, !0)", genericSignature));
         indexer->PushParameterType(Integer::Instance());
+        this->indexer = indexer;
 
         const auto add = new BuiltInVoid("Add", Describer::Public, std::format("instance void class {}::Add(!0)", genericSignature));
         add->PushParameterType(listType);
-        functions.emplace_back(std::hash<string>()("Add") ^ ArgumentHash(add), add);
+        functions[0] = { std::hash<string>()("Add") ^ ArgumentHash(add), add };
 
         const auto clear = new BuiltInVoid("Clear", Describer::Public, std::format("instance void class {}::Clear()", genericSignature));
-        functions.emplace_back(std::hash<string>()("Clear") ^ ArgumentHash(clear), clear);
+        functions[1] = { std::hash<string>()("Clear") ^ ArgumentHash(clear), clear };
 
         const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Contains(!0)", genericSignature));
         contains->PushParameterType(listType);
-        functions.emplace_back(std::hash<string>()("Contains") ^ ArgumentHash(contains), contains);
+        functions[2] = { std::hash<string>()("Contains") ^ ArgumentHash(contains), contains };
 
         const auto remove = new BuiltInMethod("Remove", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Remove(!0)", genericSignature));
         remove->PushParameterType(listType);
-        functions.emplace_back(std::hash<string>()("Remove") ^ ArgumentHash(remove), remove);
+        functions[3] = { std::hash<string>()("Remove") ^ ArgumentHash(remove), remove };
 
         const auto reverse = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse()", genericSignature));
-        functions.emplace_back(std::hash<string>()("Reverse") ^ ArgumentHash(reverse), reverse);
+        functions[4] = { std::hash<string>()("Reverse") ^ ArgumentHash(reverse), reverse };
 
         const auto reverseBound = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse(int32, int32)", genericSignature));
         reverseBound->PushParameterType(Integer::Instance());
         reverseBound->PushParameterType(Integer::Instance());
-        functions.emplace_back(std::hash<string>()("Reverse") ^ ArgumentHash(reverseBound), reverseBound);
+        functions[5] = { std::hash<string>()("Reverse") ^ ArgumentHash(reverseBound), reverseBound };
 
-        const auto defaultConstructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor()", genericSignature));
-        constructors.emplace_back(ArgumentHash(defaultConstructor), defaultConstructor);
+        const auto getHash = GetHash();
+        functions[6] = { ArgumentHash(getHash), getHash };
+
+        const auto defaultConstructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor()", genericSignature));
+        constructors[0] = { ArgumentHash(defaultConstructor), defaultConstructor };
 
         const auto constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor(int32)", genericSignature));
         constructor->PushParameterType(Integer::Instance());
-        constructors.emplace_back(ArgumentHash(constructor), constructor);
+        constructors[0] = { ArgumentHash(constructor), constructor };
+
+        implicitObject = ImplicitObject();
+
+        const auto explicitString = new GeneratedCast(String::Instance(), "callvirt instance string [System.Runtime]System.Object::ToString()");
+        explicitString->PushParameterType(this);
+        this->explicitString = explicitString;
+
+        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+        equals->PushParameterType(this);
+        equals->PushParameterType(this);
+        overloads[0] = { SyntaxKind::Equals, equals };
+
+        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        notEquals->PushParameterType(this);
+        notEquals->PushParameterType(this);
+        overloads[1] = { SyntaxKind::NotEquals, notEquals };
     }
 
     const ICharacteristic* List::FindCharacteristic(const std::string& name) const
@@ -112,8 +130,8 @@ namespace Analysis::Structure::Wrappers
         const auto hash = ArgumentHash(argumentList);
 
         for (const auto constructor: constructors)
-            if (std::get<0>(constructor) == hash)
-                return std::get<1>(constructor);
+            if (constructor.first == hash)
+                return constructor.second;
 
         return nullptr;
     }
@@ -123,25 +141,47 @@ namespace Analysis::Structure::Wrappers
         const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
 
         for (const auto function: functions)
-            if (std::get<0>(function) == hash)
-                return std::get<1>(function);
+            if (function.first == hash)
+                return function.second;
 
         return nullptr;
     }
 
     const IIndexerDefinition* List::FindIndexer(const std::vector<const IDataType*>& argumentList) const
     {
-        return ArgumentHash(indexer) == ArgumentHash(argumentList) ? indexer : nullptr;
+        if (argumentList.size() != 1)
+            return nullptr;
+
+        if (argumentList[0] != Integer::Instance())
+            return nullptr;
+
+        return indexer;
     }
 
     const IFunction* List::FindImplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
+    {
+        if (returnType == Object::Instance() && fromType == this)
+            return implicitObject;
+
+        return nullptr;
+    }
 
     const IFunction* List::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
-    { return nullptr; }
+    {
+        if (returnType == String::Instance() && fromType == this)
+            return implicitObject;
+
+        return nullptr;
+    }
 
     const IOperatorOverload* List::FindOverload(const SyntaxKind base) const
-    { return nullptr; }
+    {
+        for (const auto overload: overloads)
+            if (overload.first == base)
+                return overload.second;
+
+        return nullptr;
+    }
 
     List::~List()
     {
@@ -149,11 +189,18 @@ namespace Analysis::Structure::Wrappers
             delete characteristic;
 
         for (const auto function: functions)
-            delete std::get<1>(function);
+            delete function.second;
 
         for (const auto& constructor: constructors)
-            delete std::get<1>(constructor);
+            delete constructor.second;
 
         delete indexer;
+
+        delete explicitString;
+
+        delete implicitObject;
+
+        for (const auto overload : overloads)
+            delete overload.second;
     }
 }

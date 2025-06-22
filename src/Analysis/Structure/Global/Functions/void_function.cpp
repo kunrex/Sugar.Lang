@@ -154,5 +154,20 @@ namespace Analysis::Structure::Global
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
+
+    BuiltInVoid::BuiltInVoid(const std::string& name, const Enums::Describer describer, const string& instruction) : VoidDefinition(name, describer), BuiltInFunction()
+    {
+        fullName = instruction;
+    }
+
+    MemberType BuiltInVoid::MemberType() const { return MemberType::BuiltInDefinition; }
+
+    const string& BuiltInVoid::FullName() const { return fullName; }
+
+    void BuiltInVoid::BindLocal()
+    { }
+
+    void BuiltInVoid::Transpile(StringBuilder& builder) const
+    { }
 }
 

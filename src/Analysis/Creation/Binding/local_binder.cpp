@@ -1009,6 +1009,23 @@ namespace Analysis::Creation::Binding
         return TryBindCast(expression, type, index, sourceFile);
     }
 
+    std::optional<std::pair<const IOperatorOverload*, const IFunction*>> TryFindBinaryOverload(const SyntaxKind kind, const IDataType* const lhsCreationType, const IDataType* const rhsCreationType)
+    {
+        const auto operation = lhsCreationType->FindOverload(kind);
+        if (operation == nullptr)
+            return std::nullopt;
+
+        const auto lhsCast = lhsCreationType->FindImplicitCast(lhsCreationType, rhsCreationType);
+        const auto rhsCast = rhsCreationType->FindImplicitCast(lhsCreationType, rhsCreationType);
+
+        if (!(lhsCast == nullptr ^ rhsCast == nullptr))
+            return std::nullopt;
+        if (lhsCast == nullptr)
+            return std::make_optional(std::pair(operation, rhsCast));
+
+        return std::make_optional(std::pair(operation, lhsCast));
+    }
+
     const IContextNode* BindExpression(const IParseNode* expression, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
         const auto source = dataType->Parent();
@@ -1118,27 +1135,21 @@ namespace Analysis::Creation::Binding
                         return new InvalidBinaryExpression(lhs, rhs);
                     }
 
-                    const auto lhsCast = rhsCreationType->FindImplicitCast(rhsCreationType, lhsCreationType);
-                    const auto rhsCast = lhsCreationType->FindImplicitCast(lhsCreationType, rhsCreationType);
+                    const auto lhsOperation = TryFindBinaryOverload(kind, lhsCreationType, rhsCreationType);
+                    const auto rhsOperation = TryFindBinaryOverload(kind, rhsCreationType, lhsCreationType);
 
-                    const auto lhsOperation =  lhsCreationType->FindOverload(kind);
-                    const auto rhsOperation =  rhsCreationType->FindOverload(kind);
-
-                    const bool lhsValid = lhsCast != nullptr && rhsOperation != nullptr;
-                    const bool rhsValid = rhsCast != nullptr && lhsOperation != nullptr;
-
-                    if (lhsValid)
+                    if (lhsOperation)
                     {
-                        if (rhsValid)
+                        if (rhsOperation)
                         {
                             PushException(new LogException(std::format("Ambiguous operation between overloads defined in: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
-                        return new DefinedBinaryExpression(rhsOperation, lhs, new DefinedCastExpression(lhsCast, rhs));
+                        return new DefinedBinaryExpression(lhsOperation->first, lhs, new DefinedCastExpression(lhsOperation->second, rhs));
                     }
-                    if (rhsValid)
-                        return new DefinedBinaryExpression(rhsOperation, new DefinedCastExpression(rhsCast, lhs), rhs);
+                    if (rhsOperation)
+                        return new DefinedBinaryExpression(rhsOperation->first, new DefinedCastExpression(rhsOperation->second, lhs), rhs);
 
                     PushException(new LogException(std::format("No overload found for types: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
                     return new InvalidBinaryExpression(lhs, rhs);

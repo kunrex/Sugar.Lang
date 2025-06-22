@@ -2,6 +2,7 @@
 #define VOID_FUNCTION_H
 
 #include "../../Core/Scoped/scoped.h"
+#include "../../Core/built_in_function.h"
 #include "../../Creation/Functions/void_definition.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
@@ -52,6 +53,20 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] unsigned long ParameterCount() const override;
             [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
+
+            void BindLocal() override;
+
+            void Transpile(Services::StringBuilder& builder) const override;
+    };
+
+    class BuiltInVoid final : public Creation::VoidDefinition, public Core::BuiltInFunction
+    {
+        public:
+            BuiltInVoid(const std::string& name, Enums::Describer describer, const std::string& instruction);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] const std::string& FullName() const override;
 
             void BindLocal() override;
 

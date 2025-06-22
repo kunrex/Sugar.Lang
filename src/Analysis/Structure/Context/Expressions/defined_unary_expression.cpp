@@ -22,7 +22,7 @@ namespace Analysis::Structure::Context
     bool DefinedUnaryExpression::Readable() const { return true; }
     bool DefinedUnaryExpression::Writable() const { return true; }
 
-    string DefinedUnaryExpression::CILData() const { return operation->MemberType() == MemberType::BuiltInOperation ? operation->FullName() : std::format("call {}", operation->FullName()); }
+    string DefinedUnaryExpression::CILData() const { return operation->MemberType() == MemberType::GeneratedOverload ? operation->FullName() : std::format("call {}", operation->FullName()); }
 
     void DefinedUnaryExpression::Print(const std::string& indent, const bool last) const
     {
