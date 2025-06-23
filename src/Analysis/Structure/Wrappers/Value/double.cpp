@@ -78,13 +78,13 @@ namespace Analysis::Structure::Wrappers
 
         characteristics[5] = new BuiltInConstant("Epsilon", Describer::Public | Describer::Constexpr, this, new FloatConstant(4.94065645841247E-324));
 
-        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Double::TryParse(string, float64&)");
+        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Double::TryParse(string, float64&)");
         tryParse->PushParameterType(String::Instance());
         tryParse->PushParameterType(Referenced::Instance(this));
-        functions[0] = { ArgumentHash(tryParse), tryParse };
+        functions[0] = { std::hash<string>()(tryParse->Name()) ^ ArgumentHash(tryParse), tryParse };
 
         const auto getHash = GetHash();
-        functions[1] = { ArgumentHash(getHash), getHash };
+        functions[1] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
         const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<double>);
         explicitShort->PushParameterType(this);
@@ -102,7 +102,7 @@ namespace Analysis::Structure::Wrappers
         explicitFloat->PushParameterType(this);
         explicitCasts[3] = { ArgumentHash({ Float::Instance(), this }), explicitFloat };
 
-        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Double::ToString()", StringCast<double>);
+        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string [System.Runtime]System.Double::ToString()", StringCast<double>);
         explicitString->PushParameterType(this);
         explicitCasts[4] = { ArgumentHash({ String::Instance(), this }), explicitString };
 

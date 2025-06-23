@@ -74,71 +74,71 @@ namespace Analysis::Structure::Wrappers
         characteristics[1] = new BuiltInProperty("Empty", Describer::PublicStatic | Describer::Const, this, true, "ldsfld string [System.Runtime]System.String::Empty", false, "");
 
         const auto clone = new BuiltInMethod("Clone", Describer::Public, this, "call instance string class [System.Runtime]System.String::Clone()");
-        functions[0] = { std::hash<string>()("Clone") ^ ArgumentHash(clone), clone };
+        functions[0] = { std::hash<string>()(clone->Name()) ^ ArgumentHash(clone), clone };
 
-        const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::Contains(string)");
+        const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::Contains(string)");
         contains->PushParameterType(this);
-        functions[1] = { std::hash<string>()("Contains") ^ ArgumentHash(contains), contains };
+        functions[1] = { std::hash<string>()(contains->Name()) ^ ArgumentHash(contains), contains };
 
-        const auto containsCharacter = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::Contains(char)");
+        const auto containsCharacter = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::Contains(char)");
         containsCharacter->PushParameterType(Character::Instance());
-        functions[2] = { std::hash<string>()("Contains") ^ ArgumentHash(containsCharacter), containsCharacter };
+        functions[2] = { std::hash<string>()(containsCharacter->Name()) ^ ArgumentHash(containsCharacter), containsCharacter };
 
-        const auto toUpper = new BuiltInMethod("ToUpper", Describer::Public, this, "call instance string class [System.Runtime]System.String::ToUpper()");
-        functions[3] = { std::hash<string>()("ToUpper") ^ ArgumentHash(toUpper), toUpper };
+        const auto toUpper = new BuiltInMethod("ToUpper", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::ToUpper()");
+        functions[3] = { std::hash<string>()(toUpper->Name()) ^ ArgumentHash(toUpper), toUpper };
 
-        const auto toLower = new BuiltInMethod("ToLower", Describer::Public, this, "call instance string class [System.Runtime]System.String::ToLower()");
-        functions[4] = { std::hash<string>()("ToLower") ^ ArgumentHash(toLower), toLower };
+        const auto toLower = new BuiltInMethod("ToLower", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::ToLower()");
+        functions[4] = { std::hash<string>()(toLower->Name()) ^ ArgumentHash(toLower), toLower };
 
-        const auto trim = new BuiltInMethod("Trim", Describer::Public, this, "call instance string class [System.Runtime]System.String::Trim()");
-        functions[5] = { std::hash<string>()("Trim") ^ ArgumentHash(trim), trim };
+        const auto trim = new BuiltInMethod("Trim", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::Trim()");
+        functions[5] = { std::hash<string>()(trim->Name()) ^ ArgumentHash(trim), trim };
 
-        const auto trimStart = new BuiltInMethod("TrimStart", Describer::Public, this, "call instance string class [System.Runtime]System.String::TrimStart()");
-        functions[6] = { std::hash<string>()("TrimStart") ^ ArgumentHash(trimStart), trimStart };
+        const auto trimStart = new BuiltInMethod("TrimStart", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::TrimStart()");
+        functions[6] = { std::hash<string>()(trimStart->Name()) ^ ArgumentHash(trimStart), trimStart };
 
-        const auto trimEnd = new BuiltInMethod("TrimEnd", Describer::Public, this, "call instance string class [System.Runtime]System.String::TrimEnd()");
-        functions[7] = { std::hash<string>()("TrimEnd") ^ ArgumentHash(trimEnd), trimEnd };
+        const auto trimEnd = new BuiltInMethod("TrimEnd", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::TrimEnd()");
+        functions[7] = { std::hash<string>()(trimEnd->Name()) ^ ArgumentHash(trimEnd), trimEnd };
 
-        const auto substring = new BuiltInMethod("Substring", Describer::Public, this, "call instance string class [System.Runtime]System.String::Substring(int)");
+        const auto substring = new BuiltInMethod("Substring", Describer::Public, this, "callvirt instance string [System.Runtime]System.String::Substring(int)");
         substring->PushParameterType(Integer::Instance());
-        functions[8] = { std::hash<string>()("Subtring") ^ ArgumentHash(substring), substring };
+        functions[8] = { std::hash<string>()(substring->Name()) ^ ArgumentHash(substring), substring };
 
-        const auto substringLength = new BuiltInMethod("Substring", Describer::Public, this, "call instance string class [System.Runtime]System.String::Substring(int, int)");
+        const auto substringLength = new BuiltInMethod("Substring", Describer::Public, this, "callvirt instance string class [System.Runtime]System.String::Substring(int, int)");
         substringLength->PushParameterType(Integer::Instance());
         substringLength->PushParameterType(Integer::Instance());
-        functions[9] = { std::hash<string>()("Subtring") ^ ArgumentHash(substringLength), substringLength };
+        functions[9] = { std::hash<string>()(substringLength->Name()) ^ ArgumentHash(substringLength), substringLength };
 
-        const auto startsWith = new BuiltInMethod("StartsWith", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::StartsWith(string)");
+        const auto startsWith = new BuiltInMethod("StartsWith", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::StartsWith(string)");
         startsWith->PushParameterType(this);
-        functions[10] = { std::hash<string>()("StartsWith") ^ ArgumentHash(startsWith), startsWith };
+        functions[10] = { std::hash<string>()(startsWith->Name()) ^ ArgumentHash(startsWith), startsWith };
 
-        const auto startsWithCharacter = new BuiltInMethod("StartsWith", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::StartsWith(char)");
+        const auto startsWithCharacter = new BuiltInMethod("StartsWith", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::StartsWith(char)");
         startsWithCharacter->PushParameterType(Character::Instance());
-        functions[11] = { std::hash<string>()("StartsWith") ^ ArgumentHash(startsWithCharacter), startsWithCharacter };
+        functions[11] = { std::hash<string>()(startsWithCharacter->Name()) ^ ArgumentHash(startsWithCharacter), startsWithCharacter };
 
-        const auto endsWith = new BuiltInMethod("EndsWith", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::EndsWith(string)");
+        const auto endsWith = new BuiltInMethod("EndsWith", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::EndsWith(string)");
         endsWith->PushParameterType(this);
-        functions[12] = { std::hash<string>()("EndsWith") ^ ArgumentHash(endsWith), endsWith };
+        functions[12] = { std::hash<string>()(endsWith->Name()) ^ ArgumentHash(endsWith), endsWith };
 
-        const auto endsWithCharacter = new BuiltInMethod("EndsWith", Describer::Public, Boolean::Instance(), "call instance bool class [System.Runtime]System.String::EndsWith(char)");
+        const auto endsWithCharacter = new BuiltInMethod("EndsWith", Describer::Public, Boolean::Instance(), "callvirt instance bool [System.Runtime]System.String::EndsWith(char)");
         endsWithCharacter->PushParameterType(this);
-        functions[13] = { std::hash<string>()("EndsWith") ^ ArgumentHash(endsWithCharacter), endsWithCharacter };
+        functions[13] = { std::hash<string>()(endsWithCharacter->Name()) ^ ArgumentHash(endsWithCharacter), endsWithCharacter };
 
-        const auto toCharArray = new BuiltInMethod("ToCharArray", Describer::Public, Array::Instance(Character::Instance()), "call instance char[] class [System.Runtime]System.String::ToCharArray()");
-        functions[14] = { std::hash<string>()("ToCharArray") ^ ArgumentHash(toCharArray), toCharArray };
+        const auto toCharArray = new BuiltInMethod("ToCharArray", Describer::Public, Array::Instance(Character::Instance()), "callvirt instance char[] [System.Runtime]System.String::ToCharArray()");
+        functions[14] = { std::hash<string>()(toCharArray->Name()) ^ ArgumentHash(toCharArray), toCharArray };
 
-        const auto split = new BuiltInMethod("Split", Describer::Public, Array::Instance(this), "call instance string[] class [System.Runtime]System.String::Split(char[])");
+        const auto split = new BuiltInMethod("Split", Describer::Public, Array::Instance(this), "callvirt instance string[] [System.Runtime]System.String::Split(char[])");
         split->PushParameterType(Array::Instance(Character::Instance()));
-        functions[15] = { std::hash<string>()("Split") ^ ArgumentHash(split), split };
+        functions[15] = { std::hash<string>()(split->Name()) ^ ArgumentHash(split), split };
 
         const auto getHash = GetHash();
-        functions[16] = { ArgumentHash(getHash), getHash };
+        functions[16] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
-        const auto indexer = new BuiltInIndexer(Character::Instance(), true, "call instance char class [System.Runtime]System.String::get_Chars(int32)", false, "");
+        const auto indexer = new BuiltInIndexer(Character::Instance(), true, "call instance char [System.Runtime]System.String::get_Chars(int32)", false, "");
         indexer->PushParameterType(Integer::Instance());
         this->indexer = indexer;
 
-        const auto concatenation = new BuiltInOverload(SyntaxKind::Addition, this, "call string class [System.Runtime]System.String::Concat(string, string)", Concatenation);
+        const auto concatenation = new BuiltInOverload(SyntaxKind::Addition, this, "call string [System.Runtime]System.String::Concat(string, string)", Concatenation);
         concatenation->PushParameterType(this);
         concatenation->PushParameterType(this);
         overloads[0] = { SyntaxKind::Addition, concatenation };

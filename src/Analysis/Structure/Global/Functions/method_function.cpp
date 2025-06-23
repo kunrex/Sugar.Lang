@@ -36,7 +36,7 @@ namespace Analysis::Structure::Global
     const string& MethodFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("callvirt {} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
+            fullName = std::format("{} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "call" : "callvirt instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
@@ -80,7 +80,7 @@ namespace Analysis::Structure::Global
     const std::string& GeneratedGetFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("callvirt {} {} {} get_{}::{}()",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name);
+            fullName = std::format("{} {} {} get_{}::{}()",  CheckDescriber(Describer::Static) ? "call" : "callvirt instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name);
 
         return fullName;
     }

@@ -218,7 +218,7 @@ void Compiler::Compile() const
             return;
         }
 
-        //Transpile();
+        Transpile();
     }
     catch (const std::exception& e) {
         std::cout << e.what() << std::endl;

@@ -31,7 +31,7 @@ namespace Analysis::Structure::Global
     const string& VoidFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("callvirt {} void {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("{} void {}::{}{}",  CheckDescriber(Describer::Static) ? "call" : "callvirt instance", parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
@@ -114,7 +114,7 @@ namespace Analysis::Structure::Global
     const std::string& GeneratedSetFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("callvirt {} void {}::{}({})", CheckDescriber(Describer::Static) ? "" : "instance", parent->FullName(), name, creationType->FullName());
+            fullName = std::format("{} void {}::{}({})", CheckDescriber(Describer::Static) ? "call" : "callvirt instance", parent->FullName(), name, creationType->FullName());
 
         return fullName;
     }

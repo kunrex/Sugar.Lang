@@ -75,14 +75,14 @@ namespace Analysis::Structure::Wrappers
 
     void Tuple::BindGlobal()
     {
-        const auto constructor = new BuiltInConstructor(this, std::format("call instance void class {}::.ctor({})", genericSignature, MapGenericCallSignature(types)));
+        const auto constructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor({})", genericSignature, MapGenericCallSignature(types)));
 
-        int i = 1;
+        int i = 0;
         for (const auto type: types)
         {
-            const auto getInstruction = std::format("call instance {} class {}::get_Item{}()", type->FullName(), genericSignature, i);
+            const auto getInstruction = std::format("ldfld !{} valuetype {}::Item{}", i, genericSignature, i);
 
-            const auto name = std::format("Element{}", i++);
+            const auto name = std::format("Element{}", ++i);
             characteristics.push_back(new BuiltInProperty(name, Describer::Public, type, true, getInstruction, false, ""));
 
             constructor->PushParameterType(type);
@@ -90,7 +90,7 @@ namespace Analysis::Structure::Wrappers
 
         constructors[0] = { ArgumentHash(constructor), constructor };
 
-        const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
+        const auto defaultConstructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor()", genericSignature));
         constructors[1] = { ArgumentHash(defaultConstructor), defaultConstructor };
 
         ImplicitValueType::BindGlobal();

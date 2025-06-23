@@ -6,6 +6,8 @@
 
 using namespace std;
 
+using namespace Tokens::Enums;
+
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -34,6 +36,9 @@ namespace Analysis::Structure::Context
 
     string CreationContext::CILData() const
     {
+        if (creationType->Type() == TypeKind::Array)
+            return constructor->FullName();
+
         return "newobj " + constructor->FullName();
     }
 

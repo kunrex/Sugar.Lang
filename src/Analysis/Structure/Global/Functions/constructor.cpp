@@ -58,27 +58,29 @@ namespace Analysis::Structure::Global
         auto innerBuilder = StringBuilder();
         innerBuilder.SetIndent(builder.Indent());
 
+        parent->InstanceConstructor()->PushTranspilation(innerBuilder, maxSlotSize);
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         ScopedLocalVariableString(this, builder);
 
-        builder.PushLine(load_this);
-        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        if (parent->MemberType() == MemberType::Class)
+        {
+            builder.PushLine(load_this);
+            builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        }
 
-        parent->InstanceConstructor()->Transpile(builder);
         builder.Push(innerBuilder.Value());
-
         builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
 
-    void Constructor::PushTranspilation(StringBuilder& builder) const
+    void Constructor::PushTranspilation(const ICharacteristic* const characteristic)
     { }
 
-    void Constructor::PushTranspilation(const ICharacteristic* const characteristic)
+    void Constructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     { }
 
     ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), DefaultScoped(), characteristics()
@@ -104,28 +106,43 @@ namespace Analysis::Structure::Global
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(std::string_view(".maxstack 1"));
-        builder.PushLine(load_this);
-        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        int maxSlotSize = 1;
 
-        PushTranspilation(builder);
+        auto innerBuilder = StringBuilder();
+        innerBuilder.SetIndent(builder.Indent());
+
+        PushTranspilation(innerBuilder, maxSlotSize);
+
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
+
+        if (parent->MemberType() == MemberType::Class)
+        {
+            builder.PushLine(load_this);
+            builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        }
+
+        builder.Push(innerBuilder.Value());
         builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
 
-    void ImplicitConstructor::PushTranspilation(StringBuilder& builder) const
+    void ImplicitConstructor::PushTranspilation(const ICharacteristic* const characteristic) { characteristics.push_back(characteristic); }
+
+    void ImplicitConstructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     {
-        for (const auto characteristic: characteristics)
+        for (const auto characteristic : characteristics)
         {
+            const auto context = characteristic->Context();
+
             builder.PushLine(load_this);
-            TranspileExpression(characteristic->Context(), builder);
+            TranspileExpression(context, builder);
             builder.PushLine(std::format("stfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
+
+            slotSize = std::max(slotSize, context->SlotCount());
         }
     }
-
-    void ImplicitConstructor::PushTranspilation(const ICharacteristic* const characteristic) { characteristics.push_back(characteristic); }
 
     StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), DefaultScoped(), characteristics()
     { }
@@ -147,24 +164,36 @@ namespace Analysis::Structure::Global
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(std::string_view(".maxstack 1"));
+        int maxSlotSize = 1;
 
-        for (const auto characteristic: characteristics)
-        {
-            TranspileExpression(characteristic->Context(), builder);
-            builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
-        }
+        auto innerBuilder = StringBuilder();
+        innerBuilder.SetIndent(builder.Indent());
 
+        PushTranspilation(innerBuilder, maxSlotSize);
+
+        builder.PushLine(std::format(".maxstack {}", maxSlotSize));
+
+        builder.Push(innerBuilder.Value());
         builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
 
-    void StaticImplicitConstructor::PushTranspilation(StringBuilder& builder) const
-    { }
-
     void StaticImplicitConstructor::PushTranspilation(const ICharacteristic* const characteristic) { characteristics.push_back(characteristic); }
+
+    void StaticImplicitConstructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
+    {
+        for (const auto characteristic : characteristics)
+        {
+            const auto context = characteristic->Context();
+
+            TranspileExpression(context, builder);
+            builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
+
+            slotSize = std::max(slotSize, context->SlotCount());
+        }
+    }
 
     DefinedConstructor::DefinedConstructor(const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body), characteristics()
     { }
@@ -196,37 +225,40 @@ namespace Analysis::Structure::Global
         auto innerBuilder = StringBuilder();
         innerBuilder.SetIndent(builder.Indent());
 
+        PushTranspilation(innerBuilder, maxSlotSize);
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         ScopedLocalVariableString(this, builder);
 
-        builder.PushLine(load_this);
-        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        if (parent->MemberType() == MemberType::Class)
+        {
+            builder.PushLine(load_this);
+            builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
+        }
 
-        PushTranspilation(builder);
         builder.Push(innerBuilder.Value());
-
         builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
 
-    void DefinedConstructor::PushTranspilation(StringBuilder& builder) const
+    void DefinedConstructor::PushTranspilation(const ICharacteristic* characteristic) { characteristics.push_back(characteristic); }
+
+    void DefinedConstructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     {
-        if (!characteristics.empty())
+        for (const auto characteristic : characteristics)
         {
-            for (const auto characteristic: characteristics)
-            {
-                builder.PushLine(load_this);
-                TranspileExpression(characteristic->Context(), builder);
-                builder.PushLine(std::format("stfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
-            }
+            const auto context = characteristic->Context();
+
+            builder.PushLine(load_this);
+            TranspileExpression(context, builder);
+            builder.PushLine(std::format("stfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
+
+            slotSize = std::max(slotSize, context->SlotCount());
         }
     }
-
-    void DefinedConstructor::PushTranspilation(const ICharacteristic* characteristic) { characteristics.push_back(characteristic); }
 
     StaticDefinedConstructor::StaticDefinedConstructor(const IDataType* const creationType, const IParseNode* const body) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), Scoped(body), characteristics()
     { }
@@ -252,32 +284,33 @@ namespace Analysis::Structure::Global
         auto innerBuilder = StringBuilder();
         innerBuilder.SetIndent(builder.Indent());
 
+        PushTranspilation(innerBuilder, maxSlotSize);
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
         ScopedLocalVariableString(this, builder);
 
-        if (!characteristics.empty())
-        {
-            for (const auto characteristic: characteristics)
-            {
-                TranspileExpression(characteristic->Context(), builder);
-                builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
-            }
-        }
-
         builder.Push(innerBuilder.Value());
-
         builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
     }
 
-    void StaticDefinedConstructor::PushTranspilation(StringBuilder& builder) const
-    { }
-
     void StaticDefinedConstructor::PushTranspilation(const ICharacteristic* const characteristic) { characteristics.push_back(characteristic); }
+
+    void StaticDefinedConstructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
+    {
+        for (const auto characteristic : characteristics)
+        {
+            const auto context = characteristic->Context();
+
+            TranspileExpression(context, builder);
+            builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
+
+            slotSize = std::max(slotSize, context->SlotCount());
+        }
+    }
 
     BuiltInConstructor::BuiltInConstructor(const IDataType* const creationType, const string& instruction) : ConstructorDefinition(Describer::Public, creationType), BuiltInFunction()
     {
@@ -294,10 +327,10 @@ namespace Analysis::Structure::Global
     void BuiltInConstructor::Transpile(StringBuilder& builder) const
     { }
 
-    void BuiltInConstructor::PushTranspilation(StringBuilder& builder) const
+    void BuiltInConstructor::PushTranspilation(const ICharacteristic* const characteristic)
     { }
 
-    void BuiltInConstructor::PushTranspilation(const ICharacteristic* const characteristic)
+    void BuiltInConstructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     { }
 }
 

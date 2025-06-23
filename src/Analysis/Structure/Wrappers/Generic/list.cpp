@@ -66,36 +66,36 @@ namespace Analysis::Structure::Wrappers
         indexer->PushParameterType(Integer::Instance());
         this->indexer = indexer;
 
-        const auto add = new BuiltInVoid("Add", Describer::Public, std::format("instance void class {}::Add(!0)", genericSignature));
+        const auto add = new BuiltInVoid("Add", Describer::Public, std::format("callvirt instance void {}::Add(!0)", genericSignature));
         add->PushParameterType(listType);
-        functions[0] = { std::hash<string>()("Add") ^ ArgumentHash(add), add };
+        functions[0] = { std::hash<string>()(add->Name()) ^ ArgumentHash(add), add };
 
-        const auto clear = new BuiltInVoid("Clear", Describer::Public, std::format("instance void class {}::Clear()", genericSignature));
-        functions[1] = { std::hash<string>()("Clear") ^ ArgumentHash(clear), clear };
+        const auto clear = new BuiltInVoid("Clear", Describer::Public, std::format("callvirt instance void {}::Clear()", genericSignature));
+        functions[1] = { std::hash<string>()(clear->Name()) ^ ArgumentHash(clear), clear };
 
-        const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Contains(!0)", genericSignature));
+        const auto contains = new BuiltInMethod("Contains", Describer::Public, Boolean::Instance(), std::format("callvirt instance bool {}::Contains(!0)", genericSignature));
         contains->PushParameterType(listType);
-        functions[2] = { std::hash<string>()("Contains") ^ ArgumentHash(contains), contains };
+        functions[2] = { std::hash<string>()(contains->Name()) ^ ArgumentHash(contains), contains };
 
-        const auto remove = new BuiltInMethod("Remove", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::Remove(!0)", genericSignature));
+        const auto remove = new BuiltInMethod("Remove", Describer::Public, Boolean::Instance(), std::format("callvirt instance bool {}::Remove(!0)", genericSignature));
         remove->PushParameterType(listType);
-        functions[3] = { std::hash<string>()("Remove") ^ ArgumentHash(remove), remove };
+        functions[3] = { std::hash<string>()(remove->Name()) ^ ArgumentHash(remove), remove };
 
-        const auto reverse = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse()", genericSignature));
-        functions[4] = { std::hash<string>()("Reverse") ^ ArgumentHash(reverse), reverse };
+        const auto reverse = new BuiltInVoid("Reverse", Describer::Public, std::format("callvirt instance void {}::Reverse()", genericSignature));
+        functions[4] = { std::hash<string>()(reverse->Name()) ^ ArgumentHash(reverse), reverse };
 
-        const auto reverseBound = new BuiltInVoid("Reverse", Describer::Public, std::format("instance void class {}::Reverse(int32, int32)", genericSignature));
+        const auto reverseBound = new BuiltInVoid("Reverse", Describer::Public, std::format("callvirt instance void {}::Reverse(int32, int32)", genericSignature));
         reverseBound->PushParameterType(Integer::Instance());
         reverseBound->PushParameterType(Integer::Instance());
-        functions[5] = { std::hash<string>()("Reverse") ^ ArgumentHash(reverseBound), reverseBound };
+        functions[5] = { std::hash<string>()(reverseBound->Name()) ^ ArgumentHash(reverseBound), reverseBound };
 
         const auto getHash = GetHash();
-        functions[6] = { ArgumentHash(getHash), getHash };
+        functions[6] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
-        const auto defaultConstructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor()", genericSignature));
+        const auto defaultConstructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor()", genericSignature));
         constructors[0] = { ArgumentHash(defaultConstructor), defaultConstructor };
 
-        const auto constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor(int32)", genericSignature));
+        const auto constructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor(int32)", genericSignature));
         constructor->PushParameterType(Integer::Instance());
         constructors[1] = { ArgumentHash(constructor), constructor };
 

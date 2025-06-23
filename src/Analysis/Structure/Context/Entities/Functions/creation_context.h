@@ -7,7 +7,7 @@
 
 namespace Analysis::Structure::Context
 {
-    class CreationContext final : public DynamicContextCollection
+    class CreationContext : public DynamicContextCollection
     {
         private:
             mutable int slotCount;

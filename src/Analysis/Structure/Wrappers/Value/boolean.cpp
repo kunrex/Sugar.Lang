@@ -59,13 +59,13 @@ namespace Analysis::Structure::Wrappers
 
     void Boolean::BindGlobal()
     {
-        const auto tryParse = new BuiltInMethod("TryParse", Enums::Describer::PublicStatic, this, "bool valuetype [System.Runtime]System.Boolean::TryParse(string, bool&)");
+        const auto tryParse = new BuiltInMethod("TryParse", Enums::Describer::PublicStatic, this, "call bool [System.Runtime]System.Boolean::TryParse(string, bool&)");
         tryParse->PushParameterType(String::Instance());
         tryParse->PushParameterType(Referenced::Instance(this));
-        functions[0] = { ArgumentHash(tryParse), tryParse };
+        functions[0] = { std::hash<string>()(tryParse->Name()) ^ ArgumentHash(tryParse), tryParse };
 
         const auto getHash = GetHash();
-        functions[1] = { ArgumentHash(getHash), getHash };
+        functions[1] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
         const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<bool>);
         explicitShort->PushParameterType(this);
@@ -79,7 +79,7 @@ namespace Analysis::Structure::Wrappers
         explicitLong->PushParameterType(this);
         explicitCasts[2] = { ArgumentHash({ Long::Instance(), this }), explicitLong };
 
-        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Boolean::ToString()", StringCast<bool>);
+        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string [System.Runtime]System.Boolean::ToString()", StringCast<bool>);
         explicitString->PushParameterType(this);
         explicitCasts[3] = { ArgumentHash({ String::Instance(), this }), explicitString };
 

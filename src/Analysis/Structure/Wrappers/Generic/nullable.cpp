@@ -74,11 +74,11 @@ namespace Analysis::Structure::Wrappers
         characteristics[0] = new BuiltInProperty("IsNull", Describer::Public, Boolean::Instance(), true, std::format("call instance bool valuetype {}::get_HasValue()", genericSignature), false, "");
         characteristics[1] = new BuiltInProperty("Value", Describer::Public, nullableType, true, std::format("call instance !0 valuetype {}::get_Value()", genericSignature), false, "");
 
-        const auto constructor = new BuiltInConstructor(this, std::format("call instance void valuetype {}::.ctor(!0)", genericSignature));
+        const auto constructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor(!0)", genericSignature));
         constructor->PushParameterType(nullableType);
         constructors[0] = { ArgumentHash(constructor), constructor };
 
-        const auto defaultConstructor = new BuiltInConstructor(this, "initobj valuetype {}" + genericSignature);
+        const auto defaultConstructor = new BuiltInConstructor(this, "instance void {}::.ctor()" + genericSignature);
         constructors[1] = { ArgumentHash(defaultConstructor), defaultConstructor };
 
         ImplicitValueType::BindGlobal();

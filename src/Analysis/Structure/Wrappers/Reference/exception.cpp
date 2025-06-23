@@ -45,7 +45,7 @@ namespace Analysis::Structure::Wrappers
     {
         message = new BuiltInProperty("Message", Describer::Public, String::Instance(), true, "callvirt instance string [System.Runtime]System.Exception::get_Message()", false, "");
 
-        const auto constructor = new BuiltInConstructor(this, "newobj instance void class [System.Runtime]System.Exception::.ctor(string)");
+        const auto constructor = new BuiltInConstructor(this, "instance void [System.Runtime]System.Exception::.ctor(string)");
         constructor->PushParameterType(String::Instance());
         this->constructor = constructor;
 

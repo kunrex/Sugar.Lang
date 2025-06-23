@@ -67,27 +67,27 @@ namespace Analysis::Structure::Wrappers
         indexer->PushParameterType(keyType);
         this->indexer = indexer;
 
-        const auto containsKey = new BuiltInMethod("ContainsKey", Describer::Public, Boolean::Instance(), std::format("instance bool class {}::ContainsKey(!0)", genericSignature));
+        const auto containsKey = new BuiltInMethod("ContainsKey", Describer::Public, Boolean::Instance(), std::format("callvirt instance bool {}::ContainsKey(!0)", genericSignature));
         containsKey->PushParameterType(keyType);
         functions[0] = { std::hash<string>()("ContainsKey") ^ ArgumentHash(containsKey), containsKey };
 
-        const auto keyString = std::format("instance [System.Collections.Generic]System.Collections.Generic.Dictionary`2/KeyCollection<!0, !1> class {}::get_Keys() newobj instance void class [System.Collections.Generic]System.Collections.Generic.List`1<{}>::.ctor(class [System.Collections.Generic]System.Collections.Generic.IEnumerable`1<{}>)", genericSignature, keyType->FullName(), keyType->FullName());
+        const auto keyString = std::format("instance class [System.Collections.Generic]System.Collections.Generic.Dictionary`2/KeyCollection<!0, !1> {}::get_Keys() newobj instance void class [System.Collections.Generic]System.Collections.Generic.List`1<{}>::.ctor(class [System.Collections.Generic]System.Collections.Generic.IEnumerable`1<{}>)", genericSignature, keyType->FullName(), keyType->FullName());
         const auto keys = new BuiltInMethod("Keys", Describer::Public, List::Instance(keyType), "");
-        functions[1] = { std::hash<string>()("Keys") ^ ArgumentHash(keys), keys };
+        functions[1] = { std::hash<string>()(keys->Name()) ^ ArgumentHash(keys), keys };
 
-        const auto valueString = std::format("instance [System.Collections.Generic]System.Collections.Generic.Dictionary`2/ValueCollection<!0, !1> class {}::get_Values() newobj instance void class [System.Collections.Generic]System.Collections.Generic.List`1<{}>::.ctor(class [System.Collections.Generic]System.Collections.Generic.IEnumerable`1<{}>)", genericSignature, valueType->FullName(), valueType->FullName());
+        const auto valueString = std::format("instance class [System.Collections.Generic]System.Collections.Generic.Dictionary`2/ValueCollection<!0, !1> {}::get_Values() newobj instance void class [System.Collections.Generic]System.Collections.Generic.List`1<{}>::.ctor(class [System.Collections.Generic]System.Collections.Generic.IEnumerable`1<{}>)", genericSignature, valueType->FullName(), valueType->FullName());
         const auto values = new BuiltInMethod("Values", Describer::Public, List::Instance(valueType), "");
-        functions[2] = { std::hash<string>()("Values") ^ ArgumentHash(values), values };
+        functions[2] = { std::hash<string>()(values->Name()) ^ ArgumentHash(values), values };
 
-        const auto add = new BuiltInMethod("Add", Describer::Public, List::Instance(valueType), std::format("callvirt instance void class {}::Add(!0, !1)", genericSignature));
+        const auto add = new BuiltInMethod("Add", Describer::Public, List::Instance(valueType), std::format("callvirt instance void {}::Add(!0, !1)", genericSignature));
         add->PushParameterType(keyType);
         add->PushParameterType(valueType);
-        functions[3] = { ArgumentHash(add), add };
+        functions[3] = { std::hash<string>()(add->Name()) ^ ArgumentHash(add), add };
 
         const auto getHash = GetHash();
-        functions[4] = { ArgumentHash(getHash), getHash };
+        functions[4] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
-        constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor()", genericSignature));
+        constructor = new BuiltInConstructor(this, std::format("instance void {}::.ctor()", genericSignature));
 
         implicitObject = ImplicitObject();
 

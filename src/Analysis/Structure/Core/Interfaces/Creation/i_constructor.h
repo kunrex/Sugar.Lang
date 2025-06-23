@@ -9,8 +9,8 @@ namespace Analysis::Structure::Core::Interfaces
     class IConstructor : public virtual IFunction
     {
         public:
-            virtual void PushTranspilation(Services::StringBuilder& builder) const = 0;
             virtual void PushTranspilation(const ICharacteristic* characteristic) = 0;
+            virtual void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const = 0;
     };
 }
 

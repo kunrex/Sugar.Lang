@@ -79,13 +79,13 @@ namespace Analysis::Structure::Wrappers
         characteristics[0] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, this, new IntegerConstant(2147483647));
         characteristics[1] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, this, new IntegerConstant(-2147483648));
 
-        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Int32::TryParse(string, int32&)");
+        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Int32::TryParse(string, int32&)");
         tryParse->PushParameterType(String::Instance());
         tryParse->PushParameterType(Referenced::Instance(this));
-        functions[0] = { ArgumentHash(tryParse), tryParse };
+        functions[0] = { std::hash<string>()(tryParse->Name()) ^ ArgumentHash(tryParse), tryParse };
 
         const auto getHash = GetHash();
-        functions[1] = { ArgumentHash(getHash), getHash };
+        functions[1] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
         const auto explicitShort = new BuiltInCast(Short::Instance(), "conv.i2", ShortCast<int>);
         explicitShort->PushParameterType(this);
@@ -105,7 +105,7 @@ namespace Analysis::Structure::Wrappers
         implicitCasts[1] =  { ArgumentHash({ Double::Instance(), this }), implicitDouble };
         explicitCasts[3] = { ArgumentHash({ Double::Instance(), this}), new BuiltInCast(*implicitDouble) };
 
-        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int32::ToString()", StringCast<long>);
+        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string [System.Runtime]System.Int32::ToString()", StringCast<long>);
         explicitString->PushParameterType(this);
         explicitCasts[4] = { ArgumentHash({ String::Instance(), this }), explicitString };
 

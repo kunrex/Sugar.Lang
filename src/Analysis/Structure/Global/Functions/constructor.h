@@ -25,7 +25,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
@@ -45,7 +45,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
@@ -65,7 +65,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
@@ -85,7 +85,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
@@ -105,7 +105,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
@@ -122,7 +122,7 @@ namespace Analysis::Structure::Global
 
             void Transpile(Services::StringBuilder& builder) const override;
 
-            void PushTranspilation(Services::StringBuilder& builder) const override;
+            void PushTranspilation(Services::StringBuilder& builder, int& slotSize) const override;
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 }

@@ -56,31 +56,31 @@ namespace Analysis::Structure::Wrappers
         characteristics[0] = new BuiltInProperty("MinValue", Describer::PublicStatic, this, true, "ldsfld char System.Char::MinValue", false, "");
         characteristics[1] = new BuiltInProperty("MaxValue", Describer::PublicStatic, this, true, "ldsfld char System.Char::MaxValue", false, "");
 
-        const auto isDigit = new BuiltInMethod("IsDigit", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsDigit(char)");
+        const auto isDigit = new BuiltInMethod("IsDigit", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Char::IsDigit(char)");
         isDigit->PushParameterType(this);
-        functions[0] = { std::hash<string>()("IsDigit") ^ ArgumentHash(isDigit), isDigit };
+        functions[0] = { std::hash<string>()(isDigit->Name()) ^ ArgumentHash(isDigit), isDigit };
 
-        const auto isLetter = new BuiltInMethod("IsLetter", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetter(char)");
+        const auto isLetter = new BuiltInMethod("IsLetter", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Char::IsLetter(char)");
         isLetter->PushParameterType(this);
-        functions[1] = { std::hash<string>()("IsLetter") ^ ArgumentHash(isLetter), isLetter };
+        functions[1] = { std::hash<string>()(isLetter->Name()) ^ ArgumentHash(isLetter), isLetter };
 
-        const auto isDigitOrLetter = new BuiltInMethod("IsLetterOrDigit", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsLetterOrDigit(char)");
+        const auto isDigitOrLetter = new BuiltInMethod("IsLetterOrDigit", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Char::IsLetterOrDigit(char)");
         isDigitOrLetter->PushParameterType(this);
-        functions[2] = { std::hash<string>()("IsLetterOrDigit") ^ ArgumentHash(isDigitOrLetter), isDigitOrLetter };
+        functions[2] = { std::hash<string>()(isDigitOrLetter->Name()) ^ ArgumentHash(isDigitOrLetter), isDigitOrLetter };
 
-        const auto isWhiteSpace = new BuiltInMethod("IsWhiteSpace", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsWhiteSpace(char)");
+        const auto isWhiteSpace = new BuiltInMethod("IsWhiteSpace", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Char::IsWhiteSpace(char)");
         isWhiteSpace->PushParameterType(this);
-        functions[3] = { std::hash<string>()("IsWhiteSpace") ^ ArgumentHash(isWhiteSpace), isWhiteSpace };
+        functions[3] = { std::hash<string>()(isWhiteSpace->Name()) ^ ArgumentHash(isWhiteSpace), isWhiteSpace };
 
-        const auto isPunctuation = new BuiltInMethod("IsPunctuation", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Char::IsPunctuation(char)");
+        const auto isPunctuation = new BuiltInMethod("IsPunctuation", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Char::IsPunctuation(char)");
         isPunctuation->PushParameterType(this);
-        functions[4] = { std::hash<string>()("IsPunctuation") ^ ArgumentHash(isPunctuation), isPunctuation };
+        functions[4] = { std::hash<string>()(isPunctuation->Name()) ^ ArgumentHash(isPunctuation), isPunctuation };
 
-        const auto toUpper = new BuiltInMethod("ToUpper()", Describer::Public, this, "instance char valuetype [System.Runtime]System.Char::ToUpper()");
-        functions[5] = { std::hash<string>()("ToUpper") ^ ArgumentHash(toUpper), toUpper };
+        const auto toUpper = new BuiltInMethod("ToUpper()", Describer::Public, this, "callvirt instance char [System.Runtime]System.Char::ToUpper()");
+        functions[5] = { std::hash<string>()(toUpper->Name()) ^ ArgumentHash(toUpper), toUpper };
 
-        const auto toLower = new BuiltInMethod("ToLower()", Describer::Public, this, "instance char valuetype [System.Runtime]System.Char::ToLower()");
-        functions[6] = { std::hash<string>()("ToLower") ^ ArgumentHash(toLower), toLower };
+        const auto toLower = new BuiltInMethod("ToLower()", Describer::Public, this, "callvirt instance char [System.Runtime]System.Char::ToLower()");
+        functions[6] = { std::hash<string>()(toLower->Name()) ^ ArgumentHash(toLower), toLower };
 
         const auto getHash = GetHash();
         functions[7] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
@@ -98,7 +98,7 @@ namespace Analysis::Structure::Wrappers
         explicitLong->PushParameterType(this);
         explicitCasts[2] = { ArgumentHash({ Long::Instance(), this }), explicitLong };
 
-        const auto implicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Char::ToString()", StringCast<char>);
+        const auto implicitString = new BuiltInCast(String::Instance(), "call instance string [System.Runtime]System.Char::ToString()", StringCast<char>);
         implicitString->PushParameterType(this);
         implicitCasts[1] =  { ArgumentHash({ String::Instance(), this }), implicitString };
         explicitCasts[3] = { ArgumentHash({ String::Instance(), this }), new BuiltInCast(*implicitString) };

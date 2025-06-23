@@ -80,13 +80,13 @@ namespace Analysis::Structure::Wrappers
         characteristics[0] = new BuiltInConstant("Max", Describer::Public | Describer::Constexpr, this, new ShortConstant(32767));
         characteristics[1] = new BuiltInConstant("Min", Describer::Public | Describer::Constexpr, this, new ShortConstant(-32767));
 
-        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "bool valuetype [System.Runtime]System.Int16::TryParse(string, int16&)");
+        const auto tryParse = new BuiltInMethod("TryParse", Describer::PublicStatic, Boolean::Instance(), "call bool [System.Runtime]System.Int16::TryParse(string, int16&)");
         tryParse->PushParameterType(String::Instance());
         tryParse->PushParameterType(Referenced::Instance(this));
-        functions[0] = { ArgumentHash(tryParse), tryParse };
+        functions[0] = { std::hash<string>()(tryParse->Name()) ^ ArgumentHash(tryParse), tryParse };
 
         const auto getHash = GetHash();
-        functions[1] = { ArgumentHash(getHash), getHash };
+        functions[1] = { std::hash<string>()(getHash->Name()) ^ ArgumentHash(getHash), getHash };
 
         const auto implicitInt = new BuiltInCast(Integer::Instance(), "conv.i4", IntCast<short>);
         implicitInt->PushParameterType(this);
@@ -108,7 +108,7 @@ namespace Analysis::Structure::Wrappers
         implicitCasts[3] =  { ArgumentHash({ Double::Instance(), this }), implicitDouble };
         explicitCasts[3] = { ArgumentHash({ Double::Instance(), this }), new BuiltInCast(*implicitDouble) };
 
-        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string valuetype [System.Runtime]System.Int16::ToString()", StringCast<short>);
+        const auto explicitString = new BuiltInCast(String::Instance(), "call instance string [System.Runtime]System.Int16::ToString()", StringCast<short>);
         explicitString->PushParameterType(this);
         explicitCasts[4] = { ArgumentHash({ String::Instance(), this }), explicitString };
 
