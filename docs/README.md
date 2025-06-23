@@ -537,6 +537,18 @@ class MyFirstProgram
 
 When an entrypoint is defined, the compiler generates an executable (.exe). If no entrypoint is provided, the compiler instead produces a class library (.dll). A class library contains usable structures such as classes and functions, but it does not define a standalone path of execution.
 
+## Executing IL
+
+Since the compiler does output a `.il` file, the IL assembler must be used to produce an executable.
+
+```bash
+ilasm file.il /exe /output:file.exe
+```
+
+a dll must be replaced with `/dll /output:file.dll`
+
+If an executable, the resulting `.exe` file can be executed with `mono` or `dotnet` depending on the system
+
 ## Questions ?!
 
 So yes there a few things here. No try-catch-finally blocks, no switch statements, no generics and no destructors.
