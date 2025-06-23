@@ -13,7 +13,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
 {
-    FunctionCallContext::FunctionCallContext(const IFunctionDefinition* const function) : DynamicContextCollection(function->CreationType()), slotCount(-1), function(function)
+    FunctionCallContext::FunctionCallContext(const IFunction* const function) : DynamicContextCollection(function->CreationType()), slotCount(-1), function(function)
     { }
 
     int FunctionCallContext::SlotCount() const
@@ -35,7 +35,7 @@ namespace Analysis::Structure::Context
     bool FunctionCallContext::Writable() const { return function->CreationType() != nullptr && function->CreationType()->MemberType() == MemberType::Class; }
 
     uintptr_t FunctionCallContext::Metadata() const { return reinterpret_cast<uintptr_t>(function); }
-    string FunctionCallContext::CILData() const { return "call " + function->FullName(); }
+    string FunctionCallContext::CILData() const { return function->FullName(); }
 
     void FunctionCallContext::Print(const std::string& indent, const bool last) const
     {

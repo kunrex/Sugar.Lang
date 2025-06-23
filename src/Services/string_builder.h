@@ -24,6 +24,7 @@ namespace Services
 
             void Push(const std::string& content);
             void PushLine(const std::string& content = "");
+            void PushLine(const std::string_view& content = "");
 
             void Clear();
     };

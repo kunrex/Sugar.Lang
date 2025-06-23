@@ -351,7 +351,6 @@ namespace Analysis::Structure::DataTypes
 
     void StructSource::Transpile(Services::StringBuilder& builder) const
     {
-        builder.PushLine();
         builder.PushLine(std::format(".class {} {} auto ansi {} extends [System.Runtime]System.TypeValue", AccessModifierString(this), StaticModifierString(this), fullName));
 
         builder.PushLine(open_flower);

@@ -11,10 +11,10 @@ namespace Analysis::Structure::Context
     {
         private:
             mutable int slotCount;
-            const Core::Interfaces::IFunctionDefinition* function;
+            const Core::Interfaces::IFunction* function;
 
         public:
-            explicit FunctionCallContext(const Core::Interfaces::IFunctionDefinition* function);
+            explicit FunctionCallContext(const Core::Interfaces::IFunction* function);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

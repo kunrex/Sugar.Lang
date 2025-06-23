@@ -10,6 +10,9 @@ namespace Exceptions
 {
     class ExceptionManager final : public Services::SingletonService, public Services::ConstantCollection<CompileException>
     {
+        private:
+            std::vector<CompileException> exceptions;
+
         public:
             ExceptionManager();
 

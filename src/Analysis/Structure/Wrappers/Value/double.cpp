@@ -31,7 +31,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_double = "[System.Runtime]System.Double";
 
 namespace
 {
@@ -46,7 +45,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Double::Double() : BuiltInValueType(cil_double, Describer::Public), SingletonService(), characteristics()
+    Double::Double() : BuiltInValueType("float64", Describer::Public), SingletonService(), characteristics()
     { }
 
     Double Double::instance;

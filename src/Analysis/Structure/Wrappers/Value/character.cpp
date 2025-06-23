@@ -27,11 +27,9 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_character = "[System.Runtime]System.Char";
-
 namespace Analysis::Structure::Wrappers
 {
-    Character::Character() : BuiltInValueType(cil_character, Describer::Public), SingletonService(), characteristics()
+    Character::Character() : BuiltInValueType("char", Describer::Public), SingletonService(), characteristics()
     { }
 
     Character Character::instance;

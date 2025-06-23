@@ -25,6 +25,8 @@ namespace Analysis::Structure::Core::Interfaces
             virtual void AddLocalVariable(const Local::LocalVariable* variable) = 0;
 
             [[nodiscard]] virtual std::optional<unsigned long> GetParameterIndex(const std::string& name) const = 0;
+
+            [[nodiscard]] virtual std::pair<const Local::LocalVariable*, unsigned long> TryGetGeneratedVariable(const IDataType* type) = 0;
     };
 }
 

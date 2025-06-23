@@ -27,7 +27,6 @@
 #include "../../Structure/Core/DataTypes/data_type.h"
 
 #include "../../Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
-#include "../../Structure/Global/Functions/function_extensions.h"
 
 #include "../../Structure/Local/Scopes/scope.h"
 #include "../../Structure/Wrappers/Generic/array.h"
@@ -80,7 +79,7 @@ namespace Analysis::Creation::Transpiling
             case TypeKind::Boolean:
                 return std::format("bool({})", *reinterpret_cast<const bool*>(characteristic->Context()->Metadata()));
             case TypeKind::Character:
-                return std::format("char()", static_cast<int>(*reinterpret_cast<const char*>(characteristic->Context()->Metadata())));
+                return std::format("char({})", static_cast<int>(*reinterpret_cast<const char*>(characteristic->Context()->Metadata())));
             case TypeKind::String:
                 return *reinterpret_cast<const string*>(characteristic->Context()->Metadata());
             default:
@@ -96,24 +95,44 @@ namespace Analysis::Creation::Transpiling
         for (auto i = 0; i < parameterCount; i++)
         {
             const auto parameter = *function->VariableAt(i);
-            parameters += std::format("{} {}{}", parameter.CreationType()->FullName(), parameter.Name(), i < parameterCount - 1 ? "," : "");
+            parameters.append(std::format("{} {}{}", parameter.CreationType()->FullName(), parameter.Name(), i < parameterCount - 1 ? "," : ""));
         }
 
         return parameters;
     }
 
-    string ScopedLocalVariableString(const IScoped* const function)
+    void ScopedLocalVariableString(const IScoped* const function, StringBuilder& builder)
     {
-        string variables;
         const auto variableCount = function->VariableCount() - function->ParameterCount();
+        if (variableCount == 0)
+            return;
+
+        builder.PushLine(std::string_view(".locals init("));
+        builder.IncreaseIndent();
 
         for (auto i = 0; i < variableCount; i++)
         {
             const auto variable = *function->VariableAt(i);
-            variables += std::format("{} {}{}", variable.CreationType()->FullName(), variable.Name(), i < variableCount- 1 ? "," : "");
+            builder.PushLine(std::format("{} {}{}", variable.CreationType()->FullName(), variable.Name(), i < variableCount- 1 ? "," : ""));
         }
 
-        return variables;
+        builder.DecreaseIndent();
+        builder.PushLine(std::string_view(")"));
+    }
+
+    std::string ParameterString(const IParametrized* const parametrized)
+    {
+        string value = "(";
+        const auto count = parametrized->ParameterCount();
+
+        for (int i = 0; i < count; i++)
+        {
+            value.append(parametrized->ParameterAt(i)->FullName());
+            if (i < count - 1)
+                value.append(" ");
+        }
+
+        return value.append(")");
     }
 
     void TranspileLoad(const IContextNode* context, StringBuilder& stringBuilder);
@@ -187,7 +206,7 @@ namespace Analysis::Creation::Transpiling
     void TranspileFunctionCall(const IContextNode* const functionCallContext, StringBuilder& stringBuilder)
     {
         TranspileLoadArguments(functionCallContext, 0, stringBuilder);
-        if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); !function->CheckDescriber(Describer::Static))
+        if (const auto function = reinterpret_cast<const IFunction*>(functionCallContext->Metadata()); !function->CheckDescriber(Describer::Static))
             stringBuilder.PushLine(load_this);
 
         stringBuilder.PushLine(functionCallContext->CILData());
@@ -202,7 +221,7 @@ namespace Analysis::Creation::Transpiling
     void TranspileFunctionCall(const IContextNode* const functionCallContext, const IContextNode* const context, StringBuilder& stringBuilder)
     {
         TranspileLoadArguments(functionCallContext, 0, stringBuilder);
-        if (const auto function = reinterpret_cast<const IFunctionDefinition*>(functionCallContext->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+        if (const auto function = reinterpret_cast<const IFunction*>(functionCallContext->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
             stringBuilder.PushLine(pop);
 
         stringBuilder.PushLine(functionCallContext->CILData());
@@ -374,7 +393,7 @@ namespace Analysis::Creation::Transpiling
                         break;
                     case MemberType::FunctionCallContext:
                         {
-                            if (const auto function = reinterpret_cast<const IFunctionDefinition*>(current->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
+                            if (const auto function = reinterpret_cast<const IFunction*>(current->Metadata()); function->CheckDescriber(Describer::Static) && context->MemberType() != MemberType::StaticReferenceContext)
                                 stringBuilder.PushLine(pop);
                         }
                     default:
@@ -540,22 +559,23 @@ namespace Analysis::Creation::Transpiling
     {
         switch (assignedType->Type())
         {
+            case TypeKind::Boolean:
+                stringBuilder.PushLine(std::string_view("stind.i1"));
             case TypeKind::Short:
-                stringBuilder.PushLine("stind.i2");
+            case TypeKind::Character:
+                stringBuilder.PushLine(std::string_view("stind.i2"));
                 break;
             case TypeKind::Int:
-            case TypeKind::Boolean:
-            case TypeKind::Character:
-                stringBuilder.PushLine("stind.i4");
+                stringBuilder.PushLine(std::string_view("stind.i4"));
                 break;
             case TypeKind::Long:
-                stringBuilder.PushLine("stind.i8");
+                stringBuilder.PushLine(std::string_view("stind.i8"));
                 break;
             case TypeKind::Float:
-                stringBuilder.PushLine("stind.r4");
+                stringBuilder.PushLine(std::string_view("stind.r4"));
                 break;
             case TypeKind::Double:
-                stringBuilder.PushLine("stind.r8");
+                stringBuilder.PushLine(std::string_view("stind.r8"));
                 break;
             default:
                 stringBuilder.PushLine(std::format("cpobj {}", assignedType->FullName()));
@@ -637,6 +657,11 @@ namespace Analysis::Creation::Transpiling
                     }
                 }
                 break;
+            case MemberType::GeneratedAssignmentExpression:
+                {
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::LHS)), stringBuilder);
+                    TranspileExpression(context->GetChild(static_cast<int>(ChildCode::RHS)), stringBuilder);
+                }
             default:
                 TranspileLoad(context, stringBuilder);
                 break;

@@ -13,12 +13,13 @@
 
 namespace Analysis::Creation::Transpiling
 {
-    const std::string open_flower = "{";
-    const std::string close_flower = "}";
+    constexpr std::string_view open_flower = "{";
+    constexpr std::string_view close_flower = "}";
 
-    const std::string pop = "pop";
-    const std::string dup = "dup";
-    const std::string load_this = "ldarg.0";
+    constexpr std::string_view pop = "pop";
+    constexpr std::string_view dup = "dup";
+    constexpr std::string_view ret = "ret";
+    constexpr std::string_view load_this = "ldarg.0";
 
     std::string_view AccessModifierString(const Structure::Core::Interfaces::IDescribable* describable);
 
@@ -28,7 +29,9 @@ namespace Analysis::Creation::Transpiling
     std::string ConstantString(const Structure::Core::Interfaces::ICharacteristic* characteristic);
 
     std::string ScopedParameterString(const Structure::Core::Interfaces::IScoped* function);
-    std::string ScopedLocalVariableString(const Structure::Core::Interfaces::IScoped* function);
+    void ScopedLocalVariableString(const Structure::Core::Interfaces::IScoped* function, Services::StringBuilder& builder);
+
+    std::string ParameterString(const Structure::Core::Interfaces::IParametrized* parametrized);
 
     void TranspileExpression(const Structure::Core::Interfaces::IContextNode* context, Services::StringBuilder& stringBuilder);
 

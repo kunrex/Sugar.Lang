@@ -2,8 +2,6 @@
 
 #include <format>
 
-#include "function_extensions.h"
-
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
@@ -33,7 +31,7 @@ namespace Analysis::Structure::Global
     const string& VoidFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} void {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("callvirt {} void {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
@@ -46,7 +44,6 @@ namespace Analysis::Structure::Global
 
     void VoidFunction::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} void {}({}) cil managed", AccessModifierString(this), StaticModifierString(this), name, ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -60,11 +57,10 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.Push(innerBuilder.Value());
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -87,7 +83,6 @@ namespace Analysis::Structure::Global
 
     void Entrypoint::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} void {}({}) cil managed", AccessModifierString(this), StaticModifierString(this), name, ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -100,13 +95,12 @@ namespace Analysis::Structure::Global
 
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
-        builder.PushLine(".entrypoint");
+        builder.PushLine(std::string_view(".entrypoint"));
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.Push(innerBuilder.Value());
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -120,7 +114,7 @@ namespace Analysis::Structure::Global
     const std::string& GeneratedSetFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} void {} {}::{}({})",  CheckDescriber(Describer::Static) ? "" : "instance", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, creationType->FullName());
+            fullName = std::format("callvirt {} void {}::{}({})", CheckDescriber(Describer::Static) ? "" : "instance", parent->FullName(), name, creationType->FullName());
 
         return fullName;
     }
@@ -139,17 +133,16 @@ namespace Analysis::Structure::Global
 
     void GeneratedSetFunction::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} void {}({} value) cil managed", AccessModifierString(this), StaticModifierString(this), name, creationType->FullName()));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(".maxstack 2");
+        builder.PushLine(std::string_view(".maxstack 2"));
         builder.PushLine(load_this);
-        builder.PushLine("ldarg.1");
+        builder.PushLine(std::string_view("ldarg.1"));
         builder.PushLine(std::format("st{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(variableName)->FullName()));
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

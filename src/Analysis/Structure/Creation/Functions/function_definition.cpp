@@ -2,11 +2,12 @@
 
 #include <format>
 
-#include "../../Global/Functions/function_extensions.h"
-
+#include "../../../Creation/Transpiling/cil_transpiler.h"
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
 using namespace std;
+
+using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;

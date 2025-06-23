@@ -26,8 +26,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_string = "[System.Runtime]System.String";
-
 namespace Analysis::Structure::Wrappers
 {
     CompilationResult Concatenation(const std::vector<CompilationResult>& arguments)
@@ -50,7 +48,7 @@ namespace Analysis::Structure::Wrappers
         return { String::Instance(), result };
     }
 
-    String::String() : BuiltInClass(cil_string, Describer::Public), SingletonService(), characteristics(), indexer(nullptr), implicitObject(nullptr)
+    String::String() : BuiltInClass("string", Describer::Public), SingletonService(), characteristics(), indexer(nullptr), implicitObject(nullptr)
     { }
 
     String String::instance;

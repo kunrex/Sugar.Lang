@@ -34,6 +34,9 @@ namespace Analysis::Structure::Core
     void DefaultScoped::AddLocalVariable(const LocalVariable* const variable)
     { }
 
+    std::pair<const LocalVariable*, unsigned long> DefaultScoped::TryGetGeneratedVariable(const IDataType* const type)
+    { return { nullptr, 0 }; }
+
     DefaultScoped::~DefaultScoped()
     {
         delete scope;

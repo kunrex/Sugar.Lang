@@ -28,6 +28,8 @@ namespace Analysis::Structure::Core
 
             [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const override;
 
+            [[nodiscard]] std::pair<const Local::LocalVariable*, unsigned long> TryGetGeneratedVariable(const Interfaces::IDataType* type) override;
+
             ~DefaultScoped() override;
     };
 }

@@ -29,11 +29,8 @@ namespace Analysis::Structure::Global
     class AutoImplementedProperty final : public Property
     {
         private:
-            const bool publicGet;
-            const bool publicSet;
-
-            const std::string getInstruction;
-            const std::string setInstruction;
+            const Core::Interfaces::IFunction* get;
+            const Core::Interfaces::IFunction* set;
 
             int dependencyCount;
             int resolvedDependencyCount;
@@ -60,8 +57,7 @@ namespace Analysis::Structure::Global
     class GetProperty final : public Property
     {
         private:
-            const bool publicGet;
-            const std::string getInstruction;
+            const Core::Interfaces::IFunction* get;
 
         public:
             GetProperty(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IFunction* get);
@@ -83,8 +79,7 @@ namespace Analysis::Structure::Global
     class SetProperty final : public Property
     {
         private:
-            const bool publicSet;
-            const std::string setInstruction;
+            const Core::Interfaces::IFunction* set;
 
         public:
             SetProperty(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IFunction* set);
@@ -106,11 +101,8 @@ namespace Analysis::Structure::Global
     class GetSetProperty final : public Property
     {
         private:
-            const bool publicGet;
-            const bool publicSet;
-
-            const std::string getInstruction;
-            const std::string setInstruction;
+            const Core::Interfaces::IFunction* get;
+            const Core::Interfaces::IFunction* set;
 
         public:
             GetSetProperty(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const Core::Interfaces::IFunction* get, const Core::Interfaces::IFunction* set);

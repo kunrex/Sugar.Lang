@@ -41,7 +41,6 @@ namespace Analysis::Structure::Global
 
     void GlobalConstant::Transpile(Services::StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".field literal {} {} = {}", creationType->FullName(), name, ConstantString(this)));
     }
 

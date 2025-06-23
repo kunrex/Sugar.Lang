@@ -65,7 +65,6 @@ namespace Analysis::Structure::Global
 
     void GlobalVariable::Transpile(Services::StringBuilder& builder) const
     {
-        builder.PushLine("");
         auto modifier = string(AccessModifierString(this));
 
         std::string_view result;

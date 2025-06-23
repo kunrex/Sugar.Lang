@@ -34,7 +34,7 @@ namespace Analysis::Structure::Context
 
     string CreationContext::CILData() const
     {
-        return constructor->FullName();
+        return "newobj " + constructor->FullName();
     }
 
     void CreationContext::Print(const std::string& indent, const bool last) const
@@ -69,6 +69,38 @@ namespace Analysis::Structure::Context
     void CollectionCreationContext::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Creation: " << creationType->FullName() << std::endl;
+        DynamicContextCollection::Print(indent, last);
+    }
+
+    ConstructorCallContext::ConstructorCallContext(const IFunction* const constructor) : DynamicContextCollection(constructor->CreationType()), slotCount(-1), constructor(constructor)
+    { }
+
+    int ConstructorCallContext::SlotCount() const
+    {
+        if (slotCount < 0)
+        {
+            slotCount = CalculateFunctionCallSlotSize(this);
+
+            if (creationType != nullptr)
+                slotCount = std::max(creationType->SlotCount(), slotCount);
+        }
+
+        return slotCount;
+    }
+
+    MemberType ConstructorCallContext::MemberType() const { return MemberType::FunctionCallContext; }
+
+    bool ConstructorCallContext::Readable() const { return true; }
+    bool ConstructorCallContext::Writable() const { return constructor->CreationType()->MemberType() == MemberType::Class; }
+
+    string ConstructorCallContext::CILData() const
+    {
+        return "call " + constructor->FullName();
+    }
+
+    void ConstructorCallContext::Print(const std::string& indent, const bool last) const
+    {
+        std::cout << indent << (last ? "\\-" : "|-") << "Constructor Call: " << creationType->FullName() << std::endl;
         DynamicContextCollection::Print(indent, last);
     }
 }

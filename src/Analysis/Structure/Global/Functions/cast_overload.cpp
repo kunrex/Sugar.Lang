@@ -2,7 +2,6 @@
 
 #include <format>
 
-#include "function_extensions.h"
 #include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
 #include "../../../Creation/Binding/binder_extensions.h"
 
@@ -39,7 +38,7 @@ namespace Analysis::Structure::Global
     const string& DefinedCast::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("call {} {} {}::{}{}", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("call {} {} {}::{}{}", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
@@ -54,7 +53,6 @@ namespace Analysis::Structure::Global
 
     void DefinedCast::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} {} {}({}) cil managed", AccessModifierString(this), StaticModifierString(this), creationType->FullName(), name, ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -68,8 +66,7 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.Push(innerBuilder.Value());
 

@@ -18,7 +18,7 @@ namespace Analysis::Structure::Global
 
     unsigned long Indexer::ParameterCount() const { return parameterCount; }
 
-    GetIndexer::GetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get) : Indexer(describer, creationType, get->ParameterCount()), getInstruction("call " + get->FullName()), get(get)
+    GetIndexer::GetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get) : Indexer(describer, creationType, get->ParameterCount()), get(get)
     { }
 
     bool GetIndexer::Readable() const { return true; }
@@ -27,12 +27,12 @@ namespace Analysis::Structure::Global
     bool GetIndexer::PublicGet() const { return get->CheckDescriber(Describer::Public); }
     bool GetIndexer::PublicSet() const { return false; }
 
-    const std::string& GetIndexer::SignatureGetString() const { return getInstruction; }
-    const std::string& GetIndexer::SignatureSetString() const { return getInstruction; }
+    const std::string& GetIndexer::SignatureGetString() const { return get->FullName(); }
+    const std::string& GetIndexer::SignatureSetString() const { return get->FullName(); }
 
     const IDataType* GetIndexer::ParameterAt(const unsigned long index) const { return get->ParameterAt(index); }
 
-    SetIndexer::SetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const set) : Indexer(describer, creationType, set->ParameterCount() - 1), setInstruction("call " + set->FullName()), set(set)
+    SetIndexer::SetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const set) : Indexer(describer, creationType, set->ParameterCount() - 1), set(set)
     { }
 
     bool SetIndexer::Readable() const { return false; }
@@ -41,12 +41,12 @@ namespace Analysis::Structure::Global
     bool SetIndexer::PublicGet() const { return false; }
     bool SetIndexer::PublicSet() const { return set->CheckDescriber(Describer::Public); }
 
-    const std::string& SetIndexer::SignatureGetString() const { return setInstruction; }
-    const std::string& SetIndexer::SignatureSetString() const { return setInstruction; }
+    const std::string& SetIndexer::SignatureGetString() const { return set->FullName(); }
+    const std::string& SetIndexer::SignatureSetString() const { return set->FullName(); }
 
     const IDataType* SetIndexer::ParameterAt(const unsigned long index) const { return set->ParameterAt(index); }
 
-    GetSetIndexer::GetSetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get, const IFunction* const set) : Indexer(describer, creationType, get->ParameterCount()), getInstruction("call " + get->FullName()), get(get), setInstruction("call " + set->FullName()), set(set)
+    GetSetIndexer::GetSetIndexer(const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get, const IFunction* const set) : Indexer(describer, creationType, get->ParameterCount()), get(get), set(set)
     { }
 
     bool GetSetIndexer::Readable() const { return true; }
@@ -55,8 +55,8 @@ namespace Analysis::Structure::Global
     bool GetSetIndexer::PublicGet() const { return get->CheckDescriber(Describer::Public); }
     bool GetSetIndexer::PublicSet() const { return set->CheckDescriber(Describer::Public); }
 
-    const std::string& GetSetIndexer::SignatureGetString() const { return getInstruction; }
-    const std::string& GetSetIndexer::SignatureSetString() const { return setInstruction; }
+    const std::string& GetSetIndexer::SignatureGetString() const { return get->FullName(); }
+    const std::string& GetSetIndexer::SignatureSetString() const { return set->FullName(); }
 
     const IDataType* GetSetIndexer::ParameterAt(const unsigned long index) const { return get->ParameterAt(index); }
 

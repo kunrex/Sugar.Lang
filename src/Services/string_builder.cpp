@@ -14,8 +14,7 @@ using namespace Exceptions;
 
 namespace Services
 {
-    StringBuilder::StringBuilder() : indent(), value()
-    { }
+    StringBuilder::StringBuilder() = default;
 
     int StringBuilder::Indent() const { return indent; }
 
@@ -29,12 +28,17 @@ namespace Services
 
     void StringBuilder::Push(const std::string& content)
     {
-        value += content;
+        value.append(content);
     }
 
     void StringBuilder::PushLine(const std::string& content)
     {
-        value += std::format("{}{}\n", string(indent, '\t'), content);
+        value.append(std::format("{}{}\n", string(indent, '\t'), content));
+    }
+
+    void StringBuilder::PushLine(const std::string_view& content)
+    {
+        value.append(std::format("{}{}\n", string(indent, '\t'), content));
     }
 
     void StringBuilder::Clear()

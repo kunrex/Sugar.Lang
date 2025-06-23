@@ -6,6 +6,7 @@ using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Core
 {
@@ -46,6 +47,19 @@ namespace Analysis::Structure::Core
                 return i;
 
         return std::nullopt;
+    }
+
+    std::pair<const LocalVariable*, unsigned long> Scoped::TryGetGeneratedVariable(const IDataType* const type)
+    {
+        for (const auto index: generatedIndexes)
+            if (index.first == type)
+                return { children[index.second], index.second };
+
+        generatedIndexes.emplace_back(type, children.size());
+        const auto variable = new LocalVariable(std::format("V_{}", children.size()), Describer::None, type);
+
+        children.push_back(variable);
+        return { variable, children.size() - 1 };
     }
 
     Scoped::~Scoped()

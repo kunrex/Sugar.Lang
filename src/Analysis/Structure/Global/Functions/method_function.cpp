@@ -2,7 +2,6 @@
 
 #include <format>
 
-#include "function_extensions.h"
 #include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
 #include "../../../Creation/Binding/binder_extensions.h"
 
@@ -37,7 +36,7 @@ namespace Analysis::Structure::Global
     const string& MethodFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name, ParameterString(this));
+            fullName = std::format("callvirt {} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
 
         return fullName;
     }
@@ -52,7 +51,6 @@ namespace Analysis::Structure::Global
 
     void MethodFunction::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} {} {}({}) cil managed", AccessModifierString(this), StaticModifierString(this), creationType->FullName(), name, ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -66,8 +64,7 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.Push(innerBuilder.Value());
 
@@ -83,7 +80,7 @@ namespace Analysis::Structure::Global
     const std::string& GeneratedGetFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} {} {} get_{}::{}()",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->FullName(), parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), name);
+            fullName = std::format("callvirt {} {} {} get_{}::{}()",  CheckDescriber(Describer::Static) ? "" : "instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name);
 
         return fullName;
     }
@@ -93,16 +90,15 @@ namespace Analysis::Structure::Global
 
     void GeneratedGetFunction::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final {} void {}() cil managed", AccessModifierString(this), StaticModifierString(this), name));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(".maxstack 1");
+        builder.PushLine(std::string_view(".maxstack 1"));
         builder.PushLine(load_this);
         builder.PushLine(std::format("ld{}fld {} {}", CheckDescriber(Describer::Static) ? "s" : "", creationType->FullName(), parent->FindCharacteristic(variableName)->FullName()));
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

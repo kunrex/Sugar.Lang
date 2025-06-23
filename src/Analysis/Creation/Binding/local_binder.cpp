@@ -56,7 +56,6 @@
 #include "../../Structure/Context/Entities/References/local_variable_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_funcref_context.h"
 #include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
-#include "../../Structure/Context/Expressions/aggregate_assignment_expression.h"
 #include "../../Structure/Context/Expressions/duplicate_expression.h"
 #include "../../Structure/Context/Expressions/invalid_ternary_expression.h"
 #include "../../Structure/Context/Expressions/pop_expression.h"
@@ -1009,6 +1008,85 @@ namespace Analysis::Creation::Binding
         return TryBindCast(expression, type, index, sourceFile);
     }
 
+    const IContextNode* BindIndexerAssignmentContext(const IContextNode* const lhs, const IContextNode* const rhs, IScoped* const scoped, const unsigned long index, const SourceFile* const source)
+    {
+        const auto temporary = scoped->TryGetGeneratedVariable(lhs->CreationType());
+        const auto tempContext = new LocalVariableContext(temporary.first, temporary.second);
+
+        const auto firstAssignment = new AssignmentExpression(tempContext, new DuplicateExpression(TryBindCast(rhs, lhs->CreationType(), index, source)));
+        const auto secondAssignment = new AssignmentExpression(lhs, firstAssignment);
+
+        return new GeneratedAssignmentExpression(secondAssignment, tempContext);
+    }
+
+    const IContextNode* BindLocalConstructorContext(const IParseNode* const rhsNode, const IContextNode* lhs, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* dataType)
+    {
+        const auto creationType = BindDataType(rhsNode->GetChild(0), dataType->Parent());
+
+        std::vector<const IContextNode*> arguments;
+        std::vector<const IDataType*> argumentTypes;
+        BindArgumentContexts(rhsNode, 1, arguments, argumentTypes, scoped, scope, dataType);
+
+        if (const auto constructor = creationType->FindConstructor(argumentTypes); constructor != nullptr)
+        {
+            const auto call = new DotExpression(lhs, new ConstructorCallContext(constructor));
+            return new GeneratedAssignmentExpression(call, lhs);
+        }
+
+        return new InvalidBinaryExpression(lhs, CreateInvalidFunctionContext(arguments, creationType->FullName(), rhsNode->Token().Index(), dataType->Parent()));
+    }
+
+    const IContextNode* BindAssignmentContext(const IParseNode* const expression, const IContextNode* const lhs, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    {
+        const auto rhsNode = expression->GetChild(static_cast<int>(ChildCode::RHS));
+
+        if (!lhs->Writable())
+        {
+            PushException(new WriteException(expression->Token().Index(), dataType->Parent()));
+            return new InvalidBinaryExpression(lhs, new InvalidContext());
+        }
+
+        switch (lhs->MemberType())
+        {
+            case MemberType::LocalVariableContext:
+            case MemberType::FunctionParameterContext:
+                {
+                    if (lhs->CreationType()->MemberType() != MemberType::Class && rhsNode->NodeType() == NodeType::ConstructorCall)
+                        return BindLocalConstructorContext(rhsNode, lhs, scoped, scope, dataType);
+                }
+                break;
+        case MemberType::IndexerExpression:
+                return BindIndexerAssignmentContext(lhs, BindExpression(rhsNode, scoped, scope, dataType), scoped, expression->Token().Index(), dataType->Parent());
+            default:
+                break;
+        }
+
+        return new AssignmentExpression(lhs, new DuplicateExpression(TryBindAssignmentCast(BindExpression(rhsNode, scoped, scope, dataType), lhs->CreationType(), expression->Token().Index(), dataType->Parent())));
+    }
+
+    const IContextNode* BindAggregateAssignmentContext(const IParseNode* const expression, const SyntaxKind operation, const IContextNode* const lhs, IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
+    {
+        const auto rhs = BindExpression(expression->GetChild(static_cast<int>(ChildCode::RHS)), scoped, scope, dataType);
+
+        if (!lhs->Writable())
+        {
+            PushException(new WriteException(expression->Token().Index(), dataType->Parent()));
+            return new InvalidBinaryExpression(lhs, rhs);
+        }
+
+        const auto definition = lhs->CreationType()->FindOverload(operation);
+        if (definition == nullptr)
+        {
+            PushException(new OverloadNotFoundException(operation, expression->Token().Index(), dataType->Parent()));
+            return new InvalidBinaryExpression(lhs, rhs);
+        }
+
+        if(definition->CreationType() != lhs->CreationType())
+            PushException(new LogException(std::format("Overload for: {} does not have return type: {}", ToString(operation), lhs->CreationType()->FullName()), expression->Token().Index(), dataType->Parent()));
+
+        return new AggregateAssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, TryBindCast(rhs, lhs->CreationType(), expression->Token().Index(), dataType->Parent()))));
+    }
+
     std::optional<std::pair<const IOperatorOverload*, const IFunction*>> TryFindBinaryOverload(const SyntaxKind kind, const IDataType* const lhsCreationType, const IDataType* const rhsCreationType)
     {
         const auto operation = lhsCreationType->FindOverload(kind);
@@ -1098,30 +1176,9 @@ namespace Analysis::Creation::Binding
                     const auto rhs = BindExpression(expression->GetChild(static_cast<int>(ChildCode::RHS)), scoped, scope, dataType);
 
                     if (kind == SyntaxKind::Assignment)
-                    {
-                        if (lhs->Writable())
-                            return new AssignmentExpression(lhs, new DuplicateExpression(TryBindAssignmentCast(rhs, lhs->CreationType(), expression->Token().Index(), dataType->Parent())));
-
-                        PushException(new WriteException(index, source));
-                        return new InvalidBinaryExpression(lhs, rhs);
-                    }
+                        return BindAssignmentContext(expression, lhs, scoped, scope, dataType);
                     if (const auto operation = Operator::IsAssignment(kind); operation)
-                    {
-                        if (!lhs->Writable())
-                        {
-                            PushException(new WriteException(index, source));
-                            return new InvalidBinaryExpression(lhs, rhs);
-                        }
-
-                        const auto definition = lhs->CreationType()->FindOverload(*operation);
-                        if (definition == nullptr)
-                        {
-                            PushException(new OverloadNotFoundException(*operation, index, source));
-                            return new InvalidBinaryExpression(lhs, rhs);
-                        }
-
-                        return new AggregateAssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, rhs)));
-                    }
+                        return BindAggregateAssignmentContext(expression, *operation, lhs, scoped, scope, dataType);;
 
                     const auto lhsCreationType = lhs->CreationType();
                     const auto rhsCreationType = rhs->CreationType();

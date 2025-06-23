@@ -2,8 +2,6 @@
 
 #include <format>
 
-#include "function_extensions.h"
-
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
@@ -38,7 +36,7 @@ namespace Analysis::Structure::Global
     const string& Constructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} instance void {} {}::.ctor{}", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), ParameterString(this));
+            fullName = std::format("instance void {}::.ctor{}", parent->FullName(), ParameterString(this));
 
         return fullName;
     }
@@ -50,7 +48,6 @@ namespace Analysis::Structure::Global
 
     void Constructor::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final hidebysig specialname rtspecialname instance void .ctor({}) cil managed", AccessModifierString(this), ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -64,16 +61,15 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.PushLine(load_this);
-        builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");
+        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
 
         parent->InstanceConstructor()->Transpile(builder);
         builder.Push(innerBuilder.Value());
 
-        builder.Push("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -93,7 +89,7 @@ namespace Analysis::Structure::Global
     const std::string& ImplicitConstructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} instance void {} {}::.ctor()", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName());
+            fullName = std::format("instance void {}::.ctor()", parent->FullName());
 
         return fullName;
     }
@@ -103,18 +99,17 @@ namespace Analysis::Structure::Global
 
     void ImplicitConstructor::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final hidebysig specialname rtspecialname instance void .ctor() cil managed", AccessModifierString(this)));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(".maxstack 1");
+        builder.PushLine(std::string_view(".maxstack 1"));
         builder.PushLine(load_this);
-        builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");
+        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
 
         PushTranspilation(builder);
-        builder.Push("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -122,14 +117,11 @@ namespace Analysis::Structure::Global
 
     void ImplicitConstructor::PushTranspilation(StringBuilder& builder) const
     {
-        if (!characteristics.empty())
+        for (const auto characteristic: characteristics)
         {
-            for (const auto characteristic: characteristics)
-            {
-                builder.PushLine(load_this);
-                TranspileExpression(characteristic->Context(), builder);
-                builder.PushLine(std::format("stfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
-            }
+            builder.PushLine(load_this);
+            TranspileExpression(characteristic->Context(), builder);
+            builder.PushLine(std::format("stfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
         }
     }
 
@@ -150,13 +142,12 @@ namespace Analysis::Structure::Global
         if (characteristics.empty())
             return;
 
-        builder.PushLine();
-        builder.PushLine(".method private specialname rtspecialname static void .cctor() cil managed");
+        builder.PushLine(std::string_view(".method private specialname rtspecialname static void .cctor() cil managed"));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(".maxstack 1");
+        builder.PushLine(std::string_view(".maxstack 1"));
 
         for (const auto characteristic: characteristics)
         {
@@ -164,7 +155,7 @@ namespace Analysis::Structure::Global
             builder.PushLine(std::format("stsfld {} {}", characteristic->CreationType()->FullName(), characteristic->FullName()));
         }
 
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -183,7 +174,7 @@ namespace Analysis::Structure::Global
     const std::string& DefinedConstructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
-            fullName = std::format("{} instance void {} {}::.ctor{}", creationType->MemberType() == MemberType::Class ? "newobj" : "call", parent->MemberType() == MemberType::Class ? "class" : "valuetype", parent->FullName(), ParameterString(this));
+            fullName = std::format("instance void {}::.ctor{}", parent->FullName(), ParameterString(this));
 
         return fullName;
     }
@@ -195,7 +186,6 @@ namespace Analysis::Structure::Global
 
     void DefinedConstructor::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".method {} final hidebysig specialname rtspecialname instance void .ctor({}) cil managed", AccessModifierString(this), ScopedParameterString(this)));
 
         builder.PushLine(open_flower);
@@ -209,16 +199,15 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
-        if (children.size() - parameterCount > 0)
-            builder.PushLine(std::format(".localsinit({})", ScopedLocalVariableString(this)));
+        ScopedLocalVariableString(this, builder);
 
         builder.PushLine(load_this);
-        builder.PushLine("call instance void [System.Runtime]System.Object::.ctor()");
+        builder.PushLine(std::string_view("call instance void [System.Runtime]System.Object::.ctor()"));
 
         PushTranspilation(builder);
         builder.Push(innerBuilder.Value());
 
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -253,8 +242,7 @@ namespace Analysis::Structure::Global
 
     void StaticDefinedConstructor::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine();
-        builder.PushLine(".method private specialname rtspecialname static void .cctor() cil managed");
+        builder.PushLine(std::string_view(".method private specialname rtspecialname static void .cctor() cil managed"));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
@@ -267,6 +255,7 @@ namespace Analysis::Structure::Global
         TranspileScope(scope, innerBuilder, maxSlotSize);
 
         builder.PushLine(std::format(".maxstack {}", maxSlotSize));
+        ScopedLocalVariableString(this, builder);
 
         if (!characteristics.empty())
         {
@@ -279,7 +268,7 @@ namespace Analysis::Structure::Global
 
         builder.Push(innerBuilder.Value());
 
-        builder.PushLine("ret");
+        builder.PushLine(ret);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
@@ -302,10 +291,10 @@ namespace Analysis::Structure::Global
     void BuiltInConstructor::BindLocal()
     { }
 
-    void BuiltInConstructor::Transpile(Services::StringBuilder& builder) const
+    void BuiltInConstructor::Transpile(StringBuilder& builder) const
     { }
 
-    void BuiltInConstructor::PushTranspilation(Services::StringBuilder& builder) const
+    void BuiltInConstructor::PushTranspilation(StringBuilder& builder) const
     { }
 
     void BuiltInConstructor::PushTranspilation(const ICharacteristic* const characteristic)

@@ -31,8 +31,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_integer = "[System.Runtime]System.Int32";
-
 namespace
 {
     CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Integer::Instance(), std::get<int>(arguments[0].data) + std::get<int>(arguments[1].data)} ; }
@@ -54,7 +52,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Integer::Integer() : BuiltInValueType(cil_integer, Describer::Public), SingletonService(), characteristics()
+    Integer::Integer() : BuiltInValueType("int32", Describer::Public), SingletonService(), characteristics()
     { }
 
     Integer Integer::instance;

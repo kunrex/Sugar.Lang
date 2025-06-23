@@ -73,6 +73,7 @@ namespace Analysis::Structure::Enums
         BinaryExpression,
         TernaryExpression,
         AssignmentExpression,
+        GeneratedAssignmentExpression,
 
         PopExpression,
         DuplicateExpression,

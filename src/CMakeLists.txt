@@ -439,8 +439,6 @@ add_library(Sugar STATIC
         Analysis/Structure/DataTypes/data_type_extensions.cpp
         Analysis/Structure/DataTypes/data_type_extensions.h
         Analysis/Structure/Core/Interfaces/i_fully_nameable.h
-        Analysis/Structure/Global/Functions/function_extensions.cpp
-        Analysis/Structure/Global/Functions/function_extensions.h
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.cpp
         Parsing/ParseNodes/Functions/Calling/collection_construction_call_node.h
         Analysis/Structure/Core/Interfaces/DataTypes/i_data_type.h
@@ -540,6 +538,4 @@ add_library(Sugar STATIC
         Exceptions/Compilation/Analysis/Local/constant_expected_exception.h
         Analysis/Structure/Context/Expressions/pop_expression.cpp
         Analysis/Structure/Context/Expressions/pop_expression.h
-        Analysis/Structure/Context/Expressions/aggregate_assignment_expression.cpp
-        Analysis/Structure/Context/Expressions/aggregate_assignment_expression.h
 )

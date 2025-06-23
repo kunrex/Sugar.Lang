@@ -97,7 +97,7 @@ namespace Analysis::Structure::Wrappers
 
         const auto constructor = new BuiltInConstructor(this, std::format("newobj instance void class {}::.ctor(int32)", genericSignature));
         constructor->PushParameterType(Integer::Instance());
-        constructors[0] = { ArgumentHash(constructor), constructor };
+        constructors[1] = { ArgumentHash(constructor), constructor };
 
         implicitObject = ImplicitObject();
 

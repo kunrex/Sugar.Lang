@@ -49,6 +49,27 @@ namespace Analysis::Structure::Context
 
             void Print(const std::string& indent, bool last) const override;
     };
+
+    class ConstructorCallContext final : public DynamicContextCollection
+    {
+        private:
+            mutable int slotCount;
+            const Core::Interfaces::IFunction* constructor;
+
+        public:
+            explicit ConstructorCallContext(const Core::Interfaces::IFunction* constructor);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
+    };
 }
 
 #endif

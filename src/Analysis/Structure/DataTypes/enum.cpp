@@ -204,13 +204,12 @@ namespace Analysis::Structure::DataTypes
 
     void Enum::Transpile(Services::StringBuilder& builder) const
     {
-        builder.PushLine();
         builder.PushLine(std::format(".class {} sealed auto ansi {} extends [System.Runtime]System.Enum", AccessModifierString(this), fullName));
 
         builder.PushLine(open_flower);
         builder.IncreaseIndent();
 
-        builder.PushLine(".field public specialname rtspecialname int32 value__ ");
+        builder.PushLine(std::string_view(".field public specialname rtspecialname int32 value__"));
 
         for (const auto characteristic : characteristics)
             characteristic->Transpile(builder);

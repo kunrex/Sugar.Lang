@@ -51,17 +51,17 @@ namespace Analysis::Structure::Global
 
     bool Property::HasDependant(const ICharacteristic* characteristic) const { return false; }
 
-    AutoImplementedProperty::AutoImplementedProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* get, const IFunction* const set, const IParseNode* const value) : Property(name, describer, creationType, value), publicGet(get->CheckDescriber(Describer::Public)), publicSet(set->CheckDescriber(Describer::Public)), getInstruction("call " + get->FullName()), setInstruction("call " + set->FullName()), dependencyCount(0), resolvedDependencyCount(-1)
+    AutoImplementedProperty::AutoImplementedProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* get, const IFunction* const set, const IParseNode* const value) : Property(name, describer, creationType, value), get(get), set(set), dependencyCount(0), resolvedDependencyCount(-1)
     { }
 
     bool AutoImplementedProperty::Readable() const { return true; }
     bool AutoImplementedProperty::Writable() const { return true; }
 
-    bool AutoImplementedProperty::PublicGet() const { return publicGet; }
-    bool AutoImplementedProperty::PublicSet() const { return publicSet; }
+    bool AutoImplementedProperty::PublicGet() const { return get->CheckDescriber(Describer::Public); }
+    bool AutoImplementedProperty::PublicSet() const { return set->CheckDescriber(Describer::Public); }
 
-    const std::string& AutoImplementedProperty::SignatureGetString() const { return getInstruction; }
-    const std::string& AutoImplementedProperty::SignatureSetString() const { return setInstruction; }
+    const std::string& AutoImplementedProperty::SignatureGetString() const { return get->FullName(); }
+    const std::string& AutoImplementedProperty::SignatureSetString() const { return set->FullName(); }
 
     void AutoImplementedProperty::BindLocal()
     {
@@ -72,30 +72,35 @@ namespace Analysis::Structure::Global
         if (resolvedDependencyCount < dependencyCount)
             return;
 
-        context = ConstantCompile(this, parent);
-        if (context != nullptr && context->CreationType() != creationType)
-            PushException(new InitialisationException(context->CreationType(), creationType, parseNode->Token().Index(), parent->Parent()));
+        context = VariableCompile(this, parent);
+        if (context == nullptr)
+            return;
+
+        if (context->CreationType() != creationType)
+            PushException(new InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
+
+        const auto constructor = CheckDescriber(Describer::Static) ? parent->StaticConstructor() : parent->InstanceConstructor();
+        constructor->PushTranspilation(this);
     }
 
     void AutoImplementedProperty::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine("");
         builder.PushLine(std::format(".field {} {} {} {}", AccessModifierString(this), string(AccessModifierString(this)) + (CheckDescriber(Describer::Static) ? "static" : ""), creationType->FullName(), name));
     }
 
     void AutoImplementedProperty::IncrementDependencyCount() { dependencyCount++; }
 
-    GetProperty::GetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get) : Property(name, describer, creationType), publicGet(get->CheckDescriber(Describer::Public)), getInstruction("call " + get->FullName())
+    GetProperty::GetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get) : Property(name, describer, creationType), get(get)
     { }
 
     bool GetProperty::Readable() const { return true; }
     bool GetProperty::Writable() const { return false; }
 
-    bool GetProperty::PublicGet() const { return publicGet; }
+    bool GetProperty::PublicGet() const { return get->CheckDescriber(Describer::Public); }
     bool GetProperty::PublicSet() const { return false; }
 
-    const std::string& GetProperty::SignatureGetString() const { return getInstruction; }
-    const std::string& GetProperty::SignatureSetString() const { return getInstruction; }
+    const std::string& GetProperty::SignatureGetString() const { return get->FullName(); }
+    const std::string& GetProperty::SignatureSetString() const { return get->FullName(); }
 
     void GetProperty::BindLocal()
     { }
@@ -103,17 +108,17 @@ namespace Analysis::Structure::Global
     void GetProperty::Transpile(StringBuilder& builder) const
     { }
 
-    SetProperty::SetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const set) : Property(name, describer, creationType), publicSet(set->CheckDescriber(Describer::Public)), setInstruction("call " + set->FullName())
+    SetProperty::SetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const set) : Property(name, describer, creationType), set(set)
     { }
 
     bool SetProperty::Readable() const { return false; }
     bool SetProperty::Writable() const { return true; }
 
     bool SetProperty::PublicGet() const { return false; }
-    bool SetProperty::PublicSet() const { return publicSet; }
+    bool SetProperty::PublicSet() const { return set->CheckDescriber(Describer::Public); }
 
-    const std::string& SetProperty::SignatureGetString() const { return setInstruction; }
-    const std::string& SetProperty::SignatureSetString() const { return setInstruction; }
+    const std::string& SetProperty::SignatureGetString() const { return set->FullName(); }
+    const std::string& SetProperty::SignatureSetString() const { return set->FullName(); }
 
     void SetProperty::BindLocal()
     { }
@@ -121,17 +126,17 @@ namespace Analysis::Structure::Global
     void SetProperty::Transpile(StringBuilder& builder) const
     { }
 
-    GetSetProperty::GetSetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get, const IFunction* const set) : Property(name, describer, creationType), publicGet(get->CheckDescriber(Describer::Public)), publicSet(set->CheckDescriber(Describer::Public)), getInstruction("call " + get->FullName()), setInstruction("call " + set->FullName())
+    GetSetProperty::GetSetProperty(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IFunction* const get, const IFunction* const set) : Property(name, describer, creationType), get(get), set(set)
     { }
 
     bool GetSetProperty::Readable() const { return true; }
     bool GetSetProperty::Writable() const { return true; }
 
-    bool GetSetProperty::PublicGet() const { return publicGet; }
-    bool GetSetProperty::PublicSet() const { return publicSet; }
+    bool GetSetProperty::PublicGet() const { return get->CheckDescriber(Describer::Public); }
+    bool GetSetProperty::PublicSet() const { return set->CheckDescriber(Describer::Public); }
 
-    const std::string& GetSetProperty::SignatureGetString() const { return getInstruction; }
-    const std::string& GetSetProperty::SignatureSetString() const { return setInstruction; }
+    const std::string& GetSetProperty::SignatureGetString() const { return get->FullName(); }
+    const std::string& GetSetProperty::SignatureSetString() const { return set->FullName(); }
 
     void GetSetProperty::BindLocal()
     { }

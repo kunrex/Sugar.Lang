@@ -32,8 +32,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_short = "[System.Runtime]System.Int16";
-
 namespace
 {
     CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Short::Instance(), std::get<short>(arguments[0].data) + std::get<short>(arguments[1].data)} ; }
@@ -55,7 +53,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Short::Short() : BuiltInValueType(cil_short, Describer::Public), SingletonService(), characteristics()
+    Short::Short() : BuiltInValueType("int16", Describer::Public), SingletonService(), characteristics()
     { }
 
     Short Short::instance;

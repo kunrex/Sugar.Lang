@@ -16,11 +16,9 @@ using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_object = "[System.Runtime]System.Object";
-
 namespace Analysis::Structure::Wrappers
 {
-    Object::Object() : ImplicitClass(cil_object, Describer::Public)
+    Object::Object() : ImplicitClass("object", Describer::Public)
     { }
 
     Object Object::instance;

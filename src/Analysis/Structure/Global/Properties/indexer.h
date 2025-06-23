@@ -25,7 +25,6 @@ namespace Analysis::Structure::Global
     class GetIndexer final : public Indexer
     {
         private:
-            const std::string getInstruction;
             const Core::Interfaces::IFunction* get;
 
         public:
@@ -46,7 +45,6 @@ namespace Analysis::Structure::Global
     class SetIndexer final : public Indexer
     {
         private:
-            const std::string setInstruction;
             const Core::Interfaces::IFunction* set;
 
         public:
@@ -67,10 +65,7 @@ namespace Analysis::Structure::Global
     class GetSetIndexer final : public Indexer
     {
         private:
-            const std::string getInstruction;
             const Core::Interfaces::IFunction* get;
-
-            const std::string setInstruction;
             const Core::Interfaces::IFunction* set;
 
         public:

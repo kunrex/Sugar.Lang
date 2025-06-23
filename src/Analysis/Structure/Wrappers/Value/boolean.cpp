@@ -25,8 +25,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_boolean = "[System.Runtime]System.Boolean";
-
 namespace
 {
     CompilationResult Not(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Boolean::Instance(), !std::get<bool>(arguments[0].data)} ; }
@@ -37,7 +35,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Boolean::Boolean() : BuiltInValueType(cil_boolean, Enums::Describer::Public), SingletonService()
+    Boolean::Boolean() : BuiltInValueType("bool", Enums::Describer::Public), SingletonService()
     { }
 
     Boolean Boolean::instance;

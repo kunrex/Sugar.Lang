@@ -33,8 +33,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const string cil_float = "[System.Runtime]System.Single";
-
 namespace
 {
     CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Float::Instance(), std::get<float>(arguments[0].data) + std::get<float>(arguments[1].data)} ; }
@@ -48,7 +46,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Float::Float() : BuiltInValueType(cil_float, Describer::Public), SingletonService(), characteristics(), implicitDouble(nullptr)
+    Float::Float() : BuiltInValueType("float32", Describer::Public), SingletonService(), characteristics(), implicitDouble(nullptr)
     { }
 
     Float Float::instance;

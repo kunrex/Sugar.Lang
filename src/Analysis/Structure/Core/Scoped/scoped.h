@@ -17,6 +17,8 @@ namespace Analysis::Structure::Core
             int parameterCount;
             Local::Scope* const scope;
 
+            std::vector<std::pair<const Interfaces::IDataType*, unsigned long>> generatedIndexes;
+
             explicit Scoped(const ParseNodes::Core::Interfaces::IParseNode* parseNode);
 
         public:
@@ -32,6 +34,8 @@ namespace Analysis::Structure::Core
             void AddLocalVariable(const Local::LocalVariable* variable) override;
 
             [[nodiscard]] std::optional<unsigned long> GetParameterIndex(const std::string& name) const override;
+
+            [[nodiscard]] std::pair<const Local::LocalVariable*, unsigned long> TryGetGeneratedVariable(const Interfaces::IDataType* type) override;
 
             ~Scoped() override;
     };

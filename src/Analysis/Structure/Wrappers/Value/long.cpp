@@ -32,8 +32,6 @@ using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
-const std::string cil_long = "[System.Runtime]System.Int64";
-
 namespace
 {
     CompilationResult Addition(const std::vector<CompilationResult>& arguments) { return { Analysis::Structure::Wrappers::Long::Instance(), std::get<long>(arguments[0].data) + std::get<long>(arguments[1].data)} ; }
@@ -55,7 +53,7 @@ namespace
 
 namespace Analysis::Structure::Wrappers
 {
-    Long::Long() : BuiltInValueType(cil_long, Describer::Public), SingletonService(), characteristics()
+    Long::Long() : BuiltInValueType("int64", Describer::Public), SingletonService(), characteristics()
     { }
 
     Long Long::instance;

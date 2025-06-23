@@ -141,11 +141,11 @@ void Compiler::Transpile() const
 
     StringBuilder stringBuilder;
 
-    stringBuilder.PushLine(".assembly extern System.Runtime {}");
-    stringBuilder.PushLine(".assembly extern System.Console {}");
-    stringBuilder.PushLine(".assembly extern System.Collections.Generic.Runtime {}");
+    stringBuilder.PushLine(std::string_view(".assembly extern System.Runtime {}"));
+    stringBuilder.PushLine(std::string_view(".assembly extern System.Console {}"));
+    stringBuilder.PushLine(std::string_view(".assembly extern System.Collections.Generic.Runtime {}"));
 
-    stringBuilder.PushLine();
+    stringBuilder.PushLine(std::string_view());
     stringBuilder.PushLine(std::format(".assembly {} {}", name, "{}"));
     stringBuilder.PushLine(std::format(".module {}.{}", name, Entrypoint::Instance() == nullptr ? "dll" : "exe"));
 
