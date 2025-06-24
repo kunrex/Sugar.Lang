@@ -98,6 +98,8 @@ namespace Analysis::Structure::Context
     bool ConstructorCallContext::Readable() const { return true; }
     bool ConstructorCallContext::Writable() const { return constructor->CreationType()->MemberType() == MemberType::Class; }
 
+    uintptr_t ConstructorCallContext::Metadata() const { return reinterpret_cast<uintptr_t>(constructor); }
+
     string ConstructorCallContext::CILData() const
     {
         return "call " + constructor->FullName();

@@ -277,13 +277,13 @@ namespace Analysis::Creation::Transpiling
             case MemberType::LocalVariableContext:
                 {
                     const auto variable = reinterpret_cast<const IVariable*>(lhs->Metadata());
-                    stringBuilder.Push(std::format("ldloc{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
+                    stringBuilder.PushLine(std::format("ldloc{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
                 }
                 break;
             case MemberType::FunctionParameterContext:
                 {
                     const auto variable = reinterpret_cast<const IVariable*>(lhs->Metadata());
-                    stringBuilder.Push(std::format("ldarg{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
+                    stringBuilder.PushLine(std::format("ldarg{}.{}", variable->CreationType()->MemberType() == MemberType::Class ? "" : "a", lhs->CILData()));
                 }
                 break;
             case MemberType::FunctionCallContext:
@@ -485,7 +485,7 @@ namespace Analysis::Creation::Transpiling
                     if (const auto operand = context->GetChild(static_cast<int>(ChildCode::Expression)); operand->MemberType() != MemberType::StaticReferenceContext)
                         TranspileLoad(operand, stringBuilder);
 
-                    stringBuilder.Push(context->CILData());
+                    stringBuilder.PushLine(context->CILData());
                 }
                 break;
             case MemberType::CollectorConstructorCallContext:
@@ -524,28 +524,28 @@ namespace Analysis::Creation::Transpiling
                     switch (const auto creationType = operand->CreationType(); creationType->Type())
                     {
                         case TypeKind::Short:
-                            stringBuilder.Push("ldind.i2");
+                            stringBuilder.PushLine(std::string_view("ldind.i2"));
                             break;
                         case TypeKind::Int:
-                            stringBuilder.Push("ldind.i4");
+                            stringBuilder.PushLine(std::string_view("ldind.i4"));
                             break;
                         case TypeKind::Long:
-                            stringBuilder.Push("ldind.i8");
+                            stringBuilder.PushLine(std::string_view("ldind.i8"));
                             break;
                         case TypeKind::Float:
-                            stringBuilder.Push("ldind.r4");
+                            stringBuilder.PushLine(std::string_view("ldind.r4"));
                             break;
                         case TypeKind::Double:
-                            stringBuilder.Push("ldind.r8");
+                            stringBuilder.PushLine(std::string_view("ldind.r8"));
                             break;
                         case TypeKind::Boolean:
-                            stringBuilder.Push("ldind.i1 conv.i4");
+                            stringBuilder.PushLine(std::string_view("ldind.i1 conv.i4"));
                             break;
                         case TypeKind::Character:
-                            stringBuilder.Push("ldind.u2 conv.i4");
+                            stringBuilder.PushLine(std::string_view("ldind.u2 conv.i4"));
                             break;
                         default:
-                            stringBuilder.Push("ldobj " + creationType->FullName());
+                            stringBuilder.PushLine("ldobj " + creationType->FullName());
                             break;
                     }
                 }

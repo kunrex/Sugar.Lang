@@ -134,32 +134,44 @@ namespace Analysis::Creation::Binding
         return false;
     }
 
-    const IContextNode* InitialiseLocalDeclaration(const IDataType* const creationType)
+    const IContextNode* InitialiseLocalDeclaration(const IContextNode* const localVariableContext, const IDataType* const creationType)
     {
+        const IContextNode* context;
         if (creationType->MemberType() == MemberType::Class)
-            return new NullConstant();
-        if (creationType->MemberType() == MemberType::Enum)
-            return new IntegerConstant(0);
-
-        switch (creationType->Type())
+             context = new NullConstant();
+        else if (creationType->MemberType() == MemberType::Enum)
+            context = new IntegerConstant(0);
+        else
         {
-            case TypeKind::Int:
-                return new IntegerConstant(0);
-            case TypeKind::Long:
-                return new LongConstant(0);
-            case TypeKind::Short:
-                return new ShortConstant(0);
-            case TypeKind::Float:
-                return new FloatConstant(0);
-            case TypeKind::Double:
-                return new DoubleConstant(0);
-            case TypeKind::Character:
-                return new CharacterConstant('\0');
-            case TypeKind::Boolean:
-                return new FalseConstant();
-            default:
-                return new CreationContext(creationType->FindConstructor({ }));
+            switch (creationType->Type())
+            {
+                case TypeKind::Int:
+                    context = new IntegerConstant(0);
+                    break;
+                case TypeKind::Long:
+                    context = new LongConstant(0);
+                    break;
+                case TypeKind::Short:
+                    context = new ShortConstant(0);
+                    break;
+                case TypeKind::Float:
+                    context = new FloatConstant(0);
+                    break;
+                case TypeKind::Double:
+                    context = new DoubleConstant(0);
+                    break;
+                case TypeKind::Character:
+                    context = new CharacterConstant('\0');
+                    break;
+                case TypeKind::Boolean:
+                    context = new FalseConstant();
+                    break;
+                default:
+                    return new DotExpression(localVariableContext, new ConstructorCallContext(creationType->FindConstructor({ })));
+            }
         }
+
+        return new AssignmentExpression(localVariableContext, context);
     }
 
     void BindLocalDeclaration(const Describer describer, const IDataType* const creationType, const IParseNode* const identifier, const IScoped* const scoped, Scope* const scope, const IUserDefinedType* const dataType)
@@ -175,7 +187,7 @@ namespace Analysis::Creation::Binding
 
         const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
 
-        scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), InitialiseLocalDeclaration(creationType)));
+        scope->AddChild(InitialiseLocalDeclaration(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), creationType));
 
         ValidateDescriber(variable, Describer::None, index, source);
         scope->AddVariable(variable);
