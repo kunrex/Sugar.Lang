@@ -1,7 +1,5 @@
 #include "identifier_node.h"
 
-using namespace std;
-
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
@@ -15,6 +13,6 @@ namespace ParseNodes::Values
 
     void IdentifierNode::Print(const std::string& indent, const bool last) const
     {
-        std::cout << indent << (last ? "\\-" : "|-") << "Identifier Node: " << *token.Value<string>() << std::endl;
+        std::cout << indent << (last ? "\\-" : "|-") << "Identifier Node: " << *token.Value<std::string>() << std::endl;
     }
 }

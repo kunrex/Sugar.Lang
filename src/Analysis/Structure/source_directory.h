@@ -1,9 +1,9 @@
 #ifndef SOURCE_DIRECTORY_H
 #define SOURCE_DIRECTORY_H
 
-#include "../../Services/dictionary.h"
-
 #include "source_object.h"
+
+#include "../../Services/dictionary.h"
 
 namespace Analysis::Structure
 {

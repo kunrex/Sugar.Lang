@@ -8,7 +8,7 @@ namespace ParseNodes::Conditions
     class ElseNode final : public virtual FixedNodeCollection<1>
     {
         public:
-            ElseNode(const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            ElseNode(const IParseNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

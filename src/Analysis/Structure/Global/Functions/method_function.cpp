@@ -2,15 +2,13 @@
 
 #include <format>
 
-#include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
-#include "../../../Creation/Binding/binder_extensions.h"
-
+#include "../../../../Exceptions/exception_manager.h"
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
 
-using namespace std;
+#include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
 
 using namespace Services;
 
@@ -19,21 +17,20 @@ using namespace Exceptions;
 using namespace ParseNodes;
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Creation::Binding;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    MethodFunction::MethodFunction(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : MethodDefinition(name, describer, creationType), Scoped(body)
+    MethodFunction::MethodFunction(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : MethodDefinition(name, describer, creationType), Scoped(body)
     { }
 
     MemberType MethodFunction::MemberType() const { return MemberType::MethodDefinition; }
 
-    const string& MethodFunction::FullName() const
+    const std::string& MethodFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = std::format("{} {} {} {}::{}{}",  CheckDescriber(Describer::Static) ? "call" : "callvirt instance", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
@@ -46,7 +43,7 @@ namespace Analysis::Structure::Global
         BindScope(parseNode, scope, this, parent);
 
         if (!IsReturnComplete(scope, creationType))
-            PushException(new ReturnValueException(parseNode->Token().Index(), parent->Parent()));
+            ExceptionManager::PushException(ReturnValueException(parseNode->Token().Index(), parent->Parent()));
     }
 
     void MethodFunction::Transpile(StringBuilder& builder) const
@@ -72,7 +69,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    GeneratedGetFunction::GeneratedGetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : MethodDefinition("__get__" + variableName, describer, creationType), DefaultScoped(), variableName(std::move(variableName))
+    GeneratedGetFunction::GeneratedGetFunction(const Enums::Describer describer, std::string variableName, const IDataType* const creationType) : MethodDefinition("__get__" + variableName, describer, creationType), variableName(std::move(variableName))
     { }
 
     MemberType GeneratedGetFunction::MemberType() const { return MemberType::MethodDefinition; }
@@ -84,6 +81,11 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
+
+    unsigned long GeneratedGetFunction::ParameterCount() const { return 0; }
+
+    const IDataType* GeneratedGetFunction::ParameterAt(const unsigned long index) const
+    { return nullptr; }
 
     void GeneratedGetFunction::BindLocal()
     { }
@@ -104,14 +106,14 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    BuiltInMethod::BuiltInMethod(const string& name, const Enums::Describer describer, const IDataType* const creationType, const string& instruction) : MethodDefinition(name, describer, creationType), BuiltInFunction()
+    BuiltInMethod::BuiltInMethod(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const std::string& instruction) : MethodDefinition(name, describer, creationType), BuiltInFunction()
     {
         fullName = instruction;
     }
 
     MemberType BuiltInMethod::MemberType() const { return MemberType::BuiltInDefinition; }
 
-    const string& BuiltInMethod::FullName() const { return fullName; }
+    const std::string& BuiltInMethod::FullName() const { return fullName; }
 
     void BuiltInMethod::BindLocal()
     { }

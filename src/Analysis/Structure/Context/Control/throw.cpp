@@ -2,8 +2,6 @@
 
 #include "../../Wrappers/Reference/object.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -20,7 +18,7 @@ namespace Analysis::Structure::Context
     bool Throw::Readable() const { return false; }
     bool Throw::Writable() const { return false; }
 
-    string Throw::CILData() const { return "ret"; }
+    std::string Throw::CILData() const { return "ret"; }
 
     void Throw::Print(const std::string& indent, const bool last) const
     {

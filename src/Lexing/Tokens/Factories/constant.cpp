@@ -6,7 +6,7 @@ namespace Tokens
 {
     Constant::Constant() = default;
 
-    Token Constant::Null(const unsigned long i) { return { i, TokenType::Constant, SyntaxKind::Null, static_cast<short>(TypeKind::Object), "null"  }; }
+    Token Constant::Null(const unsigned long i) { return { i, TokenType::Constant, SyntaxKind::Null, static_cast<short>(TypeKind::Object), 0l }; }
 
     Token Constant::True(const unsigned long i) { return { i, TokenType::Constant, SyntaxKind::True, static_cast<short>(TypeKind::Boolean), static_cast<long>(true) }; }
     Token Constant::False(const unsigned long i) { return { i, TokenType::Constant, SyntaxKind::False, static_cast<short>(TypeKind::Boolean), static_cast<long>(false) }; }

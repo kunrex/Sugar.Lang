@@ -2,11 +2,10 @@
 
 #include <format>
 
-#include "../../../Creation/Binding/constant_binder.h"
-#include "../../../Creation/Transpiling/cil_transpiler.h"
 #include "../../Context/Constants/integer_constant.h"
 
-using namespace std;
+#include "../../../Creation/Binding/constant_binder.h"
+#include "../../../Creation/Transpiling/cil_transpiler.h"
 
 using namespace Tokens::Enums;
 
@@ -15,14 +14,13 @@ using namespace ParseNodes::Core::Interfaces;
 using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    GlobalConstant::GlobalConstant(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependants()
+    GlobalConstant::GlobalConstant(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* parseNode) : GlobalVariable(name, describer, creationType, parseNode), dependants()
     { }
 
     MemberType GlobalConstant::MemberType() const { return MemberType::ConstantField; }
@@ -48,7 +46,7 @@ namespace Analysis::Structure::Global
 
     void GlobalConstant::PushDependant(ICharacteristic* const characteristic) const
     {
-        if(ranges::find(dependants, characteristic) == dependants.end())
+        if(std::ranges::find(dependants, characteristic) == dependants.end())
         {
             dependants.push_back(characteristic);
             characteristic->IncrementDependencyCount();

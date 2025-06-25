@@ -6,10 +6,7 @@
 
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Context
@@ -26,7 +23,7 @@ namespace Analysis::Structure::Context
     bool DefinedBinaryExpression::Readable() const { return true; }
     bool DefinedBinaryExpression::Writable() const { return false; }
 
-    string DefinedBinaryExpression::CILData() const { return operation->MemberType() == MemberType::GeneratedOverload ? operation->FullName() : std::format("call {}", operation->FullName()); }
+    std::string DefinedBinaryExpression::CILData() const { return operation->MemberType() == MemberType::GeneratedOverload ? operation->FullName() : std::format("call {}", operation->FullName()); }
 
     void DefinedBinaryExpression::Print(const std::string& indent, const bool last) const
     {

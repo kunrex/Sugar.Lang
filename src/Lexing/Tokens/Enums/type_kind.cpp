@@ -1,10 +1,8 @@
 #include "type_kind.h"
 
-using namespace std;
-
 namespace Tokens::Enums
 {
-    string ToString(const TypeKind& kind)
+    std::string ToString(const TypeKind& kind)
     {
         switch (kind)
         {

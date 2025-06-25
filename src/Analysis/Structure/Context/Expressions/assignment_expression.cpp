@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Enums;
@@ -20,7 +18,7 @@ namespace Analysis::Structure::Context
     bool AssignmentExpression::Readable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Readable(); }
     bool AssignmentExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Writable(); }
 
-    string AssignmentExpression::CILData() const { return ""; }
+    std::string AssignmentExpression::CILData() const { return ""; }
 
     void AssignmentExpression::Print(const std::string& indent, const bool last) const
     {
@@ -38,7 +36,7 @@ namespace Analysis::Structure::Context
     bool AggregateAssignmentExpression::Readable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Readable(); }
     bool AggregateAssignmentExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::LHS))->Writable(); }
 
-    string AggregateAssignmentExpression::CILData() const { return ""; }
+    std::string AggregateAssignmentExpression::CILData() const { return ""; }
 
     void AggregateAssignmentExpression::Print(const std::string& indent, const bool last) const
     {
@@ -66,7 +64,7 @@ namespace Analysis::Structure::Context
     bool GeneratedAssignmentExpression::Readable() const { return GetChild(static_cast<int>(ChildCode::RHS))->Readable(); }
     bool GeneratedAssignmentExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::RHS))->Writable(); }
 
-    string GeneratedAssignmentExpression::CILData() const { return ""; }
+    std::string GeneratedAssignmentExpression::CILData() const { return ""; }
 
     void GeneratedAssignmentExpression::Print(const std::string& indent, const bool last) const
     {

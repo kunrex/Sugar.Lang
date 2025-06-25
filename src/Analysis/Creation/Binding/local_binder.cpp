@@ -23,7 +23,6 @@
 #include "../../Structure/Context/invalid_context.h"
 #include "../../Structure/Context/Entities/this_context.h"
 #include "../../Structure/Context/Constants/null_constant.h"
-#include "../../Structure/Context/Control/branch_condition.h"
 #include "../../Structure/Context/Constants/float_constant.h"
 #include "../../Structure/Context/Constants/string_constant.h"
 #include "../../Structure/Context/Casts/box_cast_expression.h"
@@ -61,7 +60,6 @@
 #include "../../Structure/Context/Expressions/pop_expression.h"
 #include "../../Structure/Context/Expressions/ternary_expression.h"
 #include "../../Structure/Core/Interfaces/DataTypes/i_collection_type.h"
-#include "../../Structure/Core/Scoped/default_scoped.h"
 
 #include "../../Structure/Global/Properties/property.h"
 
@@ -81,8 +79,6 @@
 #include "../../Structure/Wrappers/Reference/object.h"
 #include "../../Structure/Wrappers/Reference/string.h"
 #include "../../Structure/Wrappers/Generic/referenced.h"
-
-using namespace std;
 
 using namespace Services;
 
@@ -123,7 +119,7 @@ namespace Analysis::Creation::Binding
 
     bool VariableExists(const IParseNode* identifier, const IScoped* const scoped, const Scope* scope)
     {
-        const auto value = *identifier->Token().Value<string>();
+        const auto value = *identifier->Token().Value<std::string>();
 
         if (const auto local = scope->GetVariable(value); local > 0)
             return true;
@@ -181,11 +177,11 @@ namespace Analysis::Creation::Binding
 
         if (VariableExists(identifier, scoped, scope))
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(index, source));
             return;
         }
 
-        const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
+        const auto variable = new LocalVariable(*identifier->Token().Value<std::string>(), describer, creationType);
 
         scope->AddChild(InitialiseLocalDeclaration(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), creationType));
 
@@ -202,7 +198,7 @@ namespace Analysis::Creation::Binding
         {
             if (typeValid)
             {
-                PushException(new LogException(std::format("Ambiguous cast between casts defined in: `{}` and `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
+                ExceptionManager::PushException(LogException(std::format("Ambiguous cast between casts defined in: `{}` and `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
                 return new InvalidCastExpression(type, operand);
             }
 
@@ -211,7 +207,7 @@ namespace Analysis::Creation::Binding
         if (typeValid)
             return new DefinedCastExpression(operandCast, operand);
 
-        PushException(new LogException(std::format("No appropriate cast found from: `{}` to `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
+        ExceptionManager::PushException(LogException(std::format("No appropriate cast found from: `{}` to `{}`", type->FullName(), operand->CreationType()->FullName()), index, source));
         return new InvalidCastExpression(type, operand);
     }
 
@@ -243,11 +239,11 @@ namespace Analysis::Creation::Binding
 
         if (VariableExists(identifier, scoped, scope))
         {
-            PushException(new DuplicateVariableDefinitionException(index, source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(index, source));
             return;
         }
 
-        const auto variable = new LocalVariable(*identifier->Token().Value<string>(), describer, creationType);
+        const auto variable = new LocalVariable(*identifier->Token().Value<std::string>(), describer, creationType);
 
         scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), TryBindCast(BindExpression(value, scoped, scope, dataType), creationType, index, source)));
 
@@ -265,8 +261,8 @@ namespace Analysis::Creation::Binding
         switch (const auto typeNode = declaration->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType())
         {
             case NodeType::VoidType:
-            case NodeType::AnonymousType:
-                PushException(new DuplicateVariableDefinitionException(index, source));
+        case NodeType::AnonymousType:
+                ExceptionManager::PushException(DuplicateVariableDefinitionException(index, source));
                 break;
             default:
                 BindLocalDeclaration(FromNode(declaration->GetChild(static_cast<int>(ChildCode::Describer))), BindDataType(typeNode, dataType->Parent()), identifier, scoped, scope, dataType);
@@ -282,7 +278,7 @@ namespace Analysis::Creation::Binding
         {
             if (creationType->MemberType() == MemberType::Class)
             {
-                PushException(new LogException("Only value types may be referenced", typeNode->Token().Index(), source));
+                ExceptionManager::PushException(LogException("Only value types may be referenced", typeNode->Token().Index(), source));
                 type = creationType;
             }
             else
@@ -303,13 +299,13 @@ namespace Analysis::Creation::Binding
 
         switch (const auto typeNode = initialisation->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType())
         {
-            case NodeType::VoidType:
-                    PushException(new DuplicateVariableDefinitionException(typeNode->Token().Index(), dataType->Parent()));
+        case NodeType::VoidType:
+                    ExceptionManager::PushException(DuplicateVariableDefinitionException(typeNode->Token().Index(), dataType->Parent()));
                     break;
             case NodeType::AnonymousType:
                 {
                     const auto context = BindExpression(initialisation->GetChild(static_cast<int>(ChildCode::Expression)), scoped, scope, dataType);
-                    const auto variable = new LocalVariable(*identifier->Token().Value<string>(), FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer))), context->CreationType());
+                    const auto variable = new LocalVariable(*identifier->Token().Value<std::string>(), FromNode(initialisation->GetChild(static_cast<int>(ChildCode::Describer))), context->CreationType());
 
                     scope->AddChild(new AssignmentExpression(new LocalVariableContext(variable, scoped->VariableCount() - scoped->ParameterCount()), context));
 
@@ -332,7 +328,7 @@ namespace Analysis::Creation::Binding
         {
             case NodeType::VoidType:
             case NodeType::AnonymousType:
-                PushException(new DuplicateVariableDefinitionException(typeNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(DuplicateVariableDefinitionException(typeNode->Token().Index(), dataType->Parent()));
                 break;
             default:
                 {
@@ -349,7 +345,7 @@ namespace Analysis::Creation::Binding
                         if (const auto value = statement->GetChild(i + 1); value->NodeType() == NodeType::Empty)
                         {
                             if (forceInit)
-                                PushException(new LogException("References must be initialised", identifier->Token().Index(), dataType->Parent()));
+                                ExceptionManager::PushException(LogException("References must be initialised", identifier->Token().Index(), dataType->Parent()));
 
                             BindLocalDeclaration(describer, creationType, identifier, scoped, scope, dataType);
                         }
@@ -395,7 +391,7 @@ namespace Analysis::Creation::Binding
 
     const IContextNode* BindIdentifier(const IParseNode* identifier, const IScoped* const scoped, const Scope* const scope, const IUserDefinedType* const dataType)
     {
-        const auto value = *identifier->Token().Value<string>();
+        const auto value = *identifier->Token().Value<std::string>();
 
         if (const auto local = scope->GetVariable(value); local)
         {
@@ -412,7 +408,7 @@ namespace Analysis::Creation::Binding
         if (const auto characteristic = dataType->FindCharacteristic(value); characteristic != nullptr)
         {
             if (scoped->CheckDescriber(Describer::Static) && !characteristic->CheckDescriber(Describer::Static))
-                PushException(new NonStaticReferenceException(characteristic->FullName(), identifier->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(NonStaticReferenceException(characteristic->FullName(), identifier->Token().Index(), dataType->Parent()));
 
             switch (characteristic->MemberType())
             {
@@ -458,7 +454,7 @@ namespace Analysis::Creation::Binding
         for (const auto argument: arguments)
             functionContext->AddChild(argument);
 
-        PushException(new LogException(std::format("No appropriate overload for: `{}` was found", identifier), index, source));
+        ExceptionManager::PushException(LogException(std::format("No appropriate overload for: `{}` was found", identifier), index, source));
         return functionContext;
     }
 
@@ -467,7 +463,7 @@ namespace Analysis::Creation::Binding
         const auto source = dataType->Parent();
 
         const auto identifier = functionNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
-        const auto value = *identifier.Value<string>();
+        const auto value = *identifier.Value<std::string>();
 
         std::vector<const IContextNode*> arguments;
         std::vector<const IDataType*> argumentTypes;
@@ -476,7 +472,7 @@ namespace Analysis::Creation::Binding
         if (const auto function = dataType->FindFunction(value, argumentTypes); function != nullptr)
         {
             if (scoped->CheckDescriber(Describer::Static) && !function->CheckDescriber(Describer::Static))
-                PushException(new NonStaticReferenceException(function->FullName(), identifier.Index(), source));
+                ExceptionManager::PushException(NonStaticReferenceException(function->FullName(), identifier.Index(), source));
 
             return CreateFunctionContext(function, arguments);
         }
@@ -497,7 +493,7 @@ namespace Analysis::Creation::Binding
         if (const auto indexer = creationType->FindIndexer(argumentTypes); indexer != nullptr)
         {
             if (dataType != creationType && !indexer->CheckDescriber(Describer::Public))
-                PushException(new AccessibilityException(std::format("{}::indexer", creationType->FullName()), index, source));
+                ExceptionManager::PushException(AccessibilityException(std::format("{}::indexer", creationType->FullName()), index, source));
 
             const auto indexerContext = new IndexerExpression(indexer, operand, creationType != dataType);
             for (const auto argument: arguments)
@@ -506,7 +502,7 @@ namespace Analysis::Creation::Binding
             return indexerContext;
         }
 
-        PushException(new LogException("No appropriate overload for indexer was found", index, source));
+        ExceptionManager::PushException(LogException("No appropriate overload for indexer was found", index, source));
         const auto invalidIndexer = new InvalidIndexerExpression(operand);
         for (const auto argument: arguments)
             invalidIndexer->AddChild(argument);
@@ -537,7 +533,7 @@ namespace Analysis::Creation::Binding
                 return new StaticReferenceContext(BindDataType(lhs, dataType->Parent()));
             case NodeType::This:
                 if (scoped->CheckDescriber(Describer::Static))
-                    PushException(new LogException("Using `this` in static context", lhs->Token().Index(), dataType->Parent()));
+                    ExceptionManager::PushException(LogException("Using `this` in static context", lhs->Token().Index(), dataType->Parent()));
 
                 return new ThisContext(dataType);
             case NodeType::Constant:
@@ -551,7 +547,7 @@ namespace Analysis::Creation::Binding
                 break;
         }
 
-        PushException(new InvalidStatementException(lhs->Token().Index(), dataType->Parent()));
+        ExceptionManager::PushException(InvalidStatementException(lhs->Token().Index(), dataType->Parent()));
         return new InvalidContext();
     }
 
@@ -567,7 +563,7 @@ namespace Analysis::Creation::Binding
                     const auto lhsContext = BindStaticDotRHS(rhs->GetChild(static_cast<int>(ChildCode::LHS)), context, scoped, scope, dataType);
                     if (!lhsContext->Readable())
                     {
-                        PushException(new ReadException(rhs->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(ReadException(rhs->Token().Index(), dataType->Parent()));
                         return new DotExpression(lhsContext, new InvalidContext());
                     }
 
@@ -575,12 +571,12 @@ namespace Analysis::Creation::Binding
                 }
             case NodeType::Identifier:
                 {
-                    if (const auto characteristic = context->CreationType()->FindCharacteristic(*rhs->Token().Value<string>()); characteristic != nullptr)
+                    if (const auto characteristic = context->CreationType()->FindCharacteristic(*rhs->Token().Value<std::string>()); characteristic != nullptr)
                     {
                         if (!characteristic->CheckDescriber(Describer::Static))
-                            PushException(new NonStaticReferenceException(characteristic->FullName(), index, source));
+                            ExceptionManager::PushException(NonStaticReferenceException(characteristic->FullName(), index, source));
                         if (dataType != context->CreationType() && !characteristic->CheckDescriber(Describer::Public))
-                            PushException(new AccessibilityException(characteristic->FullName(), index, source));
+                            ExceptionManager::PushException(AccessibilityException(characteristic->FullName(), index, source));
 
                         switch (characteristic->MemberType())
                         {
@@ -596,7 +592,7 @@ namespace Analysis::Creation::Binding
                 break;
             case NodeType::FunctionCall:
                 {
-                    const auto identifier = *rhs->GetChild(0)->Token().Value<string>();
+                    const auto identifier = *rhs->GetChild(0)->Token().Value<std::string>();
 
                     std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
@@ -605,9 +601,9 @@ namespace Analysis::Creation::Binding
                     if (const auto function = context->CreationType()->FindFunction(identifier, argumentTypes); function != nullptr)
                     {
                         if (!function->CheckDescriber(Describer::Static))
-                            PushException(new NonStaticReferenceException(function->Signature(), index, source));
+                            ExceptionManager::PushException(NonStaticReferenceException(function->Signature(), index, source));
                         if (dataType != context->CreationType() && !function->CheckDescriber(Describer::Public))
-                            PushException(new AccessibilityException(function->Signature(), index, source));
+                            ExceptionManager::PushException(AccessibilityException(function->Signature(), index, source));
 
                         return CreateFunctionContext(function, arguments);
                     }
@@ -618,7 +614,7 @@ namespace Analysis::Creation::Binding
                 break;
         }
 
-        PushException(new InvalidStatementException(index, source));
+        ExceptionManager::PushException(InvalidStatementException(index, source));
         return new InvalidContext();
     }
 
@@ -634,7 +630,7 @@ namespace Analysis::Creation::Binding
                     const auto lhsContext = BindEntity(entity->GetChild(static_cast<int>(ChildCode::LHS)), context, scoped, scope, dataType);
                     if (!lhsContext->Readable())
                     {
-                        PushException(new ReadException(entity->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(ReadException(entity->Token().Index(), dataType->Parent()));
                         return new DotExpression(lhsContext, new InvalidContext());
                     }
 
@@ -643,10 +639,10 @@ namespace Analysis::Creation::Binding
             case NodeType::Identifier:
                 {
                     const auto creationType = context->CreationType();
-                    if (const auto characteristic = creationType->FindCharacteristic(*entity->Token().Value<string>()); characteristic != nullptr)
+                    if (const auto characteristic = creationType->FindCharacteristic(*entity->Token().Value<std::string>()); characteristic != nullptr)
                     {
                         if (dataType != creationType && !characteristic->CheckDescriber(Describer::Public))
-                            PushException(new AccessibilityException(characteristic->FullName(), index, source));
+                            ExceptionManager::PushException(AccessibilityException(characteristic->FullName(), index, source));
 
                         return new FieldContext(characteristic, context->MemberType() == MemberType::ThisContext && scoped->MemberType() == MemberType::Constructor);
                     }
@@ -654,7 +650,7 @@ namespace Analysis::Creation::Binding
                 break;
             case NodeType::FunctionCall:
                 {
-                    const auto identifier = *entity->GetChild(0)->Token().Value<string>();
+                    const auto identifier = *entity->GetChild(0)->Token().Value<std::string>();
 
                     std::vector<const IContextNode*> arguments;
                     std::vector<const IDataType*> argumentTypes;
@@ -663,7 +659,7 @@ namespace Analysis::Creation::Binding
                     if (const auto function = context->CreationType()->FindFunction(identifier, argumentTypes); function != nullptr)
                     {
                         if (dataType != context->CreationType() && !function->CheckDescriber(Describer::Public))
-                            PushException(new AccessibilityException(function->Signature(), index, source));
+                            ExceptionManager::PushException(AccessibilityException(function->Signature(), index, source));
 
                         return CreateFunctionContext(function, arguments);
                     }
@@ -676,7 +672,7 @@ namespace Analysis::Creation::Binding
                 break;
         }
 
-        PushException(new InvalidStatementException(index, source));
+        ExceptionManager::PushException(InvalidStatementException(index, source));
         return new InvalidContext();
     }
 
@@ -690,7 +686,7 @@ namespace Analysis::Creation::Binding
                     const auto arg1 = BindExpression(formatNode->GetChild(1), scoped, scope, dataType);
 
                     if (arg->CreationType() != String::Instance())
-                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
 
                     return new FormatSingleContext(arg, arg1->CreationType()->MemberType() == MemberType::Class ? arg1 : new BoxCastExpression(arg1));
                 }
@@ -701,7 +697,7 @@ namespace Analysis::Creation::Binding
                     const auto arg2 = BindExpression(formatNode->GetChild(2), scoped, scope, dataType);
 
                     if (arg->CreationType() != String::Instance())
-                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
 
                     const auto actualArg1 = arg1->CreationType()->MemberType() == MemberType::Class ? arg1 : new BoxCastExpression(arg1);
                     const auto actualArg2 = arg2->CreationType()->MemberType() == MemberType::Class ? arg2 : new BoxCastExpression(arg2);
@@ -715,7 +711,7 @@ namespace Analysis::Creation::Binding
                     BindArgumentContexts(formatNode, 0, arguments, argumentTypes, scoped, scope, dataType);
 
                     if (argumentTypes[0] != String::Instance())
-                        PushException(new LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("First argument of format must be a string", formatNode->Token().Index(), dataType->Parent()));
 
                     const auto format = new FormatContext();
                     for (auto i = 0; i < argumentTypes.size(); i++)
@@ -795,7 +791,7 @@ namespace Analysis::Creation::Binding
 
                     if (!lhs->Readable())
                     {
-                        PushException(new ReadException(entity->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(ReadException(entity->Token().Index(), dataType->Parent()));
                         return new DotExpression(lhs, new InvalidContext());
                     }
 
@@ -808,7 +804,7 @@ namespace Analysis::Creation::Binding
                     if (const auto character = BindIdentifier(entity, scoped, scope, dataType); character != nullptr)
                     {
                         if (character->MemberType() == MemberType::StaticReferenceContext)
-                            PushException(new LogException("Unexpected type", entity->Token().Index(), dataType->Parent()));
+                            ExceptionManager::PushException(LogException("Unexpected type", entity->Token().Index(), dataType->Parent()));
 
                         return character;
                     }
@@ -873,7 +869,7 @@ namespace Analysis::Creation::Binding
                             break;
                     }
 
-                    PushException(new LogException("Arguments do not match delegate signature", entity->Token().Index(), dataType->Parent()));
+                    ExceptionManager::PushException(LogException("Arguments do not match delegate signature", entity->Token().Index(), dataType->Parent()));
                     return new InvokeContext(Object::Instance(), Action::Instance({ }));
                 }
             case NodeType::FuncRef:
@@ -886,17 +882,17 @@ namespace Analysis::Creation::Binding
 
                     if (functionNameNode->NodeType() != NodeType::Identifier)
                     {
-                        PushException(new LogException("Expected name of the function as second argument", functionNameNode->Token().Index(), source));
+                        ExceptionManager::PushException(LogException("Expected name of the function as second argument", functionNameNode->Token().Index(), source));
                         return new InvalidContext();
                     }
 
-                    const auto identifier = *functionNameNode->Token().Value<string>();
+                    const auto identifier = *functionNameNode->Token().Value<std::string>();
 
                     const auto objectContext = BindFuncRefObject(objectNode, scoped, scope, dataType);
                     const auto flag = objectContext->MemberType() == MemberType::StaticReferenceContext;
 
                     if (!objectContext->Readable())
-                        PushException(new ReadException(objectNode->Token().Index(), source));
+                        ExceptionManager::PushException(ReadException(objectNode->Token().Index(), source));
 
                     std::vector<const IDataType*> genericTypes;
                     genericTypes.reserve(childCount - 2);
@@ -906,7 +902,7 @@ namespace Analysis::Creation::Binding
                     if (const auto function = objectContext->CreationType()->FindFunction(identifier, genericTypes); function != nullptr)
                     {
                         if (flag && !function->CheckDescriber(Describer::Static))
-                            PushException(new LogException(std::format("Trying to reference non static function: `{}`", function->Name()), entity->Token().Index(), source));
+                            ExceptionManager::PushException(LogException(std::format("Trying to reference non static function: `{}`", function->Name()), entity->Token().Index(), source));
 
                         if (function->MemberType() == MemberType::VoidDefinition)
                         {
@@ -922,7 +918,7 @@ namespace Analysis::Creation::Binding
                         }
                     }
 
-                    PushException(new LogException("Couldn't find suitable function to reference", entity->Token().Index(), source));
+                    ExceptionManager::PushException(LogException("Couldn't find suitable function to reference", entity->Token().Index(), source));
                     return new InvalidFuncRefContext(objectContext);
                 }
             case NodeType::Ref:
@@ -931,7 +927,7 @@ namespace Analysis::Creation::Binding
 
                     if (!context->Readable() || context->CreationType()->MemberType() == MemberType::Class)
                     {
-                        PushException(new LogException("Can only reference readable value type variables", entity->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("Can only reference readable value type variables", entity->Token().Index(), dataType->Parent()));
                         return context;
                     }
 
@@ -942,7 +938,7 @@ namespace Analysis::Creation::Binding
                     const auto context = BindEntity(entity->GetChild(0), scoped, scope, dataType);
 
                     if (context->CreationType()->Type() != TypeKind::Referenced)
-                        PushException(new LogException("Can only copy referenced variables", entity->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("Can only copy referenced variables", entity->Token().Index(), dataType->Parent()));
 
                     return new CopyContext(context, dynamic_cast<const Referenced*>(context));
                 }
@@ -983,7 +979,7 @@ namespace Analysis::Creation::Binding
                         const auto context = TryBindCast(BindExpression(child, scoped, scope, dataType), genericType, child->Token().Index(), source);
 
                         if (context->CreationType() != genericType)
-                            PushException(new LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
+                            ExceptionManager::PushException(LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
 
                         arguments.push_back(context);
                     }
@@ -998,7 +994,7 @@ namespace Analysis::Creation::Binding
                 break;
         }
 
-        PushException(new InvalidStatementException(entity->Token().Index(), dataType->Parent()));
+        ExceptionManager::PushException(InvalidStatementException(entity->Token().Index(), dataType->Parent()));
         return new InvalidContext();
     }
 
@@ -1008,11 +1004,11 @@ namespace Analysis::Creation::Binding
         {
             if (expression->CreationType() == type)
             {
-                PushException(new LogException("Cannot reassign the value of a reference", index, sourceFile));
+                ExceptionManager::PushException(LogException("Cannot reassign the value of a reference", index, sourceFile));
                 return expression;
             }
             if (Referenced::Instance(expression->CreationType()) != type)
-                PushException(new LogException("Cannot resolve type to reference", index, sourceFile));
+                ExceptionManager::PushException(LogException("Cannot resolve type to reference", index, sourceFile));
 
             return expression;
         }
@@ -1054,7 +1050,7 @@ namespace Analysis::Creation::Binding
 
         if (!lhs->Writable())
         {
-            PushException(new WriteException(expression->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(WriteException(expression->Token().Index(), dataType->Parent()));
             return new InvalidBinaryExpression(lhs, new InvalidContext());
         }
 
@@ -1082,19 +1078,19 @@ namespace Analysis::Creation::Binding
 
         if (!lhs->Writable())
         {
-            PushException(new WriteException(expression->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(WriteException(expression->Token().Index(), dataType->Parent()));
             return new InvalidBinaryExpression(lhs, rhs);
         }
 
         const auto definition = lhs->CreationType()->FindOverload(operation);
         if (definition == nullptr)
         {
-            PushException(new OverloadNotFoundException(operation, expression->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(OverloadNotFoundException(operation, expression->Token().Index(), dataType->Parent()));
             return new InvalidBinaryExpression(lhs, rhs);
         }
 
         if(definition->CreationType() != lhs->CreationType())
-            PushException(new LogException(std::format("Overload for: {} does not have return type: {}", ToString(operation), lhs->CreationType()->FullName()), expression->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(LogException(std::format("Overload for: {} does not have return type: {}", ToString(operation), lhs->CreationType()->FullName()), expression->Token().Index(), dataType->Parent()));
 
         return new AggregateAssignmentExpression(lhs, new DuplicateExpression(new DefinedBinaryExpression(definition, lhs, TryBindCast(rhs, lhs->CreationType(), expression->Token().Index(), dataType->Parent()))));
     }
@@ -1138,7 +1134,7 @@ namespace Analysis::Creation::Binding
                             {
                                 if (!operand->Writable())
                                 {
-                                    PushException(new WriteException(operandNode->Token().Index(), source));
+                                    ExceptionManager::PushException(WriteException(operandNode->Token().Index(), source));
                                     return new InvalidUnaryExpression(operand);
                                 }
 
@@ -1150,7 +1146,7 @@ namespace Analysis::Creation::Binding
                             {
                                 if (!operand->Writable())
                                 {
-                                    PushException(new WriteException(operandNode->Token().Index(), source));
+                                    ExceptionManager::PushException(WriteException(operandNode->Token().Index(), source));
                                     return new InvalidUnaryExpression(operand);
                                 }
 
@@ -1164,7 +1160,7 @@ namespace Analysis::Creation::Binding
 
                     if (definition == nullptr)
                     {
-                        PushException(new OverloadNotFoundException(kind, index, source));
+                        ExceptionManager::PushException(OverloadNotFoundException(kind, index, source));
                         return new InvalidUnaryExpression(operand);
                     }
 
@@ -1200,7 +1196,7 @@ namespace Analysis::Creation::Binding
                         if (const auto definition = lhsCreationType->FindOverload(kind); definition != nullptr)
                             return new DefinedBinaryExpression(definition, lhs, rhs);
 
-                        PushException(new OverloadNotFoundException(kind, index, source));
+                        ExceptionManager::PushException(OverloadNotFoundException(kind, index, source));
                         return new InvalidBinaryExpression(lhs, rhs);
                     }
 
@@ -1211,7 +1207,7 @@ namespace Analysis::Creation::Binding
                     {
                         if (rhsOperation)
                         {
-                            PushException(new LogException(std::format("Ambiguous operation between overloads defined in: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
+                            ExceptionManager::PushException(LogException(std::format("Ambiguous operation between overloads defined in: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
                             return new InvalidBinaryExpression(lhs, rhs);
                         }
 
@@ -1220,7 +1216,7 @@ namespace Analysis::Creation::Binding
                     if (rhsOperation)
                         return new DefinedBinaryExpression(rhsOperation->first, new DefinedCastExpression(rhsOperation->second, lhs), rhs);
 
-                    PushException(new LogException(std::format("No overload found for types: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
+                    ExceptionManager::PushException(LogException(std::format("No overload found for types: `{}` and `{}`", lhs->CreationType()->FullName(), rhs->CreationType()->FullName()), index, source));
                     return new InvalidBinaryExpression(lhs, rhs);
                 }
             case NodeType::Cast:
@@ -1267,7 +1263,7 @@ namespace Analysis::Creation::Binding
                     {
                         if (falseValid != nullptr)
                         {
-                            PushException(new LogException("Cannot resolve return type of ternary expression. Try casting to a specific type to avoid redundancy", index, source));
+                            ExceptionManager::PushException(LogException("Cannot resolve return type of ternary expression. Try casting to a specific type to avoid redundancy", index, source));
                             return new InvalidTernaryExpression(condition, trueValue, falseValue);
                         }
 
@@ -1276,7 +1272,7 @@ namespace Analysis::Creation::Binding
                     if (falseValid != nullptr)
                         return new TernaryExpression(falseType, condition, new DefinedCastExpression(falseValid, trueValue), falseValue);
 
-                    PushException(new LogException("Invalid Ternary Expression. True and False values must have same return type", index, source));
+                    ExceptionManager::PushException(LogException("Invalid Ternary Expression. True and False values must have same return type", index, source));
                     return new InvalidTernaryExpression(condition, trueValue, falseValue);
                 }
             default:
@@ -1301,7 +1297,7 @@ namespace Analysis::Creation::Binding
                 BindMultipleLocalDeclaration(statement, scoped, scope, dataType);
                 break;
             default:
-                PushException(new InvalidStatementException(statement->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(InvalidStatementException(statement->Token().Index(), dataType->Parent()));
                 break;
         }
     }
@@ -1360,7 +1356,7 @@ namespace Analysis::Creation::Binding
                             return;
                         }
 
-                        PushException(new LogException("No loop found to break out of", child->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("No loop found to break out of", child->Token().Index(), dataType->Parent()));
                         current->AddChild(new InvalidContext());
                     }
                     break;
@@ -1374,7 +1370,7 @@ namespace Analysis::Creation::Binding
                             return;
                         }
 
-                        PushException(new LogException("No loop found to continue to next iteration", child->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException("No loop found to continue to next iteration", child->Token().Index(), dataType->Parent()));
                         current->AddChild(new InvalidContext());
                     }
                     break;
@@ -1388,7 +1384,7 @@ namespace Analysis::Creation::Binding
 
                         current->AddChild(new Return());
                         if (scoped->CreationType() == Void::Instance())
-                            PushException(new LogException("Unexpected return argument", child->Token().Index(), dataType->Parent()));
+                            ExceptionManager::PushException(LogException("Unexpected return argument", child->Token().Index(), dataType->Parent()));
                     }
                     return;
                 case NodeType::IfChain:
@@ -1521,7 +1517,7 @@ namespace Analysis::Creation::Binding
                     break;
                 default:
                     {
-                        PushException(new InvalidStatementException(child->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(InvalidStatementException(child->Token().Index(), dataType->Parent()));
                         current->AddChild(new InvalidContext());
                         break;
                     }

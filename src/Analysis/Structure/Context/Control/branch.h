@@ -24,6 +24,46 @@ namespace Analysis::Structure::Context
 
             void Print(const std::string& indent, bool last) const override;
     };
+
+    class BranchTrue final : public ContextNode
+    {
+        private:
+            const std::string cilInstruction;
+
+        public:
+            explicit BranchTrue(const std::string& name);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
+    };
+
+    class BranchFalse final : public ContextNode
+    {
+        private:
+            const std::string cilInstruction;
+
+        public:
+            explicit BranchFalse(const std::string& name);
+
+            [[nodiscard]] Enums::MemberType MemberType() const override;
+
+            [[nodiscard]] int SlotCount() const override;
+
+            [[nodiscard]] bool Readable() const override;
+            [[nodiscard]] bool Writable() const override;
+
+            [[nodiscard]] std::string CILData() const override;
+
+            void Print(const std::string& indent, bool last) const override;
+    };
 }
 
 #endif

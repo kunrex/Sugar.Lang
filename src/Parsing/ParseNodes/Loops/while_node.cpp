@@ -6,7 +6,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Loops
 {
-    WhileNode::WhileNode(const IParseNode* const condition, const DynamicNodeCollection* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    WhileNode::WhileNode(const IParseNode* const condition, const IParseNode* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
         AddChild(ChildCode::Expression, condition);
         AddChild(ChildCode::Body, body);

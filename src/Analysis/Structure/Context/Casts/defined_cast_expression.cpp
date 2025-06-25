@@ -4,8 +4,6 @@
 
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -21,7 +19,7 @@ namespace Analysis::Structure::Context
     bool DefinedCastExpression::Readable() const { return true; }
     bool DefinedCastExpression::Writable() const { return false; }
 
-    string DefinedCastExpression::CILData() const { return definition->MemberType() == MemberType::GeneratedCast ? definition->FullName() : std::format("call {}", definition->FullName()); }
+    std::string DefinedCastExpression::CILData() const { return definition->FullName(); }
 
     void DefinedCastExpression::Print(const std::string& indent, const bool last) const
     {

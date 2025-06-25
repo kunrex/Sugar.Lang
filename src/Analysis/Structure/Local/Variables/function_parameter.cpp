@@ -1,6 +1,5 @@
 #include "function_parameter.h"
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 

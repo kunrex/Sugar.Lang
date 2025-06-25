@@ -4,12 +4,6 @@
 #include <sstream>
 
 #include "binder_extensions.h"
-#include "../../../Exceptions/exception_manager.h"
-
-#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/Project/invalid_import_path_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/Project/duplicate_structure_definition_exception.h"
 
 #include "../../Structure/source_directory.h"
 
@@ -17,7 +11,11 @@
 #include "../../Structure/DataTypes/class.h"
 #include "../../Structure/DataTypes/value_type.h"
 
-using namespace std;
+#include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Project/ambiguous_import_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Project/invalid_import_path_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Project/duplicate_structure_definition_exception.h"
 
 using namespace Exceptions;
 
@@ -37,11 +35,11 @@ namespace Analysis::Creation::Binding
     void CreateEnum(const IParseNode* const node, SourceFile* const sourceFile)
     {
         const auto index = node->Token().Index();
-        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<std::string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
-            PushException(new DuplicateStructureDefinitionException(index, sourceFile));
+            ExceptionManager::PushException(DuplicateStructureDefinitionException(index, sourceFile));
             return;
         }
 
@@ -55,11 +53,11 @@ namespace Analysis::Creation::Binding
     void CreateClass(const IParseNode* const node, SourceFile* const sourceFile)
     {
         const auto index = node->Token().Index();
-        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<std::string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
-            PushException(new DuplicateStructureDefinitionException(index, sourceFile));
+            ExceptionManager::PushException(DuplicateStructureDefinitionException(index, sourceFile));
             return;
         }
 
@@ -73,11 +71,11 @@ namespace Analysis::Creation::Binding
     void CreateStruct(const IParseNode* const node, SourceFile* const sourceFile)
     {
         const auto index = node->Token().Index();
-        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<string>();
+        const auto identifier = *node->GetChild(static_cast<int>(ChildCode::Identifier))->Token().Value<std::string>();
 
         if (sourceFile->GetChild(identifier) != nullptr)
         {
-            PushException(new DuplicateStructureDefinitionException(index, sourceFile));
+            ExceptionManager::PushException(DuplicateStructureDefinitionException(index, sourceFile));
             return;
         }
 
@@ -97,7 +95,7 @@ namespace Analysis::Creation::Binding
                 if (const auto tryRef = sourceFile->GetReference(type->Name()); tryRef == nullptr)
                     sourceFile->AddReference(type);
                 else
-                    PushException(new AmbiguousImportException(type->FullName(), tryRef->FullName(), index, sourceFile));
+                    ExceptionManager::PushException(AmbiguousImportException(type->FullName(), tryRef->FullName(), index, sourceFile));
             }
         }
     }
@@ -113,12 +111,12 @@ namespace Analysis::Creation::Binding
 
     void ImportStatement(const IParseNode* const statement, SourceFile* const sourceFile)
     {
-        const auto path = *statement->Token().Value<string>();
+        const auto path = *statement->Token().Value<std::string>();
         const auto index = statement->Token().Index();
 
         if (!std::regex_match(path, pathRegex))
         {
-            PushException(new InvalidImportPathException(path, index, sourceFile));
+            ExceptionManager::PushException(InvalidImportPathException(path, index, sourceFile));
             return;
         }
 
@@ -158,7 +156,7 @@ namespace Analysis::Creation::Binding
 
         if (current == nullptr || i < parsed.size() - 2)
         {
-            PushException(new InvalidImportPathException(path, index, sourceFile));
+            ExceptionManager::PushException(InvalidImportPathException(path, index, sourceFile));
             return;
         }
 
@@ -187,6 +185,6 @@ namespace Analysis::Creation::Binding
             }
         }
 
-        PushException(new InvalidImportPathException(path, index, sourceFile));
+        ExceptionManager::PushException(InvalidImportPathException(path, index, sourceFile));
     }
 }

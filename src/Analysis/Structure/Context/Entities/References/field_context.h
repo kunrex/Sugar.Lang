@@ -1,6 +1,8 @@
 #ifndef FIELD_CONTEXT_H
 #define FIELD_CONTEXT_H
 
+#include "../../context_node.h"
+
 #include "../../../Core/Interfaces/Creation/i_characteristic.h"
 
 namespace Analysis::Structure::Context

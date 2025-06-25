@@ -1,5 +1,6 @@
 #ifndef POP_EXPRESSION_H
 #define POP_EXPRESSION_H
+
 #include "../unary_context_node.h"
 
 namespace Analysis::Structure::Context

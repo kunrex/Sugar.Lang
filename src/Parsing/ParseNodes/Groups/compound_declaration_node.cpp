@@ -4,7 +4,7 @@ using namespace ParseNodes::Enums;
 
 namespace ParseNodes::Groups
 {
-    CompoundDeclarationNode::CompoundDeclarationNode(const Tokens::Token& token, const Describers::DescriberNode* const describer, const IParseNode* const type) : DynamicNodeCollection(token)
+    CompoundDeclarationNode::CompoundDeclarationNode(const Tokens::Token& token, const IParseNode* const describer, const IParseNode* const type) : DynamicNodeCollection(token)
     {
         AddChild(describer);
         AddChild(type);

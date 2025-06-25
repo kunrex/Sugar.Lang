@@ -4,10 +4,11 @@
 #include <array>
 #include <vector>
 
+#include "Enums/child_code.h"
+
 #include "Core/Interfaces/i_parse_node.h"
 
 #include "../../Lexing/Tokens/token.h"
-#include "Enums/child_code.h"
 
 namespace ParseNodes
 {

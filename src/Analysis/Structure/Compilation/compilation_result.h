@@ -25,7 +25,7 @@ namespace Analysis::Structure::Compilation
             CompilationResult(const Core::Interfaces::IPrimitiveType* creationType, float data);
             CompilationResult(const Core::Interfaces::IPrimitiveType* creationType, double data);
 
-            CompilationResult(const Core::Interfaces::IPrimitiveType*, const std::string& data);
+            CompilationResult(const Core::Interfaces::IPrimitiveType*, std::string data);
 
             CompilationResult(const Core::Interfaces::IPrimitiveType*, Primitive data);
     };

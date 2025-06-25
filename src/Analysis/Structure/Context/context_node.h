@@ -5,9 +5,10 @@
 #include <tuple>
 #include <vector>
 
-#include "../../../Parsing/ParseNodes/Enums/child_code.h"
 #include "../Core/created.h"
 #include "../Core/Interfaces/Context/i_context_node.h"
+
+#include "../../../Parsing/ParseNodes/Enums/child_code.h"
 
 namespace Analysis::Structure::Context
 {

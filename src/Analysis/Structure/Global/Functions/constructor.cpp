@@ -5,11 +5,7 @@
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
-
-#include "../../../../Parsing/ParseNodes/Groups/scope_node.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
-
-using namespace std;
 
 using namespace Services;
 
@@ -17,11 +13,10 @@ using namespace ParseNodes;
 using namespace ParseNodes::Groups;
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Creation::Binding;
 using namespace Analysis::Structure::Core::Interfaces;
 
 const auto defaultConstructor = Tokens::Token(0, Tokens::Enums::TokenType::Constant, Tokens::Enums::SyntaxKind::Constant, 0.0);
@@ -33,7 +28,7 @@ namespace Analysis::Structure::Global
 
     MemberType Constructor::MemberType() const { return MemberType::Constructor; }
 
-    const string& Constructor::FullName() const
+    const std::string& Constructor::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = std::format("instance void {}::.ctor{}", parent->FullName(), ParameterString(this));
@@ -83,7 +78,7 @@ namespace Analysis::Structure::Global
     void Constructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     { }
 
-    ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), DefaultScoped(), characteristics()
+    ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : Nameable(".ctor"), ConstructorDefinition(describer, creationType)
     { }
 
     MemberType ImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
@@ -95,6 +90,11 @@ namespace Analysis::Structure::Global
 
         return fullName;
     }
+
+    unsigned long ImplicitConstructor::ParameterCount() const { return 0; }
+
+    const IDataType* ImplicitConstructor::ParameterAt(const unsigned long index) const
+    { return nullptr; }
 
     void ImplicitConstructor::BindLocal()
     { }
@@ -144,12 +144,17 @@ namespace Analysis::Structure::Global
         }
     }
 
-    StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), DefaultScoped(), characteristics()
+    StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType)
     { }
 
     MemberType StaticImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
 
     const std::string& StaticImplicitConstructor::FullName() const { return name; }
+
+    unsigned long StaticImplicitConstructor::ParameterCount() const { return 0; }
+
+    const IDataType* StaticImplicitConstructor::ParameterAt(const unsigned long index) const
+    { return nullptr; }
 
     void StaticImplicitConstructor::BindLocal()
     { }
@@ -195,7 +200,7 @@ namespace Analysis::Structure::Global
         }
     }
 
-    DefinedConstructor::DefinedConstructor(const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body), characteristics()
+    DefinedConstructor::DefinedConstructor(const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
     { }
 
     MemberType DefinedConstructor::MemberType() const { return MemberType::Constructor; }
@@ -260,7 +265,7 @@ namespace Analysis::Structure::Global
         }
     }
 
-    StaticDefinedConstructor::StaticDefinedConstructor(const IDataType* const creationType, const IParseNode* const body) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), Scoped(body), characteristics()
+    StaticDefinedConstructor::StaticDefinedConstructor(const IDataType* const creationType, const IParseNode* const body) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType), Scoped(body)
     { }
 
     MemberType StaticDefinedConstructor::MemberType() const { return MemberType::Constructor; }
@@ -312,14 +317,14 @@ namespace Analysis::Structure::Global
         }
     }
 
-    BuiltInConstructor::BuiltInConstructor(const IDataType* const creationType, const string& instruction) : ConstructorDefinition(Describer::Public, creationType), BuiltInFunction()
+    BuiltInConstructor::BuiltInConstructor(const IDataType* const creationType, const std::string& instruction) : ConstructorDefinition(Describer::Public, creationType), BuiltInFunction()
     {
         fullName = instruction;
     }
 
     MemberType BuiltInConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
 
-    const string& BuiltInConstructor::FullName() const { return fullName; }
+    const std::string& BuiltInConstructor::FullName() const { return fullName; }
 
     void BuiltInConstructor::BindLocal()
     { }

@@ -1,7 +1,5 @@
 #include "constructor_definition.h"
 
-using namespace Analysis::Structure::Core;
-using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Creation

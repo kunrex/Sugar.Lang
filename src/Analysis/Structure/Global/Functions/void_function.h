@@ -1,9 +1,10 @@
 #ifndef VOID_FUNCTION_H
 #define VOID_FUNCTION_H
 
+#include "../../Creation/Functions/void_definition.h"
+
 #include "../../Core/Scoped/scoped.h"
 #include "../../Core/built_in_function.h"
-#include "../../Creation/Functions/void_definition.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../../Services/child.h"
@@ -38,7 +39,7 @@ namespace Analysis::Structure::Global
             void Transpile(Services::StringBuilder& builder) const override;
     };
 
-    class GeneratedSetFunction final : public Creation::VoidDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class GeneratedSetFunction final : public Creation::VoidDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             const std::string variableName;

@@ -1,11 +1,9 @@
 #include "nameable.h"
 
-using namespace std;
-
 namespace Analysis::Structure::Core
 {
-    Nameable::Nameable(string name) : name(std::move(name))
+    Nameable::Nameable(std::string name) : name(std::move(name))
     { }
 
-    const string& Nameable::Name() const { return name; }
+    const std::string& Nameable::Name() const { return name; }
 }

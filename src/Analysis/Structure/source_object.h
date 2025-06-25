@@ -1,14 +1,14 @@
 #ifndef SOURCE_OBJECT_H
 #define SOURCE_OBJECT_H
 
-#include "../../Services/child.h"
-#include "../../Services/printable.h"
-
 #include "Enums/source_type.h"
 
 #include "Core/nameable.h"
 #include "Core/Interfaces/i_bindable.h"
 #include "Core/Interfaces/i_transpilable.h"
+
+#include "../../Services/child.h"
+#include "../../Services/printable.h"
 
 namespace Analysis::Structure
 {

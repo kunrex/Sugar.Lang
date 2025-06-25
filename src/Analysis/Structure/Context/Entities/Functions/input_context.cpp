@@ -2,8 +2,6 @@
 
 #include "../../../Wrappers/Reference/string.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
@@ -19,7 +17,7 @@ namespace Analysis::Structure::Context
     bool InputContext::Readable() const { return true; }
     bool InputContext::Writable() const { return false; }
 
-    string InputContext::CILData() const { return "call string [System.Console]System.Console::ReadLine()"; }
+    std::string InputContext::CILData() const { return "call string [System.Console]System.Console::ReadLine()"; }
 
     void InputContext::Print(const std::string& indent, const bool last) const
     {

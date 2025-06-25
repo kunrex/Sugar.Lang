@@ -5,8 +5,8 @@ namespace Analysis::Structure::Enums
 {
     enum class SourceType : short
     {
-        File = 0,
-        Directory = 1
+        File,
+        Directory
     };
 }
 

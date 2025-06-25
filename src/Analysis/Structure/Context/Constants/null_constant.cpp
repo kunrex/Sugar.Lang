@@ -2,8 +2,6 @@
 
 #include "../../Wrappers/Reference/object.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
@@ -19,7 +17,7 @@ namespace Analysis::Structure::Context
     bool NullConstant::Readable() const { return true; }
     bool NullConstant::Writable() const { return false; }
 
-    string NullConstant::CILData() const { return "ldnull"; }
+    std::string NullConstant::CILData() const { return "ldnull"; }
 
     void NullConstant::Print(const std::string& indent, const bool last) const
     {

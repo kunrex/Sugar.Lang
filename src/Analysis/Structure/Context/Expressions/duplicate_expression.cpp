@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Enums;
@@ -20,7 +18,7 @@ namespace Analysis::Structure::Context
     bool DuplicateExpression::Readable() const { return GetChild(static_cast<int>(ChildCode::Expression))->Readable(); }
     bool DuplicateExpression::Writable() const { return GetChild(static_cast<int>(ChildCode::Expression))->Writable(); }
 
-    string DuplicateExpression::CILData() const { return "dup"; }
+    std::string DuplicateExpression::CILData() const { return "dup"; }
 
     void DuplicateExpression::Print(const std::string& indent, const bool last) const
     {

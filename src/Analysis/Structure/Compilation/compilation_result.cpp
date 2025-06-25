@@ -1,11 +1,5 @@
 #include "compilation_result.h"
 
-#include <utility>
-
-using namespace std;
-
-using namespace Tokens::Enums;
-
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Compilation
@@ -31,7 +25,7 @@ namespace Analysis::Structure::Compilation
     CompilationResult::CompilationResult(const IPrimitiveType* creationType, const double data) : creationType(creationType), data(data)
     { }
 
-    CompilationResult::CompilationResult(const IPrimitiveType* creationType, const string& data) : creationType(creationType), data(data)
+    CompilationResult::CompilationResult(const IPrimitiveType* creationType, std::string data) : creationType(creationType), data(std::move(data))
     { }
 
     CompilationResult::CompilationResult(const IPrimitiveType* creationType, Primitive data) : creationType(creationType), data(std::move(data))

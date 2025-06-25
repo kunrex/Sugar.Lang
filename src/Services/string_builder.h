@@ -11,8 +11,11 @@ namespace Services
             int indent = 0;
             std::string value;
 
+            const std::string fileLocation;
+
         public:
             StringBuilder();
+            explicit StringBuilder(std::string fileLocation);
 
             [[nodiscard]] int Indent() const;
             [[nodiscard]] const std::string& Value() const;
@@ -25,6 +28,8 @@ namespace Services
             void Push(const std::string& content);
             void PushLine(const std::string& content = "");
             void PushLine(const std::string_view& content = "");
+
+            void WriteToFile();
 
             void Clear();
     };

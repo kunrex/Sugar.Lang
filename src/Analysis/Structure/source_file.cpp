@@ -1,5 +1,9 @@
 #include "source_file.h"
 
+#include "Core/Interfaces/DataTypes/i_user_defined_type.h"
+
+#include "../Creation/Binding/global_binder.h"
+#include "../Creation/Binding/project_binder.h"
 
 #include "../../Exceptions/log_exception.h"
 #include "../../Exceptions/exception_manager.h"
@@ -7,14 +11,6 @@
 #include "../../Lexing/Lexer/lexer.h"
 
 #include "../../Parsing/Parser/parser.h"
-
-#include "../Creation/Binding/local_binder.h"
-#include "../Creation/Binding/global_binder.h"
-#include "../Creation/Binding/project_binder.h"
-
-#include "Core/Interfaces/DataTypes/i_user_defined_type.h"
-
-using namespace std;
 
 using namespace Exceptions;
 
@@ -31,12 +27,12 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure
 {
-    SourceFile::SourceFile(const string& name, string source) : SourceObject(name), Dictionary(), source(std::move(source)), tokens(), sourceNode(nullptr), references()
+    SourceFile::SourceFile(const std::string& name, std::string source) : SourceObject(name), source(std::move(source)), sourceNode(nullptr)
     { }
 
     SourceType SourceFile::SourceType() const { return SourceType::File; }
 
-    bool SourceFile::AddChild(const string key, IUserDefinedType* const value)
+    bool SourceFile::AddChild(const std::string key, IUserDefinedType* const value)
     {
         const auto result = Dictionary::AddChild(key, value);
         if (result)
@@ -53,7 +49,7 @@ namespace Analysis::Structure
         references[dataType->Name()] = dataType;
     }
 
-    const IDataType* SourceFile::GetReference(const string& name) const
+    const IDataType* SourceFile::GetReference(const std::string& name) const
     {
         return references.contains(name) ? references.at(name) : nullptr;
     }
@@ -73,10 +69,10 @@ namespace Analysis::Structure
 
     void SourceFile::LexParse()
     {
-        const auto previous = ExceptionManager::Instance().ChildCount();
+        const auto previous = ExceptionManager::ExceptionCount();
         Lexer::Instance().Lex(this);
 
-        if (ExceptionManager::Instance().ChildCount() == previous)
+        if (ExceptionManager::ExceptionCount() == previous)
             sourceNode = Parser::Instance().Parse(this);
     }
 
@@ -117,7 +113,7 @@ namespace Analysis::Structure
                     ImportStatement(node, this);
                     break;
                 default:
-                    ExceptionManager::Instance().AddChild(new LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
+                    ExceptionManager::PushException(LogException("Project scopes can only contain import statements and type definitions", node->Token().Index(), this));
                     break;
             }
         }
@@ -141,12 +137,12 @@ namespace Analysis::Structure
             type->BindLocal();
     }
 
-    void SourceFile::Print(const string& indent, const bool last) const
+    void SourceFile::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Sugar File: " << name << std::endl;
         const auto next = indent + (last ? " " : "| ");
 
-        string referenceString = "References: ";
+        std::string referenceString = "References: ";
         auto i = 0;
         for (const auto& reference : references)
             referenceString += reference.second->FullName() + (i == references.size() - 1 ? "" : ", ");

@@ -1,7 +1,5 @@
 #include "created_type_node.h"
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 using namespace ParseNodes::Values;
 
@@ -14,6 +12,6 @@ namespace ParseNodes::Types
 
     void CreatedTypeNode::Print(const std::string& indent, const bool last) const
     {
-        std::cout << indent << (last ? "\\-" : "|-") << "Created Type Node: " << *token.Value<string>() << std::endl;
+        std::cout << indent << (last ? "\\-" : "|-") << "Created Type Node: " << *token.Value<std::string>() << std::endl;
     }
 }

@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Enums;

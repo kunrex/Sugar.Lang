@@ -8,7 +8,7 @@ namespace Tokens
 
     std::optional<Token> Keyword::TryMatchKeyword(const std::string& value, const unsigned long i)
     {
-        static const std::unordered_map<std::string, std::tuple<SyntaxKind, KeywordType>> keywordMap = {
+        static const std::unordered_map<std::string_view, std::tuple<SyntaxKind, KeywordType>> keywordMap = {
             { "print",       { SyntaxKind::Print,       KeywordType::General } },
             { "println",     { SyntaxKind::Println,     KeywordType::General } },
             { "input",       { SyntaxKind::Input,       KeywordType::General } },

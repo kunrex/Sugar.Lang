@@ -1,15 +1,6 @@
 #include "parser.h"
-#include "../../Analysis/Structure/Wrappers/Generic/generic_extensions.h"
 
-#include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
-#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
-#include "../../Exceptions/Compilation/Parsing/empty_expression_exception.h"
-#include "../../Exceptions/Compilation/Parsing/generic_argument_exception.h"
-#include "../../Exceptions/Compilation/Parsing/invalid_expression_exception.h"
-
-#include "../../Lexing/Tokens/Enums/keyword_type.h"
-#include "../../Lexing/Tokens/Factories/operator.h"
+#include <stack>
 
 #include "../ParseNodes/Values/this_node.h"
 #include "../ParseNodes/Values/null_node.h"
@@ -36,7 +27,17 @@
 #include "../ParseNodes/Types/Keyword/Generic/nullable_type_node.h"
 #include "../ParseNodes/Types/Keyword/Generic/dictionary_type_node.h"
 
-using namespace std;
+#include "../../Exceptions/exception_manager.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
+#include "../../Exceptions/Compilation/Parsing/empty_expression_exception.h"
+#include "../../Exceptions/Compilation/Parsing/generic_argument_exception.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_expression_exception.h"
+
+#include "../../Lexing/Tokens/Enums/keyword_type.h"
+#include "../../Lexing/Tokens/Factories/operator.h"
+
+#include "../../Analysis/Structure/Wrappers/Generic/generic_extensions.h"
 
 using namespace Exceptions;
 
@@ -59,8 +60,8 @@ namespace Parsing
 {
     const IParseNode* Parser::ParseEntity(const SeparatorKind breakSeparator)
     {
-        stack<const Token*> tokens;
-        stack<const IParseNode*> output;
+        std::stack<const Token*> tokens;
+        std::stack<const IParseNode*> output;
 
         TokenType expected = TokenType::Constant | TokenType::Identifier | TokenType::Keyword;
 
@@ -152,7 +153,7 @@ namespace Parsing
 
                 if (output.size() % 2 == tokens.size() % 2)
                 {
-                    ExceptionManager::Instance().AddChild(new TokenExpectedException(expected, Current(), source));
+                    ExceptionManager::PushException(TokenExpectedException(expected, Current(), source));
                     output.push(new InvalidNode(Current()));
                 }
 
@@ -163,7 +164,7 @@ namespace Parsing
 
         if (!breakOut)
         {
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(breakSeparator, Current(), source));
+            ExceptionManager::PushException(TokenExpectedException(breakSeparator, Current(), source));
             ClearStack(tokens, output);;
         }
 
@@ -182,14 +183,14 @@ namespace Parsing
             invalidNode->AddChild(top);
         }
 
-        ExceptionManager::Instance().AddChild(new InvalidExpressionException(Current(), source));
+        ExceptionManager::PushException(InvalidExpressionException(Current(), source));
         return invalidNode;
     }
 
     const IParseNode* Parser::ParseExpression(const SeparatorKind breakSeparator)
     {
-        stack<const Token*> tokens;
-        stack<const IParseNode*> output;
+        std::stack<const Token*> tokens;
+        std::stack<const IParseNode*> output;
 
         TokenType expected = TokenType::Constant | TokenType::Identifier | TokenType::UnaryOperator | TokenType::Keyword | TokenType::Separator;
 
@@ -279,7 +280,7 @@ namespace Parsing
                                     {
                                         if (output.empty())
                                         {
-                                            ExceptionManager::Instance().AddChild(new EmptyExpressionException(Current(), source));
+                                            ExceptionManager::PushException(EmptyExpressionException(Current(), source));
                                             output.push(new EmptyNode(Current()));
                                         }
                                         else
@@ -396,7 +397,7 @@ namespace Parsing
             {
                 if (invalid)
                 {
-                    ExceptionManager::Instance().AddChild(new InvalidTokenException(Current(), source));
+                    ExceptionManager::PushException(InvalidTokenException(Current(), source));
                     output.push(ParseInvalid(breakSeparator));
                 }
 
@@ -407,7 +408,7 @@ namespace Parsing
 
         if (!breakOut)
         {
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(breakSeparator, Current(), source));
+            ExceptionManager::PushException(TokenExpectedException(breakSeparator, Current(), source));
             ClearStack(tokens, output);
         }
 
@@ -431,7 +432,7 @@ namespace Parsing
                         invalidNode->AddChild(top);
                     }
 
-                    ExceptionManager::Instance().AddChild(new InvalidExpressionException(Current(), source));
+                    ExceptionManager::PushException(InvalidExpressionException(Current(), source));
                     return invalidNode;
                 }
         }
@@ -443,7 +444,7 @@ namespace Parsing
 
         if (expression->NodeType() == NodeType::Empty)
         {
-            ExceptionManager::Instance().AddChild(new EmptyExpressionException(Current(), source));
+            ExceptionManager::PushException(EmptyExpressionException(Current(), source));
             const auto invalid = new InvalidNode(Current());
             invalid->AddChild(expression);
             return invalid;
@@ -503,7 +504,7 @@ namespace Parsing
                     return;
             }
 
-            ExceptionManager::Instance().AddChild(new InvalidTokenException(Current(), source));
+            ExceptionManager::PushException(InvalidTokenException(Current(), source));
             break;
         }
 
@@ -524,7 +525,7 @@ namespace Parsing
             if (MatchSeparator(current, breakSeparator))
                 return;
 
-            ExceptionManager::Instance().AddChild(new InvalidTokenException(current, source));
+            ExceptionManager::PushException(InvalidTokenException(current, source));
             break;
         }
 
@@ -567,7 +568,7 @@ namespace Parsing
                     ParseGeneric(list);
 
                     if (list->ChildCount() != 1)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(1, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(1, current, source));
 
                     return list;
                 }
@@ -578,7 +579,7 @@ namespace Parsing
                     ParseGeneric(array);
 
                     if (array->ChildCount() != 1)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(1, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(1, current, source));
 
                     return array;
                 }
@@ -589,7 +590,7 @@ namespace Parsing
                     ParseGeneric(tuple);
 
                     if (tuple->ChildCount() > max_tuple_length)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_tuple_length, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(max_tuple_length, current, source));
 
                     return tuple;
                 }
@@ -599,7 +600,7 @@ namespace Parsing
                     const auto dictionary = new DictionaryTypeNode(current);
                     ParseGeneric(dictionary);
                     if (dictionary->ChildCount() != 2)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(2, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(2, current, source));
 
                     return dictionary;
                 }
@@ -609,7 +610,7 @@ namespace Parsing
                     const auto func = new FuncTypeNode(current);
                     ParseGeneric(func);
                     if (func->ChildCount() > max_delegate_length)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(max_delegate_length, current, source));
 
                     return func;
                 }
@@ -622,7 +623,7 @@ namespace Parsing
                     {
                         ParseGeneric(action);
                         if (action->ChildCount() > max_delegate_length)
-                            ExceptionManager::Instance().AddChild(new GenericArgumentException(max_delegate_length, current, source));
+                            ExceptionManager::PushException(GenericArgumentException(max_delegate_length, current, source));
                     }
 
                     return action;
@@ -633,7 +634,7 @@ namespace Parsing
                     const auto nullable = new NullableTypeNode(current);
                     ParseGeneric(nullable);
                     if (nullable->ChildCount() != 1)
-                        ExceptionManager::Instance().AddChild(new GenericArgumentException(1, current, source));
+                        ExceptionManager::PushException(GenericArgumentException(1, current, source));
 
                     return nullable;
                 }
@@ -665,7 +666,7 @@ namespace Parsing
                 return parsed;
             default:
                 {
-                    ExceptionManager::Instance().AddChild(new ParsingException("Type expected", Current(), source));;
+                    ExceptionManager::PushException(ParsingException("Type expected", Current(), source));;
                     const auto invalid = new InvalidNode(Current());
                     invalid->AddChild(parsed);
                     return invalid;
@@ -684,7 +685,7 @@ namespace Parsing
                 index++;
         }
         else
-            ExceptionManager::Instance().AddChild(new ParsingException("Identifier expected", current, source));
+            ExceptionManager::PushException(ParsingException("Identifier expected", current, source));
 
         return identifier;
     }

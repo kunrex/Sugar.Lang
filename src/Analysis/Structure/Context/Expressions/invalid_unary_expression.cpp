@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
@@ -18,7 +16,7 @@ namespace Analysis::Structure::Context
     bool InvalidUnaryExpression::Readable() const { return false; }
     bool InvalidUnaryExpression::Writable() const { return false; }
 
-    string InvalidUnaryExpression::CILData() const { return ""; }
+    std::string InvalidUnaryExpression::CILData() const { return ""; }
 
     void InvalidUnaryExpression::Print(const std::string& indent, const bool last) const
     {

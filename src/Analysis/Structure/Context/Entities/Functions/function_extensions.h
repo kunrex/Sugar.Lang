@@ -2,8 +2,6 @@
 #define FUNCTION_EXTENSIONS_H
 
 #include "../../binary_context_node.h"
-#include "../../context_node.h"
-#include "../../../../../Services/collection.h"
 
 namespace Analysis::Structure::Context
 {

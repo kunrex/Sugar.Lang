@@ -65,19 +65,19 @@ namespace Analysis::Structure::Enums
         std::string result;
 
         if ((shortValue & static_cast<short>(Describer::Ref)) == static_cast<short>(Describer::Ref))
-            result += "Ref, ";
+            result.append("ref, ");
         if ((shortValue & static_cast<short>(Describer::Public)) == static_cast<short>(Describer::Public))
-            result += "Public, ";
+            result.append("public, ");
         if ((shortValue & static_cast<short>(Describer::Private)) == static_cast<short>(Describer::Private))
-            result += "Private, ";
+            result.append("private, ");
         if ((shortValue & static_cast<short>(Describer::Static)) == static_cast<short>(Describer::Static))
-            result += "Static, ";
+            result.append("static, ");
         if ((shortValue & static_cast<short>(Describer::Const)) == static_cast<short>(Describer::Const))
-            result += "Const, ";
+            result.append("const, ");
         if ((shortValue & static_cast<short>(Describer::Constexpr)) == static_cast<short>(Describer::Constexpr))
-            result += "Constexpr, ";
+            result.append("constexpr, ");
         if ((shortValue & static_cast<short>(Describer::Entrypoint)) == static_cast<short>(Describer::Entrypoint))
-            result += "Entrypoint, ";
+            result.append("entrypoint, ");
 
         if (!result.empty())
             result.erase(result.size() - 2);

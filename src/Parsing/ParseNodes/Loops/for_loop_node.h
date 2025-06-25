@@ -8,7 +8,7 @@ namespace ParseNodes::Loops
     class ForLoopNode final : public virtual FixedNodeCollection<4>
     {
         public:
-            ForLoopNode(const IParseNode* pre, const IParseNode* condition, const IParseNode* post, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            ForLoopNode(const IParseNode* pre, const IParseNode* condition, const IParseNode* post, const IParseNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

@@ -391,8 +391,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Control/return.h
         Analysis/Structure/Context/Control/branch.cpp
         Analysis/Structure/Context/Control/branch.h
-        Analysis/Structure/Context/Control/branch_condition.cpp
-        Analysis/Structure/Context/Control/branch_condition.h
         Analysis/Structure/Context/Constants/integer_constant.cpp
         Analysis/Structure/Context/Constants/integer_constant.h
         Analysis/Structure/Context/Constants/string_constant.cpp
@@ -514,14 +512,11 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Expressions/indexer_expression_node.cpp
         Parsing/ParseNodes/Describers/describer_keyword_node.cpp
         Parsing/ParseNodes/Describers/describer_keyword_node.h
-        Analysis/Structure/Core/Scoped/default_scoped.cpp
-        Analysis/Structure/Core/Scoped/default_scoped.h
         Analysis/Structure/Core/Interfaces/DataTypes/i_primitive_type.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_overload.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_cast.h
         Analysis/Structure/Wrappers/Value/built_in_functions.cpp
         Analysis/Structure/Wrappers/Value/built_in_functions.h
-        Lexing/Tokens/Enums/type_kind.cpp
         Analysis/Structure/Core/Interfaces/i_bindable.h
         Analysis/Structure/Core/Interfaces/Creation/i_built_in_parametrized.h
         Analysis/Structure/Core/Interfaces/i_transpilable.h
@@ -538,4 +533,5 @@ add_library(Sugar STATIC
         Exceptions/Compilation/Analysis/Local/constant_expected_exception.h
         Analysis/Structure/Context/Expressions/pop_expression.cpp
         Analysis/Structure/Context/Expressions/pop_expression.h
+        Lexing/Tokens/Enums/type_kind.cpp
 )

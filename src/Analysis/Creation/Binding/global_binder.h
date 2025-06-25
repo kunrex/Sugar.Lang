@@ -1,10 +1,10 @@
 #ifndef GLOBAL_BINDER_H
 #define GLOBAL_BINDER_H
 
+#include "../../Structure/DataTypes/enum.h"
 #include "../../Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../Parsing/ParseNodes/Core/Interfaces/i_parse_node.h"
-#include "../../Structure/DataTypes/enum.h"
 
 namespace Analysis::Creation::Binding
 {

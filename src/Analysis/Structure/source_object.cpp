@@ -1,10 +1,8 @@
 #include "source_object.h"
 
-using namespace std;
-
 namespace Analysis::Structure
 {
-    SourceObject::SourceObject(const string& name) : Nameable(name), Child()
+    SourceObject::SourceObject(const std::string& name) : Nameable(name), Child()
     { }
 
     const std::string& SourceObject::FullName() const

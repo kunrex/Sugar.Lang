@@ -2,8 +2,6 @@
 
 #include "../../Wrappers/Reference/void.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -23,7 +21,7 @@ namespace Analysis::Structure::Context
     bool Return::Readable() const { return false; }
     bool Return::Writable() const { return false; }
 
-    string Return::CILData() const { return "ret"; }
+    std::string Return::CILData() const { return "ret"; }
 
     void Return::Print(const std::string& indent, const bool last) const
     {

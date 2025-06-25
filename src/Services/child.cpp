@@ -1,14 +1,13 @@
 #include "child.h"
 
-#include "../Analysis/Structure/source_object.h"
+#include "../Parsing/ParseNodes/Core/Interfaces/i_parse_node.h"
+
 #include "../Analysis/Structure/Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure;
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
-using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Services

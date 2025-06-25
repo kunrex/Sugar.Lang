@@ -4,8 +4,6 @@
 
 #include "../../Wrappers/Reference/object.h"
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Core;
@@ -24,7 +22,7 @@ namespace Analysis::Structure::Context
     bool BoxCastExpression::Readable() const { return true; }
     bool BoxCastExpression::Writable() const { return false; }
 
-    string BoxCastExpression::CILData() const { return std::format("box {}", GetChild(static_cast<int>(ChildCode::Expression))->CreationType()->FullName()); }
+    std::string BoxCastExpression::CILData() const { return std::format("box {}", GetChild(static_cast<int>(ChildCode::Expression))->CreationType()->FullName()); }
 
     void BoxCastExpression::Print(const std::string& indent, const bool last) const
     {

@@ -5,7 +5,7 @@ using namespace Tokens::Enums;
 
 using namespace ParseNodes::Enums;
 
-const auto startOfFile = Token(0, TokenType::Constant, SyntaxKind::Constant, "");
+const auto startOfFile = Token(0, TokenType::Constant, SyntaxKind::Constant, 0l);
 
 namespace ParseNodes::Groups
 {

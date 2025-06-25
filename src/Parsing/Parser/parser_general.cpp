@@ -1,5 +1,18 @@
 #include "parser.h"
-#include "../../Analysis/Structure/Wrappers/Reference/exception.h"
+
+#include "../ParseNodes/Describers/describer_keyword_node.h"
+
+#include "../ParseNodes/Types/Keyword/void_type_node.h"
+#include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
+
+#include "../ParseNodes/Statements/empty_node.h"
+#include "../ParseNodes/Statements/declaration_node.h"
+#include "../ParseNodes/Statements/Control/break_node.h"
+#include "../ParseNodes/Statements/Control/return_node.h"
+#include "../ParseNodes/Statements/initialisation_node.h"
+#include "../ParseNodes/Statements/throw_statement_node.h"
+#include "../ParseNodes/Statements/Control/continue_node.h"
+#include "../ParseNodes/Statements/expression_statement_node.h"
 
 #include "../../Exceptions/exception_manager.h"
 #include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
@@ -7,31 +20,16 @@
 
 #include "../../Lexing/Tokens/Enums/keyword_type.h"
 
-#include "../ParseNodes/Describers/describer_keyword_node.h"
-
-#include "../ParseNodes/Types/Keyword/anonymous_type_node.h"
-
-#include "../ParseNodes/Statements/empty_node.h"
-#include "../ParseNodes/Statements/Control/break_node.h"
-#include "../ParseNodes/Statements/Control/return_node.h"
-#include "../ParseNodes/Statements/initialisation_node.h"
-#include "../ParseNodes/Statements/throw_statement_node.h"
-#include "../ParseNodes/Statements/Control/continue_node.h"
-#include "../ParseNodes/Statements/expression_statement_node.h"
-#include "../ParseNodes/Types/Keyword/void_type_node.h"
+using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
-using namespace ParseNodes;
 using namespace ParseNodes::Enums;
 using namespace ParseNodes::Types;
-using namespace ParseNodes::Values;
 using namespace ParseNodes::Groups;
 using namespace ParseNodes::Describers;
 using namespace ParseNodes::Statements;
-using namespace ParseNodes::Expressions;
 using namespace ParseNodes::Core::Interfaces;
-using namespace ParseNodes::Functions::Calling;
 
 namespace Parsing
 {
@@ -41,7 +39,7 @@ namespace Parsing
         {
             if (!MatchType(Current(), TokenType::Identifier))
             {
-                Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(Current(), source));
+                ExceptionManager::PushException(InvalidTokenException(Current(), source));
                 break;
             }
 
@@ -95,7 +93,7 @@ namespace Parsing
             }
         }
 
-        Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
+        ExceptionManager::PushException(InvalidTokenException(current, source));
 
         const auto invalid =  ParseInvalid(breakSeparator);
         TryMatchSeparator(Current(), breakSeparator);
@@ -114,7 +112,7 @@ namespace Parsing
         {
             if (const auto& current = Current(); !MatchType(current, TokenType::Keyword) || static_cast<KeywordType>(current.Metadata()) != KeywordType::Describer)
             {
-                Exceptions::ExceptionManager::Instance().AddChild(new Exceptions::InvalidTokenException(current, source));
+                ExceptionManager::PushException(InvalidTokenException(current, source));
                 break;
             }
             else

@@ -1,15 +1,8 @@
 #include "parse_node.h"
 
-#include "Statements/declaration_node.h"
-
-using namespace std;
-
 using namespace Tokens;
 
-using namespace Services;
-
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Statements;
 using namespace ParseNodes::Core::Interfaces;
 
 namespace ParseNodes

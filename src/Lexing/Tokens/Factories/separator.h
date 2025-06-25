@@ -10,7 +10,7 @@ namespace Tokens
         private:
             Separator();
 
-            static Token Create(unsigned long i, Enums::SyntaxKind syntaxKind, const std::string& value);
+            static Token Create(unsigned long i, Enums::SyntaxKind syntaxKind);
 
         public:
             static Token Dot(unsigned long i);

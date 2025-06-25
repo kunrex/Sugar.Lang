@@ -12,9 +12,9 @@ namespace Tokens
         private:
             Operator();
 
-            static Token Unary(unsigned long index, Enums::SyntaxKind syntaxKind, const std::string& value, bool leftAssociative, int precedence);
-            static Token Binary(unsigned long index, Enums::SyntaxKind syntaxKind, const std::string& value, int precedence);
-            static Token Assignment(unsigned long index, Enums::SyntaxKind syntaxKind, const std::string& value);
+            static Token Unary(unsigned long index, Enums::SyntaxKind syntaxKind, bool leftAssociative, int precedence);
+            static Token Binary(unsigned long index, Enums::SyntaxKind syntaxKind, int precedence);
+            static Token Assignment(unsigned long index, Enums::SyntaxKind syntaxKind);
 
         public:
             static std::tuple<bool, int> DecodeMetadata(const Token& token);

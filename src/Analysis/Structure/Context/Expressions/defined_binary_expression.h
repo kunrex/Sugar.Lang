@@ -2,7 +2,8 @@
 #define DEFINED_BINARY_EXPRESSION_H
 
 #include "../binary_context_node.h"
-#include "../../Creation/Functions/overload_definition.h"
+
+#include "../../Core/Interfaces/Creation/i_function.h"
 
 namespace Analysis::Structure::Context
 {

@@ -4,20 +4,16 @@
 
 #include "data_type_extensions.h"
 
-#include "../../Creation/Binding/global_binder.h"
-#include "../../Creation/Binding/binder_extensions.h"
-
-#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
-#include "../../Creation/Transpiling/cil_transpiler.h"
-#include "../Wrappers/Generic/action.h"
 #include "../Wrappers/Value/integer.h"
 
 #include "../Compilation/compilation_result.h"
+
 #include "../Global/Functions/cast_overload.h"
 #include "../Global/Functions/method_function.h"
 #include "../Global/Functions/operator_overload.h"
 
-using namespace std;
+#include "../../Creation/Binding/global_binder.h"
+#include "../../Creation/Transpiling/cil_transpiler.h"
 
 using namespace Tokens::Enums;
 
@@ -45,7 +41,7 @@ namespace
 
 namespace Analysis::Structure::DataTypes
 {
-    Enum::Enum(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : DataType(name, describer | Describer::Static), skeleton(skeleton), fullName(), hashCode(nullptr), explicitCasts()
+    Enum::Enum(const std::string& name, const Enums::Describer describer, const IParseNode* skeleton) : DataType(name, describer | Describer::Static), skeleton(skeleton), fullName(), hashCode(nullptr), explicitCasts()
     { }
 
     MemberType Enum::MemberType() const { return MemberType::Enum; }
@@ -54,7 +50,7 @@ namespace Analysis::Structure::DataTypes
 
     TypeKind Enum::Type() const { return TypeKind::Custom; }
 
-    const string& Enum::FullName() const
+    const std::string& Enum::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = parent->FullName() + "." + name;
@@ -75,7 +71,7 @@ namespace Analysis::Structure::DataTypes
         characteristics.push_back(characteristic);
     }
 
-    const ICharacteristic* Enum::FindCharacteristic(const string& name) const
+    const ICharacteristic* Enum::FindCharacteristic(const std::string& name) const
     {
         for (const auto characteristic : characteristics)
             if (characteristic->Name() == name)
@@ -87,7 +83,7 @@ namespace Analysis::Structure::DataTypes
     void Enum::PushFunction(IFunctionDefinition* const function)
     { }
 
-    const IFunctionDefinition* Enum::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
+    const IFunctionDefinition* Enum::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
     {
         if (name == hashCode->Name() && argumentList.empty())
             return hashCode;
@@ -123,9 +119,7 @@ namespace Analysis::Structure::DataTypes
     }
 
     void Enum::PushExplicitCast(IFunction* const cast)
-    {
-        explicitCasts.emplace_back(ArgumentHash(std::vector({ cast->CreationType(), cast->ParameterAt(0)})), cast);
-    }
+    { }
 
     const IFunction* Enum::FindExplicitCast(const IDataType* returnType, const IDataType* fromType) const
     {
@@ -160,40 +154,40 @@ namespace Analysis::Structure::DataTypes
 
         const auto explicitInteger = new GeneratedCast(Integer::Instance(), "conv.i4");
         explicitInteger->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash(explicitInteger), explicitInteger);
+        explicitCasts[0] = { ArgumentHash(explicitInteger), explicitInteger };
 
         const auto explicitString = new GeneratedCast(Integer::Instance(), std::format("constrained. {} callvirt instance string [System.Runtime]System.Object::ToString()", FullName()));
         explicitString->PushParameterType(this);
-        explicitCasts.emplace_back(ArgumentHash(explicitString), explicitString);
+        explicitCasts[1] = { ArgumentHash(explicitString), explicitString };
 
         const auto bitwiseNot = new BuiltInOverload(SyntaxKind::BitwiseNot, this, "not", Not);
         bitwiseNot->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseNot, bitwiseNot);
+        overloads[0] = { SyntaxKind::BitwiseNot, bitwiseNot };
 
         const auto bitwiseAnd = new BuiltInOverload(SyntaxKind::BitwiseAnd, this, "and", BitwiseAnd);
         bitwiseAnd->PushParameterType(this);
         bitwiseAnd->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseAnd, bitwiseAnd);
+        overloads[1] = { SyntaxKind::BitwiseAnd, bitwiseAnd };
 
         const auto bitwiseOr = new BuiltInOverload(SyntaxKind::BitwiseOr, this, "or", BitwiseOr);
         bitwiseOr->PushParameterType(this);
         bitwiseOr->PushParameterType(this);
-        overloads.emplace_back(SyntaxKind::BitwiseOr, bitwiseOr);
+        overloads[2] = { SyntaxKind::BitwiseOr, bitwiseOr };
 
         const auto bitwiseXor = new BuiltInOverload(SyntaxKind::BitwiseXor, this, "xor", BitwiseXor);
         bitwiseXor->PushParameterType(this);
         bitwiseXor->PushParameterType(Integer::Instance());
-        overloads.emplace_back(SyntaxKind::BitwiseXor, bitwiseXor);
+        overloads[3] = { SyntaxKind::BitwiseXor, bitwiseXor };
 
         const auto rightShift = new BuiltInOverload(SyntaxKind::RightShift, this, "shr", RightShift);
         rightShift->PushParameterType(this);
         rightShift->PushParameterType(Integer::Instance());
-        overloads.emplace_back(SyntaxKind::RightShift, rightShift);
+        overloads[4] = { SyntaxKind::RightShift, rightShift };
 
         const auto leftShift = new BuiltInOverload(SyntaxKind::LeftShift, this, "shl", LeftShift);
         leftShift->PushParameterType(this);
         leftShift->PushParameterType(Integer::Instance());
-        overloads.emplace_back(SyntaxKind::LeftShift, leftShift);
+        overloads[5] = { SyntaxKind::LeftShift, leftShift };
     }
 
     void Enum::BindLocal()
@@ -216,9 +210,11 @@ namespace Analysis::Structure::DataTypes
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
+
+        builder.WriteToFile();
     }
 
-    void Enum::Print(const string& indent, const bool last) const
+    void Enum::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Enum: " << name << std::endl;
     }

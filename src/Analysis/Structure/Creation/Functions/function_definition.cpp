@@ -2,21 +2,18 @@
 
 #include <format>
 
-#include "../../../Creation/Transpiling/cil_transpiler.h"
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
+#include "../../../Creation/Transpiling/cil_transpiler.h"
 
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
-using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Creation
 {
-    FunctionDefinition::FunctionDefinition(const string& name, const Enums::Describer describer, const IDataType* const creationType) : Nameable(name), Function(describer, creationType), signature()
+    FunctionDefinition::FunctionDefinition(const std::string& name, const Enums::Describer describer, const IDataType* const creationType) : Nameable(name), Function(describer, creationType), signature()
     { }
 
     const std::string& FunctionDefinition::Signature() const

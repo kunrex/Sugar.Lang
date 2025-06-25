@@ -22,7 +22,7 @@ namespace Analysis::Structure::Context
     bool StringConstant::Writable() const { return false; }
 
     uintptr_t StringConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string StringConstant::CILData() const { return std::format("ldstr \"{}\"", value); }
+    std::string StringConstant::CILData() const { return std::format("ldstr \"{}\"", value); }
 
     void StringConstant::Print(const std::string& indent, const bool last) const
     {

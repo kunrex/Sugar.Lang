@@ -4,8 +4,6 @@
 
 #include "../../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 

@@ -8,7 +8,7 @@ namespace ParseNodes::Loops
     class WhileNode final : public virtual FixedNodeCollection<2>
     {
         public:
-            WhileNode(const IParseNode* condition, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            WhileNode(const IParseNode* condition, const IParseNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

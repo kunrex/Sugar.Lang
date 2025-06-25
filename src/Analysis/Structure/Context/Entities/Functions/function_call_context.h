@@ -3,7 +3,7 @@
 
 #include "../../context_node.h"
 
-#include "../../../Creation/Functions/function_definition.h"
+#include "../../../Core/Interfaces/Creation/i_function.h"
 
 namespace Analysis::Structure::Context
 {

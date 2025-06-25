@@ -3,29 +3,30 @@
 #include <format>
 
 #include "binder_extensions.h"
-#include "../../../Exceptions/Compilation/Analysis/Local/constant_expected_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/Local/overload_not_found_exception.h"
+
+#include "../../Structure/Wrappers/Value/long.h"
+#include "../../Structure/Wrappers/Value/float.h"
+#include "../../Structure/Wrappers/Value/short.h"
+#include "../../Structure/Wrappers/Value/double.h"
+#include "../../Structure/Wrappers/Value/boolean.h"
+#include "../../Structure/Wrappers/Value/integer.h"
+#include "../../Structure/Wrappers/Value/character.h"
+#include "../../Structure/Wrappers/Reference/string.h"
+
+#include "../../Structure/Compilation/compilation_result.h"
+
+#include "../../Structure/Context/invalid_context.h"
 #include "../../Structure/Context/Constants/float_constant.h"
 #include "../../Structure/Context/Constants/integer_constant.h"
 #include "../../Structure/Context/Constants/string_constant.h"
-#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
-#include "../../Structure/Wrappers/Generic/action.h"
-#include "../../Structure/Wrappers/Reference/string.h"
-#include "../../Structure/Wrappers/Value/boolean.h"
-#include "../../Structure/Wrappers/Value/character.h"
-#include "../../Structure/Wrappers/Value/double.h"
-#include "../../Structure/Wrappers/Value/float.h"
-#include "../../Structure/Wrappers/Value/integer.h"
-#include "../../Structure/Wrappers/Value/long.h"
-#include "../../Structure/Wrappers/Value/short.h"
-
-#include "../../Structure/Compilation/compilation_result.h"
-#include "../../Structure/Context/invalid_context.h"
 #include "../../Structure/Context/Entities/Functions/creation_context.h"
-#include "../../Structure/Context/Entities/Functions/invalid_function_context.h"
+
+#include "../../Structure/Core/Interfaces/DataTypes/i_primitive_type.h"
 #include "../../Structure/Core/Interfaces/DataTypes/i_collection_type.h"
 
-using namespace std;
+#include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compilation/Analysis/Local/constant_expected_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/Local/overload_not_found_exception.h"
 
 using namespace Exceptions;
 
@@ -107,7 +108,7 @@ namespace Analysis::Creation::Binding
 
                     if (constant->HasDependant(characteristic))
                     {
-                        PushException(new LogException(std::format("Cyclic dependency between: {} and: {}", constant->FullName(), characteristic->FullName()), identifierNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException(std::format("Cyclic dependency between: {} and: {}", constant->FullName(), characteristic->FullName()), identifierNode->Token().Index(), dataType->Parent()));
                         constant->IncrementDependencyCount();
 
                         return std::nullopt;
@@ -117,7 +118,7 @@ namespace Analysis::Creation::Binding
                 }
                 break;
             default:
-                PushException(new ConstantNotFoundException(identifierNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(identifierNode->Token().Index(), dataType->Parent()));
                 break;
         }
 
@@ -136,16 +137,16 @@ namespace Analysis::Creation::Binding
 
             if (current->NodeType() != NodeType::Dot)
             {
-                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                 return std::nullopt;
             }
 
             if (const auto lhs = parseNode->GetChild(static_cast<int>(ChildCode::LHS)); lhs->NodeType() == NodeType::Identifier)
             {
-                const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<string>());
+                const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<std::string>());
                 if (characteristic == nullptr)
                 {
-                    PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                    ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                     return std::nullopt;
                 }
 
@@ -155,7 +156,7 @@ namespace Analysis::Creation::Binding
                 continue;
             }
 
-            PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
             return std::nullopt;
         }
     }
@@ -187,7 +188,7 @@ namespace Analysis::Creation::Binding
                         case TypeKind::String:
                             return CompilationResult(String::Instance(), *token.Value<std::string>());
                         default:
-                            PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                            ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                             return std::nullopt;
                     }
                 }
@@ -204,7 +205,7 @@ namespace Analysis::Creation::Binding
                     if (const auto cast = operand->creationType->FindBuiltInCast(type, operand->creationType); cast != nullptr)
                         return cast->StaticCompile(*operand);
 
-                    PushException(new LogException("No built in cast not found", parseNode->Token().Index(), dataType->Parent()));
+                    ExceptionManager::PushException(LogException("No built in cast not found", parseNode->Token().Index(), dataType->Parent()));
                     return std::nullopt;
                 }
             case NodeType::Unary:
@@ -216,7 +217,7 @@ namespace Analysis::Creation::Binding
                     const auto operation = parseNode->Token().Kind();
                     if (operation == SyntaxKind::Increment || operation == SyntaxKind::Decrement)
                     {
-                        PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
@@ -224,7 +225,7 @@ namespace Analysis::Creation::Binding
 
                     if (overload == nullptr)
                     {
-                        PushException(new OverloadNotFoundException(operation, parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(OverloadNotFoundException(operation, parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
@@ -239,7 +240,7 @@ namespace Analysis::Creation::Binding
 
                     if (lhs->creationType != rhs->creationType)
                     {
-                        PushException(new LogException(std::format("Cannot perform built int operation between types: {} and: {}", lhs->creationType->FullName(), rhs->creationType->FullName()), parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(LogException(std::format("Cannot perform built int operation between types: {} and: {}", lhs->creationType->FullName(), rhs->creationType->FullName()), parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
@@ -247,14 +248,14 @@ namespace Analysis::Creation::Binding
 
                     if (overload == nullptr)
                     {
-                        PushException(new OverloadNotFoundException(parseNode->Token().Kind(), parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(OverloadNotFoundException(parseNode->Token().Kind(), parseNode->Token().Index(), dataType->Parent()));
                         return std::nullopt;
                     }
 
                     return overload->StaticCompile({ *lhs, *rhs });
                 }
             default:
-                PushException(new ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
                 return std::nullopt;
         }
     }
@@ -346,7 +347,7 @@ namespace Analysis::Creation::Binding
             return context;
         }
 
-        PushException(new LogException(std::format("No appropriate constructor for: `{}` was found", creationType->FullName()), constructorCallNode->Token().Index(), source));
+        ExceptionManager::PushException(LogException(std::format("No appropriate constructor for: `{}` was found", creationType->FullName()), constructorCallNode->Token().Index(), source));
         return new InvalidContext();
     }
 
@@ -371,7 +372,7 @@ namespace Analysis::Creation::Binding
             if (const auto context = VariableCompile(child, characteristic, dataType); context != nullptr)
             {
                 if (context->CreationType() != genericType)
-                    PushException(new LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
+                    ExceptionManager::PushException(LogException(std::format("Expected argument of type: {}", genericType->FullName()), child->Token().Index(), source));
 
                 arguments.push_back(context);
             }

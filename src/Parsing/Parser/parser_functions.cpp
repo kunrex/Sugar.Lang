@@ -1,13 +1,13 @@
 #include "parser.h"
 
-#include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
-#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
-#include "../../Exceptions/Compilation/Parsing/function_argument_exception.h"
-
+#include "../ParseNodes/Statements/empty_node.h"
+#include "../ParseNodes/Statements/declaration_node.h"
 #include "../ParseNodes/Statements/initialisation_node.h"
 
 #include "../ParseNodes/Properties/base_indexer_node.h"
+#include "../ParseNodes/Properties/Accessors/get_node.h"
+#include "../ParseNodes/Properties/Accessors/set_node.h"
+#include "../ParseNodes/Properties/base_property_node.h"
 #include "../ParseNodes/Properties/assigned_property_node.h"
 
 #include "../ParseNodes/Functions/Creation/explicit_cast_node.h"
@@ -15,8 +15,13 @@
 #include "../ParseNodes/Functions/Calling/constructor_call_node.h"
 #include "../ParseNodes/Functions/Creation/function_creation_node.h"
 #include "../ParseNodes/Functions/Creation/operator_overload_node.h"
+#include "../ParseNodes/Functions/Creation/constructor_creation_node.h"
 #include "../ParseNodes/Functions/Calling/collection_construction_call_node.h"
-#include "../ParseNodes/Statements/empty_node.h"
+
+#include "../../Exceptions/exception_manager.h"
+#include "../../Exceptions/Compilation/Parsing/invalid_token_exception.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
+#include "../../Exceptions/Compilation/Parsing/function_argument_exception.h"
 
 using namespace Exceptions;
 
@@ -112,7 +117,7 @@ namespace Parsing
                 }
             default:
                 {
-                    ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Get, firstToken, source));
+                    ExceptionManager::PushException(TokenExpectedException(SyntaxKind::Get, firstToken, source));
 
                     const auto invalid = ParseInvalid(SeparatorKind::FlowerCloseBracket);
                     invalid->AddChild(first);
@@ -136,7 +141,7 @@ namespace Parsing
                 }
             default:
                 {
-                    ExceptionManager::Instance().AddChild(new TokenExpectedException(SyntaxKind::Set, secondToken, source));
+                    ExceptionManager::PushException(TokenExpectedException(SyntaxKind::Set, secondToken, source));
 
                     const auto invalid = ParseInvalid(SeparatorKind::FlowerCloseBracket);
                     invalid->AddChild(second);
@@ -185,7 +190,7 @@ namespace Parsing
             if (MatchToken(current, SyntaxKind::CloseBracket))
                 break;
 
-            ExceptionManager::Instance().AddChild(new InvalidTokenException(current, source));
+            ExceptionManager::PushException(InvalidTokenException(current, source));
 
             parameters->AddChild(new InitialisationNode(describer, type, identifier, ParseInvalid(SeparatorKind::CloseBracket), Current()));
             TryMatchToken(Current(), SyntaxKind::CloseBracket);
@@ -319,7 +324,7 @@ namespace Parsing
 
         ParseFunctionArguments(print);
         if (print->ChildCount() != 1)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(1, keyword, source));
 
         index++;
         return print;
@@ -333,7 +338,7 @@ namespace Parsing
 
         ParseFunctionArguments(print);
         if (print->ChildCount() != 1)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(1, keyword, source));
 
         return print;
     }
@@ -346,7 +351,7 @@ namespace Parsing
 
         ParseFunctionArguments(input);
         if (input->ChildCount() > 0)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(0, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(0, keyword, source));
 
         return input;
     }
@@ -359,7 +364,7 @@ namespace Parsing
 
         ParseFunctionArguments(format);
         if (format->ChildCount() < 1)
-            ExceptionManager::Instance().AddChild(new MinimumFunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(MinimumFunctionArgumentException(1, keyword, source));
 
         return format;
     }
@@ -372,7 +377,7 @@ namespace Parsing
 
         ParseFunctionArguments(invoke);
         if (invoke->ChildCount() < 1)
-            ExceptionManager::Instance().AddChild(new MinimumFunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(MinimumFunctionArgumentException(1, keyword, source));
 
         return invoke;
     }
@@ -394,7 +399,7 @@ namespace Parsing
         ParseFunctionArguments(funcRef);
 
         if (funcRef->ChildCount() - genericLength != 2)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(2, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(2, keyword, source));
 
         return funcRef;
     }
@@ -407,7 +412,7 @@ namespace Parsing
 
         ParseFunctionArguments(toString);
         if (toString->ChildCount() != 1)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(1, keyword, source));
 
         return toString;
     }
@@ -420,7 +425,7 @@ namespace Parsing
 
         ParseFunctionArguments(ref);
         if (ref->ChildCount() != 1)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(1, keyword, source));
 
         return ref;
     }
@@ -433,7 +438,7 @@ namespace Parsing
 
         ParseFunctionArguments(copy);
         if (copy->ChildCount() != 1)
-            ExceptionManager::Instance().AddChild(new FunctionArgumentException(1, keyword, source));
+            ExceptionManager::PushException(FunctionArgumentException(1, keyword, source));
 
         return copy;
     }

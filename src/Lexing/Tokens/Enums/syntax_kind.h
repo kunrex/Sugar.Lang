@@ -166,7 +166,7 @@ namespace Tokens::Enums
         Invalid,
     };
 
-    std::string ToString(const SyntaxKind& syntaxKind);
+    std::string_view ToString(const SyntaxKind& syntaxKind);
     std::ostream& operator << (std::ostream& os, const SyntaxKind& dt);
 }
 

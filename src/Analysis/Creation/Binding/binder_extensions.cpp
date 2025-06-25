@@ -1,12 +1,5 @@
 #include "binder_extensions.h"
 
-#include "../../../Exceptions/log_exception.h"
-#include "../../../Exceptions/exception_manager.h"
-#include "../../../Exceptions/Compilation/Analysis/type_exception.h"
-#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
-
-#include "../../../Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h"
-
 #include "../../Structure/Wrappers/Value/long.h"
 #include "../../Structure/Wrappers/Value/short.h"
 #include "../../Structure/Wrappers/Value/integer.h"
@@ -30,7 +23,12 @@
 #include "../../Structure/Wrappers/Generic/nullable.h"
 #include "../../Structure/Wrappers/Generic/dictionary.h"
 
-using namespace std;
+#include "../../../Exceptions/log_exception.h"
+#include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compilation/Analysis/type_exception.h"
+#include "../../../Exceptions/Compilation/Analysis/invalid_describer_exception.h"
+
+#include "../../../Parsing/ParseNodes/Types/BuiltIn/built_in_type_node.h"
 
 using namespace Exceptions;
 
@@ -47,15 +45,11 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Creation::Binding
 {
-    void PushException(const LogException* const exception)
-    {
-        ExceptionManager::Instance().AddChild(exception);
-    }
 
     void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
     {
         if (!describable->ValidateDescriber(allowed))
-            PushException(new InvalidDescriberException(describable->Describer(), allowed, index, source));
+            ExceptionManager::PushException(InvalidDescriberException(describable->Describer(), allowed, index, source));
     }
 
     const IDataType* BindBuiltInType(const IParseNode* const node)
@@ -107,7 +101,7 @@ namespace Analysis::Creation::Binding
         const auto typeNode = node->GetChild(0);
         const auto type = BindDataType(typeNode, source);
         if (type->MemberType() != MemberType::ValueType)
-            ExceptionManager::Instance().AddChild(new LogException("Only value types can be used in nullable<T>.", typeNode->Token().Index(), source));
+            ExceptionManager::PushException(LogException("Only value types can be used in nullable<T>.", typeNode->Token().Index(), source));
 
         return Nullable::Instance(type);
     }
@@ -153,7 +147,7 @@ namespace Analysis::Creation::Binding
                 return BindBuiltInType(node);
             case NodeType::CreatedType:
                 {
-                    if (const auto type = source->GetReference(*node->Token().Value<string>()); type != nullptr)
+                    if (const auto type = source->GetReference(*node->Token().Value<std::string>()); type != nullptr)
                         return type;
                 }
                 break;
@@ -175,7 +169,7 @@ namespace Analysis::Creation::Binding
                break;
         }
 
-        ExceptionManager::Instance().AddChild(new TypeNotFoundException(node->Token().Index(), source));
+        ExceptionManager::PushException(TypeNotFoundException(node->Token().Index(), source));
         return Object::Instance();
     }
 }

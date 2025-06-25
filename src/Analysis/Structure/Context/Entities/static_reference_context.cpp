@@ -4,8 +4,6 @@
 
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -21,7 +19,7 @@ namespace Analysis::Structure::Context
     bool StaticReferenceContext::Readable() const { return true; }
     bool StaticReferenceContext::Writable() const { return false; }
 
-    string StaticReferenceContext::CILData() const { return ""; }
+    std::string StaticReferenceContext::CILData() const { return ""; }
 
     void StaticReferenceContext::Print(const std::string& indent, const bool last) const
     {

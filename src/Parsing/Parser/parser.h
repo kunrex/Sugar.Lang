@@ -1,15 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stack>
 #include <optional>
-#include <functional>
-
-#include "../../Services/singleton_service.h"
-
-#include "../../Analysis/Structure/source_file.h"
-
-#include "../../Lexing/Tokens/token.h"
 
 #include "../ParseNodes/parse_node.h"
 #include "../ParseNodes/invalid_node.h"
@@ -18,12 +10,13 @@
 #include "../ParseNodes/Loops/do_while_node.h"
 #include "../ParseNodes/Loops/for_loop_node.h"
 
-#include "../ParseNodes/Groups/scope_node.h"
-#include "../ParseNodes/Groups/if_chain_node.h"
-
 #include "../ParseNodes/Values/identifier_node.h"
 
-#include "../ParseNodes/Properties/base_property_node.h"
+#include "../ParseNodes/Describers/describer_node.h"
+
+#include "../ParseNodes/Groups/scope_node.h"
+#include "../ParseNodes/Groups/if_chain_node.h"
+#include "../ParseNodes/Groups/compound_declaration_node.h"
 
 #include "../ParseNodes/Expressions/indexer_expression_node.h"
 
@@ -32,11 +25,16 @@
 #include "../ParseNodes/Functions/Calling/BaseFunctions/print_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/invoke_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/format_node.h"
-#include "../ParseNodes/Functions/Creation/constructor_creation_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/funcref_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/ref_call_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/tostring_node.h"
 #include "../ParseNodes/Functions/Calling/BaseFunctions/copy_coll_node.h"
+
+#include "../../Services/singleton_service.h"
+
+#include "../../Lexing/Tokens/token.h"
+
+#include "../../Analysis/Structure/source_file.h"
 
 namespace Parsing
 {

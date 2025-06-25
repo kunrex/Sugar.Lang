@@ -10,14 +10,14 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Core
 {
-    Scoped::Scoped(const IParseNode* const parseNode) : ConstantCollection(), parseNode(parseNode), parameterCount(0), scope(new Local::Scope(ScopeType::Scope, "", this))
+    Scoped::Scoped(const IParseNode* const parseNode) : parseNode(parseNode), parameterCount(0), scope(new Local::Scope(ScopeType::Scope, "", this))
     { }
 
     Scope* Scoped::Scope() const { return scope; }
 
     unsigned long Scoped::ParameterCount() const { return parameterCount; }
 
-    const Interfaces::IDataType* Scoped::ParameterAt(const unsigned long index) const
+    const IDataType* Scoped::ParameterAt(const unsigned long index) const
     {
         return children.at(index)->CreationType();
     }

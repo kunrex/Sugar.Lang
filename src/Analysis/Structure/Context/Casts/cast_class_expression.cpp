@@ -4,8 +4,6 @@
 
 #include "../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -22,7 +20,7 @@ namespace Analysis::Structure::Context
     bool CastClassExpression::Readable() const { return true; }
     bool CastClassExpression::Writable() const { return false; }
 
-    string CastClassExpression::CILData() const { return std::format("castclass {}", creationType->FullName()); }
+    std::string CastClassExpression::CILData() const { return std::format("castclass {}", creationType->FullName()); }
 
     void CastClassExpression::Print(const std::string& indent, const bool last) const
     {

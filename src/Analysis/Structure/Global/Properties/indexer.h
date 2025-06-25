@@ -2,6 +2,7 @@
 #define INDEXER_H
 
 #include "../../Creation/Properties/indexer_definition.h"
+
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 #include "../../Core/Interfaces/Creation/i_built_in_parametrized.h"
 

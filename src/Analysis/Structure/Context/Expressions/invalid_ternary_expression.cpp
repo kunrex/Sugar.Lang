@@ -17,6 +17,6 @@ namespace Analysis::Structure::Context
     void InvalidTernaryExpression::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Invalid Ternary Expression" << std::endl;
-        FixedContextCollection::Print(indent, last);
+        TernaryExpression::Print(indent, last);
     }
 }

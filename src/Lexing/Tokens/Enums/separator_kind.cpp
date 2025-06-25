@@ -21,7 +21,11 @@ namespace Tokens::Enums
         for (short i = 1; i <= static_cast<short>(SeparatorKind::None); i *= 2)
         {
             if ((shortValue & i) == i)
-                result += ToString(static_cast<SyntaxKind>(i)) + ", ";
+            {
+                result += ToString(static_cast<SyntaxKind>(i));
+                result += ", ";
+            }
+
         }
 
         return result.substr(0, result.size() - 2);

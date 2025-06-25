@@ -2,6 +2,7 @@
 #define COPY_CONTEXT_H
 
 #include "../../unary_context_node.h"
+
 #include "../../../Wrappers/Generic/referenced.h"
 
 namespace Analysis::Structure::Context

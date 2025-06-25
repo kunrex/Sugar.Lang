@@ -1,14 +1,12 @@
 #include "local_variable.h"
 
-using namespace std;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Local
 {
-    LocalVariable::LocalVariable(const string& name, const Enums::Describer describer, const IDataType* const creationType) : Variable(name, describer, creationType)
+    LocalVariable::LocalVariable(const std::string& name, const Enums::Describer describer, const IDataType* const creationType) : Variable(name, describer, creationType)
     { }
 
     MemberType LocalVariable::MemberType() const { return MemberType::LocalVariable; }

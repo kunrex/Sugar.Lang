@@ -1,10 +1,8 @@
 #include "syntax_kind.h"
 
-using namespace std;
-
 namespace Tokens::Enums
 {
-    std::string ToString(const SyntaxKind& syntaxKind)
+    std::string_view ToString(const SyntaxKind& syntaxKind)
     {
         switch (syntaxKind)
         {

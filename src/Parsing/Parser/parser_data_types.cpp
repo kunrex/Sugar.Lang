@@ -1,13 +1,13 @@
 #include "parser.h"
 
-#include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compilation/Parsing/parsing_exception.h"
-
 #include "../ParseNodes/DataTypes/enum_node.h"
 #include "../ParseNodes/DataTypes/class_node.h"
 #include "../ParseNodes/DataTypes/struct_node.h"
 
 #include "../ParseNodes/Statements/import_statement_node.h"
+
+#include "../../Exceptions/exception_manager.h"
+#include "../../Exceptions/Compilation/Parsing/parsing_exception.h"
 
 using namespace Exceptions;
 
@@ -30,7 +30,7 @@ namespace Parsing
         if (TryMatchToken(path, SyntaxKind::Constant))
         {
             if (const auto kind = static_cast<TypeKind>(path.Metadata()); kind != TypeKind::String)
-                ExceptionManager::Instance().AddChild(new ParsingException("Local path expected (as a string).", path, source));
+                ExceptionManager::PushException(ParsingException("Local path expected (as a string).", path, source));
             else
                 index++;
         }

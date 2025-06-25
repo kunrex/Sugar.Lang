@@ -4,26 +4,26 @@
 
 namespace Exceptions
 {
-    ExceptionManager::ExceptionManager() : SingletonService(), ConstantCollection()
-    { }
+    std::vector<CompileException> ExceptionManager::exceptions;
 
-    ExceptionManager& ExceptionManager::Instance()
+    void ExceptionManager::PushException(const CompileException& exception)
     {
-        static ExceptionManager instance;
-        return instance;
+        exceptions.emplace_back(exception);
     }
 
-    bool ExceptionManager::LogAllExceptions() const
+    bool ExceptionManager::LogAllExceptions()
     {
-        if (children.empty())
+        if (exceptions.empty())
             return false;
 
-        for (const auto exception: children)
+        for (const auto& exception: exceptions)
         {
-            std::cerr << exception->what() << std::endl;
+            std::cerr << exception.what() << std::endl;
             std::cout << std::endl;
         }
 
         return true;
     }
+
+    unsigned long ExceptionManager::ExceptionCount() { return exceptions.size(); }
 }

@@ -2,15 +2,13 @@
 
 #include <format>
 
-#include "../../../../Exceptions/Compilation/Analysis/Local/initialisation_exception.h"
-#include "../../../Creation/Binding/binder_extensions.h"
-#include "../../../Creation/Binding/constant_binder.h"
-#include "../../../Creation/Binding/local_binder.h"
-#include "../../../Creation/Transpiling/cil_transpiler.h"
+#include "../../../../Exceptions/exception_manager.h"
 #include "../../Core/DataTypes/data_type.h"
-#include "../../Core/Scoped/default_scoped.h"
 
-using namespace std;
+#include "../../../Creation/Binding/constant_binder.h"
+#include "../../../Creation/Transpiling/cil_transpiler.h"
+
+#include "../../../../Exceptions/Compilation/Analysis/Local/initialisation_exception.h"
 
 using namespace Services;
 
@@ -21,17 +19,16 @@ using namespace ParseNodes::Core::Interfaces;
 using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType) : PropertyDefinition(name, describer, creationType, nullptr)
+    Property::Property(const std::string& name, const Enums::Describer describer, const IDataType* const creationType) : PropertyDefinition(name, describer, creationType, nullptr)
     { }
 
-    Property::Property(const string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const value) : PropertyDefinition(name, describer, creationType, value)
+    Property::Property(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const value) : PropertyDefinition(name, describer, creationType, value)
     { }
 
     MemberType Property::MemberType() const { return MemberType::Property; }
@@ -77,7 +74,7 @@ namespace Analysis::Structure::Global
             return;
 
         if (context->CreationType() != creationType)
-            PushException(new InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
+            ExceptionManager::PushException(InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
 
         const auto constructor = CheckDescriber(Describer::Static) ? parent->StaticConstructor() : parent->InstanceConstructor();
         constructor->PushTranspilation(this);
@@ -85,7 +82,7 @@ namespace Analysis::Structure::Global
 
     void AutoImplementedProperty::Transpile(StringBuilder& builder) const
     {
-        builder.PushLine(std::format(".field {} {} {} {}", AccessModifierString(this), string(AccessModifierString(this)) + (CheckDescriber(Describer::Static) ? "static" : ""), creationType->FullName(), name));
+        builder.PushLine(std::format(".field {} {} {} {}", AccessModifierString(this), std::string(AccessModifierString(this)) + (CheckDescriber(Describer::Static) ? "static" : ""), creationType->FullName(), name));
     }
 
     void AutoImplementedProperty::IncrementDependencyCount() { dependencyCount++; }
@@ -144,7 +141,7 @@ namespace Analysis::Structure::Global
     void GetSetProperty::Transpile(StringBuilder& builder) const
     { }
 
-    BuiltInProperty::BuiltInProperty(const string& name, const Enums::Describer describer, const IDataType* creationType, const bool readable, string getInstruction, const bool writable, string setInstruction) : PropertyDefinition(name, describer, creationType, nullptr), readable(readable), writable(writable), getInstruction(std::move(getInstruction)), setInstruction(std::move(setInstruction))
+    BuiltInProperty::BuiltInProperty(const std::string& name, const Enums::Describer describer, const IDataType* creationType, const bool readable, std::string getInstruction, const bool writable, std::string setInstruction) : PropertyDefinition(name, describer, creationType, nullptr), readable(readable), writable(writable), getInstruction(std::move(getInstruction)), setInstruction(std::move(setInstruction))
     { }
 
     MemberType BuiltInProperty::MemberType() const { return MemberType::BuiltInProperty; }

@@ -3,11 +3,10 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Properties
 {
-    SetNode::SetNode(const DescriberNode* const describer, const IParseNode* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
+    SetNode::SetNode(const IParseNode* const describer, const IParseNode* const body, const Tokens::Token& keyword) : FixedNodeCollection(keyword)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Body, body);

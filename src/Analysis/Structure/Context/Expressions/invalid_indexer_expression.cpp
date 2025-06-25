@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
@@ -20,7 +18,7 @@ namespace Analysis::Structure::Context
     bool InvalidIndexerExpression::Readable() const { return false; }
     bool InvalidIndexerExpression::Writable() const { return false; }
 
-    string InvalidIndexerExpression::CILData() const { return ""; }
+    std::string InvalidIndexerExpression::CILData() const { return ""; }
 
     void InvalidIndexerExpression::Print(const std::string& indent, const bool last) const
     {

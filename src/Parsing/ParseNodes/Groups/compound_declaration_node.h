@@ -2,14 +2,13 @@
 #define COMPOUND_DECLARATION_NODE_H
 
 #include "../parse_node.h"
-#include "../Statements/declaration_node.h"
 
 namespace ParseNodes::Groups
 {
     class CompoundDeclarationNode final : public DynamicNodeCollection
     {
         public:
-            CompoundDeclarationNode(const Tokens::Token& token, const Describers::DescriberNode* describer, const IParseNode* type);
+            CompoundDeclarationNode(const Tokens::Token& token, const IParseNode* describer, const IParseNode* type);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

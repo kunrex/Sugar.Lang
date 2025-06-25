@@ -2,15 +2,13 @@
 #define BASE_PROPERTY_NODE_H
 
 #include "../parse_node.h"
-#include "../Values/identifier_node.h"
-#include "../Describers/describer_node.h"
 
 namespace ParseNodes::Properties
 {
     class BasePropertyNode final : public virtual FixedNodeCollection<5>
     {
         public:
-            BasePropertyNode(const Describers::DescriberNode* describer, const IParseNode* type, const Values::IdentifierNode* identifier, const IParseNode* get, const IParseNode* set);
+            BasePropertyNode(const IParseNode* describer, const IParseNode* type, const IParseNode* identifier, const IParseNode* get, const IParseNode* set);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

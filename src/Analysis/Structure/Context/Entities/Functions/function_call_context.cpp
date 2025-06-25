@@ -6,8 +6,6 @@
 
 #include "../../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -35,7 +33,7 @@ namespace Analysis::Structure::Context
     bool FunctionCallContext::Writable() const { return function->CreationType() != nullptr && function->CreationType()->MemberType() == MemberType::Class; }
 
     uintptr_t FunctionCallContext::Metadata() const { return reinterpret_cast<uintptr_t>(function); }
-    string FunctionCallContext::CILData() const { return function->FullName(); }
+    std::string FunctionCallContext::CILData() const { return function->FullName(); }
 
     void FunctionCallContext::Print(const std::string& indent, const bool last) const
     {

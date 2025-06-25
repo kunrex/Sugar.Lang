@@ -1,7 +1,6 @@
-#include "src/compiler.h"
-
-#include <string>
 #include <filesystem>
+
+#include "src/compiler.h"
 
 namespace fs = std::filesystem;
 

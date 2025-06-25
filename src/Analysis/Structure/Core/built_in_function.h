@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "Interfaces/DataTypes/i_data_type.h"
 #include "Interfaces/Creation/i_built_in_function.h"
 
 namespace Analysis::Structure::Core

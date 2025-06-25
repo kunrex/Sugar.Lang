@@ -1,16 +1,12 @@
 #include "source_directory.h"
 
 #include <iostream>
-#include <ostream>
 
-using namespace std;
-
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure
 {
-    SourceDirectory::SourceDirectory(const string& name, const bool isRoot) : SourceObject(name), Dictionary()
+    SourceDirectory::SourceDirectory(const std::string& name, const bool isRoot) : SourceObject(name), Dictionary()
     {
         if (isRoot)
             fullName = name;
@@ -18,7 +14,7 @@ namespace Analysis::Structure
 
     SourceType SourceDirectory::SourceType() const { return SourceType::Directory; }
 
-    bool SourceDirectory::AddChild(const string key, SourceObject* const value)
+    bool SourceDirectory::AddChild(const std::string key, SourceObject* const value)
     {
         const auto result = Dictionary::AddChild(key, value);
         if (result)

@@ -4,8 +4,6 @@
 
 #include "../../../Core/DataTypes/data_type.h"
 
-using namespace std;
-
 using namespace Tokens::Enums;
 
 using namespace Analysis::Structure::Enums;
@@ -34,7 +32,7 @@ namespace Analysis::Structure::Context
     bool CreationContext::Readable() const { return true; }
     bool CreationContext::Writable() const { return constructor->CreationType()->MemberType() == MemberType::Class; }
 
-    string CreationContext::CILData() const
+    std::string CreationContext::CILData() const
     {
         if (creationType->Type() == TypeKind::Array)
             return constructor->FullName();
@@ -69,7 +67,7 @@ namespace Analysis::Structure::Context
     bool CollectionCreationContext::Readable() const { return true; }
     bool CollectionCreationContext::Writable() const { return creationType->MemberType() == MemberType::Class; }
 
-    string CollectionCreationContext::CILData() const { return ""; }
+    std::string CollectionCreationContext::CILData() const { return ""; }
 
     void CollectionCreationContext::Print(const std::string& indent, const bool last) const
     {
@@ -100,7 +98,7 @@ namespace Analysis::Structure::Context
 
     uintptr_t ConstructorCallContext::Metadata() const { return reinterpret_cast<uintptr_t>(constructor); }
 
-    string ConstructorCallContext::CILData() const
+    std::string ConstructorCallContext::CILData() const
     {
         return "call " + constructor->FullName();
     }

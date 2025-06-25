@@ -1,14 +1,13 @@
 #ifndef CONSTRUCTOR_H
 #define CONSTRUCTOR_H
 
-#include "../../Core/Scoped/scoped.h"
 #include "../../Creation/Functions/constructor_definition.h"
+
+#include "../../Core/Scoped/scoped.h"
+#include "../../Core/built_in_function.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
-#include "../../Core/Interfaces/Creation/i_constructor.h"
 
 #include "../../../../Services/child.h"
-#include "../../Core/built_in_function.h"
-#include "../../Core/Scoped/default_scoped.h"
 
 namespace Analysis::Structure::Global
 {
@@ -29,7 +28,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class ImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class ImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -41,6 +40,9 @@ namespace Analysis::Structure::Global
 
             [[nodiscard]] const std::string& FullName() const override;
 
+            [[nodiscard]] unsigned long ParameterCount() const override;
+            [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
+
             void BindLocal() override;
 
             void Transpile(Services::StringBuilder& builder) const override;
@@ -49,7 +51,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class StaticImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Core::DefaultScoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class StaticImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -60,6 +62,9 @@ namespace Analysis::Structure::Global
             [[nodiscard]] Enums::MemberType MemberType() const override;
 
             [[nodiscard]] const std::string& FullName() const override;
+
+            [[nodiscard]] unsigned long ParameterCount() const override;
+            [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
 
             void BindLocal() override;
 

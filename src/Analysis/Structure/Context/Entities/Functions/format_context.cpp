@@ -4,8 +4,6 @@
 
 #include "../../../Wrappers/Reference/string.h"
 
-using namespace std;
-
 using namespace ParseNodes::Enums;
 
 using namespace Analysis::Structure::Enums;
@@ -29,7 +27,7 @@ namespace Analysis::Structure::Context
     bool FormatContext::Readable() const { return true; }
     bool FormatContext::Writable() const { return false; }
 
-    string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
+    std::string FormatContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object[])"; }
 
     void FormatContext::Print(const std::string& indent, const bool last) const
     {
@@ -53,7 +51,7 @@ namespace Analysis::Structure::Context
     bool FormatSingleContext::Readable() const { return true; }
     bool FormatSingleContext::Writable() const { return false; }
 
-    string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
+    std::string FormatSingleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object)"; }
 
     void FormatSingleContext::Print(const std::string& indent, const bool last) const
     {
@@ -104,7 +102,7 @@ namespace Analysis::Structure::Context
     bool FormatDoubleContext::Readable() const { return true; }
     bool FormatDoubleContext::Writable() const { return false; }
 
-    string FormatDoubleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object, object)"; }
+    std::string FormatDoubleContext::CILData() const { return "call string [System.Runtime]System.String::Format(string, object, object)"; }
 
     void FormatDoubleContext::Print(const std::string& indent, const bool last) const
     {

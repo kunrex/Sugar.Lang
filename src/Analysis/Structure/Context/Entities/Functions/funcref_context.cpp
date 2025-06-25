@@ -4,8 +4,6 @@
 
 #include "../../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -21,10 +19,7 @@ namespace Analysis::Structure::Context
     bool FuncRefContext::Readable() const { return false; }
     bool FuncRefContext::Writable() const { return false; }
 
-    string FuncRefContext::CILData() const
-    {
-        return "ldftn " + function->Signature();
-    }
+    std::string FuncRefContext::CILData() const { return "ldftn " + function->Signature(); }
 
     void FuncRefContext::Print(const std::string& indent, const bool last) const
     {

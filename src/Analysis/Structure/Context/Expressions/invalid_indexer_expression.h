@@ -2,7 +2,6 @@
 #define INVALID_INDEXER_EXPRESSION_H
 
 #include "../unary_context_node.h"
-#include "../../../../Services/collection.h"
 
 namespace Analysis::Structure::Context
 {

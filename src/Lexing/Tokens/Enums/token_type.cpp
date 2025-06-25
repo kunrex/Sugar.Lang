@@ -1,7 +1,5 @@
 #include "token_type.h"
 
-using namespace std;
-
 namespace Tokens::Enums
 {
     TokenType operator | (const TokenType& lhs, const TokenType& rhs)
@@ -14,9 +12,9 @@ namespace Tokens::Enums
         return static_cast<TokenType>(static_cast<short>(lhs) & static_cast<short>(rhs));
     }
 
-    string ToString(const TokenType& tokenType)
+    std::string ToString(const TokenType& tokenType)
     {
-        string result;
+        std::string result;
         const auto shortValue = static_cast<short>(tokenType);
         for (short i = 1; i <= static_cast<short>(TokenType::Invalid); i *= 2)
         {
@@ -55,5 +53,5 @@ namespace Tokens::Enums
         return result.substr(0, result.size() - 2);
     }
 
-    ostream& operator << (std::ostream& os, const TokenType& dt) { return os << ToString(dt); }
+   std::ostream& operator << (std::ostream& os, const TokenType& dt) { return os << ToString(dt); }
 }

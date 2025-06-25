@@ -1,7 +1,6 @@
 #include "built_in_type_node.h"
 
 using namespace Tokens;
-using namespace Tokens::Enums;
 
 using namespace ParseNodes::Enums;
 

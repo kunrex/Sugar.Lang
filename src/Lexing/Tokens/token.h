@@ -20,7 +20,7 @@ namespace Tokens
             const Enums::SyntaxKind syntaxKind;
 
             const short metadata;
-            const std::variant<long, double, std::string> value;
+            const std::variant<long, double, std::string, std::string_view> value;
 
         public:
             static Token Invalid(unsigned long i, std::string value);
@@ -29,10 +29,12 @@ namespace Tokens
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, long value);
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, double value);
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, std::string value);
+            Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, std::string_view value);
 
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, short metadata, long value);
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, short metadata, double value);
             Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, short metadata, std::string value);
+            Token(unsigned long index, Enums::TokenType type, Enums::SyntaxKind syntaxKind, short metadata, std::string_view value);
 
             [[nodiscard]] unsigned long Index() const;
 

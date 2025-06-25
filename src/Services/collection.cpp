@@ -1,29 +1,13 @@
 #include "collection.h"
 
-#include "../Exceptions/compile_exception.h"
-
-#include "../Lexing/Tokens/token.h"
-
 #include "../Parsing/ParseNodes/parse_node.h"
-#include "../Parsing/ParseNodes/Statements/declaration_node.h"
 
 #include "../Analysis/Structure/source_object.h"
 #include "../Analysis/Structure/Context/context_node.h"
 #include "../Analysis/Structure/Local/Variables/local_variable.h"
 
-using namespace std;
-
-using namespace Exceptions;
-
-using namespace Tokens;
-
-using namespace ParseNodes;
-using namespace ParseNodes::Statements;
-
 using namespace Analysis::Structure;
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
-using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Services
@@ -79,9 +63,7 @@ namespace Services
 
     template class Collection<const IContextNode>;
     template class Collection<const LocalVariable>;
-    template class Collection<const CompileException>;
 
     template class ConstantCollection<IContextNode>;
     template class ConstantCollection<LocalVariable>;
-    template class ConstantCollection<CompileException>;
 }

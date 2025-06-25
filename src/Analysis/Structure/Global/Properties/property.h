@@ -1,9 +1,8 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 
-#include "../../Creation/Functions/void_definition.h"
-#include "../../Creation/Functions/method_definition.h"
 #include "../../Creation/Properties/property_definition.h"
+
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../../Services/child.h"

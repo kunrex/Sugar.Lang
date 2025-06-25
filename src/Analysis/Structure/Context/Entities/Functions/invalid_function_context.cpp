@@ -2,8 +2,6 @@
 
 #include "../../../Wrappers/Reference/object.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
@@ -19,7 +17,7 @@ namespace Analysis::Structure::Context
     bool InvalidFunctionContext::Readable() const { return false; }
     bool InvalidFunctionContext::Writable() const { return false; }
 
-    string InvalidFunctionContext::CILData() const { return ""; }
+    std::string InvalidFunctionContext::CILData() const { return ""; }
 
     void InvalidFunctionContext::Print(const std::string& indent, const bool last) const
     {

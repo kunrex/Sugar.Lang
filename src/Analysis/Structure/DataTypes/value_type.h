@@ -1,7 +1,6 @@
 #ifndef VALUE_TYPE_H
 #define VALUE_TYPE_H
 
-#include <tuple>
 #include <vector>
 
 #include "../Core/DataTypes/data_type.h"

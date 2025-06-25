@@ -1,11 +1,11 @@
 #include "parser.h"
 
-#include "../../Exceptions/exception_manager.h"
-#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
-
 #include "../ParseNodes/invalid_node.h"
 
 #include "../ParseNodes/Groups/source_file_node.h"
+
+#include "../../Exceptions/exception_manager.h"
+#include "../../Exceptions/Compilation/Parsing/token_expected_exception.h"
 
 using namespace Exceptions;
 
@@ -94,7 +94,7 @@ namespace Parsing
         const bool result = MatchType(token, tokenType, increment);
 
         if (!result)
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(tokenType, token, source));
+            ExceptionManager::PushException(TokenExpectedException(tokenType, token, source));
 
         return result;
     }
@@ -104,7 +104,7 @@ namespace Parsing
         const bool result = MatchToken(token, syntaxKind, increment);
 
         if (!result)
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(syntaxKind, token, source));
+            ExceptionManager::PushException(TokenExpectedException(syntaxKind, token, source));
 
         return result;
     }
@@ -114,7 +114,7 @@ namespace Parsing
         const bool result = MatchSeparator(token, kind, increment);;
 
         if (!result)
-            ExceptionManager::Instance().AddChild(new TokenExpectedException(kind, token, source));
+            ExceptionManager::PushException(TokenExpectedException(kind, token, source));
 
         return result;
     }

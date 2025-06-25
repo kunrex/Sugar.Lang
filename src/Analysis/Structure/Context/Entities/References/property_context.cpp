@@ -4,8 +4,6 @@
 
 #include "../../../Core/Interfaces/DataTypes/i_data_type.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
 
@@ -22,7 +20,7 @@ namespace Analysis::Structure::Context
     bool PropertyContext::Writable() const { return property->Writable() && !isPublic || property->PublicSet(); }
 
     uintptr_t PropertyContext::Metadata() const { return reinterpret_cast<uintptr_t>(property); }
-    string PropertyContext::CILData() const { return ""; }
+    std::string PropertyContext::CILData() const { return ""; }
 
     void PropertyContext::Print(const std::string& indent, const bool last) const
     {

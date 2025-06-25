@@ -2,9 +2,6 @@
 #define FORMAT_CONTEXT_H
 
 #include "../../binary_context_node.h"
-#include "../../context_node.h"
-#include "../../unary_context_node.h"
-#include "../../../../../Services/collection.h"
 
 namespace Analysis::Structure::Context
 {

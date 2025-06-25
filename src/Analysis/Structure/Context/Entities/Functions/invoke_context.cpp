@@ -6,8 +6,6 @@
 
 #include "../../../Global/Variables/global_variable.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
@@ -36,16 +34,15 @@ namespace Analysis::Structure::Context
     bool InvokeContext::Readable() const { return true; }
     bool InvokeContext::Writable() const { return creationType != nullptr; }
 
-    string InvokeContext::CILData() const
+    std::string InvokeContext::CILData() const
     {
-        string parameterString;
+        std::string parameterString;
         for (auto i = 1; i < children.size(); i++)
         {
-            const auto current = children.at(i)->CreationType();
-            parameterString += current->FullName();
+            parameterString.append(children.at(i)->CreationType()->FullName());
 
             if (i < children.size() - 1)
-                parameterString += ", ";
+                parameterString.append(", ");
         }
 
         return std::format("callvirt instance void {}::Invoke({})", delegateType->DelegateSignature(), parameterString);

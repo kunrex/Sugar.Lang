@@ -8,7 +8,7 @@ namespace ParseNodes::Loops
     class DoWhileNode final : public virtual FixedNodeCollection<2>
     {
         public:
-            DoWhileNode(const IParseNode* condition, const DynamicNodeCollection* body, const Tokens::Token& keyword);
+            DoWhileNode(const IParseNode* condition, const IParseNode* body, const Tokens::Token& keyword);
 
             [[nodiscard]] Enums::NodeType NodeType() const override;
 

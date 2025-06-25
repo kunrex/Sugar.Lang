@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 
 namespace Analysis::Structure::Context
@@ -18,7 +16,7 @@ namespace Analysis::Structure::Context
     bool InvalidBinaryExpression::Readable() const { return false; }
     bool InvalidBinaryExpression::Writable() const { return false; }
 
-    string InvalidBinaryExpression::CILData() const { return ""; }
+    std::string InvalidBinaryExpression::CILData() const { return ""; }
 
     void InvalidBinaryExpression::Print(const std::string& indent, const bool last) const
     {

@@ -2,28 +2,27 @@
 
 #include <format>
 
-#include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
-#include "../../../Creation/Binding/binder_extensions.h"
-
 #include "../../Core/DataTypes/data_type.h"
 #include "../../Compilation/compilation_result.h"
 
 #include "../../../Creation/Binding/local_binder.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
 
-using namespace std;
+#include "../../../../Exceptions/exception_manager.h"
+#include "../../../../Exceptions/Compilation/Analysis/Local/return_value_exception.h"
 
 using namespace Services;
+
+using namespace Exceptions;
 
 using namespace Tokens::Enums;
 
 using namespace ParseNodes::Core::Interfaces;
 
+using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Creation::Binding;
 using namespace Analysis::Structure::Compilation;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -34,7 +33,7 @@ namespace Analysis::Structure::Global
 
     MemberType OperatorOverload::MemberType() const { return MemberType::OperatorOverload; }
 
-    const string& OperatorOverload::FullName() const
+    const std::string& OperatorOverload::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = std::format("call {} {} {}::{}{}", creationType->MemberType() == MemberType::Class ? "class" : "valuetype", creationType->FullName(), parent->FullName(), name, ParameterString(this));
@@ -47,7 +46,7 @@ namespace Analysis::Structure::Global
         BindScope(parseNode, scope, this, parent);
 
         if (!IsReturnComplete(scope, creationType))
-            PushException(new Exceptions::ReturnValueException(parseNode->Token().Index(), parent->Parent()));
+            ExceptionManager::PushException(ReturnValueException(parseNode->Token().Index(), parent->Parent()));
     }
 
     void OperatorOverload::Transpile(StringBuilder& builder) const
@@ -73,14 +72,14 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    ImplicitOverload::ImplicitOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), BuiltInFunction()
+    ImplicitOverload::ImplicitOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const std::string& instruction) : OverloadDefinition(baseOperator, Describer::PublicStatic, creationType), BuiltInFunction()
     {
         fullName = instruction;
     }
 
     MemberType ImplicitOverload::MemberType() const { return MemberType::GeneratedOverload; }
 
-    const string& ImplicitOverload::FullName() const { return fullName; }
+    const std::string& ImplicitOverload::FullName() const { return fullName; }
 
     void ImplicitOverload::BindLocal()
     { }
@@ -88,10 +87,10 @@ namespace Analysis::Structure::Global
     void ImplicitOverload::Transpile(StringBuilder& builder) const
     { }
 
-    BuiltInOverload::BuiltInOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const string& instruction, const OverloadFunction overloadDelegate) : ImplicitOverload(baseOperator, creationType, instruction), overloadDelegate(overloadDelegate)
+    BuiltInOverload::BuiltInOverload(const SyntaxKind baseOperator, const IDataType* const creationType, const std::string& instruction, const OverloadFunction overloadDelegate) : ImplicitOverload(baseOperator, creationType, instruction), overloadDelegate(overloadDelegate)
     { }
 
-    const string& BuiltInOverload::FullName() const { return fullName; }
+    const std::string& BuiltInOverload::FullName() const { return fullName; }
 
     CompilationResult BuiltInOverload::StaticCompile(const std::vector<CompilationResult>& arguments) const { return overloadDelegate(arguments); }
 }

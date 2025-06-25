@@ -5,8 +5,6 @@
 #include "../../Wrappers/Value/float.h"
 #include "../../Wrappers/Value/double.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 
@@ -23,7 +21,7 @@ namespace Analysis::Structure::Context
     bool FloatConstant::Writable() const { return false; }
 
     uintptr_t FloatConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string FloatConstant::CILData() const { return std::format("ldc.r4 {}", value); }
+    std::string FloatConstant::CILData() const { return std::format("ldc.r4 {}", value); }
 
     void FloatConstant::Print(const std::string& indent, const bool last) const
     {
@@ -41,7 +39,7 @@ namespace Analysis::Structure::Context
     bool DoubleConstant::Writable() const { return false; }
 
     uintptr_t DoubleConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string DoubleConstant::CILData() const { return std::format("ldc.r8 {}", value); }
+    std::string DoubleConstant::CILData() const { return std::format("ldc.r8 {}", value); }
 
     void DoubleConstant::Print(const std::string& indent, const bool last) const
     {

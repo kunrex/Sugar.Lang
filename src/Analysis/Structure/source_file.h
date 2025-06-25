@@ -3,14 +3,15 @@
 
 #include <vector>
 
+#include "source_object.h"
+
+#include "Core/Interfaces/DataTypes/i_data_type.h"
+
 #include "../../Services/dictionary.h"
 
 #include "../../Lexing/Tokens/token.h"
 
 #include "../../Parsing/ParseNodes/Groups/source_file_node.h"
-
-#include "source_object.h"
-#include "Core/Interfaces/DataTypes/i_data_type.h"
 
 namespace Analysis::Structure::Core::Interfaces
 {

@@ -4,8 +4,6 @@
 
 #include "../../Wrappers/Reference/object.h"
 
-using namespace std;
-
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
 using namespace Analysis::Structure::Core::Interfaces;
@@ -22,7 +20,7 @@ namespace Analysis::Structure::Context
     bool UnboxCastExpression::Readable() const { return true; }
     bool UnboxCastExpression::Writable() const { return false; }
 
-    string UnboxCastExpression::CILData() const { return std::format("box {}", creationType->FullName()); }
+    std::string UnboxCastExpression::CILData() const { return std::format("unbox {}", creationType->FullName()); }
 
     void UnboxCastExpression::Print(const std::string& indent, const bool last) const
     {

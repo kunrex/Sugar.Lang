@@ -3,12 +3,10 @@
 using namespace Tokens;
 
 using namespace ParseNodes::Enums;
-using namespace ParseNodes::Groups;
-using namespace ParseNodes::Describers;
 
 namespace ParseNodes::Functions::Creation
 {
-    OperatorOverloadNode::OperatorOverloadNode(const DescriberNode* const describer, const IParseNode* const type, const Tokens::Token& base, const MultipleDeclarationNode* const parameters, const DynamicNodeCollection* const body) : FixedNodeCollection(base)
+    OperatorOverloadNode::OperatorOverloadNode(const IParseNode* const describer, const IParseNode* const type, const Tokens::Token& base, const IParseNode* const parameters, const IParseNode* const body) : FixedNodeCollection(base)
     {
         AddChild(ChildCode::Describer, describer);
         AddChild(ChildCode::Type, type);

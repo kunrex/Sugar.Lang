@@ -2,13 +2,11 @@
 
 #include <format>
 
+#include "../../Wrappers/Value/long.h"
 #include "../../Wrappers/Value/short.h"
 #include "../../Wrappers/Value/integer.h"
-#include "../../Wrappers/Value/long.h"
 #include "../../Wrappers/Value/boolean.h"
 #include "../../Wrappers/Value/character.h"
-
-using namespace std;
 
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Wrappers;
@@ -26,7 +24,7 @@ namespace Analysis::Structure::Context
     bool ShortConstant::Writable() const { return false; }
 
     uintptr_t ShortConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string ShortConstant::CILData() const { return std::format("ldc.i4 {}", value); }
+    std::string ShortConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
     void ShortConstant::Print(const std::string& indent, const bool last) const
     {
@@ -44,7 +42,7 @@ namespace Analysis::Structure::Context
     bool IntegerConstant::Writable() const { return false; }
 
     uintptr_t IntegerConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string IntegerConstant::CILData() const { return std::format("ldc.i4 {}", value); }
+    std::string IntegerConstant::CILData() const { return std::format("ldc.i4 {}", value); }
 
     void IntegerConstant::Print(const std::string& indent, const bool last) const
     {
@@ -62,7 +60,7 @@ namespace Analysis::Structure::Context
     bool LongConstant::Writable() const { return false; }
 
     uintptr_t LongConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string LongConstant::CILData() const { return std::format("ldc.i8 {}", value); }
+    std::string LongConstant::CILData() const { return std::format("ldc.i8 {}", value); }
 
     void LongConstant::Print(const std::string& indent, const bool last) const
     {
@@ -80,7 +78,7 @@ namespace Analysis::Structure::Context
     bool CharacterConstant::Writable() const { return false; }
 
     uintptr_t CharacterConstant::Metadata() const { return reinterpret_cast<uintptr_t>(&value); }
-    string CharacterConstant::CILData() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
+    std::string CharacterConstant::CILData() const { return std::format("ldc.i4.s {}", static_cast<int>(value)); }
 
     void CharacterConstant::Print(const std::string& indent, const bool last) const
     {
@@ -107,7 +105,7 @@ namespace Analysis::Structure::Context
     bool TrueConstant::Readable() const { return true; }
     bool TrueConstant::Writable() const { return false; }
 
-    string TrueConstant::CILData() const { return "ldc.i4.1"; }
+    std::string TrueConstant::CILData() const { return "ldc.i4.1"; }
 
     FalseConstant::FalseConstant(): BoolConstant(false)
     { }
@@ -119,5 +117,5 @@ namespace Analysis::Structure::Context
     bool FalseConstant::Readable() const { return true; }
     bool FalseConstant::Writable() const { return false; }
 
-    string FalseConstant::CILData() const { return "ldc.i4.0"; }
+    std::string FalseConstant::CILData() const { return "ldc.i4.0"; }
 }

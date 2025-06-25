@@ -4,21 +4,21 @@
 
 #include "data_type_extensions.h"
 
-#include "../../Creation/Binding/global_binder.h"
-#include "../../Creation/Binding/binder_extensions.h"
+#include "../Wrappers/Value/boolean.h"
+#include "../Wrappers/Value/integer.h"
+#include "../Wrappers/Reference/object.h"
+#include "../Wrappers/Reference/string.h"
 
-#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
-#include "../../Creation/Transpiling/cil_transpiler.h"
+#include "../Global/Functions/void_function.h"
 #include "../Global/Functions/cast_overload.h"
 #include "../Global/Functions/method_function.h"
 #include "../Global/Functions/operator_overload.h"
-#include "../Global/Functions/void_function.h"
-#include "../Wrappers/Reference/object.h"
-#include "../Wrappers/Reference/string.h"
-#include "../Wrappers/Value/boolean.h"
-#include "../Wrappers/Value/integer.h"
 
-using namespace std;
+#include "../../Creation/Binding/global_binder.h"
+#include "../../Creation/Transpiling/cil_transpiler.h"
+
+#include "../../../Exceptions/exception_manager.h"
+#include "../../../Exceptions/Compilation/Analysis/Global/invalid_global_statement_exception.h"
 
 using namespace Exceptions;
 
@@ -30,7 +30,6 @@ using namespace ParseNodes::Core::Interfaces;
 using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Wrappers;
@@ -38,7 +37,7 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::DataTypes
 {
-    Class::Class(const string& name, const Enums::Describer describer) : DataType(name, describer)
+    Class::Class(const std::string& name, const Enums::Describer describer) : DataType(name, describer)
     { }
 
     MemberType Class::MemberType() const { return MemberType::Class; }
@@ -60,7 +59,7 @@ namespace Analysis::Structure::DataTypes
     BuiltInClass::BuiltInClass(const std::string& name, const Enums::Describer describer) : Class(name, describer)
     { }
 
-    const string& BuiltInClass::FullName() const { return name; }
+    const std::string& BuiltInClass::FullName() const { return name; }
 
     void BuiltInClass::BindLocal()
     { }
@@ -112,12 +111,12 @@ namespace Analysis::Structure::DataTypes
     }
 
 
-    ClassSource::ClassSource(const string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
+    ClassSource::ClassSource(const std::string& name, const Enums::Describer describer, const IParseNode* skeleton) : Class(name, describer), skeleton(skeleton), fullName()
     { }
 
     TypeKind ClassSource::Type() const { return TypeKind::Custom; }
 
-    const string& ClassSource::FullName() const
+    const std::string& ClassSource::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = parent->FullName() + "." + name;
@@ -130,7 +129,7 @@ namespace Analysis::Structure::DataTypes
         characteristics.push_back(characteristic);
     }
 
-    const ICharacteristic* ClassSource::FindCharacteristic(const string& name) const
+    const ICharacteristic* ClassSource::FindCharacteristic(const std::string& name) const
     {
         for (const auto characteristic : characteristics)
             if (characteristic->Name() == name)
@@ -141,12 +140,12 @@ namespace Analysis::Structure::DataTypes
 
     void ClassSource::PushFunction(IFunctionDefinition* const function)
     {
-        functions.emplace_back(std::hash<string>()(function->Name()) ^ ArgumentHash(function), function);
+        functions.emplace_back(std::hash<std::string>()(function->Name()) ^ ArgumentHash(function), function);
     }
 
-    const IFunctionDefinition* ClassSource::FindFunction(const string& name, const std::vector<const IDataType*>& argumentList) const
+    const IFunctionDefinition* ClassSource::FindFunction(const std::string& name, const std::vector<const IDataType*>& argumentList) const
     {
-        const auto hash = std::hash<string>()(name) ^ ArgumentHash(argumentList);
+        const auto hash = std::hash<std::string>()(name) ^ ArgumentHash(argumentList);
 
         for (const auto function : functions)
             if (function.first == hash)
@@ -301,7 +300,7 @@ namespace Analysis::Structure::DataTypes
                     CreateOperatorOverload(child, this);
                     break;
                 default:
-                    PushException(new InvalidGlobalStatementException(child->Token().Index(), parent));
+                    ExceptionManager::PushException(InvalidGlobalStatementException(child->Token().Index(), parent));
                     break;
             }
         }
@@ -342,13 +341,13 @@ namespace Analysis::Structure::DataTypes
         }
 
         if (flag)
-            PushException(new LogException(std::format("Type: {} must define overloads for both == and !=", FullName()), skeleton->Token().Index(), parent));
+            ExceptionManager::PushException(LogException(std::format("Type: {} must define overloads for both == and !=", FullName()), skeleton->Token().Index(), parent));
 
         if (FindOverload(SyntaxKind::GreaterThan) == nullptr ^ FindOverload(SyntaxKind::LesserThan) == nullptr)
-            PushException(new LogException(std::format("Type: {} must define overloads for both < and >", FullName()), skeleton->Token().Index(), parent));
+            ExceptionManager::PushException(LogException(std::format("Type: {} must define overloads for both < and >", FullName()), skeleton->Token().Index(), parent));
 
         if (FindOverload(SyntaxKind::GreaterThanEquals) == nullptr ^ FindOverload(SyntaxKind::LesserThanEquals) == nullptr)
-            PushException(new LogException(std::format("Type: {} must define overloads for both <= and >=", FullName()), skeleton->Token().Index(), parent));
+            ExceptionManager::PushException(LogException(std::format("Type: {} must define overloads for both <= and >=", FullName()), skeleton->Token().Index(), parent));
     }
 
     void ClassSource::BindLocal()
@@ -399,9 +398,11 @@ namespace Analysis::Structure::DataTypes
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);
+
+        builder.WriteToFile();
     }
 
-    void ClassSource::Print(const string& indent, const bool last) const
+    void ClassSource::Print(const std::string& indent, const bool last) const
     {
         std::cout << indent << (last ? "\\-" : "|-") << "Class: " << name << std::endl;
     }

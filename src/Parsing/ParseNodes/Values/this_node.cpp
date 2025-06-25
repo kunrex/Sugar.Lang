@@ -15,5 +15,4 @@ namespace ParseNodes::Values
     {
         std::cout << indent << (last ? "\\-" : "|-") << "This Node" << std::endl;
     }
-
 }

@@ -1,7 +1,6 @@
 #include "lexer.h"
 
 #include <cfloat>
-#include <vector>
 #include <optional>
 
 #include "../../Exceptions/exception_manager.h"
@@ -13,8 +12,6 @@
 #include "../Tokens/Factories/constant.h"
 #include "../Tokens/Factories/operator.h"
 #include "../Tokens/Factories/separator.h"
-
-using namespace std;
 
 using namespace Exceptions;
 
@@ -64,7 +61,7 @@ namespace Lexing
 
     void Lexer::ReadNumber()
     {
-        string number;
+        std::string number;
         const auto start = index;
 
         bool isWhole = true, breakOut = false;
@@ -84,7 +81,7 @@ namespace Lexing
                         }
 
                         source->PushBackToken(Token::Invalid(start, number));
-                        ExceptionManager::Instance().AddChild(new ConstantOutOfRangeException(TypeKind::Short, index, source));
+                        ExceptionManager::PushException(ConstantOutOfRangeException(TypeKind::Short, index, source));
                         return;
                     }
                 case 'i':
@@ -99,7 +96,7 @@ namespace Lexing
                         }
 
                         source->PushBackToken(Token::Invalid(start, number));
-                        ExceptionManager::Instance().AddChild(new ConstantOutOfRangeException(TypeKind::Int, index, source));
+                        ExceptionManager::PushException(ConstantOutOfRangeException(TypeKind::Int, index, source));
                         return;
                     }
                 case 'l':
@@ -112,7 +109,7 @@ namespace Lexing
                         else
                         {
                             source->PushBackToken(Token::Invalid(start, number));
-                            ExceptionManager::Instance().AddChild(new ConstantOutOfRangeException(TypeKind::Long, index, source));
+                            ExceptionManager::PushException(ConstantOutOfRangeException(TypeKind::Long, index, source));
                         }
 
                         return;
@@ -124,7 +121,7 @@ namespace Lexing
                         else
                         {
                             source->PushBackToken(Token::Invalid(start, number));
-                            ExceptionManager::Instance().AddChild(new ConstantOutOfRangeException(TypeKind::Float, index, source));
+                            ExceptionManager::PushException(ConstantOutOfRangeException(TypeKind::Float, index, source));
                         }
                     }
                     return;
@@ -135,7 +132,7 @@ namespace Lexing
                         else
                         {
                             source->PushBackToken(Token::Invalid(start, number));
-                            ExceptionManager::Instance().AddChild(new ConstantOutOfRangeException(TypeKind::Double, index, source));
+                            ExceptionManager::PushException(ConstantOutOfRangeException(TypeKind::Double, index, source));
                         }
                     }
                     return;
@@ -204,7 +201,7 @@ namespace Lexing
     {
         index++;
 
-        string value;
+        std::string value;
         const auto start = index;
 
         while(index < source->SourceLength())
@@ -231,12 +228,12 @@ namespace Lexing
         }
 
         source->PushBackToken(Token::Invalid(start, value));
-        ExceptionManager::Instance().AddChild(new CharacterExpectedException('"', index - 1, source));
+        ExceptionManager::PushException(CharacterExpectedException('"', index - 1, source));
     }
 
     void Lexer::ReadIdentifier()
     {
-        string value;
+        std::string value;
         const auto start = index;
 
         bool breakOut = false;
@@ -276,7 +273,7 @@ namespace Lexing
                 case '"':
                 case '\'':
                     source->PushBackToken(Token::Invalid(start, value));
-                    ExceptionManager::Instance().AddChild(new InvalidCharacterException(c, index, source));
+                    ExceptionManager::PushException(InvalidCharacterException(c, index, source));
                     return;
                 default:
                     value += c;
@@ -320,8 +317,8 @@ namespace Lexing
             return;
         }
 
-        source->PushBackToken(Token::Invalid(start,  string(1, source->SourceAt(index))));
-        ExceptionManager::Instance().AddChild(new CharacterExpectedException('\'', index, source));
+        source->PushBackToken(Token::Invalid(start,  std::string(1, source->SourceAt(index))));
+        ExceptionManager::PushException(CharacterExpectedException('\'', index, source));
     }
 
     void Lexer::Lex(Analysis::Structure::SourceFile* const source)
@@ -538,7 +535,7 @@ namespace Lexing
                             }
                             else
                             {
-                                if (!prev || lookAhead == '-')
+                                if (!prev)
                                 {
                                     source->PushBackToken(Operator::Minus(index));
                                     break;

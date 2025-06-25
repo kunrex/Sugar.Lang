@@ -2,12 +2,12 @@
 
 #include <format>
 
+#include "../../Local/Scopes/scope.h"
+
 #include "../../Core/DataTypes/data_type.h"
 
 #include "../../../Creation/Binding/local_binder.h"
 #include "../../../Creation/Transpiling/cil_transpiler.h"
-
-using namespace std;
 
 using namespace Services;
 
@@ -16,19 +16,18 @@ using namespace ParseNodes::Core::Interfaces;
 using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
-    VoidFunction::VoidFunction(const string& name, const Enums::Describer describer, const IParseNode* const body) : VoidDefinition(name, describer), Scoped(body)
+    VoidFunction::VoidFunction(const std::string& name, const Enums::Describer describer, const IParseNode* const body) : VoidDefinition(name, describer), Scoped(body)
     { }
 
     MemberType VoidFunction::MemberType() const { return MemberType::VoidDefinition; }
 
-    const string& VoidFunction::FullName() const
+    const std::string& VoidFunction::FullName() const
     {
         if (fullName.empty() && parent != nullptr)
             fullName = std::format("{} void {}::{}{}",  CheckDescriber(Describer::Static) ? "call" : "callvirt instance", parent->FullName(), name, ParameterString(this));
@@ -106,7 +105,7 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, string variableName, const IDataType* const creationType) : VoidDefinition("__set__" + variableName, describer), DefaultScoped(), variableName(std::move(variableName)), creationType(creationType)
+    GeneratedSetFunction::GeneratedSetFunction(const Enums::Describer describer, std::string variableName, const IDataType* const creationType) : VoidDefinition("__set__" + variableName, describer), variableName(std::move(variableName)), creationType(creationType)
     { }
 
     MemberType GeneratedSetFunction::MemberType() const { return MemberType::VoidDefinition; }
@@ -148,14 +147,14 @@ namespace Analysis::Structure::Global
         builder.PushLine(close_flower);
     }
 
-    BuiltInVoid::BuiltInVoid(const std::string& name, const Enums::Describer describer, const string& instruction) : VoidDefinition(name, describer), BuiltInFunction()
+    BuiltInVoid::BuiltInVoid(const std::string& name, const Enums::Describer describer, const std::string& instruction) : VoidDefinition(name, describer), BuiltInFunction()
     {
         fullName = instruction;
     }
 
     MemberType BuiltInVoid::MemberType() const { return MemberType::BuiltInDefinition; }
 
-    const string& BuiltInVoid::FullName() const { return fullName; }
+    const std::string& BuiltInVoid::FullName() const { return fullName; }
 
     void BuiltInVoid::BindLocal()
     { }

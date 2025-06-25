@@ -1,10 +1,7 @@
 #include "indexer.h"
 
-#include <format>
-
 using namespace Services;
 
-using namespace Analysis::Structure::Core;
 using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;

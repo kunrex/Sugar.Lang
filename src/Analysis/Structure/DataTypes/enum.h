@@ -1,7 +1,7 @@
 #ifndef ENUM_H
 #define ENUM_H
 
-#include <tuple>
+#include <array>
 #include <vector>
 
 #include "../Core/DataTypes/data_type.h"
@@ -20,9 +20,9 @@ namespace Analysis::Structure::DataTypes
 
             Core::Interfaces::IFunctionDefinition* hashCode;
 
-            std::vector<std::pair<unsigned long, Core::Interfaces::IFunction*>> explicitCasts;
+            std::array<std::pair<unsigned long, Core::Interfaces::IFunction*>, 2> explicitCasts;
 
-            std::vector<std::pair<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>> overloads;
+            std::array<std::pair<Tokens::Enums::SyntaxKind, Core::Interfaces::IOperatorOverload*>, 5> overloads;
 
         public:
             Enum(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* skeleton);

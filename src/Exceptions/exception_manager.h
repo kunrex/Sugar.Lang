@@ -1,24 +1,22 @@
 #ifndef EXCEPTION_MANAGER_H
 #define EXCEPTION_MANAGER_H
 
-#include "../Services/collection.h"
-#include "../Services/singleton_service.h"
+#include <vector>
 
 #include "compile_exception.h"
 
 namespace Exceptions
 {
-    class ExceptionManager final : public Services::SingletonService, public Services::ConstantCollection<CompileException>
+    class ExceptionManager final
     {
         private:
-            std::vector<CompileException> exceptions;
+            static std::vector<CompileException> exceptions;
 
         public:
-            ExceptionManager();
+            static void PushException(const CompileException& exception);
 
-            static ExceptionManager& Instance();
-
-            [[nodiscard]] bool LogAllExceptions() const;
+            [[nodiscard]] static bool LogAllExceptions();
+            [[nodiscard]] static unsigned long ExceptionCount();
     };
 }
 

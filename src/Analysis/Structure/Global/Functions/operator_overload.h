@@ -1,13 +1,13 @@
 #ifndef OPERATOR_OVERLOAD_H
 #define OPERATOR_OVERLOAD_H
 
-#include "../../Core/Scoped/scoped.h"
-#include "../../Core/built_in_function.h"
 #include "../../Creation/Functions/overload_definition.h"
+
+#include "../../Core/Scoped/scoped.h"
+#include "../../Core/Interfaces/Creation/i_built_in_overload.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../../Services/child.h"
-#include "../../Core/Interfaces/Creation/i_built_in_overload.h"
 
 namespace Analysis::Structure::Global
 {
