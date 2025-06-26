@@ -7,7 +7,7 @@
 
 namespace Analysis::Creation::Binding
 {
-    void ValidateDescriber(const Structure::Core::Describable* describable, Structure::Enums::Describer allowed, unsigned long index, const Structure::SourceFile* source);
+    void ValidateDescriber(const Structure::Core::Describable* describable, Structure::Enums::Describer allowed, const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Structure::Core::Interfaces::IUserDefinedType* dataType);
 
     const Structure::Core::Interfaces::IDataType* BindDataType(const ParseNodes::Core::Interfaces::IParseNode* node, const Structure::SourceFile* source);
 }

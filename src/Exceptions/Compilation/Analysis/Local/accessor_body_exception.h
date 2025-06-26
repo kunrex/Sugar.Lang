@@ -1,14 +1,14 @@
 #ifndef ACCESSOR_BODY_EXCEPTION_H
 #define ACCESSOR_BODY_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class AccessorBodyException final : public LogException
+    class AccessorBodyException final : public BindingException
     {
         public:
-            AccessorBodyException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            AccessorBodyException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

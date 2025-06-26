@@ -1,20 +1,20 @@
 #ifndef READ_WRITE_EXCEPTION_H
 #define READ_WRITE_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class ReadException final : public LogException
+    class ReadException final : public BindingException
     {
         public:
-            ReadException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            ReadException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 
-    class WriteException final : public LogException
+    class WriteException final : public BindingException
     {
         public:
-            WriteException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            WriteException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

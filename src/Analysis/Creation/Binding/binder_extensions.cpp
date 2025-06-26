@@ -46,10 +46,10 @@ using namespace Analysis::Structure::Core::Interfaces;
 namespace Analysis::Creation::Binding
 {
 
-    void ValidateDescriber(const Describable* const describable, const Describer allowed, const unsigned long index, const SourceFile* const source)
+    void ValidateDescriber(const Describable* const describable, const Describer allowed, const IParseNode* const parseNode, const IUserDefinedType* const dataType)
     {
         if (!describable->ValidateDescriber(allowed))
-            ExceptionManager::PushException(InvalidDescriberException(describable->Describer(), allowed, index, source));
+            ExceptionManager::PushException(InvalidDescriberException(describable->Describer(), allowed, parseNode, dataType));
     }
 
     const IDataType* BindBuiltInType(const IParseNode* const node)
@@ -169,7 +169,7 @@ namespace Analysis::Creation::Binding
                break;
         }
 
-        ExceptionManager::PushException(TypeNotFoundException(node->Token().Index(), source));
+        ExceptionManager::PushException(TypeNotFoundException(node, source));
         return Object::Instance();
     }
 }

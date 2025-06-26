@@ -51,37 +51,37 @@ using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Creation::Binding
 {
-    void ValidateStaticBinding(const Describable* const describable, const unsigned long index, const IUserDefinedType* const dataType)
+    void ValidateStaticBinding(const Describable* const describable, const IParseNode* const parseNode, const IUserDefinedType* const dataType)
     {
         if (dataType->CheckDescriber(Describer::Static) && !describable->CheckDescriber(Describer::Static))
-            ExceptionManager::PushException(StaticBindingException(index, dataType->Parent()));
+            ExceptionManager::PushException(StaticBindingException(parseNode, dataType));
     }
 
-    void MatchReturnAccessibility(const Characteristic* const characteristic, const unsigned long index, const IUserDefinedType* const dataType)
+    void MatchReturnAccessibility(const Characteristic* const characteristic,const IParseNode* const parseNode, const IUserDefinedType* const dataType)
     {
         if (characteristic->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (characteristic->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-            ExceptionManager::PushException(ReturnAccessibilityException(index, dataType->Parent()));
+            ExceptionManager::PushException(ReturnAccessibilityException(parseNode, dataType));
     }
 
-    void MatchReturnAccessibility(const Function* const function, const unsigned long index, const IUserDefinedType* const dataType)
+    void MatchReturnAccessibility(const Function* const function, const IParseNode* const parseNode, const IUserDefinedType* const dataType)
     {
         if (function->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (function->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-            ExceptionManager::PushException(ReturnAccessibilityException(index, dataType->Parent()));
+            ExceptionManager::PushException(ReturnAccessibilityException(parseNode, dataType));
     }
 
-    void MatchReturnAccessibility(const Indexer* const indexer, const unsigned long index, const IUserDefinedType* const dataType)
+    void MatchReturnAccessibility(const Indexer* const indexer, const IParseNode* const parseNode, const IUserDefinedType* const dataType)
     {
         if (indexer->CreationType()->CheckDescriber(Describer::Public))
             return;
 
         if (indexer->CheckDescriber(Describer::Public) && dataType->CheckDescriber(Describer::Public))
-            ExceptionManager::PushException(ReturnAccessibilityException(index, dataType->Parent()));
+            ExceptionManager::PushException(ReturnAccessibilityException(parseNode, dataType));
     }
 
     void BindEnumConstant(const IParseNode* const expressionNode, Enum* const dataType)
@@ -95,7 +95,7 @@ namespace Analysis::Creation::Binding
 
                     if (dataType->FindCharacteristic(value) != nullptr)
                     {
-                        ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), dataType->Parent()));
+                        ExceptionManager::PushException(DuplicateVariableDefinitionException(expressionNode, dataType));
                         return;
                     }
 
@@ -109,14 +109,14 @@ namespace Analysis::Creation::Binding
                 {
                     if (const auto& operation = expressionNode->Token(); operation.Kind() != SyntaxKind::Assignment)
                     {
-                        ExceptionManager::PushException(InvalidGlobalStatementException(operation.Index(), dataType->Parent()));
+                        ExceptionManager::PushException(InvalidGlobalStatementException(expressionNode, dataType));
                         return;
                     }
 
                     const auto lhs = expressionNode->GetChild(static_cast<int>(ChildCode::LHS));
                     if (lhs->NodeType() != NodeType::Identifier)
                     {
-                        ExceptionManager::PushException(InvalidGlobalStatementException(lhs->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(InvalidGlobalStatementException(lhs, dataType));
                         return;
                     }
 
@@ -124,7 +124,7 @@ namespace Analysis::Creation::Binding
                     const auto value = *identifier.Value<std::string>();
                     if (dataType->FindCharacteristic(value) != nullptr)
                     {
-                        ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), dataType->Parent()));
+                        ExceptionManager::PushException(DuplicateVariableDefinitionException(lhs, dataType));
                         return;
                     }
 
@@ -135,23 +135,22 @@ namespace Analysis::Creation::Binding
                 }
                 break;
             default:
-                ExceptionManager::PushException(InvalidGlobalStatementException(expressionNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(InvalidGlobalStatementException(expressionNode, dataType));
                 break;
         }
     }
 
     void DeclareGlobalVariable(const IParseNode* const declarationNode, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto identifier = declarationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+        const auto identifierNode = declarationNode->GetChild(static_cast<int>(ChildCode::Identifier));
+        const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
-        const auto creationType = BindDataType(declarationNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(declarationNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         if (dataType->FindCharacteristic(value) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(declarationNode, dataType));
             return;
         }
 
@@ -159,16 +158,16 @@ namespace Analysis::Creation::Binding
 
         if ((describer & Describer::Constexpr) == Describer::Constexpr)
         {
-            ExceptionManager::PushException(LogException("Constants must be initialised", declarationNode->Token().Index(), source));
+            ExceptionManager::PushException(BindingException("Constants must be initialised", declarationNode, dataType));
             return;
         }
 
         const auto globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType);
 
-        MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
+        MatchReturnAccessibility(globalVariable, identifierNode, dataType);
 
-        ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
-        ValidateDescriber(globalVariable, Describer::Const | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
+        ValidateStaticBinding(globalVariable, identifierNode, dataType);
+        ValidateDescriber(globalVariable, Describer::Const | Describer::AccessModifiers | Describer::Static, identifierNode, dataType);
 
         globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);
@@ -176,16 +175,15 @@ namespace Analysis::Creation::Binding
 
     void InitialiseGlobalVariable(const IParseNode* const initialisationNode, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto identifier = initialisationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+        const auto identifierNode = initialisationNode->GetChild(static_cast<int>(ChildCode::Identifier));
+        const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
-        const auto creationType = BindDataType(initialisationNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(initialisationNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         if (dataType->FindCharacteristic(value) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifierNode, dataType));
             return;
         }
 
@@ -197,10 +195,10 @@ namespace Analysis::Creation::Binding
         else
             globalVariable = new GlobalVariable(value, describer == Describer::None ? Describer::Private : describer, creationType, initialisationNode->GetChild(static_cast<int>(ChildCode::Expression)));
 
-        MatchReturnAccessibility(globalVariable, identifier.Index(), dataType);
+        MatchReturnAccessibility(globalVariable, identifierNode, dataType);
 
-        ValidateStaticBinding(globalVariable, identifier.Index(), dataType);
-        ValidateDescriber(globalVariable, Describer::Const | Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifier.Index(), source);
+        ValidateStaticBinding(globalVariable, identifierNode, dataType);
+        ValidateDescriber(globalVariable, Describer::Const | Describer::Constexpr | Describer::AccessModifiers | Describer::Static, identifierNode, dataType);
 
         globalVariable->SetParent(dataType);
         dataType->PushCharacteristic(globalVariable);
@@ -208,9 +206,7 @@ namespace Analysis::Creation::Binding
 
     void CreateAutoGeneratedProperty(const IParseNode* const propertyNode, const std::string& value, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -225,7 +221,7 @@ namespace Analysis::Creation::Binding
         const auto get = new GeneratedGetFunction(getDescriber, value, creationType);
         if (dataType->FindFunction(get->Name(), { }) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode, dataType));
             delete get;
             return;
         }
@@ -243,7 +239,7 @@ namespace Analysis::Creation::Binding
         const auto set = new GeneratedSetFunction(setDescriber, value, creationType);
         if (dataType->FindFunction(set->Name(), { creationType }) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode, dataType));
             delete set;
             return;
         }
@@ -253,10 +249,10 @@ namespace Analysis::Creation::Binding
 
         const auto property = new AutoImplementedProperty(value, describer, creationType, get, set, propertyNode->GetChild(static_cast<int>(ChildCode::Expression)));
 
-        MatchReturnAccessibility(property, propertyNode->Token().Index(), dataType);
+        MatchReturnAccessibility(property, propertyNode, dataType);
 
-        ValidateStaticBinding(property, propertyNode->Token().Index(), dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode->Token().Index(), source);
+        ValidateStaticBinding(property, propertyNode, dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode, dataType);
 
         property->SetParent(dataType);
         dataType->PushCharacteristic(property);
@@ -273,7 +269,7 @@ namespace Analysis::Creation::Binding
         const auto get = new MethodFunction("get_" + value, getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(get->Name(), { }) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode, dataType));
             delete get;
 
             return nullptr;
@@ -296,7 +292,7 @@ namespace Analysis::Creation::Binding
         const auto set = new VoidFunction("set_" + value, setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(set->Name(), { creationType }) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(setNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(setNode, dataType));
             delete set;
 
             return nullptr;
@@ -311,9 +307,7 @@ namespace Analysis::Creation::Binding
 
     void CreateGetProperty(const IParseNode* const propertyNode, const std::string& value, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -324,10 +318,10 @@ namespace Analysis::Creation::Binding
 
         const auto property = new GetProperty(value, describer, creationType, get);
 
-        MatchReturnAccessibility(property, propertyNode->Token().Index(), dataType);
+        MatchReturnAccessibility(property, propertyNode, dataType);
 
-        ValidateStaticBinding(property, propertyNode->Token().Index(), dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode->Token().Index(), source);
+        ValidateStaticBinding(property, propertyNode, dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode, dataType);
 
         property->SetParent(dataType);
         dataType->PushCharacteristic(property);
@@ -335,9 +329,7 @@ namespace Analysis::Creation::Binding
 
     void CreateSetProperty(const IParseNode* const propertyNode, const std::string& value, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -348,10 +340,10 @@ namespace Analysis::Creation::Binding
 
         const auto property = new SetProperty(value, describer, creationType, set);
 
-        MatchReturnAccessibility(property, propertyNode->Token().Index(), dataType);
+        MatchReturnAccessibility(property, propertyNode, dataType);
 
-        ValidateStaticBinding(property, propertyNode->Token().Index(), dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode->Token().Index(), source);
+        ValidateStaticBinding(property, propertyNode, dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode, dataType);
 
         property->SetParent(dataType);
         dataType->PushCharacteristic(property);
@@ -359,9 +351,7 @@ namespace Analysis::Creation::Binding
 
     void CreateGetSetProperty(const IParseNode* const propertyNode, const std::string& value, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(propertyNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(propertyNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -376,10 +366,10 @@ namespace Analysis::Creation::Binding
 
         const auto property = new GetSetProperty(value, describer, creationType, get, set);
 
-        MatchReturnAccessibility(property, propertyNode->Token().Index(), dataType);
+        MatchReturnAccessibility(property, propertyNode, dataType);
 
-        ValidateStaticBinding(property, propertyNode->Token().Index(), dataType);
-        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode->Token().Index(), source);
+        ValidateStaticBinding(property, propertyNode, dataType);
+        ValidateDescriber(property, Describer::Static | Describer::AccessModifiers, propertyNode, dataType);
 
         property->SetParent(dataType);
         dataType->PushCharacteristic(property);
@@ -387,15 +377,14 @@ namespace Analysis::Creation::Binding
 
     void CreateProperty(const IParseNode* const propertyNode, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto identifier = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+        const auto identifierNode = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier));
+        const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
 
         if (dataType->FindCharacteristic(value) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifierNode, dataType));
             return;
         }
 
@@ -412,19 +401,19 @@ namespace Analysis::Creation::Binding
             else  if (!getBody && !setBody)
                 CreateAutoGeneratedProperty(propertyNode, value, dataType);
             else
-                ExceptionManager::PushException(LogException("Expected both accessors to define a body", identifier.Index(), source));
+                ExceptionManager::PushException(BindingException("Expected both accessors to define a body", identifierNode, dataType));
         }
         else if (getNode != nullptr)
         {
             if (getNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
-                ExceptionManager::PushException(LogException("Expected get accessor to define a body", identifier.Index(), source));
+                ExceptionManager::PushException(BindingException("Expected get accessor to define a body", identifierNode, dataType));
             else
                 CreateGetProperty(propertyNode, value, dataType);
         }
         else if (setNode != nullptr)
         {
             if (setNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
-                ExceptionManager::PushException(LogException("Expected set accessor to define a body", identifier.Index(), source));
+                ExceptionManager::PushException(BindingException("Expected set accessor to define a body", identifierNode, dataType));
             else
                 CreateSetProperty(propertyNode, value, dataType);
         }
@@ -432,15 +421,14 @@ namespace Analysis::Creation::Binding
 
     void InitialiseProperty(const IParseNode* const propertyNode, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto identifier = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+        const auto identifierNode = propertyNode->GetChild(static_cast<int>(ChildCode::Identifier));
+        const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
 
         if (dataType->FindCharacteristic(value) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), source));
+            ExceptionManager::PushException(DuplicateVariableDefinitionException(identifierNode, dataType));
             return;
         }
 
@@ -455,10 +443,10 @@ namespace Analysis::Creation::Binding
             if (noGetBody && noSetBody)
                 CreateAutoGeneratedProperty(propertyNode, value, dataType);
             else
-                ExceptionManager::PushException(LogException("Initialised properties cannot define accessor bodies", identifier.Index(), source));
+                ExceptionManager::PushException(BindingException("Initialised properties cannot define accessor bodies", identifierNode, dataType));
         }
         else
-            ExceptionManager::PushException(LogException("Only get set properties may be initialised", identifier.Index(), source));
+            ExceptionManager::PushException(BindingException("Only get set properties may be initialised", identifierNode, dataType));
     }
 
     void BindFunctionParameters(const IParseNode* const declarationNode, std::vector<const IDataType*>& parameters, const SourceFile* const source)
@@ -468,26 +456,27 @@ namespace Analysis::Creation::Binding
             parameters.push_back(BindDataType(declarationNode->GetChild(i)->GetChild(static_cast<int>(ChildCode::Type)), source));
     }
 
-    void BindFunctionParameters(IScoped* const scope, const std::vector<const IDataType*>& parameters, const IParseNode* const declarationNode, const SourceFile* const source)
+    void BindFunctionParameters(IScoped* const scope, const std::vector<const IDataType*>& parameters, const IParseNode* const declarationNode, const IUserDefinedType* const dataType)
     {
         const auto count = declarationNode->ChildCount();
         for (int i = 0; i < count; i++)
         {
             const auto current = declarationNode->GetChild(i);
 
-            const auto identifier = current->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+            const auto identifierNode = current->GetChild(static_cast<int>(ChildCode::Identifier));
+            const auto identifier = identifierNode->Token();
 
             const auto value = *identifier.Value<std::string>();
             const auto creationType = parameters.at(i);
 
             if (scope->GetParameterIndex(value))
             {
-                ExceptionManager::PushException(DuplicateVariableDefinitionException(identifier.Index(), source));
+                ExceptionManager::PushException(DuplicateVariableDefinitionException(identifierNode, dataType));
                 continue;
             }
 
             const auto parameter = new FunctionParameter(value, FromNode(current->GetChild(static_cast<int>(ChildCode::Describer))), creationType);
-            ValidateDescriber(parameter, creationType->MemberType() == MemberType::Class ? Describer::None : Describer::Ref, identifier.Index(), source);
+            ValidateDescriber(parameter, creationType->MemberType() == MemberType::Class ? Describer::None : Describer::Ref, identifierNode, dataType);
 
             scope->AddParameter(parameter);
         }
@@ -502,15 +491,15 @@ namespace Analysis::Creation::Binding
         const auto get = new MethodFunction("this_get", getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(get->Name(), parameters) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), dataType->Parent()));
             delete get;
 
+            ExceptionManager::PushException(DuplicateFunctionDefinition(getNode, dataType));
             return nullptr;
         }
 
-        ValidateDescriber(get, Describer::AccessModifiers, getNode->Token().Index(), dataType->Parent());
+        ValidateDescriber(get, Describer::AccessModifiers, getNode, dataType);
 
-        BindFunctionParameters(get, parameters, declarationNode, dataType->Parent());
+        BindFunctionParameters(get, parameters, declarationNode, dataType);
         get->SetParent(dataType);
         dataType->PushFunction(get);
 
@@ -529,15 +518,15 @@ namespace Analysis::Creation::Binding
         const auto set = new VoidFunction("this_set", setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(set->Name(), extended) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(setNode->Token().Index(), dataType->Parent()));
             delete set;
 
+            ExceptionManager::PushException(DuplicateFunctionDefinition(setNode, dataType));
             return nullptr;
         }
 
-        ValidateDescriber(set, Describer::AccessModifiers, setNode->Token().Index(), dataType->Parent());
+        ValidateDescriber(set, Describer::AccessModifiers, setNode, dataType);
 
-        BindFunctionParameters(set, parameters, declarationNode, dataType->Parent());
+        BindFunctionParameters(set, parameters, declarationNode, dataType);
         set->AddParameter(new LocalVariable("value", Describer::Const, creationType));
 
         set->SetParent(dataType);
@@ -548,9 +537,7 @@ namespace Analysis::Creation::Binding
 
     void CreateGetIndexer(const IParseNode* indexerNode, const std::vector<const IDataType*>& parameters, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(indexerNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -561,8 +548,8 @@ namespace Analysis::Creation::Binding
 
         const auto indexer = new GetIndexer(describer, creationType, get);
 
-        MatchReturnAccessibility(indexer, indexerNode->Token().Index(), dataType);
-        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode->Token().Index(), source);
+        MatchReturnAccessibility(indexer, indexerNode, dataType);
+        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode, dataType);
 
         indexer->SetParent(dataType);
         dataType->PushIndexer(indexer);
@@ -570,9 +557,7 @@ namespace Analysis::Creation::Binding
 
     void CreateSetIndexer(const IParseNode* indexerNode, const std::vector<const IDataType*>& parameters, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(indexerNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -583,8 +568,8 @@ namespace Analysis::Creation::Binding
 
         const auto indexer = new SetIndexer(describer, creationType, set);
 
-        MatchReturnAccessibility(indexer, indexerNode->Token().Index(), dataType);
-        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode->Token().Index(), source);
+        MatchReturnAccessibility(indexer, indexerNode, dataType);
+        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode, dataType);
 
         indexer->SetParent(dataType);
         dataType->PushIndexer(indexer);
@@ -592,10 +577,8 @@ namespace Analysis::Creation::Binding
 
     void CreateGetSetIndexer(const IParseNode* indexerNode, const std::vector<const IDataType*>& parameters, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
         const auto declarationNode = indexerNode->GetChild(static_cast<int>(ChildCode::Parameters));
-        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(indexerNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
 
         const auto provided = FromNode(indexerNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -610,8 +593,8 @@ namespace Analysis::Creation::Binding
 
         const auto indexer = new GetSetIndexer(describer, creationType, get, set);
 
-        MatchReturnAccessibility(indexer, indexerNode->Token().Index(), dataType);
-        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode->Token().Index(), source);
+        MatchReturnAccessibility(indexer, indexerNode, dataType);
+        ValidateDescriber(indexer, Describer::AccessModifiers, indexerNode, dataType);
 
         indexer->SetParent(dataType);
         dataType->PushIndexer(indexer);
@@ -619,21 +602,18 @@ namespace Analysis::Creation::Binding
 
     void CreateIndexer(const IParseNode* const indexerNode, IUserDefinedType* const dataType)
     {
-        const auto index = indexerNode->Token().Index();
-        const auto source = dataType->Parent();
-
         if (dataType->CheckDescriber(Describer::Static))
         {
-            ExceptionManager::PushException(NonStaticMemberDefinitionException(index, source));
+            ExceptionManager::PushException(NonStaticMemberDefinitionException(indexerNode, dataType));
             return;
         }
 
         std::vector<const IDataType*> parameters;
-        BindFunctionParameters(indexerNode->GetChild(static_cast<int>(ChildCode::Parameters)), parameters, source);
+        BindFunctionParameters(indexerNode->GetChild(static_cast<int>(ChildCode::Parameters)), parameters, dataType->Parent());
 
         if (dataType->FindIndexer(parameters) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(indexerNode, dataType));
             return;
         }
 
@@ -643,14 +623,14 @@ namespace Analysis::Creation::Binding
         if (getNode == nullptr)
         {
             if (setNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
-                ExceptionManager::PushException(LogException("Expected set accessor to define a body", setNode->Token().Index(), source));
+                ExceptionManager::PushException(BindingException("Expected set accessor to define a body", setNode, dataType));
             else
                 CreateSetIndexer(indexerNode, parameters, dataType);
         }
         else if (setNode == nullptr)
         {
             if (getNode->GetChild(static_cast<int>(ChildCode::Body))->NodeType() == NodeType::Empty)
-                ExceptionManager::PushException(LogException("Expected get accessor to define a body", getNode->Token().Index(), source));
+                ExceptionManager::PushException(BindingException("Expected get accessor to define a body", getNode, dataType));
             else
                 CreateGetIndexer(indexerNode, parameters, dataType);
         }
@@ -662,7 +642,7 @@ namespace Analysis::Creation::Binding
             if (getBody && setBody)
                 CreateGetSetIndexer(indexerNode, parameters, dataType);
             else
-                ExceptionManager::PushException(LogException("Expected both accessors to define a body", getNode->Token().Index(), source));
+                ExceptionManager::PushException(BindingException("Expected both accessors to define a body", indexerNode, dataType));
         }
     }
 
@@ -681,7 +661,7 @@ namespace Analysis::Creation::Binding
         }
 
         if (describer != Describer::Entrypoint)
-            ExceptionManager::PushException(InvalidDescriberException(describer, Describer::Entrypoint, functionCreationNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(InvalidDescriberException(describer, Describer::Entrypoint, functionCreationNode, dataType));
 
         const auto entryPoint = Entrypoint::InitInstance(value, describer, functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
 
@@ -693,19 +673,18 @@ namespace Analysis::Creation::Binding
 
     void CreateFunction(const IParseNode* const functionCreationNode, IUserDefinedType* const dataType)
     {
-        const auto source = dataType->Parent();
-
-        const auto identifier = functionCreationNode->GetChild(static_cast<int>(ChildCode::Identifier))->Token();
+        const auto identifierNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Expression));
+        const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
         const auto declarationNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
-        BindFunctionParameters(declarationNode, parameters, source);
+        BindFunctionParameters(declarationNode, parameters, dataType->Parent());
 
         if (dataType->FindFunction(value, parameters) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(identifier.Index(), source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(identifierNode, dataType));
             return;
         }
 
@@ -716,12 +695,12 @@ namespace Analysis::Creation::Binding
         {
             if (const auto entryPoint = DefineEntrypoint(functionCreationNode, value, describer, dataType); entryPoint != nullptr)
             {
-                BindFunctionParameters(entryPoint, parameters, declarationNode, source);
+                BindFunctionParameters(entryPoint, parameters, declarationNode, dataType);
 
                 if (parameters.size() > 1)
-                    ExceptionManager::PushException(LogException("Entrypoint can define no parameters or one parameter of array<string>", identifier.Index(), source));
+                    ExceptionManager::PushException(BindingException("Entrypoint can define no parameters or one parameter of array<string>", identifierNode, dataType));
                 else if (parameters.size() == 1 && parameters[0] != Array::Instance(String::Instance()))
-                    ExceptionManager::PushException(LogException("Expected type of array<string>", identifier.Index(), source));
+                    ExceptionManager::PushException(BindingException("Expected type of array<string>", identifierNode, dataType));
             }
 
             return;
@@ -731,43 +710,40 @@ namespace Analysis::Creation::Binding
         if (const auto typeNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Type)); typeNode->NodeType() == NodeType::VoidType)
         {
             const auto voidDefinition = new VoidFunction(value, describer, functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
-            BindFunctionParameters(voidDefinition, parameters, declarationNode, source);
+            BindFunctionParameters(voidDefinition, parameters, declarationNode, dataType);
 
             voidDefinition->SetParent(dataType);
             function = voidDefinition;
         }
         else
         {
-            const auto methodDefinition = new MethodFunction(value, describer, BindDataType(typeNode, source), functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
-            BindFunctionParameters(methodDefinition, parameters, declarationNode, source);
+            const auto methodDefinition = new MethodFunction(value, describer, BindDataType(typeNode, dataType->Parent()), functionCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
+            BindFunctionParameters(methodDefinition, parameters, declarationNode, dataType);
 
             methodDefinition->SetParent(dataType);
             function = methodDefinition;
 
-            MatchReturnAccessibility(function, identifier.Index(), dataType);
+            MatchReturnAccessibility(function, identifierNode, dataType);
         }
 
-        ValidateStaticBinding(function, identifier.Index(), dataType);
-        ValidateDescriber(function, Describer::Static | Describer::AccessModifiers, identifier.Index(), source);
+        ValidateStaticBinding(function, identifierNode, dataType);
+        ValidateDescriber(function, Describer::Static | Describer::AccessModifiers, identifierNode, dataType);
 
         dataType->PushFunction(function);
     }
 
     void CreateStaticConstructor(const IParseNode* const constructorCreationNode, const Describer describer, IUserDefinedType* const dataType)
     {
-        const auto index = constructorCreationNode->Token().Index();
-        const auto source = dataType->Parent();
-
         if (dataType->StaticConstructor() != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(constructorCreationNode, dataType));
             return;
         }
 
         const auto constructor = new StaticDefinedConstructor(dataType, constructorCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
 
         if (describer != (Describer::Private | Describer::Static))
-            ExceptionManager::PushException(LogException("Static constructor must be private static only", index, source));
+            ExceptionManager::PushException(BindingException("Static constructor must be private static only", constructorCreationNode, dataType));
 
         constructor->SetParent(dataType);
         dataType->PushConstructor(constructor);
@@ -775,18 +751,15 @@ namespace Analysis::Creation::Binding
 
     void CreateInstanceConstructor(const IParseNode* const constructorCreationNode, const Describer describer, IUserDefinedType* const dataType)
     {
-        const auto index = constructorCreationNode->Token().Index();
-        const auto source = dataType->Parent();
-
         if (dataType->InstanceConstructor() != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(constructorCreationNode, dataType));
             return;
         }
 
         const auto constructor = new DefinedConstructor(describer, dataType, constructorCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
 
-        ValidateDescriber(constructor, Describer::AccessModifiers, index, source);
+        ValidateDescriber(constructor, Describer::AccessModifiers, constructorCreationNode, dataType);
 
         constructor->SetParent(dataType);
         dataType->PushConstructor(constructor);
@@ -794,13 +767,10 @@ namespace Analysis::Creation::Binding
 
     void CreateConstructor(const IParseNode* const constructorCreationNode, IUserDefinedType* const dataType)
     {
-        const auto index = constructorCreationNode->Token().Index();
-        const auto source = dataType->Parent();
-
         const auto declarationNode = constructorCreationNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
-        BindFunctionParameters(declarationNode, parameters, source);
+        BindFunctionParameters(declarationNode, parameters, dataType->Parent());
 
         const auto provided = FromNode(constructorCreationNode->GetChild(static_cast<int>(ChildCode::Describer)));
         const auto describer = provided == Describer::None ? Describer::Private : provided;
@@ -808,7 +778,7 @@ namespace Analysis::Creation::Binding
         if ((describer & Describer::Static) == Describer::Static)
         {
             if (!parameters.empty())
-                ExceptionManager::PushException(LogException("Static constructor cannot define parameters", index, source));
+                ExceptionManager::PushException(BindingException("Static constructor cannot define parameters", constructorCreationNode, dataType));
 
             CreateStaticConstructor(constructorCreationNode, describer, dataType);
             return;
@@ -822,14 +792,14 @@ namespace Analysis::Creation::Binding
 
         if (dataType->FindConstructor(parameters) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(constructorCreationNode, dataType));
             return;
         }
 
         const auto constructor = new Constructor(describer, dataType, constructorCreationNode->GetChild(static_cast<int>(ChildCode::Body)));
-        BindFunctionParameters(constructor, parameters, declarationNode, source);
+        BindFunctionParameters(constructor, parameters, declarationNode, dataType);
 
-        ValidateDescriber(constructor, Describer::AccessModifiers, index, source);
+        ValidateDescriber(constructor, Describer::AccessModifiers, constructorCreationNode, dataType);
 
         constructor->SetParent(dataType);
         dataType->PushConstructor(constructor);
@@ -837,24 +807,21 @@ namespace Analysis::Creation::Binding
 
     void CreateExplict(const IParseNode* const explicitCastNode, IUserDefinedType* const dataType)
     {
-        const auto index = explicitCastNode->Token().Index();
-        const auto source = dataType->Parent();
-
         if (dataType->CheckDescriber(Describer::Static))
         {
-            ExceptionManager::PushException(NonStaticMemberDefinitionException(index, source));
+            ExceptionManager::PushException(NonStaticMemberDefinitionException(explicitCastNode, dataType));
             return;
         }
 
-        const auto creationType = BindDataType(explicitCastNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(explicitCastNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
         const auto declarationNode = explicitCastNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
-        BindFunctionParameters(declarationNode, parameters, source);
+        BindFunctionParameters(declarationNode, parameters, dataType->Parent());
 
         if (parameters.size() != 1)
         {
-            ExceptionManager::PushException(LogException("Explicit cast definition can contain only 1 parameter.", index, source));
+            ExceptionManager::PushException(BindingException("Explicit cast definition can contain only 1 parameter.", explicitCastNode, dataType));
             return;
         }
 
@@ -862,13 +829,13 @@ namespace Analysis::Creation::Binding
 
         if (fromType != dataType && creationType != dataType)
         {
-            ExceptionManager::PushException(LogException("Return type or the argument of an explicit cast must the same as the type its defined in.", index, source));
+            ExceptionManager::PushException(BindingException("Return type or the argument of an explicit cast must the same as the type its defined in.", explicitCastNode, dataType));
             return;
         }
 
         if  (dataType->FindExplicitCast(creationType, fromType) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(explicitCastNode, dataType));
             return;
         }
 
@@ -877,17 +844,17 @@ namespace Analysis::Creation::Binding
         {
             delete castFunction;
 
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(explicitCastNode, dataType));
             return;
         }
 
         const auto explicitCast = new CastOverload(castFunction);
-        BindFunctionParameters(castFunction, parameters, declarationNode, source);
+        BindFunctionParameters(castFunction, parameters, declarationNode, dataType);
 
-        MatchReturnAccessibility(castFunction, index, dataType);
+        MatchReturnAccessibility(castFunction, explicitCastNode, dataType);
 
         if (!castFunction->MatchDescriber(Describer::PublicStatic))
-            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, index, source));
+            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, explicitCastNode, dataType));
 
         castFunction->SetParent(dataType);
         dataType->PushFunction(castFunction);
@@ -901,7 +868,7 @@ namespace Analysis::Creation::Binding
 
         if (dataType->CheckDescriber(Describer::Static))
         {
-            ExceptionManager::PushException(NonStaticMemberDefinitionException(index, source));
+            ExceptionManager::PushException(NonStaticMemberDefinitionException(implicitCastNode, dataType));
             return;
         }
 
@@ -927,7 +894,7 @@ namespace Analysis::Creation::Binding
 
         if  (dataType->FindImplicitCast(creationType, fromType) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(implicitCastNode, dataType));
             return;
         }
 
@@ -936,17 +903,17 @@ namespace Analysis::Creation::Binding
         {
             delete castFunction;
 
-            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(implicitCastNode, dataType));
             return;
         }
 
         const auto implicitCast = new CastOverload(castFunction);
-        BindFunctionParameters(castFunction, parameters, declarationNode, source);
+        BindFunctionParameters(castFunction, parameters, declarationNode, dataType);
 
-        MatchReturnAccessibility(castFunction, index, dataType);
+        MatchReturnAccessibility(castFunction, implicitCastNode, dataType);
 
         if (!castFunction->MatchDescriber(Describer::PublicStatic))
-            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, index, source));
+            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, implicitCastNode, dataType));
 
         castFunction->SetParent(dataType);
         dataType->PushFunction(castFunction);
@@ -956,22 +923,21 @@ namespace Analysis::Creation::Binding
     void CreateOperatorOverload(const IParseNode* const operatorOverloadNode, IUserDefinedType* const dataType)
     {
         const auto& base = operatorOverloadNode->Token();
-        const auto source = dataType->Parent();
 
         if (dataType->CheckDescriber(Describer::Static))
         {
-            ExceptionManager::PushException(NonStaticMemberDefinitionException(base.Index(), source));
+            ExceptionManager::PushException(NonStaticMemberDefinitionException(operatorOverloadNode, dataType));
             return;
         }
 
-        const auto creationType = BindDataType(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Type)), source);
+        const auto creationType = BindDataType(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Type)), dataType->Parent());
         if (creationType != dataType)
-            ExceptionManager::PushException(LogException(std::format("Expected return type: {}.", dataType->FullName()), base.Index(), source));
+            ExceptionManager::PushException(LogException(std::format("Expected return type: {}.", dataType->FullName()), base.Index(), dataType->Parent()));
 
         const auto declarationNode = operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters));
 
         std::vector<const IDataType*> parameters;
-        BindFunctionParameters(declarationNode, parameters, source);
+        BindFunctionParameters(declarationNode, parameters, dataType->Parent());
 
         bool flag = false;
         for (const auto parameter : parameters)
@@ -982,16 +948,16 @@ namespace Analysis::Creation::Binding
             }
 
         if ((static_cast<OperatorKind>(base.Kind()) & OperatorKind::Assignment) == OperatorKind::Assignment)
-            ExceptionManager::PushException(LogException("Cannot overload the assignment operator or any of its derivatives", base.Index(), source));
+            ExceptionManager::PushException(BindingException("Cannot overload the assignment operator or any of its derivatives", operatorOverloadNode, dataType));
 
         if (base.Type() == TokenType::UnaryOperator && (parameters.size() != 1 || flag))
-            ExceptionManager::PushException(LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), base.Index(), source));
+            ExceptionManager::PushException(BindingException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), operatorOverloadNode, dataType));
         else if (parameters.size() != 2 || flag)
-            ExceptionManager::PushException(LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), base.Index(), source));
+            ExceptionManager::PushException(BindingException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), operatorOverloadNode, dataType));
 
         if (dataType->FindOverload(base.Kind()) != nullptr)
         {
-            ExceptionManager::PushException(DuplicateFunctionDefinition(base.Index(), source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(operatorOverloadNode, dataType));
             return;
         }
 
@@ -1000,17 +966,17 @@ namespace Analysis::Creation::Binding
         {
             delete overloadFunction;
 
-            ExceptionManager::PushException(DuplicateFunctionDefinition(base.Index(), source));
+            ExceptionManager::PushException(DuplicateFunctionDefinition(operatorOverloadNode, dataType));
             return;
         }
 
         const auto operatorOverload = new OperatorOverload(base.Kind(), overloadFunction);
-        BindFunctionParameters(overloadFunction, parameters, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters)), source);
+        BindFunctionParameters(overloadFunction, parameters, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters)), dataType);
 
-        MatchReturnAccessibility(overloadFunction, base.Index(), dataType);
+        MatchReturnAccessibility(overloadFunction, operatorOverloadNode, dataType);
 
         if (!operatorOverload->MatchDescriber(Describer::PublicStatic))
-            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, base.Index(), source));
+            ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, operatorOverloadNode, dataType));
 
         overloadFunction->SetParent(dataType);
         dataType->PushFunction(overloadFunction);

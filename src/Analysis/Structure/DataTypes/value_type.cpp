@@ -299,7 +299,7 @@ namespace Analysis::Structure::DataTypes
                     CreateOperatorOverload(child, this);
                     break;
                 default:
-                    ExceptionManager::PushException(InvalidGlobalStatementException(child->Token().Index(), parent));
+                    ExceptionManager::PushException(InvalidGlobalStatementException(child, this));
                     break;
             }
         }

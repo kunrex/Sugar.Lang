@@ -8,13 +8,7 @@ namespace Exceptions
     class TypeNotFoundException final : public LogException
     {
         public:
-            TypeNotFoundException(unsigned long index, const Analysis::Structure::SourceFile* source);
-    };
-
-    class InvalidTypeException final : public LogException
-    {
-        public:
-            InvalidTypeException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            TypeNotFoundException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::SourceFile* source);
     };
 }
 

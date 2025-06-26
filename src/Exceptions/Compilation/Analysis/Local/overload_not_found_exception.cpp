@@ -4,10 +4,12 @@
 
 using namespace Tokens::Enums;
 
-using namespace Analysis::Structure;
+using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    OverloadNotFoundException::OverloadNotFoundException(const SyntaxKind kind, const unsigned long index, const SourceFile* const source) : LogException(std::format("No overload found for: {}", ToString(kind)), index, source)
+    OverloadNotFoundException::OverloadNotFoundException(const SyntaxKind kind, const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException(std::format("No overload found for: {}", ToString(kind)), parseNode, dataType)
     { }
 }

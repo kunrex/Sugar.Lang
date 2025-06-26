@@ -54,7 +54,7 @@ namespace Analysis::Structure::Global
             return;
 
         if (context->CreationType() != creationType)
-            ExceptionManager::PushException(InitialisationException(creationType, context->CreationType(), parseNode->Token().Index(), parent->Parent()));
+            ExceptionManager::PushException(InitialisationException(creationType, context->CreationType(), parseNode, parent));
 
         const auto constructor = CheckDescriber(Describer::Static) ? parent->StaticConstructor() : parent->InstanceConstructor();
         constructor->PushTranspilation(this);

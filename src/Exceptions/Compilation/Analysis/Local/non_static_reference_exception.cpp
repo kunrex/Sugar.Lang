@@ -2,12 +2,12 @@
 
 #include <format>
 
-using namespace std;
+using namespace ParseNodes::Core::Interfaces;
 
-using namespace Analysis::Structure;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    NonStaticReferenceException::NonStaticReferenceException(const string& referenced, const unsigned long index, const SourceFile* const source) : LogException(std::format("Trying to reference non static: `{}` from a static scope", referenced), index, source)
+    NonStaticReferenceException::NonStaticReferenceException(const std::string& referenced, const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException(std::format("Trying to reference non static: `{}` from a static scope", referenced), parseNode, dataType)
     { }
 }

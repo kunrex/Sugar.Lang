@@ -1,11 +1,11 @@
 #include "return_accessibility_exception.h"
 
-using namespace std;
+using namespace ParseNodes::Core::Interfaces;
 
-using namespace Analysis::Structure;
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    ReturnAccessibilityException::ReturnAccessibilityException(const unsigned long index, const SourceFile* const source) : LogException("Return type is less accessible than member.", index, source)
+    ReturnAccessibilityException::ReturnAccessibilityException(const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException("Return type is less accessible than member.", parseNode, dataType)
     { }
 }

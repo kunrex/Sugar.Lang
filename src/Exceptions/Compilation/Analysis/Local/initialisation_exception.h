@@ -1,14 +1,14 @@
 #ifndef INITIALISATION_EXCEPTION_H
 #define INITIALISATION_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class InitialisationException final : public LogException
+    class InitialisationException final : public BindingException
     {
         public:
-            InitialisationException(const Analysis::Structure::Core::Interfaces::IDataType* expected, const Analysis::Structure::Core::Interfaces::IDataType* actual, unsigned long index, const Analysis::Structure::SourceFile* source);
+            InitialisationException(const Analysis::Structure::Core::Interfaces::IDataType* expected, const Analysis::Structure::Core::Interfaces::IDataType* actual, const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

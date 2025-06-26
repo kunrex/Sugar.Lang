@@ -43,7 +43,7 @@ namespace Analysis::Structure::Global
         BindScope(parseNode, scope, this, parent);
 
         if (!IsReturnComplete(scope, creationType))
-            ExceptionManager::PushException(ReturnValueException(parseNode->Token().Index(), parent->Parent()));
+            ExceptionManager::PushException(ReturnValueException(parseNode, parent));
     }
 
     void MethodFunction::Transpile(StringBuilder& builder) const

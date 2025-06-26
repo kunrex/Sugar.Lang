@@ -1,15 +1,12 @@
 #include "type_exception.h"
 
-using namespace std;
+using namespace ParseNodes::Core::Interfaces;
 
 using namespace Analysis::Structure;
 
 namespace Exceptions
 {
-    TypeNotFoundException::TypeNotFoundException(const unsigned long index, const SourceFile* const source) : LogException("Failed to reference type", index, source)
-    { }
-
-    InvalidTypeException::InvalidTypeException(const unsigned long index, const SourceFile* const source) : LogException("Type is not applicable", index, source)
+    TypeNotFoundException::TypeNotFoundException(const IParseNode* const parseNode, const SourceFile* const source) : LogException("Failed to reference type", parseNode->Token().Index(), source)
     { }
 }
 

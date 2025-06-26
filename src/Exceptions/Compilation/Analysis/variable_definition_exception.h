@@ -1,14 +1,14 @@
 #ifndef VARIABLE_DEFINITION_EXCEPTION_H
 #define VARIABLE_DEFINITION_EXCEPTION_H
 
-#include "../../log_exception.h"
+#include "binding_exception.h"
 
 namespace Exceptions
 {
-    class DuplicateVariableDefinitionException final : public LogException
+    class DuplicateVariableDefinitionException final : public BindingException
     {
         public:
-            DuplicateVariableDefinitionException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            DuplicateVariableDefinitionException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

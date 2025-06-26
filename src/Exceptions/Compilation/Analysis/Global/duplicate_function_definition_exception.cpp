@@ -1,10 +1,12 @@
 #include "duplicate_function_definition_exception.h"
 
-using namespace Analysis::Structure;
+using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    DuplicateFunctionDefinition::DuplicateFunctionDefinition(const unsigned long index, const SourceFile* const source) : LogException("Scopes already defines a function with the same signature.", index, source)
+    DuplicateFunctionDefinition::DuplicateFunctionDefinition(const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException("Scopes already defines a function with the same signature.", parseNode, dataType)
     { }
 }
 

@@ -1,22 +1,22 @@
 #ifndef INVALID_DESCRIBER_EXCEPTION_H
 #define INVALID_DESCRIBER_EXCEPTION_H
 
-#include "../../log_exception.h"
+#include "binding_exception.h"
 
 #include "../../../Analysis/Structure/Enums/describer.h"
 
 namespace Exceptions
 {
-    class ExpectedDescriberException final : public LogException
+    class ExpectedDescriberException final : public BindingException
     {
         public:
-            ExpectedDescriberException(Analysis::Structure::Enums::Describer value, unsigned long index, const Analysis::Structure::SourceFile* source);
+            ExpectedDescriberException(Analysis::Structure::Enums::Describer value, const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 
-    class InvalidDescriberException final : public LogException
+    class InvalidDescriberException final : public BindingException
     {
         public:
-            InvalidDescriberException(Analysis::Structure::Enums::Describer value, Analysis::Structure::Enums::Describer expected, unsigned long index, const Analysis::Structure::SourceFile* source);
+            InvalidDescriberException(Analysis::Structure::Enums::Describer value, Analysis::Structure::Enums::Describer expected,  const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

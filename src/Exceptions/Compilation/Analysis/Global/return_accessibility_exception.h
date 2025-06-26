@@ -1,14 +1,14 @@
 #ifndef RETURN_ACCESSIBILITY_EXCEPTION_H
 #define RETURN_ACCESSIBILITY_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class ReturnAccessibilityException final : public LogException
+    class ReturnAccessibilityException final : public BindingException
     {
         public:
-            ReturnAccessibilityException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            ReturnAccessibilityException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

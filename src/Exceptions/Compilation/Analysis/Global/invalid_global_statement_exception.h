@@ -1,14 +1,14 @@
 #ifndef INVALID_GLOBAL_STATEMENT_EXCEPTION_H
 #define INVALID_GLOBAL_STATEMENT_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class InvalidGlobalStatementException final : public LogException
+    class InvalidGlobalStatementException final : public BindingException
     {
         public:
-            InvalidGlobalStatementException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            InvalidGlobalStatementException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

@@ -2,8 +2,6 @@
 
 #include <format>
 
-using namespace std;
-
 using namespace Analysis::Structure;
 
 namespace Exceptions

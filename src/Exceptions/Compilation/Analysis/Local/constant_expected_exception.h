@@ -1,14 +1,14 @@
 #ifndef CONSTANT_EXPECTED_EXCEPTION_H
 #define CONSTANT_EXPECTED_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class ConstantNotFoundException final : public LogException
+    class ConstantNotFoundException final : public BindingException
     {
         public:
-            ConstantNotFoundException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            ConstantNotFoundException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

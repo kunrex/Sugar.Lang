@@ -1,14 +1,14 @@
 #ifndef STATIC_BINDING_EXCEPTION_H
 #define STATIC_BINDING_EXCEPTION_H
 
-#include "../../log_exception.h"
+#include "binding_exception.h"
 
 namespace Exceptions
 {
-    class StaticBindingException final : public LogException
+    class StaticBindingException final : public BindingException
     {
         public:
-            StaticBindingException(unsigned long index, const Analysis::Structure::SourceFile* source);
+            StaticBindingException(const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

@@ -1,12 +1,14 @@
 #include "read_write_exception.h"
 
-using namespace Analysis::Structure;
+using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    ReadException::ReadException(const unsigned long index, const SourceFile* const source) : LogException("Cannot read this value", index, source)
+    ReadException::ReadException(const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException("Cannot read this value", parseNode, dataType)
     { }
 
-    WriteException::WriteException(const unsigned long index, const SourceFile* const source) : LogException("Cannot write to this value", index, source)
+    WriteException::WriteException(const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException("Cannot write to this value", parseNode, dataType)
     { }
 }

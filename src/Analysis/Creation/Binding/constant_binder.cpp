@@ -118,7 +118,7 @@ namespace Analysis::Creation::Binding
                 }
                 break;
             default:
-                ExceptionManager::PushException(ConstantNotFoundException(identifierNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(identifierNode, dataType));
                 break;
         }
 
@@ -137,7 +137,7 @@ namespace Analysis::Creation::Binding
 
             if (current->NodeType() != NodeType::Dot)
             {
-                ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
                 return std::nullopt;
             }
 
@@ -146,7 +146,7 @@ namespace Analysis::Creation::Binding
                 const auto characteristic = currentType->FindCharacteristic(*lhs->Token().Value<std::string>());
                 if (characteristic == nullptr)
                 {
-                    ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                    ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
                     return std::nullopt;
                 }
 
@@ -156,7 +156,7 @@ namespace Analysis::Creation::Binding
                 continue;
             }
 
-            ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+            ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
             return std::nullopt;
         }
     }
@@ -188,7 +188,7 @@ namespace Analysis::Creation::Binding
                         case TypeKind::String:
                             return CompilationResult(String::Instance(), *token.Value<std::string>());
                         default:
-                            ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                            ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
                             return std::nullopt;
                     }
                 }
@@ -217,7 +217,7 @@ namespace Analysis::Creation::Binding
                     const auto operation = parseNode->Token().Kind();
                     if (operation == SyntaxKind::Increment || operation == SyntaxKind::Decrement)
                     {
-                        ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
                         return std::nullopt;
                     }
 
@@ -225,7 +225,7 @@ namespace Analysis::Creation::Binding
 
                     if (overload == nullptr)
                     {
-                        ExceptionManager::PushException(OverloadNotFoundException(operation, parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(OverloadNotFoundException(operation, parseNode, dataType));
                         return std::nullopt;
                     }
 
@@ -248,14 +248,14 @@ namespace Analysis::Creation::Binding
 
                     if (overload == nullptr)
                     {
-                        ExceptionManager::PushException(OverloadNotFoundException(parseNode->Token().Kind(), parseNode->Token().Index(), dataType->Parent()));
+                        ExceptionManager::PushException(OverloadNotFoundException(parseNode->Token().Kind(), parseNode, dataType));
                         return std::nullopt;
                     }
 
                     return overload->StaticCompile({ *lhs, *rhs });
                 }
             default:
-                ExceptionManager::PushException(ConstantNotFoundException(parseNode->Token().Index(), dataType->Parent()));
+                ExceptionManager::PushException(ConstantNotFoundException(parseNode, dataType));
                 return std::nullopt;
         }
     }

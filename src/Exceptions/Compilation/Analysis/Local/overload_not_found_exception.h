@@ -1,14 +1,14 @@
 #ifndef OVERLOAD_NOT_FOUND_EXCEPTION_H
 #define OVERLOAD_NOT_FOUND_EXCEPTION_H
 
-#include "../../../log_exception.h"
+#include "../binding_exception.h"
 
 namespace Exceptions
 {
-    class OverloadNotFoundException final : public LogException
+    class OverloadNotFoundException final : public BindingException
     {
         public:
-            OverloadNotFoundException(Tokens::Enums::SyntaxKind kind, unsigned long index, const Analysis::Structure::SourceFile* source);
+            OverloadNotFoundException(Tokens::Enums::SyntaxKind kind, const ParseNodes::Core::Interfaces::IParseNode* parseNode, const Analysis::Structure::Core::Interfaces::IUserDefinedType* dataType);
     };
 }
 

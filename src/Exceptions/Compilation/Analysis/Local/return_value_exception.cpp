@@ -2,10 +2,12 @@
 
 using namespace Tokens::Enums;
 
-using namespace Analysis::Structure;
+using namespace ParseNodes::Core::Interfaces;
+
+using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Exceptions
 {
-    ReturnValueException::ReturnValueException(const unsigned long index, const SourceFile* const source) : LogException("Not all paths return a value", index, source)
+    ReturnValueException::ReturnValueException(const IParseNode* const parseNode, const IUserDefinedType* const dataType) : BindingException("Not all paths return a value", parseNode, dataType)
     { }
 }

@@ -459,8 +459,6 @@ add_library(Sugar STATIC
         Exceptions/Compilation/Analysis/Local/non_static_reference_exception.h
         Exceptions/Compilation/Analysis/Local/accessibility_exception.cpp
         Exceptions/Compilation/Analysis/Local/accessibility_exception.h
-        Exceptions/Compilation/Analysis/Local/func_ref_exception.cpp
-        Exceptions/Compilation/Analysis/Local/func_ref_exception.h
         Analysis/Structure/Context/Entities/Functions/invalid_funcref_context.cpp
         Analysis/Structure/Context/Entities/Functions/invalid_funcref_context.h
         Analysis/Structure/Context/Entities/Functions/copy_context.cpp
@@ -520,4 +518,6 @@ add_library(Sugar STATIC
         Lexing/Tokens/Enums/type_kind.cpp
         Analysis/Structure/Global/Functions/function_definition.cpp
         Analysis/Structure/Global/Functions/function_definition.h
+        Exceptions/Compilation/Analysis/binding_exception.cpp
+        Exceptions/Compilation/Analysis/binding_exception.h
 )
