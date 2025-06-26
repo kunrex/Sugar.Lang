@@ -5,7 +5,7 @@
 #include "../../../Core/Interfaces/DataTypes/i_data_type.h"
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
+using namespace Analysis::Structure::Global;
 
 namespace Analysis::Structure::Context
 {

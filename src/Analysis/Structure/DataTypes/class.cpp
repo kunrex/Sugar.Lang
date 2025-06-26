@@ -322,7 +322,7 @@ namespace Analysis::Structure::DataTypes
         auto flag = false;
         if (FindOverload(SyntaxKind::Equals) == nullptr)
         {
-            const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+            const auto equals = new GeneratedOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
             equals->PushParameterType(this);
             equals->PushParameterType(this);
             PushOverload(equals);
@@ -332,7 +332,7 @@ namespace Analysis::Structure::DataTypes
 
         if (FindOverload(SyntaxKind::NotEquals) == nullptr)
         {
-            const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+            const auto notEquals = new GeneratedOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
             notEquals->PushParameterType(this);
             notEquals->PushParameterType(this);
             PushOverload(notEquals);
@@ -360,15 +360,6 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto constructor: constructors)
             constructor.second->BindLocal();
-
-        for (const auto cast: implicitCasts)
-            cast.second->BindLocal();
-
-        for (const auto cast: explicitCasts)
-            cast.second->BindLocal();
-
-        for (const auto overload: overloads)
-            overload.second->BindLocal();
     }
 
     void ClassSource::Transpile(Services::StringBuilder& builder) const
@@ -386,15 +377,6 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto constructor: constructors)
             constructor.second->Transpile(builder);
-
-        for (const auto cast: implicitCasts)
-            cast.second->Transpile(builder);
-
-        for (const auto cast: explicitCasts)
-            cast.second->Transpile(builder);
-
-        for (const auto overload: overloads)
-            overload.second->Transpile(builder);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

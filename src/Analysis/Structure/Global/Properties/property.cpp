@@ -20,11 +20,13 @@ using namespace Analysis::Creation::Binding;
 using namespace Analysis::Creation::Transpiling;
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
+    PropertyDefinition::PropertyDefinition(const std::string& name, const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const parseNode) : Characteristic(name, describer, creationType, parseNode)
+    { }
+
     Property::Property(const std::string& name, const Enums::Describer describer, const IDataType* const creationType) : PropertyDefinition(name, describer, creationType, nullptr)
     { }
 

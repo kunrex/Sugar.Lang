@@ -62,12 +62,12 @@ namespace Analysis::Structure::Wrappers
 
     void Action::BindGlobal()
     {
-        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate)");
+        const auto equals = new GeneratedOverload(SyntaxKind::Equals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate)");
         equals->PushParameterType(this);
         equals->PushParameterType(this);
         overloads[0] = { SyntaxKind::Equals, equals };
 
-        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate) ldc.i4.0 ceq");
+        const auto notEquals = new GeneratedOverload(SyntaxKind::NotEquals, Boolean::Instance(), "call bool [System.Runtime]System.Delegate::op_Equality(class [System.Runtime]System.Delegate, class [System.Runtime]System.Delegate) ldc.i4.0 ceq");
         notEquals->PushParameterType(this);
         notEquals->PushParameterType(this);
         overloads[1] = { SyntaxKind::NotEquals, notEquals };

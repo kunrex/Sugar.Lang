@@ -2,7 +2,8 @@
 #define DEFINED_UNARY_EXPRESSION_H
 
 #include "../unary_context_node.h"
-#include "../../Creation/Functions/overload_definition.h"
+
+#include "../../Core/Interfaces/Creation/i_function.h"
 
 namespace Analysis::Structure::Context
 {

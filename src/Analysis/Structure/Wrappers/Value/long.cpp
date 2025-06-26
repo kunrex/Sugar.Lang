@@ -151,12 +151,12 @@ namespace Analysis::Structure::Wrappers
         negation->PushParameterType(this);
         builtInOverloads[8] = { SyntaxKind::Minus, negation };
 
-        const auto increment = new ImplicitOverload(SyntaxKind::Increment, this, "ldc.i8 1 add");
+        const auto increment = new GeneratedOverload(SyntaxKind::Increment, this, "ldc.i8 1 add");
         increment->PushParameterType(this);
         increment->PushParameterType(this);
         overloads[0] = { SyntaxKind::Increment, increment };
 
-        const auto decrement = new ImplicitOverload(SyntaxKind::Decrement, this, "ldc.i8 1 sub");
+        const auto decrement = new GeneratedOverload(SyntaxKind::Decrement, this, "ldc.i8 1 sub");
         decrement->PushParameterType(this);
         decrement->PushParameterType(this);
         overloads[1] = { SyntaxKind::Decrement, decrement };

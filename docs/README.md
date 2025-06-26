@@ -95,6 +95,7 @@ Sugar supports custom data structures: `class`, `struct` and `enum`.
 
 ### Memory Implications (`class` vs `struct`)
 
+
 Sugar is garbage collected since it compiles to CIL. The primary difference between a class and a struct in sugar is how they're handled in memory.
 
 | Criteria  | Class                 | Struct                              |
@@ -246,7 +247,7 @@ Enums implicitly define bitwise operations and an explicit conversion to their i
 1. Non Static Classes
 
 - An `(overridable)` explicit conversion to string.
-- `(overridable)` Operator overloads for `==` and `!=`
+- `(overridable)` Operator overloads for `==` and `!=`.
 - A `GetHash` function.
 
 2. Non Static Structs
@@ -256,11 +257,12 @@ Enums implicitly define bitwise operations and an explicit conversion to their i
 
 3. Enums
 
-- An explicit conversion to string
-- A `GetHas` function.
-- Operator Overloads for `~`, `&`, `|`, `>>`, `<<` and `^`
+- An explicit conversion to string.
+- A `GetHash` function.
+- Operator Overloads for `~`, `&`, `|`, `>>`, `<<` and `^`.
 
-Static structs and classes have no implicitly defined functions except an (overridable) static constructor, whenever required.
+4. Static Classes and Structs
+- An `(overridable)` static constructor.
 
 ### Built In Types
 These data types are built into sugar:
@@ -518,7 +520,7 @@ let: x = create Class(param1, param2);
 
 Importing a directory imports all files whereas importing a file imports all public structures within it. You may also import a specific public structure.
 
-## The Entry Point, Executables vs Libraries
+## Entry Point
 
 Here's how `Hello World` looks in Sugar:
 
@@ -533,21 +535,30 @@ class MyFirstProgram
 }
 ```
 
-`entrypoint` in the describer defines that execution will begin from the `HelloWorld` function. By default, this function is also public and static. Naturally only one function can contain this describer. 
+`entrypoint` in the describer defines that execution will begin from the `HelloWorld` function. By default, this function is also public and static and may optionally take an `array<string>`. 
 
-When an entrypoint is defined, the compiler generates an executable (.exe). If no entrypoint is provided, the compiler instead produces a class library (.dll). A class library contains usable structures such as classes and functions, but it does not define a standalone path of execution.
+Naturally only one function can contain this describer.
+
+The presence of an entrypoint allows the generation of an executable. Without the entrypoint only a class library can be generated. 
 
 ## Executing IL
 
-Since the compiler does output a `.il` file, the IL assembler must be used to produce an executable.
+As already mentioned, sugar compiles to CIL and so requires a .NET environment to be executed.
+
+After successful compilation, the generated `.il` file can be assembled into a usable `.exe` or `.dll` using the ilasm tool:
 
 ```bash
-ilasm file.il /exe /output:file.exe
+ilasm file.il /exe # for executables
+ilasm file.il /dll # for class libraries
 ```
 
-a dll must be replaced with `/dll /output:file.dll`
+The resulting .exe can be executed in a .NET-compatible environment (e.g., using dotnet or mono, depending on the target).
 
-If an executable, the resulting `.exe` file can be executed with `mono` or `dotnet` depending on the system
+The resulting .dll can be imported into other .NET projects as a reference, allowing its types and methods to be used just like any other library.
+
+Sugar should run without any issues on
+- **.NET 5.0+**
+- **.NET Standard 2.0+**
 
 ## Questions ?!
 

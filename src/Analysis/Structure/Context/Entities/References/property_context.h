@@ -3,7 +3,7 @@
 
 #include "../../context_node.h"
 
-#include "../../../Creation/Properties/property_definition.h"
+#include "../../../Global/Properties/property.h"
 
 namespace Analysis::Structure::Context
 {
@@ -11,10 +11,10 @@ namespace Analysis::Structure::Context
     {
         private:
             const bool isPublic;
-            const Creation::PropertyDefinition* property;
+            const Global::PropertyDefinition* property;
 
         public:
-            PropertyContext(const Creation::PropertyDefinition* property, bool isPublic);
+            PropertyContext(const Global::PropertyDefinition* property, bool isPublic);
 
             [[nodiscard]] Enums::MemberType MemberType() const override;
 

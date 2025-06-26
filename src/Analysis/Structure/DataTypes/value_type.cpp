@@ -338,15 +338,6 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto constructor: constructors)
             constructor.second->BindLocal();
-
-        for (const auto cast: implicitCasts)
-            cast.second->BindLocal();
-
-        for (const auto cast: explicitCasts)
-            cast.second->BindLocal();
-
-        for (const auto overload: overloads)
-            overload.second->BindLocal();
     }
 
     void StructSource::Transpile(Services::StringBuilder& builder) const
@@ -364,15 +355,6 @@ namespace Analysis::Structure::DataTypes
 
         for (const auto constructor: constructors)
             constructor.second->Transpile(builder);
-
-        for (const auto cast: implicitCasts)
-            cast.second->Transpile(builder);
-
-        for (const auto cast: explicitCasts)
-            cast.second->Transpile(builder);
-
-        for (const auto overload: overloads)
-            overload.second->Transpile(builder);
 
         builder.DecreaseIndent();
         builder.PushLine(close_flower);

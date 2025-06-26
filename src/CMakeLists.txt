@@ -205,16 +205,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Core/Creation/function.h
         Analysis/Structure/Core/Scoped/scoped.cpp
         Analysis/Structure/Core/Scoped/scoped.h
-        Analysis/Structure/Creation/Functions/void_definition.cpp
-        Analysis/Structure/Creation/Functions/void_definition.h
-        Analysis/Structure/Creation/Functions/method_definition.cpp
-        Analysis/Structure/Creation/Functions/method_definition.h
-        Analysis/Structure/Creation/Functions/cast_definition.cpp
-        Analysis/Structure/Creation/Functions/cast_definition.h
-        Analysis/Structure/Creation/Functions/overload_definition.cpp
-        Analysis/Structure/Creation/Functions/overload_definition.h
-        Analysis/Structure/Creation/Properties/property_definition.cpp
-        Analysis/Structure/Creation/Properties/property_definition.h
         Analysis/Structure/Global/Functions/void_function.cpp
         Analysis/Structure/Global/Functions/void_function.h
         Analysis/Structure/Global/Functions/method_function.cpp
@@ -223,10 +213,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Global/Functions/operator_overload.h
         Analysis/Structure/Global/Functions/cast_overload.cpp
         Analysis/Structure/Global/Functions/cast_overload.h
-        Analysis/Structure/Creation/Properties/indexer_definition.cpp
-        Analysis/Structure/Creation/Properties/indexer_definition.h
-        Analysis/Structure/Creation/Functions/constructor_definition.cpp
-        Analysis/Structure/Creation/Functions/constructor_definition.h
         Analysis/Structure/Global/Functions/constructor.cpp
         Analysis/Structure/Global/Functions/constructor.h
         Analysis/Structure/Global/Variables/global_variable.cpp
@@ -369,8 +355,6 @@ add_library(Sugar STATIC
         Parsing/ParseNodes/Properties/assigned_property_node.h
         Analysis/Creation/Binding/local_binder.cpp
         Analysis/Creation/Binding/local_binder.h
-        Analysis/Structure/Creation/Functions/function_definition.cpp
-        Analysis/Structure/Creation/Functions/function_definition.h
         Analysis/Structure/Global/Properties/indexer.cpp
         Analysis/Structure/Global/Properties/indexer.h
         Analysis/Structure/Global/Properties/property.cpp
@@ -534,4 +518,6 @@ add_library(Sugar STATIC
         Analysis/Structure/Context/Expressions/pop_expression.cpp
         Analysis/Structure/Context/Expressions/pop_expression.h
         Lexing/Tokens/Enums/type_kind.cpp
+        Analysis/Structure/Global/Functions/function_definition.cpp
+        Analysis/Structure/Global/Functions/function_definition.h
 )

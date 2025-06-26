@@ -1,8 +1,9 @@
 #ifndef INDEXER_H
 #define INDEXER_H
 
-#include "../../Creation/Properties/indexer_definition.h"
-
+#include "../../Core/created.h"
+#include "../../Core/describable.h"
+#include "../../Core/Interfaces/Creation/i_indexer_definition.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 #include "../../Core/Interfaces/Creation/i_built_in_parametrized.h"
 
@@ -10,7 +11,13 @@
 
 namespace Analysis::Structure::Global
 {
-    class Indexer : public Creation::IndexerDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class IndexerDefinition : public Core::Describable, public Core::Created, public Services::Printable, public virtual Core::Interfaces::IIndexerDefinition
+    {
+        protected:
+            IndexerDefinition(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
+    };
+
+    class Indexer : public IndexerDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         protected:
             const unsigned long parameterCount;
@@ -84,7 +91,7 @@ namespace Analysis::Structure::Global
             [[nodiscard]] const Core::Interfaces::IDataType* ParameterAt(unsigned long index) const override;
     };
 
-    class BuiltInIndexer final : public Creation::IndexerDefinition, public virtual Core::Interfaces::IBuiltInParametrized
+    class BuiltInIndexer final : public IndexerDefinition, public virtual Core::Interfaces::IBuiltInParametrized
     {
         private:
             const bool readable;

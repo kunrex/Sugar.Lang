@@ -2,6 +2,7 @@
 #define FUNCTION_H
 
 #include "../created.h"
+#include "../nameable.h"
 #include "../describable.h"
 #include "../Interfaces/Creation/i_function.h"
 
@@ -13,6 +14,9 @@ namespace Analysis::Structure::Core
             mutable std::string fullName;
 
             Function(Enums::Describer describer, const Interfaces::IDataType* creationType);
+
+        public:
+            const std::string& FullName() const override;
     };
 }
 

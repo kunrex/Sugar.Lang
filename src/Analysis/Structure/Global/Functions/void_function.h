@@ -1,7 +1,7 @@
 #ifndef VOID_FUNCTION_H
 #define VOID_FUNCTION_H
 
-#include "../../Creation/Functions/void_definition.h"
+#include "function_definition.h"
 
 #include "../../Core/Scoped/scoped.h"
 #include "../../Core/built_in_function.h"
@@ -11,7 +11,7 @@
 
 namespace Analysis::Structure::Global
 {
-    class VoidFunction : public Creation::VoidDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class VoidFunction : public VoidDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             VoidFunction(const std::string& name, Enums::Describer describer, const ParseNodes::Core::Interfaces::IParseNode* body);
@@ -39,7 +39,7 @@ namespace Analysis::Structure::Global
             void Transpile(Services::StringBuilder& builder) const override;
     };
 
-    class GeneratedSetFunction final : public Creation::VoidDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class GeneratedSetFunction final : public VoidDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             const std::string variableName;
@@ -60,7 +60,7 @@ namespace Analysis::Structure::Global
             void Transpile(Services::StringBuilder& builder) const override;
     };
 
-    class BuiltInVoid final : public Creation::VoidDefinition, public Core::BuiltInFunction
+    class BuiltInVoid final : public VoidDefinition, public Core::BuiltInFunction
     {
         public:
             BuiltInVoid(const std::string& name, Enums::Describer describer, const std::string& instruction);

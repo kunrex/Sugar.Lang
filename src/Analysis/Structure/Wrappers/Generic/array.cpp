@@ -124,12 +124,12 @@ namespace Analysis::Structure::Wrappers
 
         }
 
-        const auto equals = new ImplicitOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
+        const auto equals = new GeneratedOverload(SyntaxKind::Equals, Boolean::Instance(), "ceq");
         equals->PushParameterType(this);
         equals->PushParameterType(this);
         overloads[0] = { SyntaxKind::Equals, equals };
 
-        const auto notEquals = new ImplicitOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
+        const auto notEquals = new GeneratedOverload(SyntaxKind::NotEquals, Boolean::Instance(), "ceq ldc.i4.0 ceq");
         notEquals->PushParameterType(this);
         notEquals->PushParameterType(this);
         overloads[1] = { SyntaxKind::NotEquals, notEquals };

@@ -6,7 +6,7 @@
 
 namespace Analysis::Structure::Core::Interfaces
 {
-    class IConstructor : public virtual IFunction
+    class IConstructor : public virtual IFunction, public virtual ITranspilable, public virtual ILocallyBindable
     {
         public:
             virtual void PushTranspilation(const ICharacteristic* characteristic) = 0;

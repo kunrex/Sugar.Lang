@@ -52,7 +52,6 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Context;
 using namespace Analysis::Structure::Wrappers;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Creation::Transpiling

@@ -1,17 +1,22 @@
 #ifndef CONSTRUCTOR_H
 #define CONSTRUCTOR_H
 
-#include "../../Creation/Functions/constructor_definition.h"
-
 #include "../../Core/Scoped/scoped.h"
 #include "../../Core/built_in_function.h"
+#include "../../Core/Creation/function.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class Constructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class ConstructorDefinition : public Core::Function, public virtual Core::Interfaces::IConstructor
+    {
+        protected:
+            ConstructorDefinition(Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
+    };
+
+    class Constructor final : public Core::Nameable, public ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             Constructor(Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* body);
@@ -28,7 +33,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class ImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class ImplicitConstructor final : public ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -51,7 +56,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class StaticImplicitConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class StaticImplicitConstructor final : public ConstructorDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -74,7 +79,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class DefinedConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class DefinedConstructor final : public Core::Nameable, public ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -94,7 +99,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class StaticDefinedConstructor final : public Core::Nameable, public Creation::ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class StaticDefinedConstructor final : public Core::Nameable, public ConstructorDefinition, public Core::Scoped, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         private:
             std::vector<const Core::Interfaces::ICharacteristic*> characteristics;
@@ -114,7 +119,7 @@ namespace Analysis::Structure::Global
             void PushTranspilation(const Core::Interfaces::ICharacteristic* characteristic) override;
     };
 
-    class BuiltInConstructor final : public Creation::ConstructorDefinition, public Core::BuiltInFunction
+    class BuiltInConstructor final : public ConstructorDefinition, public Core::BuiltInFunction
     {
         public:
             BuiltInConstructor(const Core::Interfaces::IDataType* creationType, const std::string& instruction);

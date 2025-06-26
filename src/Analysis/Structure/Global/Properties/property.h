@@ -1,15 +1,21 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 
-#include "../../Creation/Properties/property_definition.h"
-
+#include "../../Core/Creation/characteristic.h"
+#include "../../Core/Interfaces/Creation/i_property_signature.h"
 #include "../../Core/Interfaces/DataTypes/i_user_defined_type.h"
 
 #include "../../../../Services/child.h"
 
 namespace Analysis::Structure::Global
 {
-    class Property : public Creation::PropertyDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
+    class PropertyDefinition : public Core::Characteristic, public virtual Core::Interfaces::IPropertySignature
+    {
+        protected:
+            PropertyDefinition(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType, const ParseNodes::Core::Interfaces::IParseNode* parseNode);
+    };
+
+    class Property : public PropertyDefinition, public Services::ConstantChild<Core::Interfaces::IUserDefinedType>
     {
         public:
             Property(const std::string& name, Enums::Describer describer, const Core::Interfaces::IDataType* creationType);
@@ -120,7 +126,7 @@ namespace Analysis::Structure::Global
             void Transpile(Services::StringBuilder& builder) const override;
     };
 
-    class BuiltInProperty final : public Creation::PropertyDefinition
+    class BuiltInProperty final : public PropertyDefinition
     {
         protected:
             const bool readable;

@@ -3,11 +3,13 @@
 using namespace Services;
 
 using namespace Analysis::Structure::Enums;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::Core::Interfaces;
 
 namespace Analysis::Structure::Global
 {
+    IndexerDefinition::IndexerDefinition(const Enums::Describer describer, const IDataType* const creationType) : Describable(describer), Created(creationType)
+    { }
+
     Indexer::Indexer(const Enums::Describer describer, const IDataType* const creationType, const unsigned long parameterCount) : IndexerDefinition(describer, creationType), parameterCount(parameterCount)
     { }
 

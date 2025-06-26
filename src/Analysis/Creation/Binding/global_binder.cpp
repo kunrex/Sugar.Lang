@@ -46,7 +46,6 @@ using namespace Analysis::Structure::Enums;
 using namespace Analysis::Structure::Local;
 using namespace Analysis::Structure::Global;
 using namespace Analysis::Structure::Wrappers;
-using namespace Analysis::Structure::Creation;
 using namespace Analysis::Structure::DataTypes;
 using namespace Analysis::Structure::Core::Interfaces;
 
@@ -271,7 +270,7 @@ namespace Analysis::Creation::Binding
         else if ((describer & Describer::Static) == Describer::Static)
             getDescriber = getDescriber | Describer::Static;
 
-        const auto get = new MethodFunction("__get__" + value, getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto get = new MethodFunction("get_" + value, getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(get->Name(), { }) != nullptr)
         {
             ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), dataType->Parent()));
@@ -294,7 +293,7 @@ namespace Analysis::Creation::Binding
         else if ((describer & Describer::Static) == Describer::Static)
             setDescriber = setDescriber | Describer::Static;
 
-        const auto set = new VoidFunction("__set__" + value, setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto set = new VoidFunction("set_" + value, setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(set->Name(), { creationType }) != nullptr)
         {
             ExceptionManager::PushException(DuplicateFunctionDefinition(setNode->Token().Index(), dataType->Parent()));
@@ -500,7 +499,7 @@ namespace Analysis::Creation::Binding
         if (getDescriber == Describer::None)
             getDescriber = describer;
 
-        const auto get = new MethodFunction("__get__", getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto get = new MethodFunction("this_get", getDescriber, creationType, getNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(get->Name(), parameters) != nullptr)
         {
             ExceptionManager::PushException(DuplicateFunctionDefinition(getNode->Token().Index(), dataType->Parent()));
@@ -527,7 +526,7 @@ namespace Analysis::Creation::Binding
         std::vector extended(parameters);
         extended.push_back(creationType);
 
-        const auto set = new VoidFunction("__set__", setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
+        const auto set = new VoidFunction("this_set", setDescriber, setNode->GetChild(static_cast<int>(ChildCode::Body)));
         if (dataType->FindFunction(set->Name(), extended) != nullptr)
         {
             ExceptionManager::PushException(DuplicateFunctionDefinition(setNode->Token().Index(), dataType->Parent()));
@@ -873,15 +872,25 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto explicitCast = new ExplicitCast(FromNode(explicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, explicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
-        BindFunctionParameters(explicitCast, parameters, declarationNode, source);
+        const auto castFunction = new MethodFunction("explicit_" + creationType->Name(), FromNode(explicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, explicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
+        if  (dataType->FindFunction(castFunction->Name(), parameters) != nullptr)
+        {
+            delete castFunction;
 
-        MatchReturnAccessibility(explicitCast, index, dataType);
+            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            return;
+        }
 
-        if (!explicitCast->MatchDescriber(Describer::PublicStatic))
+        const auto explicitCast = new CastOverload(castFunction);
+        BindFunctionParameters(castFunction, parameters, declarationNode, source);
+
+        MatchReturnAccessibility(castFunction, index, dataType);
+
+        if (!castFunction->MatchDescriber(Describer::PublicStatic))
             ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, index, source));
 
-        explicitCast->SetParent(dataType);
+        castFunction->SetParent(dataType);
+        dataType->PushFunction(castFunction);
         dataType->PushExplicitCast(explicitCast);
     }
 
@@ -922,15 +931,25 @@ namespace Analysis::Creation::Binding
             return;
         }
 
-        const auto implicitCast = new ImplicitCast(FromNode(implicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, implicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
-        BindFunctionParameters(implicitCast, parameters, declarationNode, source);
+        const auto castFunction = new MethodFunction("implicit_" + creationType->Name(), FromNode(implicitCastNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, implicitCastNode->GetChild(static_cast<int>(ChildCode::Body)));
+        if  (dataType->FindFunction(castFunction->Name(), parameters) != nullptr)
+        {
+            delete castFunction;
 
-        MatchReturnAccessibility(implicitCast, index, dataType);
+            ExceptionManager::PushException(DuplicateFunctionDefinition(index, source));
+            return;
+        }
 
-        if (!implicitCast->MatchDescriber(Describer::PublicStatic))
+        const auto implicitCast = new CastOverload(castFunction);
+        BindFunctionParameters(castFunction, parameters, declarationNode, source);
+
+        MatchReturnAccessibility(castFunction, index, dataType);
+
+        if (!castFunction->MatchDescriber(Describer::PublicStatic))
             ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, index, source));
 
-        implicitCast->SetParent(dataType);
+        castFunction->SetParent(dataType);
+        dataType->PushFunction(castFunction);
         dataType->PushImplicitCast(implicitCast);
     }
 
@@ -954,43 +973,47 @@ namespace Analysis::Creation::Binding
         std::vector<const IDataType*> parameters;
         BindFunctionParameters(declarationNode, parameters, source);
 
+        bool flag = false;
+        for (const auto parameter : parameters)
+            if (parameter != dataType)
+            {
+                flag = true;
+                break;
+            }
 
         if ((static_cast<OperatorKind>(base.Kind()) & OperatorKind::Assignment) == OperatorKind::Assignment)
             ExceptionManager::PushException(LogException("Cannot overload the assignment operator or any of its derivatives", base.Index(), source));
 
-        switch (base.Kind())
+        if (base.Type() == TokenType::UnaryOperator && (parameters.size() != 1 || flag))
+            ExceptionManager::PushException(LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), base.Index(), source));
+        else if (parameters.size() != 2 || flag)
+            ExceptionManager::PushException(LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), base.Index(), source));
+
+        if (dataType->FindOverload(base.Kind()) != nullptr)
         {
-            case SyntaxKind::Increment:
-            case SyntaxKind::Decrement:
-            case SyntaxKind::IncrementPrefix:
-            case SyntaxKind::DecrementPrefix:
-            case SyntaxKind::Not:
-            case SyntaxKind::Plus:
-            case SyntaxKind::Minus:
-            case SyntaxKind::BitwiseNot:
-            case SyntaxKind::BitwiseAnd:
-                {
-                    if (parameters.size() != 1)
-                        ExceptionManager::PushException(LogException(std::format("Expected 1 argument of type: {}.", dataType->FullName()), base.Index(), source));
-                }
-                break;
-            default:
-                {
-                    if (parameters.size() != 2)
-                        ExceptionManager::PushException(LogException(std::format("Expected 2 arguments of type: {}.", dataType->FullName()), base.Index(), source));
-                }
-                break;
+            ExceptionManager::PushException(DuplicateFunctionDefinition(base.Index(), source));
+            return;
         }
 
-        const auto operatorOverload = new OperatorOverload(base.Kind(), FromNode(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Body)));
-        BindFunctionParameters(operatorOverload, parameters, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters)), source);
+        const auto overloadFunction = new MethodFunction(std::format("operator_{}", ToString(base.Kind())), FromNode(operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Describer))), creationType, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Body)));
+        if  (dataType->FindFunction(overloadFunction->Name(), parameters) != nullptr)
+        {
+            delete overloadFunction;
 
-        MatchReturnAccessibility(operatorOverload, base.Index(), dataType);
+            ExceptionManager::PushException(DuplicateFunctionDefinition(base.Index(), source));
+            return;
+        }
+
+        const auto operatorOverload = new OperatorOverload(base.Kind(), overloadFunction);
+        BindFunctionParameters(overloadFunction, parameters, operatorOverloadNode->GetChild(static_cast<int>(ChildCode::Parameters)), source);
+
+        MatchReturnAccessibility(overloadFunction, base.Index(), dataType);
 
         if (!operatorOverload->MatchDescriber(Describer::PublicStatic))
             ExceptionManager::PushException(ExpectedDescriberException(Describer::PublicStatic, base.Index(), source));
 
-        operatorOverload->SetParent(dataType);
+        overloadFunction->SetParent(dataType);
+        dataType->PushFunction(overloadFunction);
         dataType->PushOverload(operatorOverload);
     }
 

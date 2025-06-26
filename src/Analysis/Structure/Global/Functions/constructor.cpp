@@ -23,6 +23,9 @@ const auto defaultConstructor = Tokens::Token(0, Tokens::Enums::TokenType::Const
 
 namespace Analysis::Structure::Global
 {
+    ConstructorDefinition::ConstructorDefinition(const Enums::Describer describer, const IDataType* const creationType) : Function(describer, creationType)
+    { }
+
     Constructor::Constructor(const Enums::Describer describer, const IDataType* const creationType, const IParseNode* const body) : Nameable(".ctor"), ConstructorDefinition(describer, creationType), Scoped(body)
     { }
 
@@ -78,7 +81,7 @@ namespace Analysis::Structure::Global
     void Constructor::PushTranspilation(StringBuilder& builder, int& slotSize) const
     { }
 
-    ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : Nameable(".ctor"), ConstructorDefinition(describer, creationType)
+    ImplicitConstructor::ImplicitConstructor(const Enums::Describer describer, const IDataType* const creationType) : ConstructorDefinition(describer, creationType)
     { }
 
     MemberType ImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
@@ -144,12 +147,12 @@ namespace Analysis::Structure::Global
         }
     }
 
-    StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : Nameable(".cctor"), ConstructorDefinition(Describer::Private | Describer::Static, creationType)
+    StaticImplicitConstructor::StaticImplicitConstructor(const IDataType* const creationType) : ConstructorDefinition(Describer::Private | Describer::Static, creationType)
     { }
 
     MemberType StaticImplicitConstructor::MemberType() const { return MemberType::GeneratedConstructor; }
 
-    const std::string& StaticImplicitConstructor::FullName() const { return name; }
+    const std::string& StaticImplicitConstructor::FullName() const { return fullName; }
 
     unsigned long StaticImplicitConstructor::ParameterCount() const { return 0; }
 
