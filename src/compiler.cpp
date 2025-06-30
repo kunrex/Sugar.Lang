@@ -181,6 +181,7 @@ void Compiler::Compile() const
         Math::BindGlobalInstance();
 
         source->BindGlobal();
+
         if (ExceptionManager::LogAllExceptions())
         {
             delete source;

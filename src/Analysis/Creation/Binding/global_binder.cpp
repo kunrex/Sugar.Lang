@@ -673,7 +673,7 @@ namespace Analysis::Creation::Binding
 
     void CreateFunction(const IParseNode* const functionCreationNode, IUserDefinedType* const dataType)
     {
-        const auto identifierNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Expression));
+        const auto identifierNode = functionCreationNode->GetChild(static_cast<int>(ChildCode::Identifier));
         const auto identifier = identifierNode->Token();
 
         const auto value = *identifier.Value<std::string>();
